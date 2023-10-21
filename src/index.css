@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+
+  .center {
+    @apply flex flex-col items-center justify-center h-screen
+  }
+
+  .login-form {
+    @apply bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-xs
+  }
+
+  .login-title {
+    @apply block text-gray-700 font-bold text-center text-xl mb-3
+  }
+
+  .input-form {
+    @apply mt-1 mb-3 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+    focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
+    disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
+    invalid:border-pink-500 invalid:text-pink-600
+    focus:invalid:border-pink-500 focus:invalid:ring-pink-500
+  }
+
+  .input-form-highlighted {
+    @apply mt-1 mb-3 block w-full px-3 py-2 bg-yellow-200 border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+    focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
+    disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
+    invalid:border-pink-500 invalid:text-pink-600
+    focus:invalid:border-pink-500 focus:invalid:ring-pink-500
+  }
+
+  .label {
+    @apply block text-gray-700 text-sm font-bold mb-2 
+  }
+
+  .error-label {
+    @apply my-auto text-red-500 text-sm
+  }
+
+  .success-label {
+    @apply my-auto text-green-600 text-sm
+  }
+
+  .button {
+    @apply inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 my-2 rounded-md
+    transition ease-in-out duration-150 disabled:bg-blue-300  disabled:cursor-not-allowed
+  }
+
+  .white-spin {
+    @apply animate-spin -ml-1 mr-3 h-5 w-5 text-white
+  }
+
+  .cancel-button {
+    @apply inline-flex items-center bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 mb-2 rounded-md
+    transition ease-in-out duration-150 disabled:bg-blue-300  disabled:cursor-not-allowed
+  }
+
+  .delete-button {
+    @apply inline-flex items-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 mb-2 rounded-md
+    transition ease-in-out duration-150 disabled:bg-blue-300  disabled:cursor-not-allowed
+  }
+
+  .button-tip {
+    @apply absolute w-auto p-2 mb-24 rounded-md shadow-md text-white 
+    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-top
+  }
+
+  .sidebar::-webkit-scrollbar {
+    display: none
+  }
+
+  .sidebar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    @apply fixed top-0 left-0 flex landscape:flex-col landscape:h-screen landscape:w-1/12 landscape:min-w-max landscape:min-h-max landscape:overflow-y-auto landscape:overflow-x-hidden
+    portrait:flex-row portrait:h-[10%] portrait:w-screen portrait:min-h-max portrait:overflow-x-auto portrait:overflow-y-hidden bg-primary shadow-lg 
+  }
+
+  .sidebar-icon {
+    @apply relative flex items-center justify-center landscape:w-full landscape:h-24 landscape:px-1 
+    landscape:py-3  portrait:h-full portrait:py-1 portrait:px-3 portrait:w-24
+    hover:bg-secondary transition-all duration-200 ease-linear cursor-pointer select-none
+  }
+
+  .sidebar-icon-selected {
+    @apply relative flex items-center justify-center landscape:w-full landscape:h-24 landscape:px-1 
+    landscape:py-3 portrait:h-full portrait:py-1 portrait:px-3 portrait:w-24
+    portrait:border-b-2 landscape:border-r-2 border-black bg-white pointer-events-none select-none
+  }
+
+  .sidebar-tip {
+    @apply absolute w-auto p-2 m-2 min-w-max landscape:left-[100%] portrait:top-[100%] rounded-md shadow-md text-white 
+    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-left
+  }
+
+  .selected-tab {
+    @apply mr-2 inline-block p-4 text-blue-600 bg-gray-200 rounded-t-lg 
+    hover:bg-gray-300 hover:text-blue-700 cursor-pointer
+  }
+
+  .tab {
+    @apply mr-2 inline-block p-4 text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-100 cursor-pointer
+  }
+
+  .editable-input {
+    @apply my-2 block w-1/2 px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+    focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
+    disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
+    invalid:border-pink-500 invalid:text-pink-600
+    focus:invalid:border-pink-500 focus:invalid:ring-pink-500
+  }
+
+  .add-input {
+    @apply my-2 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+    focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
+    invalid:border-pink-500 invalid:text-pink-600
+    focus:invalid:border-pink-500 focus:invalid:ring-pink-500
+  }
+
+  .reservation-tip {
+    @apply absolute w-[178px] h-auto p-2 mx-auto bottom-[60%] rounded-md shadow-md text-white 
+    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-left
+  }
+}
