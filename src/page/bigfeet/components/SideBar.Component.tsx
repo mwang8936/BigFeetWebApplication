@@ -7,6 +7,7 @@ import CustomersIcon from '../../../assets/Customers_Icon.svg';
 import { SideBarItems } from '../BigFeet.Page';
 import { logout } from '../../../service/auth.service';
 import { useAuthenticationContext } from '../../../App';
+import { useTranslation } from 'react-i18next';
 
 interface SideBarProp {
 	selectedIndex: number;
@@ -15,9 +16,10 @@ interface SideBarProp {
 }
 
 export default function SideBar(prop: SideBarProp) {
+	const { t } = useTranslation();
 	const { setAuthentication } = useAuthenticationContext();
 	return (
-		<div className='sidebar'>
+		<div className="sidebar">
 			{prop.sideBarItems.includes(SideBarItems.Profile) && (
 				<div
 					className={
@@ -27,11 +29,10 @@ export default function SideBar(prop: SideBarProp) {
 					}
 					onClick={() => {
 						prop.onIndexSelected(SideBarItems.Profile);
-					}}
-				>
-					<img src={ProfileIcon} className='h-16 w-16' />
-					<span className='sidebar-tip group-hover:scale-100'>
-						Profile
+					}}>
+					<img src={ProfileIcon} className="h-16 w-16" />
+					<span className="sidebar-tip group-hover:scale-100">
+						{t('Profile')}
 					</span>
 				</div>
 			)}
@@ -45,11 +46,10 @@ export default function SideBar(prop: SideBarProp) {
 					}
 					onClick={() => {
 						prop.onIndexSelected(SideBarItems.Scheduler);
-					}}
-				>
-					<img src={SchedulerIcon} className='h-16 w-16' />
-					<span className='sidebar-tip group-hover:scale-100'>
-						Schedule
+					}}>
+					<img src={SchedulerIcon} className="h-16 w-16" />
+					<span className="sidebar-tip group-hover:scale-100">
+						{t('Schedule')}
 					</span>
 				</div>
 			)}
@@ -63,11 +63,10 @@ export default function SideBar(prop: SideBarProp) {
 					}
 					onClick={() => {
 						prop.onIndexSelected(SideBarItems.PayRoll);
-					}}
-				>
-					<img src={PayRollIcon} className='h-16 w-16' />
-					<span className='sidebar-tip group-hover:scale-100'>
-						Pay Roll
+					}}>
+					<img src={PayRollIcon} className="h-16 w-16" />
+					<span className="sidebar-tip group-hover:scale-100">
+						{t('Pay Roll')}
 					</span>
 				</div>
 			)}
@@ -81,11 +80,10 @@ export default function SideBar(prop: SideBarProp) {
 					}
 					onClick={() => {
 						prop.onIndexSelected(SideBarItems.Employees);
-					}}
-				>
-					<img src={EmployeesIcon} className='h-16 w-16' />
-					<span className='sidebar-tip group-hover:scale-100'>
-						Employees
+					}}>
+					<img src={EmployeesIcon} className="h-16 w-16" />
+					<span className="sidebar-tip group-hover:scale-100">
+						{t('Employees')}
 					</span>
 				</div>
 			)}
@@ -99,11 +97,10 @@ export default function SideBar(prop: SideBarProp) {
 					}
 					onClick={() => {
 						prop.onIndexSelected(SideBarItems.Services);
-					}}
-				>
-					<img src={ServicesIcon} className='h-16 w-16' />
-					<span className='sidebar-tip group-hover:scale-100'>
-						Services
+					}}>
+					<img src={ServicesIcon} className="h-16 w-16" />
+					<span className="sidebar-tip group-hover:scale-100">
+						{t('Services')}
 					</span>
 				</div>
 			)}
@@ -117,22 +114,20 @@ export default function SideBar(prop: SideBarProp) {
 					}
 					onClick={() => {
 						prop.onIndexSelected(SideBarItems.Customers);
-					}}
-				>
-					<img src={CustomersIcon} className='h-16 w-16' />
-					<span className='sidebar-tip group-hover:scale-100'>
-						Customers
+					}}>
+					<img src={CustomersIcon} className="h-16 w-16" />
+					<span className="sidebar-tip group-hover:scale-100">
+						{t('Customers')}
 					</span>
 				</div>
 			)}
 
 			<div
-				className='sidebar-icon landscape:mt-auto landscape:py-5 portrait:ml-auto portrait:px-5 text-center'
+				className="sidebar-icon landscape:mt-auto landscape:py-5 portrait:ml-auto portrait:px-5 text-center"
 				onClick={() => {
 					logout(setAuthentication);
-				}}
-			>
-				Log Out
+				}}>
+				{t('Log Out')}
 			</div>
 		</div>
 	);

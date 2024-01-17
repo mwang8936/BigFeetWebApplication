@@ -14,18 +14,14 @@ export async function getCustomers(navigate: NavigateFunction) {
 
 export async function getCustomer(
 	navigate: NavigateFunction,
-	phone_number: number
+	phone_number: string
 ) {
-	return authorizedRequest(
-		navigate,
-		`${customerPath}/${phone_number}`,
-		'get'
-	);
+	return authorizedRequest(navigate, `${customerPath}/${phone_number}`, 'get');
 }
 
 export async function updateCustomer(
 	navigate: NavigateFunction,
-	phone_number: number,
+	phone_number: string,
 	request: UpdateCustomerRequest
 ) {
 	return authorizedRequest(
@@ -45,7 +41,7 @@ export async function addCustomer(
 
 export async function deleteCustomer(
 	navigate: NavigateFunction,
-	phone_number: number
+	phone_number: string
 ) {
 	return authorizedRequest(
 		navigate,

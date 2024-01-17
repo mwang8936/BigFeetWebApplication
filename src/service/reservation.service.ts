@@ -39,7 +39,7 @@ export async function updateReservation(
 	return authorizedRequest(
 		navigate,
 		`${reservationPath}/${reservation_id}`,
-		'update',
+		'patch',
 		request
 	);
 }

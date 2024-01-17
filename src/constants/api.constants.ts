@@ -8,3 +8,4 @@ export const profilePath = 'profile';
 export const reservationPath = 'reservation';
 export const schedulePath = 'schedule';
 export const servicePath = 'service';
+export const vipPackagePath = 'vip-package';

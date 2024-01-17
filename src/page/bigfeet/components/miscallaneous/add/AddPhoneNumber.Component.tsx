@@ -1,0 +1,77 @@
+import { FC } from 'react';
+import LENGTHS from '../../../../../constants/lengths.constants';
+import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
+import PATTERNS from '../../../../../constants/patterns.constants';
+
+interface ValidationProp {
+	required: boolean;
+	requiredMessage?: string;
+	invalid: boolean;
+	setInvalid(invalid: boolean): void;
+	invalidMessage: string;
+}
+
+interface AddPhoneNumberProp {
+	phoneNumber: string | null;
+	setPhoneNumber(phoneNumber: string | null): void;
+	label: string;
+	name: string;
+	validationProp: ValidationProp;
+}
+
+const AddPhoneNumber: FC<AddPhoneNumberProp> = ({
+	phoneNumber,
+	setPhoneNumber,
+	label,
+	name,
+	validationProp,
+}) => {
+	const formatPhoneNumber = (number: string): string => {
+		const cleanedNumber = number.replace(/\D/g, ''); // Remove non-numeric characters
+		if (cleanedNumber.length > 6) {
+			return `(${cleanedNumber.slice(0, 3)}) ${cleanedNumber.slice(
+				3,
+				6
+			)}-${cleanedNumber.slice(6, 10)}`;
+		} else {
+			return cleanedNumber;
+		}
+	};
+
+	return (
+		<div className="mb-4">
+			<label className="label" htmlFor={name}>
+				{label}
+			</label>
+			<div className="flex rounded-md shadow-sm">
+				<input
+					className="add-input"
+					id={name}
+					type="tel"
+					value={formatPhoneNumber(phoneNumber || '')}
+					onChange={(event) => {
+						const text = event.target.value.replace(/\D/g, '');
+
+						setPhoneNumber(text.length === 0 ? null : text);
+						validationProp.setInvalid(!event.target.validity.valid);
+					}}
+					pattern={PATTERNS.customer.phone_number}
+					maxLength={LENGTHS.customer.phone_number}
+					required={validationProp.required}
+					placeholder={PLACEHOLDERS.customer.phone_number}
+				/>
+			</div>
+			{validationProp.required &&
+			(phoneNumber === null || phoneNumber.length === 0) ? (
+				<p className="error-label">{validationProp.requiredMessage}</p>
+			) : (
+				validationProp.invalid &&
+				!(phoneNumber === null || phoneNumber.length === 0) && (
+					<p className="error-label">{validationProp.invalidMessage}</p>
+				)
+			)}
+		</div>
+	);
+};
+
+export default AddPhoneNumber;

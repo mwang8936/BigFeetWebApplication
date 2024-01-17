@@ -1,16 +1,25 @@
-import { useState } from 'react';
-import AddButton from '../miscallaneous/AddButton.Component';
+import { FC, useState } from 'react';
 import { useEmployeesContext, useUserContext } from '../../BigFeet.Page';
-import { Gender, Permissions, Role } from '../../../../models/enums';
+import { Permissions } from '../../../../models/enums';
 import { addEmployee } from '../../../../service/employee.service';
-import AddEmployee from './AddEmployee.Component';
 import Tabs from '../miscallaneous/Tabs.Component';
-import EditEmployee from './EditEmployee.Component';
+import EditEmployee from './components/EditEmployee.Component';
 import { useNavigate } from 'react-router-dom';
+import PermissionsButton, {
+	ButtonType,
+} from '../miscallaneous/PermissionsButton.Component';
+import ERRORS from '../../../../constants/error.constants';
+import AddEmployeeModal from '../miscallaneous/modals/employee/AddEmployeeModal.Component';
+import { AddEmployeeRequest } from '../../../../models/requests/Employee.Request.Model';
+import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
-export default function Employees() {
+const Employees: FC = () => {
+	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const [selectedTab, setSelectedTab] = useState(0);
+
+	const [openAddModal, setOpenAddModal] = useState<boolean>(false);
 
 	const { employees, setEmployees } = useEmployeesContext();
 	const { user } = useUserContext();
@@ -27,97 +36,61 @@ export default function Employees() {
 
 	const tabs = employees.map((employee) => employee.username);
 
-	const [adding, setAdding] = useState(false);
-	const [addError, setAddError] = useState('');
-	const [addSuccess, setAddSuccess] = useState('');
-
-	const [gender, setGender] = useState<Gender | null>(null);
-	const [role, setRole] = useState<Role | null>(null);
-	const [permissions, setPermissions] = useState<Permissions[]>([]);
-
-	const onAdd = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		setAddError('');
-		setAddSuccess('');
-		const username: string | undefined =
-			event.currentTarget.username?.value?.trim();
-		const password: string | undefined =
-			event.currentTarget.password?.value?.trim();
-		const first_name: string | undefined =
-			event.currentTarget.first_name?.value?.trim();
-		const last_name: string | undefined =
-			event.currentTarget.last_name?.value?.trim();
-		const body_rate: number | undefined =
-			event.currentTarget.body_rate?.value == ''
-				? undefined
-				: event.currentTarget.body_rate?.value;
-		const feet_rate: number | undefined =
-			event.currentTarget.feet_rate?.value == ''
-				? undefined
-				: event.currentTarget.feet_rate?.value;
-		const per_hour: number | undefined =
-			event.currentTarget.per_hour?.value == ''
-				? undefined
-				: event.currentTarget.per_hour?.value;
-
-		if (
-			!username ||
-			!password ||
-			!first_name ||
-			!last_name ||
-			!gender ||
-			!role
-		) {
-			setAddError('Missing Required Field');
-		} else {
-			const addEmployeeRequest = {
-				username,
-				password,
-				first_name,
-				last_name,
-				gender,
-				role,
-				permissions,
-				body_rate,
-				feet_rate,
-				per_hour,
-			};
-			setAdding(true);
-			addEmployee(navigate, addEmployeeRequest)
-				.then((response) => {
-					const updatedEmployees = employees;
-					updatedEmployees.push(response);
-					setEmployees(updatedEmployees);
-					setAddSuccess('Successfully Added');
-				})
-				.catch((error) => setAddError(error.message))
-				.finally(() => setAdding(false));
-		}
+	const onAdd = async (addEmployeeRequest: AddEmployeeRequest) => {
+		const toastId = toast.loading(t('Adding Employee...'));
+		addEmployee(navigate, addEmployeeRequest)
+			.then((response) => {
+				setEmployees([...employees, response]);
+				toast.update(toastId, {
+					render: t('Employee Added Successfully'),
+					type: 'success',
+					isLoading: false,
+					position: 'top-right',
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					pauseOnFocusLoss: true,
+					draggable: true,
+					theme: 'light',
+				});
+			})
+			.catch((error) => {
+				toast.update(toastId, {
+					render: (
+						<h1>
+							{t('Failed to Add Employee')} <br />
+							{error.message}
+						</h1>
+					),
+					type: 'error',
+					isLoading: false,
+					position: 'top-right',
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					pauseOnFocusLoss: true,
+					draggable: true,
+					theme: 'light',
+				});
+			});
 	};
 
 	return (
-		<div className='w-11/12 mx-auto h-full flex-col'>
-			<div className='h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between'>
-				<h1 className='my-auto text-gray-600 text-3xl'>Employees</h1>
-				<div className='h-fit my-auto flex'>
-					<AddButton
-						element={
-							<AddEmployee
-								setGender={setGender}
-								setRole={setRole}
-								setPermissions={setPermissions}
-							/>
-						}
-						elementTitle='Add Employee'
-						loading={adding}
+		<div className="w-11/12 mx-auto h-full flex-col">
+			<div className="h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
+				<h1 className="my-auto text-gray-600 text-3xl">{t('Employees')}</h1>
+				<div className="h-fit my-auto flex">
+					<PermissionsButton
+						btnTitle={t('Add Employee')}
+						btnType={ButtonType.ADD}
+						top={false}
 						disabled={!creatable}
-						missingPermissionMessage='You do not have permission to create employees.'
-						onAdd={onAdd}
-						addBtnTitle='Add Employee'
-						addingBtnTitle='Adding Employee...'
-						addTitle='Create Employee'
-						error={addError}
-						success={addSuccess}
+						missingPermissionMessage={ERRORS.employee.permissions.add}
+						onClick={() => {
+							setOpenAddModal(true);
+						}}
 					/>
 				</div>
 			</div>
@@ -126,10 +99,16 @@ export default function Employees() {
 				selectedTab={selectedTab}
 				onTabSelected={setSelectedTab}
 			/>
-			<div className='mt-8 mb-4'>
+			<AddEmployeeModal
+				open={openAddModal}
+				setOpen={setOpenAddModal}
+				creatable={creatable}
+				onAddEmployee={onAdd}
+			/>
+			<div className="mt-8 mb-4">
 				{employees.length <= 0 ? (
-					<h1 className='m-auto text-gray-600 text-3xl'>
-						No Employees Created
+					<h1 className="m-auto text-gray-600 text-3xl">
+						{t('No Employees Created')}
 					</h1>
 				) : (
 					<>
@@ -145,4 +124,6 @@ export default function Employees() {
 			</div>
 		</div>
 	);
-}
+};
+
+export default Employees;

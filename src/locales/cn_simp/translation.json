@@ -1,0 +1,14 @@
+{
+    "Retry": "Retry",
+    "Retrying": "Retrying",
+    "Profile": "Profile",
+    "Schedule": "Schedule",
+    "Pay Roll": "Pay Roll",
+    "Employees": "Employees",
+    "Services": "Services",
+    "Customers": "Customers",
+    "Log Out": "Log Out",
+    "welcome": "Welcome!",
+    "greeting": "Hello, {{name}}!",
+    "buttonLabel": "Click me"
+}

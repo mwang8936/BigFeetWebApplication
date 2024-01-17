@@ -1,79 +1,158 @@
 import PATTERNS from '../../../../../constants/patterns.constants';
 import LENGTHS from '../../../../../constants/lengths.constants';
-import EditableInput from '../../miscallaneous/EditableInput.Component';
-import SaveButton from '../../miscallaneous/SaveButton.Component';
-import { useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { updateEmployee } from '../../../../../service/employee.service';
 import { useNavigate } from 'react-router-dom';
 import { useEmployeesContext, useUserContext } from '../../../BigFeet.Page';
 import { Gender } from '../../../../../models/enums';
-import EditableDropDown from '../../miscallaneous/EditableDropDown.Component';
+import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
 import { genderDropDownItems } from '../../../../../constants/drop-down.constants';
+import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
+import ERRORS from '../../../../../constants/error.constants';
+import EditableInput from '../../miscallaneous/editable/EditableInput.Component';
+import LABELS from '../../../../../constants/label.constants';
+import NAMES from '../../../../../constants/name.constants';
+import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
+import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
+import { ToastContainer, toast } from 'react-toastify';
 import Employee from '../../../../../models/Employee.Model';
+import { useTranslation } from 'react-i18next';
 
 interface PersonalProp {
 	editable: boolean;
-	username: string;
-	firstName: string;
-	lastName: string;
-	gender: Gender;
+	originalUsername: string;
+	originalFirstName: string;
+	originalLastName: string;
+	originalGender: Gender;
 }
 
-export default function Personal(prop: PersonalProp) {
+const Personal: FC<PersonalProp> = ({
+	editable,
+	originalUsername,
+	originalFirstName,
+	originalLastName,
+	originalGender,
+}) => {
+	const { t } = useTranslation();
 	const navigate = useNavigate();
 
-	const [saving, setSaving] = useState(false);
-	const [error, setError] = useState('');
-	const [success, setSuccess] = useState('');
+	const [usernameInput, setUsernameInput] = useState<string | null>(
+		originalUsername
+	);
+	const [firstNameInput, setFirstNameInput] = useState<string | null>(
+		originalFirstName
+	);
+	const [lastNameInput, setLastNameInput] = useState<string | null>(
+		originalLastName
+	);
+	const [genderInput, setGenderInput] = useState<Gender | null>(originalGender);
+
+	const [invalidUsername, setInvalidUsername] = useState<boolean>(false);
+	const [invalidFirstName, setInvalidFirstName] = useState<boolean>(false);
+	const [invalidLastName, setInvalidLastName] = useState<boolean>(false);
+
+	const [changesMade, setChangesMade] = useState<boolean>(false);
+	const [missingRequiredInput, setMissingRequiredInput] =
+		useState<boolean>(false);
+	const [invalidInput, setInvalidInput] = useState<boolean>(false);
+
+	useEffect(() => {
+		setUsernameInput(originalUsername);
+		setFirstNameInput(originalFirstName);
+		setLastNameInput(originalLastName);
+		setGenderInput(originalGender);
+
+		setChangesMade(false);
+		setMissingRequiredInput(false);
+		setInvalidUsername(false);
+		setInvalidFirstName(false);
+		setInvalidLastName(false);
+		setInvalidInput(false);
+	}, [originalUsername, originalFirstName, originalLastName, originalGender]);
+
+	useEffect(() => {
+		const trimmedUsername = usernameInput ? usernameInput.trim() : null;
+		const username: string | null | undefined =
+			trimmedUsername === originalUsername ? undefined : trimmedUsername;
+		const trimmedFirstName = firstNameInput ? firstNameInput.trim() : null;
+		const first_name: string | null | undefined =
+			trimmedFirstName === originalFirstName ? undefined : trimmedFirstName;
+		const trimmedLastName = lastNameInput ? lastNameInput.trim() : null;
+		const last_name: string | null | undefined =
+			trimmedLastName === originalLastName ? undefined : trimmedLastName;
+		const gender: Gender | null | undefined =
+			genderInput === originalGender ? undefined : genderInput;
+
+		const changesMade =
+			username !== undefined ||
+			first_name !== undefined ||
+			last_name !== undefined ||
+			gender !== undefined;
+
+		setChangesMade(changesMade);
+
+		const missingRequiredInput =
+			username === null ||
+			first_name === null ||
+			last_name === null ||
+			gender === null;
+
+		setMissingRequiredInput(missingRequiredInput);
+	}, [usernameInput, firstNameInput, lastNameInput, genderInput]);
+
+	useEffect(() => {
+		const invalidInput = invalidUsername || invalidFirstName || invalidLastName;
+
+		setInvalidInput(invalidInput);
+	}, [invalidUsername, invalidFirstName, invalidLastName]);
 
 	const { user, setUser } = useUserContext();
-	let employees: Employee[] = [];
-	let setEmployees = (_: Employee[]) => {};
+	let employees: Employee[] | undefined = undefined;
+	let setEmployees: ((employees: Employee[]) => void) | undefined = undefined;
+
 	try {
-		employees = useEmployeesContext().employees;
-		setEmployees = useEmployeesContext().setEmployees;
+		const employeesContext = useEmployeesContext();
+		employees = employeesContext.employees;
+		setEmployees = employeesContext.setEmployees;
 	} catch {}
 
-	const [gender, setGender] = useState<Gender | null>(prop.gender);
-
-	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		setError('');
-		setSuccess('');
+	const onSave = async () => {
 		const username: string | undefined =
-			event.currentTarget.username?.value;
+			(usernameInput as string).trim() === originalUsername
+				? undefined
+				: (usernameInput as string).trim();
 		const first_name: string | undefined =
-			event.currentTarget.first_name?.value;
+			(firstNameInput as string).trim() === originalFirstName
+				? undefined
+				: (firstNameInput as string).trim();
 		const last_name: string | undefined =
-			event.currentTarget.last_name?.value;
-		if (!username || !first_name || !last_name || !gender) {
-			setError('Missing Required Field');
-		} else if (
-			username == prop.username &&
-			first_name == prop.firstName &&
-			last_name == prop.lastName &&
-			gender == prop.gender
-		) {
-			setError('No changes were made');
-		} else {
-			const updateEmployeeRequest = {
-				...(username != prop.username && { username }),
-				...(first_name != prop.firstName && { first_name }),
-				...(last_name != prop.lastName && { last_name }),
-				...(gender != prop.gender && { gender }),
-			};
-			setSaving(true);
-			updateEmployee(navigate, user.employee_id, updateEmployeeRequest)
-				.then(() => {
-					const updatedUser = {
-						...user,
-						...updateEmployeeRequest,
-					};
-					sessionStorage.setItem('user', JSON.stringify(updatedUser));
-					setUser(updatedUser);
-					const updatedEmployee = Object(updatedUser);
-					delete updatedEmployee['language'];
-					delete updatedEmployee['dark_mode'];
+			(lastNameInput as string).trim() === originalLastName
+				? undefined
+				: (lastNameInput as string).trim();
+		const gender: Gender | undefined =
+			genderInput === originalGender ? undefined : (genderInput as Gender);
+
+		const updateEmployeeRequest: UpdateEmployeeRequest = {
+			...(username && { username }),
+			...(first_name && { first_name }),
+			...(last_name && { last_name }),
+			...(gender && { gender }),
+		};
+
+		const toastId = toast.loading(t('Updating Profile...'));
+
+		updateEmployee(navigate, user.employee_id, updateEmployeeRequest)
+			.then(() => {
+				const updatedUser = {
+					...user,
+					...updateEmployeeRequest,
+				};
+				sessionStorage.setItem('user', JSON.stringify(updatedUser));
+				setUser(updatedUser);
+				const updatedEmployee = Object(updatedUser);
+				delete updatedEmployee['language'];
+				delete updatedEmployee['dark_mode'];
+				if (employees !== undefined && setEmployees !== undefined) {
 					setEmployees(
 						employees.map((employee) =>
 							employee.employee_id == user.employee_id
@@ -81,89 +160,158 @@ export default function Personal(prop: PersonalProp) {
 								: employee
 						)
 					);
-					setSuccess('Profile successfully updated.');
-				})
-				.catch((error) => setError(error.message))
-				.finally(() => setSaving(false));
-		}
+				}
+
+				toast.update(toastId, {
+					render: t('Profile Updated Successfully'),
+					type: 'success',
+					isLoading: false,
+					position: 'top-right',
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					pauseOnFocusLoss: true,
+					draggable: true,
+					theme: 'light',
+				});
+			})
+			.catch((error) => {
+				toast.update(toastId, {
+					render: (
+						<h1>
+							{t('Failed to Update Profile')} <br />
+							{error.message}
+						</h1>
+					),
+					type: 'error',
+					isLoading: false,
+					position: 'top-right',
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					pauseOnFocusLoss: true,
+					draggable: true,
+					theme: 'light',
+				});
+			});
 	};
-
 	return (
-		<form onSubmit={handleSubmit}>
+		<>
 			<EditableInput
-				text={prop.username}
-				label='Username'
-				name='username'
-				type='text'
-				pattern={PATTERNS.employee.username}
-				maxLength={LENGTHS.employee.username}
-				placeholder='Username'
-				required={true}
-				editable={prop.editable}
-				missingPermissionMessage='You do not have permission to change employee details.'
-				invalidMessage='Username can only contain letters, numbers and .'
-				requiredMessage='Username cannot be empty.'
+				originalText={originalUsername}
+				text={usernameInput}
+				setText={setUsernameInput}
+				label={LABELS.employee.username}
+				name={NAMES.employee.username}
+				type="text"
+				validationProp={{
+					maxLength: LENGTHS.employee.username,
+					pattern: PATTERNS.employee.username,
+					required: true,
+					requiredMessage: ERRORS.employee.username.required,
+					invalid: invalidUsername,
+					setInvalid: setInvalidUsername,
+					invalidMessage: ERRORS.employee.username.invalid,
+				}}
+				placeholder={PLACEHOLDERS.employee.username}
+				editable={editable}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
 			/>
 
 			<EditableInput
-				text={prop.firstName}
-				label='First Name'
-				name='first_name'
-				type='text'
-				pattern={PATTERNS.employee.first_name}
-				maxLength={LENGTHS.employee.first_name}
-				placeholder='FirstName'
-				required={true}
-				editable={prop.editable}
-				missingPermissionMessage='You do not have permission to change employee details.'
-				invalidMessage='First Name can only contain letters.'
-				requiredMessage='First Name cannot be empty.'
+				originalText={originalFirstName}
+				text={firstNameInput}
+				setText={setFirstNameInput}
+				label={LABELS.employee.first_name}
+				name={NAMES.employee.first_name}
+				type="text"
+				validationProp={{
+					maxLength: LENGTHS.employee.first_name,
+					pattern: PATTERNS.employee.first_name,
+					required: true,
+					requiredMessage: ERRORS.employee.first_name.required,
+					invalid: invalidFirstName,
+					setInvalid: setInvalidFirstName,
+					invalidMessage: ERRORS.employee.first_name.invalid,
+				}}
+				placeholder={PLACEHOLDERS.employee.first_name}
+				editable={editable}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
 			/>
 
 			<EditableInput
-				text={prop.lastName}
-				label='Last Name'
-				name='last_name'
-				type='text'
-				pattern={PATTERNS.employee.last_name}
-				maxLength={LENGTHS.employee.last_name}
-				placeholder='LastName'
-				required={true}
-				editable={prop.editable}
-				missingPermissionMessage='You do not have permission to change employee details.'
-				invalidMessage='Last Name can only contain letters.'
-				requiredMessage='Last Name cannot be empty.'
+				originalText={originalLastName}
+				text={lastNameInput}
+				setText={setLastNameInput}
+				label={LABELS.employee.last_name}
+				name={NAMES.employee.last_name}
+				type="text"
+				validationProp={{
+					maxLength: LENGTHS.employee.last_name,
+					pattern: PATTERNS.employee.last_name,
+					required: true,
+					requiredMessage: ERRORS.employee.last_name.required,
+					invalid: invalidLastName,
+					setInvalid: setInvalidLastName,
+					invalidMessage: ERRORS.employee.last_name.invalid,
+				}}
+				placeholder={PLACEHOLDERS.employee.last_name}
+				editable={editable}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
 			/>
 
 			<EditableDropDown
-				default={
-					genderDropDownItems.find(
-						(option) => option.id == prop.gender
-					) || genderDropDownItems[0]
+				originalOption={
+					genderDropDownItems[
+						genderDropDownItems.findIndex(
+							(option) => option.id === originalGender
+						) || 0
+					]
 				}
 				options={genderDropDownItems}
-				onSelect={(option) => {
-					if (option.id == null) setGender(null);
-					else setGender(option.id as Gender);
+				option={
+					genderDropDownItems[
+						genderDropDownItems.findIndex(
+							(option) => option.id === genderInput
+						) || 0
+					]
+				}
+				setOption={(option) => setGenderInput(option.id as Gender | null)}
+				label={LABELS.employee.gender}
+				validationProp={{
+					required: true,
+					requiredMessage: ERRORS.employee.gender.required,
 				}}
-				label='Gender'
-				required={true}
-				editable={prop.editable}
-				missingPermissionMessage='You do not have permission to change employee details.'
-				requiredMessage='A gender must be selected.'
+				editable={editable}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
 			/>
 
-			<div className='flex border-t-2 border-gray-400 py-4'>
-				<SaveButton
-					loading={saving}
-					disabled={!prop.editable}
-					saveBtnTitle='Save Changes'
-					savingBtnTitle='Saving...'
-					missingPermissionMessage='You do not have permission to change employee details.'
-					error={error}
-					success={success}
+			<div className="flex border-t-2 border-gray-400 py-4">
+				<PermissionsButton
+					btnTitle={t('Save Changes')}
+					right={false}
+					disabled={
+						!editable || !changesMade || missingRequiredInput || invalidInput
+					}
+					missingPermissionMessage={
+						!editable
+							? ERRORS.employee.permissions.edit
+							: !changesMade
+							? ERRORS.no_changes
+							: missingRequiredInput
+							? ERRORS.required
+							: invalidInput
+							? ERRORS.invalid
+							: ''
+					}
+					onClick={onSave}
 				/>
 			</div>
-		</form>
+			<ToastContainer limit={5} />
+		</>
 	);
-}
+};
+
+export default Personal;

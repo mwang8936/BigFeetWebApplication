@@ -1,8 +1,10 @@
 export interface UpdateVipPackageRequest {
-	amount: number;
+	amount?: number;
+	schedules?: { date: Date; employee_id: number }[];
 }
 
 export interface AddVipPackageRequest {
-	serial: number;
+	serial: string;
 	amount: number;
+	schedules: { date: Date; employee_id: number }[];
 }

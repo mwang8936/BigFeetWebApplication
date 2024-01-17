@@ -4,11 +4,11 @@ import VipPackage from './Vip-Package.Model';
 
 export default interface Schedule {
 	date: Date;
-	employee: Employee | null;
+	employee: Employee;
 	is_working: boolean;
 	start: Date | null;
 	end: Date | null;
-	reservations: Reservation[] | null;
+	reservations: Reservation[];
 	vip_packages: VipPackage[];
 	signed: boolean;
 }

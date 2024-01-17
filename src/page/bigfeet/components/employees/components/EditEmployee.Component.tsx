@@ -1,0 +1,640 @@
+import { FC, useEffect, useState } from 'react';
+import { Role, Permissions, Gender } from '../../../../../models/enums';
+import { useEmployeesContext, useUserContext } from '../../../BigFeet.Page';
+import {
+	deleteEmployee,
+	updateEmployee,
+} from '../../../../../service/employee.service';
+import PATTERNS from '../../../../../constants/patterns.constants';
+import LENGTHS from '../../../../../constants/lengths.constants';
+import EditablePayRate from '../../miscallaneous/editable/EditablePayRate.Component';
+import DatesDisplay from '../../miscallaneous/DatesDisplay.Component';
+import EditableMultiSelect from '../../miscallaneous/editable/EditableMultiSelect.Component';
+import { useNavigate } from 'react-router-dom';
+import Employee from '../../../../../models/Employee.Model';
+import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
+import {
+	genderDropDownItems,
+	roleDropDownItems,
+} from '../../../../../constants/drop-down.constants';
+import { useAuthenticationContext } from '../../../../../App';
+import { logout } from '../../../../../service/auth.service';
+import DeleteEmployeeModal from '../../miscallaneous/modals/employee/DeleteEmployeeModal.Component';
+import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
+import { ToastContainer, toast } from 'react-toastify';
+import PermissionsButton, {
+	ButtonType,
+} from '../../miscallaneous/PermissionsButton.Component';
+import ERRORS from '../../../../../constants/error.constants';
+import EditableInput from '../../miscallaneous/editable/EditableInput.Component';
+import LABELS from '../../../../../constants/label.constants';
+import NAMES from '../../../../../constants/name.constants';
+import NUMBERS from '../../../../../constants/numbers.constants';
+import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
+import { useTranslation } from 'react-i18next';
+
+interface EditEmployeeProp {
+	editable: boolean;
+	deletable: boolean;
+	employee: Employee;
+}
+
+const EditEmployee: FC<EditEmployeeProp> = ({
+	editable,
+	deletable,
+	employee,
+}) => {
+	const { t } = useTranslation();
+	const navigate = useNavigate();
+
+	const [usernameInput, setUsernameInput] = useState<string | null>(
+		employee.username
+	);
+	const [firstNameInput, setFirstNameInput] = useState<string | null>(
+		employee.first_name
+	);
+	const [lastNameInput, setLastNameInput] = useState<string | null>(
+		employee.last_name
+	);
+	const [genderInput, setGenderInput] = useState<Gender | null>(
+		employee.gender
+	);
+	const [roleInput, setRoleInput] = useState<Role | null>(employee.role);
+	const [permissionsInput, setPermissionsInput] = useState<Permissions[]>(
+		employee.permissions
+	);
+	const [bodyRateInput, setBodyRateInput] = useState<number | null>(
+		employee.body_rate
+	);
+	const [feetRateInput, setFeetRateInput] = useState<number | null>(
+		employee.feet_rate
+	);
+	// const [accupunctureInput, setAccupunctureInput] = useState<number | null>(
+	// 	employee.accupuncture_rate
+	// );
+	const [perHourInput, setPerHourInput] = useState<number | null>(
+		employee.per_hour
+	);
+
+	const [invalidUsername, setInvalidUsername] = useState<boolean>(false);
+	const [invalidFirstName, setInvalidFirstName] = useState<boolean>(false);
+	const [invalidLastName, setInvalidLastName] = useState<boolean>(false);
+	const [invalidBodyRate, setInvalidBodyRate] = useState<boolean>(false);
+	const [invalidFeetRate, setInvalidFeetRate] = useState<boolean>(false);
+	// const [invalidAccupunctureRate, setInvalidAccupunctureRate] =
+	// 	useState<boolean>(false);
+	const [invalidPerHour, setInvalidPerHour] = useState<boolean>(false);
+
+	const [changesMade, setChangesMade] = useState<boolean>(false);
+	const [missingRequiredInput, setMissingRequiredInput] =
+		useState<boolean>(false);
+	const [invalidInput, setInvalidInput] = useState<boolean>(false);
+
+	const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+
+	useEffect(() => {
+		setUsernameInput(employee.username);
+		setFirstNameInput(employee.first_name);
+		setLastNameInput(employee.last_name);
+		setGenderInput(employee.gender);
+		setRoleInput(employee.role);
+		setPermissionsInput(employee.permissions);
+		setBodyRateInput(employee.body_rate);
+		setFeetRateInput(employee.feet_rate);
+		// setAccupunctureInput(employee.accupuncture_rate)
+		setPerHourInput(employee.per_hour);
+
+		setChangesMade(false);
+		setMissingRequiredInput(false);
+		setInvalidUsername(false);
+		setInvalidFirstName(false);
+		setInvalidLastName(false);
+		setInvalidBodyRate(false);
+		setInvalidFeetRate(false);
+		// setInvalidAccupunctureRate(false);
+		setInvalidPerHour(false);
+		setInvalidInput(false);
+	}, [employee]);
+
+	useEffect(() => {
+		const trimmedUsername = usernameInput ? usernameInput.trim() : null;
+		const username: string | null | undefined =
+			trimmedUsername === employee.username ? undefined : trimmedUsername;
+		const trimmedFirstName = firstNameInput ? firstNameInput.trim() : null;
+		const first_name: string | null | undefined =
+			trimmedFirstName === employee.first_name ? undefined : trimmedFirstName;
+		const trimmedLastName = lastNameInput ? lastNameInput.trim() : null;
+		const last_name: string | null | undefined =
+			trimmedLastName === employee.last_name ? undefined : trimmedLastName;
+		const gender: Gender | null | undefined =
+			genderInput === employee.gender ? undefined : genderInput;
+		const role: Role | null | undefined =
+			roleInput === employee.role ? undefined : roleInput;
+		const permissions: Permissions[] | undefined =
+			permissionsInput.length === employee.permissions.length &&
+			permissionsInput.every((permission) =>
+				employee.permissions.includes(permission)
+			) &&
+			employee.permissions.every((permission) =>
+				permissionsInput.includes(permission)
+			)
+				? undefined
+				: (permissionsInput as Permissions[]);
+		const body_rate: number | null | undefined =
+			bodyRateInput === employee.body_rate ? undefined : bodyRateInput;
+		const feet_rate: number | null | undefined =
+			feetRateInput === employee.feet_rate ? undefined : feetRateInput;
+		// const accupuncture_rate: number | null | undefined =
+		// 	accupunctureInput === employee.accupuncture_rate
+		// 		? undefined
+		// 		: accupunctureInput;
+		const per_hour: number | null | undefined =
+			perHourInput === employee.per_hour ? undefined : perHourInput;
+
+		const changesMade =
+			username !== undefined ||
+			first_name !== undefined ||
+			last_name !== undefined ||
+			gender !== undefined ||
+			role !== undefined ||
+			permissions !== undefined ||
+			body_rate !== undefined ||
+			feet_rate !== undefined ||
+			//accupuncture_rate !== undefined ||
+			per_hour !== undefined;
+
+		setChangesMade(changesMade);
+
+		const missingRequiredInput =
+			username === null ||
+			first_name === null ||
+			last_name === null ||
+			gender === null ||
+			role === null ||
+			permissions === null;
+
+		setMissingRequiredInput(missingRequiredInput);
+	}, [
+		usernameInput,
+		firstNameInput,
+		lastNameInput,
+		genderInput,
+		roleInput,
+		permissionsInput,
+		bodyRateInput,
+		feetRateInput,
+		//accupunctureInput,
+		perHourInput,
+	]);
+
+	useEffect(() => {
+		const invalidInput =
+			invalidUsername ||
+			invalidFirstName ||
+			invalidLastName ||
+			invalidBodyRate ||
+			invalidFeetRate ||
+			//invalidAccupunctureRate ||
+			invalidPerHour;
+
+		setInvalidInput(invalidInput);
+	}, [
+		invalidUsername,
+		invalidFirstName,
+		invalidLastName,
+		invalidBodyRate,
+		invalidFeetRate,
+		//invalidAccupunctureRate,
+		invalidPerHour,
+	]);
+
+	const { user, setUser } = useUserContext();
+	const { employees, setEmployees } = useEmployeesContext();
+	const { setAuthentication } = useAuthenticationContext();
+
+	const onSave = async () => {
+		const username: string | undefined =
+			(usernameInput as string).trim() === employee.username
+				? undefined
+				: (usernameInput as string).trim();
+		const first_name: string | undefined =
+			(firstNameInput as string).trim() === employee.first_name
+				? undefined
+				: (firstNameInput as string).trim();
+		const last_name: string | undefined =
+			(lastNameInput as string).trim() === employee.last_name
+				? undefined
+				: (lastNameInput as string).trim();
+		const gender: Gender | undefined =
+			genderInput === employee.gender ? undefined : (genderInput as Gender);
+		const role: Role | undefined =
+			roleInput === employee.role ? undefined : (roleInput as Role);
+		const permissions: Permissions[] | undefined =
+			permissionsInput.length === employee.permissions.length &&
+			permissionsInput.every((permission) =>
+				employee.permissions.includes(permission)
+			) &&
+			employee.permissions.every((permission) =>
+				permissionsInput.includes(permission)
+			)
+				? undefined
+				: (permissionsInput as Permissions[]);
+		const body_rate: number | null | undefined =
+			bodyRateInput === employee.body_rate ? undefined : bodyRateInput;
+		const feet_rate: number | null | undefined =
+			feetRateInput === employee.feet_rate ? undefined : feetRateInput;
+		// const accupuncture_rate: number | null | undefined =
+		// 	accupunctureInput === employee.accupuncture_rate
+		// 		? undefined
+		// 		: accupunctureInput;
+		const per_hour: number | null | undefined =
+			perHourInput === employee.per_hour ? undefined : perHourInput;
+
+		const updateEmployeeRequest: UpdateEmployeeRequest = {
+			...(username && { username }),
+			...(first_name && { first_name }),
+			...(last_name && { last_name }),
+			...(gender && { gender }),
+			...(role && { role }),
+			...(permissions && { permissions }),
+			...(body_rate && { body_rate }),
+			...(feet_rate && { feet_rate }),
+			// ...(accupuncture_rate && { accupuncture_rate }),
+			...(per_hour && { per_hour }),
+		};
+
+		const toastId = toast.loading(t('Updating Employee...'));
+
+		updateEmployee(navigate, employee.employee_id, updateEmployeeRequest)
+			.then(() => {
+				const updatedEmployee = {
+					...employee,
+					...updateEmployeeRequest,
+				};
+				setEmployees(
+					employees.map((employee) =>
+						employee.employee_id == employee.employee_id
+							? updatedEmployee
+							: employee
+					)
+				);
+
+				if (employee.employee_id === user.employee_id) {
+					const updatedUser = {
+						...user,
+						...updateEmployeeRequest,
+					};
+					sessionStorage.setItem('user', JSON.stringify(updatedUser));
+					setUser(updatedUser);
+				}
+				toast.update(toastId, {
+					render: t('Employee Updated Successfully'),
+					type: 'success',
+					isLoading: false,
+					position: 'top-right',
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					pauseOnFocusLoss: true,
+					draggable: true,
+					theme: 'light',
+				});
+			})
+			.catch((error) => {
+				toast.update(toastId, {
+					render: (
+						<h1>
+							{t('Failed to Update Employee')} <br />
+							{error.message}
+						</h1>
+					),
+					type: 'error',
+					isLoading: false,
+					position: 'top-right',
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					pauseOnFocusLoss: true,
+					draggable: true,
+					theme: 'light',
+				});
+			});
+	};
+
+	const onDelete = async (employeeId: number) => {
+		const toastId = toast.loading(t('Deleting Employee...'));
+
+		deleteEmployee(navigate, employeeId)
+			.then(() => {
+				setEmployees(
+					employees.filter((employee) => employee.employee_id !== employeeId)
+				);
+				toast.update(toastId, {
+					render: t('Employee Deleted Successfully'),
+					type: 'success',
+					isLoading: false,
+					position: 'top-right',
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					pauseOnFocusLoss: true,
+					draggable: true,
+					theme: 'light',
+				});
+				if (employee.employee_id === user.employee_id) {
+					logout(setAuthentication);
+				}
+			})
+			.catch((error) => {
+				toast.update(toastId, {
+					render: (
+						<h1>
+							{t('Failed to Delete Employee')} <br />
+							{error.message}
+						</h1>
+					),
+					type: 'error',
+					isLoading: false,
+					position: 'top-right',
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					pauseOnFocusLoss: true,
+					draggable: true,
+					theme: 'light',
+				});
+			});
+	};
+
+	const permissionValues = Object.values(Permissions).map(
+		(permission: Permissions) => permission
+	);
+
+	return (
+		<>
+			<EditableInput
+				originalText={employee.username}
+				text={usernameInput}
+				setText={setUsernameInput}
+				label={LABELS.employee.username}
+				name={NAMES.employee.username}
+				type="text"
+				validationProp={{
+					maxLength: LENGTHS.employee.username,
+					pattern: PATTERNS.employee.username,
+					required: true,
+					requiredMessage: ERRORS.employee.username.required,
+					invalid: invalidUsername,
+					setInvalid: setInvalidUsername,
+					invalidMessage: ERRORS.employee.username.invalid,
+				}}
+				placeholder={PLACEHOLDERS.employee.username}
+				editable={editable}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
+			/>
+
+			<EditableInput
+				originalText={employee.first_name}
+				text={firstNameInput}
+				setText={setFirstNameInput}
+				label={LABELS.employee.first_name}
+				name={NAMES.employee.first_name}
+				type="text"
+				validationProp={{
+					maxLength: LENGTHS.employee.first_name,
+					pattern: PATTERNS.employee.first_name,
+					required: true,
+					requiredMessage: ERRORS.employee.first_name.required,
+					invalid: invalidFirstName,
+					setInvalid: setInvalidFirstName,
+					invalidMessage: ERRORS.employee.first_name.invalid,
+				}}
+				placeholder={PLACEHOLDERS.employee.first_name}
+				editable={editable}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
+			/>
+
+			<EditableInput
+				originalText={employee.last_name}
+				text={lastNameInput}
+				setText={setLastNameInput}
+				label={LABELS.employee.last_name}
+				name={NAMES.employee.last_name}
+				type="text"
+				validationProp={{
+					maxLength: LENGTHS.employee.last_name,
+					pattern: PATTERNS.employee.last_name,
+					required: true,
+					requiredMessage: ERRORS.employee.last_name.required,
+					invalid: invalidLastName,
+					setInvalid: setInvalidLastName,
+					invalidMessage: ERRORS.employee.last_name.invalid,
+				}}
+				placeholder={PLACEHOLDERS.employee.last_name}
+				editable={editable}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
+			/>
+
+			<EditableDropDown
+				originalOption={
+					genderDropDownItems[
+						genderDropDownItems.findIndex(
+							(option) => option.id === employee.gender
+						) || 0
+					]
+				}
+				options={genderDropDownItems}
+				option={
+					genderDropDownItems[
+						genderDropDownItems.findIndex(
+							(option) => option.id === genderInput
+						) || 0
+					]
+				}
+				setOption={(option) => setGenderInput(option.id as Gender | null)}
+				label={LABELS.employee.gender}
+				validationProp={{
+					required: true,
+					requiredMessage: ERRORS.employee.gender.required,
+				}}
+				editable={editable}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
+			/>
+
+			<EditableDropDown
+				originalOption={
+					roleDropDownItems[
+						roleDropDownItems.findIndex(
+							(option) => option.id === employee.role
+						) || 0
+					]
+				}
+				options={roleDropDownItems}
+				option={
+					roleDropDownItems[
+						roleDropDownItems.findIndex((option) => option.id === roleInput) ||
+							0
+					]
+				}
+				setOption={(option) => setRoleInput(option.id as Role | null)}
+				label={LABELS.employee.role}
+				validationProp={{
+					required: true,
+					requiredMessage: ERRORS.employee.role.required,
+				}}
+				editable={editable}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
+			/>
+
+			<EditableMultiSelect
+				originalValues={employee.permissions.map((value) => ({
+					value: value,
+					label: value,
+				}))}
+				options={permissionValues.map((value) => ({
+					value: value,
+					label: value,
+				}))}
+				values={permissionsInput.map((value) => ({
+					value: value,
+					label: value,
+				}))}
+				setValues={(selectedValues) =>
+					setPermissionsInput(
+						selectedValues.map((item) => item.value as Permissions)
+					)
+				}
+				label={LABELS.employee.permissions}
+				name={NAMES.employee.permissions}
+				placeholder={PLACEHOLDERS.employee.permissions}
+				editable={editable}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
+			/>
+
+			<EditablePayRate
+				originalAmount={employee.body_rate}
+				amount={bodyRateInput}
+				setAmount={setBodyRateInput}
+				label={LABELS.employee.body_rate}
+				name={NAMES.employee.body_rate}
+				validationProp={{
+					max: NUMBERS.employee.body_rate,
+					required: false,
+					invalid: invalidBodyRate,
+					setInvalid: setInvalidBodyRate,
+					invalidMessage: ERRORS.employee.body_rate.invalid,
+				}}
+				placeholder={PLACEHOLDERS.employee.body_rate}
+				editable={editable}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
+			/>
+
+			<EditablePayRate
+				originalAmount={employee.feet_rate}
+				amount={feetRateInput}
+				setAmount={setFeetRateInput}
+				label={LABELS.employee.feet_rate}
+				name={NAMES.employee.feet_rate}
+				validationProp={{
+					max: NUMBERS.employee.feet_rate,
+					required: false,
+					invalid: invalidFeetRate,
+					setInvalid: setInvalidFeetRate,
+					invalidMessage: ERRORS.employee.feet_rate.invalid,
+				}}
+				placeholder={PLACEHOLDERS.employee.feet_rate}
+				editable={editable}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
+			/>
+
+			{/* <EditablePayRate
+				originalAmount={employee.accupuncture_rate}
+				amount={accupunctureRateInput}
+				setAmount={setAccupunctureRateInput}
+				label={LABELS.employee.accupuncture_rate}
+				name={NAMES.employee.accupuncture_rate}
+				validationProp={{
+					max: NUMBERS.employee.accupuncture_rate,
+					required: false,
+					requiredMessage: ERRORS.employee.accupuncture_rate.required,
+					invalid: invalidAccupunctureRate,
+					setInvalid: setInvalidAccupunctureRate,
+					invalidMessage: ERRORS.employee.accupuncture_rate.invalid,
+				}}
+				editable={editable}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
+			/> */}
+
+			<EditablePayRate
+				originalAmount={employee.per_hour}
+				amount={perHourInput}
+				setAmount={setPerHourInput}
+				label={LABELS.employee.per_hour}
+				name={NAMES.employee.per_hour}
+				validationProp={{
+					max: NUMBERS.employee.per_hour,
+					required: false,
+					invalid: invalidPerHour,
+					setInvalid: setInvalidPerHour,
+					invalidMessage: ERRORS.employee.per_hour.invalid,
+				}}
+				placeholder={PLACEHOLDERS.employee.per_hour}
+				editable={editable}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
+			/>
+
+			<div className="flex border-t-2 border-gray-400 py-4 justify-between">
+				<PermissionsButton
+					btnTitle={t('Save Changes')}
+					right={false}
+					disabled={
+						!editable || !changesMade || missingRequiredInput || invalidInput
+					}
+					missingPermissionMessage={
+						!editable
+							? ERRORS.employee.permissions.edit
+							: !changesMade
+							? ERRORS.no_changes
+							: missingRequiredInput
+							? ERRORS.required
+							: invalidInput
+							? ERRORS.invalid
+							: ''
+					}
+					onClick={onSave}
+				/>
+
+				<PermissionsButton
+					btnTitle={t('Delete')}
+					btnType={ButtonType.DELETE}
+					disabled={!deletable}
+					missingPermissionMessage={ERRORS.employee.permissions.delete}
+					onClick={() => {
+						setOpenDeleteModal(true);
+					}}
+				/>
+
+				<DeleteEmployeeModal
+					open={openDeleteModal}
+					setOpen={setOpenDeleteModal}
+					employeeId={employee.employee_id}
+					employeeName={employee.username}
+					deletable={deletable}
+					onDeleteEmployee={onDelete}
+				/>
+			</div>
+
+			<DatesDisplay
+				updatedAt={employee.updated_at}
+				createdAt={employee.created_at}
+			/>
+			<ToastContainer limit={5} />
+		</>
+	);
+};
+
+export default EditEmployee;

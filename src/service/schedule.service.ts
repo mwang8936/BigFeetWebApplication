@@ -27,7 +27,7 @@ export async function getSchedule(
 ) {
 	return authorizedRequest(
 		navigate,
-		`${schedulePath}/${date}/employee/${employee_id}`,
+		`${schedulePath}/${date.toISOString()}/employee/${employee_id}`,
 		'get'
 	);
 }
@@ -40,7 +40,7 @@ export async function updateSchedule(
 ) {
 	return authorizedRequest(
 		navigate,
-		`${schedulePath}/${date}/employee/${employee_id}`,
+		`${schedulePath}/${date.toISOString()}/employee/${employee_id}`,
 		'patch',
 		request
 	);
@@ -60,7 +60,7 @@ export async function deleteSchedule(
 ) {
 	return authorizedRequest(
 		navigate,
-		`${schedulePath}/${date}/employee/${employee_id}`,
+		`${schedulePath}/${date.toISOString()}/employee/${employee_id}`,
 		'delete'
 	);
 }

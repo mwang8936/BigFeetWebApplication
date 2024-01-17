@@ -1,100 +1,184 @@
-import { useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Language } from '../../../../../models/enums';
 import { useUserContext } from '../../../BigFeet.Page';
-import ToggleSwitch from './ToggleSwitch.Commponent';
+import { ToggleColor } from '../../miscallaneous/add/AddToggleSwitch.Component';
 import { useNavigate } from 'react-router-dom';
-import SaveButton from '../../miscallaneous/SaveButton.Component';
 import { updateProfile } from '../../../../../service/profile.service';
-import EditableDropDown from '../../miscallaneous/EditableDropDown.Component';
+import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
 import { languageDropDownItems } from '../../../../../constants/drop-down.constants';
+import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
+import ERRORS from '../../../../../constants/error.constants';
+import { ToastContainer, toast } from 'react-toastify';
+import { UpdateProfileRequest } from '../../../../../models/requests/Profile.Request.Model';
+import LABELS from '../../../../../constants/label.constants';
+import NAMES from '../../../../../constants/name.constants';
+import EditableToggleSwitch from '../../miscallaneous/editable/EditableToggleSwitch.Component';
+import { useTranslation } from 'react-i18next';
+import { getLanguageFile } from '../../../../../constants/language.constants';
 
 interface SettingsProp {
-	editable: boolean;
-	language: Language;
-	darkMode: boolean;
+	originalLanguage: Language;
+	originalDarkMode: boolean;
 }
 
-export default function Settings(prop: SettingsProp) {
+const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
+	const { t, i18n } = useTranslation();
 	const navigate = useNavigate();
 
-	const [saving, setSaving] = useState(false);
-	const [error, setError] = useState('');
-	const [success, setSuccess] = useState('');
+	const [languageInput, setLanguageInput] = useState<Language | null>(
+		originalLanguage
+	);
+	const [darkModeInput, setDarkModeInput] = useState<boolean>(originalDarkMode);
 
-	const [language, setLanguage] = useState<Language | null>(prop.language);
+	const [changesMade, setChangesMade] = useState<boolean>(false);
+	const [missingRequiredInput, setMissingRequiredInput] =
+		useState<boolean>(false);
+
+	useEffect(() => {
+		setLanguageInput(originalLanguage);
+		setDarkModeInput(originalDarkMode);
+
+		setChangesMade(false);
+		setMissingRequiredInput(false);
+	}, [originalLanguage, originalDarkMode]);
+
+	useEffect(() => {
+		const language: Language | null | undefined =
+			languageInput === originalLanguage ? undefined : languageInput;
+		const dark_mode: boolean | undefined =
+			darkModeInput === originalDarkMode ? undefined : darkModeInput;
+
+		const changesMade = language !== undefined || dark_mode !== undefined;
+
+		setChangesMade(changesMade);
+
+		const missingRequiredInput = language === null;
+
+		setMissingRequiredInput(missingRequiredInput);
+	}, [languageInput, darkModeInput]);
 
 	const { user, setUser } = useUserContext();
 
-	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		setError('');
-		setSuccess('');
+	const onSave = async () => {
+		const language: Language | undefined =
+			languageInput === originalLanguage
+				? undefined
+				: (languageInput as Language);
 		const dark_mode: boolean | undefined =
-			event.currentTarget.dark_mode?.checked;
+			darkModeInput === originalDarkMode ? undefined : darkModeInput;
 
-		if (!language || dark_mode == undefined) {
-			setError('Missing Required Field');
-		} else if (language == prop.language && dark_mode == prop.darkMode) {
-			setError('No changes were made');
-		} else {
-			const updateProfileRequest = {
-				...(language != prop.language && { language }),
-				...(dark_mode != prop.darkMode && { dark_mode }),
-			};
-			const updatedUser = {
-				...user,
-				...updateProfileRequest,
-			};
-			setSaving(true);
-			updateProfile(navigate, updateProfileRequest)
-				.then(() => {
-					sessionStorage.setItem('user', JSON.stringify(updatedUser));
-					setUser(updatedUser);
-					setSuccess('Profile successfully updated.');
-				})
-				.catch((error) => setError(error.message))
-				.finally(() => setSaving(false));
-		}
+		const updateProfileRequest: UpdateProfileRequest = {
+			...(language && { language }),
+			...(dark_mode && { dark_mode }),
+		};
+
+		const toastId = toast.loading(t('Updating Profile...'));
+
+		updateProfile(navigate, updateProfileRequest)
+			.then(() => {
+				const updatedUser = {
+					...user,
+					...updateProfileRequest,
+				};
+				sessionStorage.setItem('user', JSON.stringify(updatedUser));
+				setUser(updatedUser);
+				i18n.changeLanguage(getLanguageFile(user.language));
+
+				toast.update(toastId, {
+					render: t('Profile Updated Successfully'),
+					type: 'success',
+					isLoading: false,
+					position: 'top-right',
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					pauseOnFocusLoss: true,
+					draggable: true,
+					theme: 'light',
+				});
+			})
+			.catch((error) => {
+				toast.update(toastId, {
+					render: (
+						<h1>
+							{t('Failed to Update Profile')} <br />
+							{error.message}
+						</h1>
+					),
+					type: 'error',
+					isLoading: false,
+					position: 'top-right',
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					pauseOnFocusLoss: true,
+					draggable: true,
+					theme: 'light',
+				});
+			});
 	};
 
 	return (
-		<form onSubmit={handleSubmit}>
+		<>
 			<EditableDropDown
-				default={
-					languageDropDownItems.find(
-						(option) => option.id == prop.language
-					) || languageDropDownItems[0]
+				originalOption={
+					languageDropDownItems[
+						languageDropDownItems.findIndex(
+							(option) => option.id === originalLanguage
+						) || 0
+					]
 				}
 				options={languageDropDownItems}
-				onSelect={(option) => {
-					if (option.id == null) setLanguage(null);
-					else setLanguage(option.id as Language);
+				option={
+					languageDropDownItems[
+						languageDropDownItems.findIndex(
+							(option) => option.id === languageInput
+						) || 0
+					]
+				}
+				setOption={(option) => setLanguageInput(option.id as Language | null)}
+				label={LABELS.profile.language}
+				validationProp={{
+					required: true,
+					requiredMessage: ERRORS.profile.language.required,
 				}}
-				label='Language'
-				required={true}
-				editable={prop.editable}
-				missingPermissionMessage='You do not have permission to change employee details.'
-				requiredMessage='A language must be selected.'
+				editable={true}
+				missingPermissionMessage=""
 			/>
 
-			<ToggleSwitch
-				name='dark_mode'
-				checked={prop.darkMode}
-				falseText='Light'
-				trueText='Dark'
+			<EditableToggleSwitch
+				originalChecked={originalDarkMode}
+				checked={darkModeInput}
+				setChecked={setDarkModeInput}
+				falseText={t('Light')}
+				trueText={t('Dark')}
+				toggleColour={ToggleColor.BLACK}
+				label={LABELS.profile.dark_mode}
+				name={NAMES.profile.dark_mode}
+				editable={true}
+				missingPermissionMessage=""
 			/>
 
-			<div className='flex border-t-2 border-gray-400 py-4'>
-				<SaveButton
-					loading={saving}
-					disabled={!prop.editable}
-					saveBtnTitle='Save Changes'
-					savingBtnTitle='Saving...'
-					missingPermissionMessage='You do not have permission to change employee details.'
-					error={error}
-					success={success}
+			<div className="flex border-t-2 border-gray-400 py-4">
+				<PermissionsButton
+					btnTitle={t('Save Changes')}
+					right={false}
+					disabled={!changesMade || missingRequiredInput}
+					missingPermissionMessage={
+						!changesMade
+							? ERRORS.no_changes
+							: missingRequiredInput
+							? ERRORS.required
+							: ''
+					}
+					onClick={onSave}
 				/>
 			</div>
-		</form>
+			<ToastContainer limit={5} />
+		</>
 	);
-}
+};
+
+export default Settings;

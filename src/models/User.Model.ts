@@ -1,18 +1,7 @@
-import { Gender, Language, Permissions, Role } from './enums';
+import Employee from './Employee.Model';
+import { Language } from './enums';
 
-export default interface User {
-	employee_id: number;
-	username: string;
-	first_name: string;
-	last_name: string;
-	gender: Gender;
-	role: Role;
-	permissions: Permissions[];
-	body_rate: number | null;
-	feet_rate: number | null;
-	per_hour: number | null;
+export default interface User extends Employee {
 	language: Language;
 	dark_mode: boolean;
-	created_at: Date;
-	updated_at: Date;
 }

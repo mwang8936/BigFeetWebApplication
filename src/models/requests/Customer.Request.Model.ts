@@ -4,7 +4,7 @@ export interface UpdateCustomerRequest {
 }
 
 export interface AddCustomerRequest {
-	phone_number: number;
+	phone_number: string;
 	customer_name: string;
 	notes?: string;
 }

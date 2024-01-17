@@ -1,11 +1,10 @@
 import { Gender, TipMethod } from '../enums';
 
 export interface UpdateReservationRequest {
-	date?: Date;
-	employee_id?: number | null;
-	reserved_time?: Date;
+	reserved_date?: Date;
+	employee_id?: number;
 	service_id?: number;
-	phone_number?: number | null;
+	phone_number?: string | null;
 	customer_name?: string | null;
 	notes?: string | null;
 	requested_gender?: Gender | null;
@@ -15,18 +14,16 @@ export interface UpdateReservationRequest {
 	vip?: number | null;
 	tips?: number | null;
 	tip_method?: TipMethod | null;
-	is_completed?: boolean;
 	message?: string | null;
 	updated_by: string;
 }
 
 export interface AddReservationRequest {
-	date: Date;
-	employee_id: number | null;
-	reserved_time: Date;
+	reserved_date: Date;
+	employee_id: number;
 	service_id: number;
 	created_by: string;
-	phone_number?: number;
+	phone_number?: string;
 	customer_name?: string;
 	notes?: string;
 	requested_gender?: Gender;

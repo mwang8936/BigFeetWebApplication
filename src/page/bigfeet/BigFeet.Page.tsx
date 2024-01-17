@@ -20,6 +20,12 @@ import { useNavigate } from 'react-router-dom';
 import { getSchedules } from '../../service/schedule.service';
 import Employee from '../../models/Employee.Model';
 import Schedule from '../../models/Schedule.Model';
+import {
+	getBeginningOfMonth,
+	getBeginningOfNextMonth,
+} from '../../utils/date.utils';
+import { useTranslation } from 'react-i18next';
+import { getLanguageFile } from '../../constants/language.constants';
 
 export const enum SideBarItems {
 	Profile = 0,
@@ -51,9 +57,7 @@ const CustomersContext = createContext<
 export function useCustomersContext() {
 	const context = useContext(CustomersContext);
 	if (context === undefined) {
-		throw new Error(
-			'useCustomersContext must be within CustomersProvider.'
-		);
+		throw new Error('useCustomersContext must be within CustomersProvider.');
 	}
 
 	return context;
@@ -67,9 +71,7 @@ const EmployeesContext = createContext<
 export function useEmployeesContext() {
 	const context = useContext(EmployeesContext);
 	if (context === undefined) {
-		throw new Error(
-			'useEmployeesContext must be within EmployeesProvider.'
-		);
+		throw new Error('useEmployeesContext must be within EmployeesProvider.');
 	}
 
 	return context;
@@ -96,9 +98,7 @@ const SchedulesContext = createContext<
 export function useSchedulesContext() {
 	const context = useContext(SchedulesContext);
 	if (context === undefined) {
-		throw new Error(
-			'useSchedulesContext must be within SchedulesProvider.'
-		);
+		throw new Error('useSchedulesContext must be within SchedulesProvider.');
 	}
 
 	return context;
@@ -131,12 +131,14 @@ export default function BigFeet() {
 
 	const [sideBarItems] = useState([SideBarItems.Profile]);
 
-	const [selectedIndex, setSelectedIndex] = useState(0);
+	const [selectedIndex, setSelectedIndex] = useState(1);
 
 	useEffect(() => {
 		setLoading(true);
 		getItems().finally(() => setLoading(false));
 	}, []);
+
+	const { i18n } = useTranslation();
 
 	const getItems = async () => {
 		const storageUser = sessionStorage.getItem('user');
@@ -157,6 +159,7 @@ export default function BigFeet() {
 
 			const user: User = JSON.parse(storageUser, reviveDateTime);
 			setUser(user);
+			i18n.changeLanguage(getLanguageFile(user.language));
 
 			sideBarItems.push(SideBarItems.Scheduler, SideBarItems.PayRoll);
 
@@ -175,7 +178,10 @@ export default function BigFeet() {
 			}
 
 			if (permissions.includes(Permissions.PERMISSION_GET_SCHEDULE)) {
-				getSchedules(navigate, {})
+				getSchedules(navigate, {
+					start: getBeginningOfMonth(new Date()),
+					end: getBeginningOfNextMonth(new Date()),
+				})
 					.then((response) => setSchedules(response))
 					.catch((error) => setSchedulesError(error.message));
 			} else {
@@ -222,6 +228,8 @@ export default function BigFeet() {
 			.then((response) => {
 				sessionStorage.setItem('user', JSON.stringify(response));
 				setUser(response);
+				i18n.changeLanguage(getLanguageFile(response.language));
+
 				getItems().finally(() => setLoading(false));
 				setUserError('');
 			})
@@ -265,9 +273,7 @@ export default function BigFeet() {
 	const retryGetSchedules = async () => {
 		if (user) {
 			setRetryingSchedules(true);
-			if (
-				user.permissions.includes(Permissions.PERMISSION_GET_SCHEDULE)
-			) {
+			if (user.permissions.includes(Permissions.PERMISSION_GET_SCHEDULE)) {
 				getSchedules(navigate, {})
 					.then((response) => {
 						setSchedules(response);
@@ -340,7 +346,7 @@ export default function BigFeet() {
 	};
 
 	return (
-		<div className='flex min-h-screen'>
+		<div className="flex min-h-screen">
 			<SideBar
 				selectedIndex={selectedIndex}
 				onIndexSelected={setSelectedIndex}
@@ -352,7 +358,7 @@ export default function BigFeet() {
 					EmployeesContainer(
 						CustomersContainer(
 							SchedulesContainer(
-								<div className='grid landscape:grow landscape:h-screen landscape:ml-[9%] portrait:w-screen portrait:mt-[20%] portrait:sm:mt-[12%]'>
+								<div className="grid landscape:grow landscape:h-screen landscape:ml-[9%] portrait:w-screen portrait:mt-[20%] portrait:sm:mt-[12%]">
 									{loading ? (
 										<Loading />
 									) : selectedIndex == 0 ? (

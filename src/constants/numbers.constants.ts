@@ -8,17 +8,17 @@ const NUMBERS = {
 		cash: 999.99,
 		machine: 999.99,
 		vip: 999.99,
-		tips: 9999.999,
+		tips: 9999.99,
 	},
 	service: {
 		time: 999,
 		money: 999.99,
-		body: 9.99,
-		feet: 9.99,
+		body: 9.9,
+		feet: 9.9,
+		accupuncture: 9.9,
 	},
 	vip_package: {
-		serial: 999999,
-		amount: 999.99,
+		amount: 999999.99,
 	},
 };
 

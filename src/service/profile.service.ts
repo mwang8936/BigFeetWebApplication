@@ -19,3 +19,14 @@ export async function updateProfile(
 ) {
 	return authorizedRequest(navigate, `${profilePath}`, 'patch', request);
 }
+
+export async function signProfileSchedule(
+	navigate: NavigateFunction,
+	date: Date
+) {
+	return authorizedRequest(
+		navigate,
+		`${profilePath}/sign/${date.toISOString()}`,
+		'patch'
+	);
+}

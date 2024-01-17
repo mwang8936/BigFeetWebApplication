@@ -8,5 +8,6 @@ export default interface Service {
 	money: number;
 	body: number;
 	feet: number;
+	accupuncture: number;
 	color: ServiceColor;
 }
