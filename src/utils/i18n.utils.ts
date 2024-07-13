@@ -9,10 +9,10 @@ const resources = {
 		translation: english_translation,
 	},
 	cn_simp: {
-		chinese_simplified_translation,
+		translation: chinese_simplified_translation,
 	},
 	cn_trad: {
-		chinese_traditional_translation,
+		translation: chinese_traditional_translation,
 	},
 };
 

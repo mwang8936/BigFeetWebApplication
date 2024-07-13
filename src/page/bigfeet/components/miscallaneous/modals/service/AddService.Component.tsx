@@ -14,10 +14,13 @@ import AddMinute from '../../add/AddMinute.Component';
 import AddPayRate from '../../add/AddPayRate.Component';
 import AddDropDown from '../../add/AddDropDown.Component';
 import { colorDropDownItems } from '../../../../../../constants/drop-down.constants';
-import AddBodyFeetAccupunctureService from '../../../services/components/AddBodyFeetAccupunctureService.Component';
+import AddBodyFeetAcupunctureService from '../../../services/components/AddBodyFeetAcupunctureService.Component';
 import NUMBERS from '../../../../../../constants/numbers.constants';
 import AddBottom from '../AddBottom.Component';
 import { useTranslation } from 'react-i18next';
+import AddToggleSwitch, {
+	ToggleColor,
+} from '../../add/AddToggleSwitch.Component';
 
 interface AddServiceProp {
 	setOpen(open: boolean): void;
@@ -38,7 +41,8 @@ const AddService: FC<AddServiceProp> = ({
 	const [moneyInput, setMoneyInput] = useState<number | null>(null);
 	const [bodyInput, setBodyInput] = useState<number | null>(0);
 	const [feetInput, setFeetInput] = useState<number | null>(0);
-	const [accupunctureInput, setAccupunctureInput] = useState<number | null>(0);
+	const [acupunctureInput, setAcupunctureInput] = useState<number | null>(0);
+	const [bedRequiredInput, setBedRequiredInput] = useState<boolean>(false);
 	const [colorInput, setColorInput] = useState<ServiceColor | null>(null);
 
 	const [invalidServiceName, setInvalidServiceName] = useState<boolean>(false);
@@ -47,8 +51,7 @@ const AddService: FC<AddServiceProp> = ({
 	const [invalidMoney, setInvalidMoney] = useState<boolean>(false);
 	const [invalidBody, setInvalidBody] = useState<boolean>(false);
 	const [invalidFeet, setInvalidFeet] = useState<boolean>(false);
-	const [invalidAccupuncture, setInvalidAccupuncture] =
-		useState<boolean>(false);
+	const [invalidAcupuncture, setInvalidAcupuncture] = useState<boolean>(false);
 
 	const [missingRequiredInput, setMissingRequiredInput] =
 		useState<boolean>(true);
@@ -64,7 +67,7 @@ const AddService: FC<AddServiceProp> = ({
 			moneyInput === null ||
 			bodyInput === null ||
 			feetInput === null ||
-			accupunctureInput === null ||
+			acupunctureInput === null ||
 			colorInput === null;
 
 		setMissingRequiredInput(missingRequiredInput);
@@ -75,7 +78,7 @@ const AddService: FC<AddServiceProp> = ({
 		moneyInput,
 		bodyInput,
 		feetInput,
-		accupunctureInput,
+		acupunctureInput,
 		colorInput,
 	]);
 
@@ -87,7 +90,7 @@ const AddService: FC<AddServiceProp> = ({
 			invalidMoney ||
 			invalidBody ||
 			invalidFeet ||
-			invalidAccupuncture;
+			invalidAcupuncture;
 
 		setInvalidInput(invalidInput);
 	}, [
@@ -97,7 +100,7 @@ const AddService: FC<AddServiceProp> = ({
 		invalidMoney,
 		invalidBody,
 		invalidFeet,
-		invalidAccupuncture,
+		invalidAcupuncture,
 	]);
 
 	const onAdd = async () => {
@@ -107,7 +110,8 @@ const AddService: FC<AddServiceProp> = ({
 		const money: number = moneyInput as number;
 		const body: number = bodyInput as number;
 		const feet: number = feetInput as number;
-		const accupuncture: number = accupunctureInput as number;
+		const acupuncture: number = acupunctureInput as number;
+		const bed_required: boolean = bedRequiredInput;
 		const color: ServiceColor = colorInput as ServiceColor;
 
 		const addServiceRequest: AddServiceRequest = {
@@ -117,7 +121,8 @@ const AddService: FC<AddServiceProp> = ({
 			money,
 			body,
 			feet,
-			accupuncture,
+			acupuncture,
+			bed_required,
 			color,
 		};
 
@@ -209,7 +214,7 @@ const AddService: FC<AddServiceProp> = ({
 								placeholder={PLACEHOLDERS.service.money}
 							/>
 
-							<AddBodyFeetAccupunctureService
+							<AddBodyFeetAcupunctureService
 								body={bodyInput}
 								setBody={setBodyInput}
 								bodyValidationProp={{
@@ -228,15 +233,26 @@ const AddService: FC<AddServiceProp> = ({
 									setInvalid: setInvalidFeet,
 									invalidMessage: ERRORS.service.feet.invalid,
 								}}
-								accupuncture={accupunctureInput}
-								setAccupuncture={setAccupunctureInput}
-								accupunctureValidationProp={{
+								acupuncture={acupunctureInput}
+								setAcupuncture={setAcupunctureInput}
+								acupunctureValidationProp={{
 									required: true,
-									requiredMessage: ERRORS.service.accupuncture.required,
-									invalid: invalidAccupuncture,
-									setInvalid: setInvalidAccupuncture,
-									invalidMessage: ERRORS.service.accupuncture.invalid,
+									requiredMessage: ERRORS.service.acupuncture.required,
+									invalid: invalidAcupuncture,
+									setInvalid: setInvalidAcupuncture,
+									invalidMessage: ERRORS.service.acupuncture.invalid,
 								}}
+							/>
+
+							<AddToggleSwitch
+								setChecked={setBedRequiredInput}
+								checked={bedRequiredInput}
+								falseText={'No Bed Required'}
+								trueText={'Bed Required'}
+								toggleColour={ToggleColor.GREEN}
+								label={LABELS.service.bed_required}
+								name={NAMES.service.bed_required}
+								disabled={false}
 							/>
 
 							<AddDropDown

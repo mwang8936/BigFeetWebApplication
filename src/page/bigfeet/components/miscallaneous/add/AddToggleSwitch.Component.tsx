@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export enum ToggleColor {
 	GREEN = 'GREEN',
@@ -28,6 +29,8 @@ const AddToggleSwitch: FC<AddToggleSwitchProp> = ({
 	name,
 	disabled,
 }) => {
+	const { t } = useTranslation();
+
 	const textColour = disabled ? 'text-gray-500' : 'text-black';
 
 	const greenColour = disabled ? 'bg-green-300' : 'bg-green-500';
@@ -45,7 +48,7 @@ const AddToggleSwitch: FC<AddToggleSwitchProp> = ({
 	return (
 		<div className="mb-4">
 			<label className="label" htmlFor={name}>
-				{label}
+				{t(label)}
 			</label>
 			<div className="flex rounded-md shadow-sm">
 				<label
@@ -61,7 +64,7 @@ const AddToggleSwitch: FC<AddToggleSwitchProp> = ({
 					/>
 					<span
 						className={`label flex items-center text-sm font-medium ${textColour}`}>
-						{falseText}
+						{t(falseText)}
 					</span>
 					<span
 						className={`slider mx-4 flex h-8 w-[60px] items-center rounded-full p-1 duration-200 ${
@@ -75,7 +78,7 @@ const AddToggleSwitch: FC<AddToggleSwitchProp> = ({
 					</span>
 					<span
 						className={`label flex items-center text-sm font-medium ${textColour}`}>
-						{trueText}
+						{t(trueText)}
 					</span>
 				</label>
 			</div>

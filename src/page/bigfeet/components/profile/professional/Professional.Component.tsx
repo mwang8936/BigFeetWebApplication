@@ -1,4 +1,4 @@
-import { Role } from '../../../../../models/enums';
+import { Permissions, Role } from '../../../../../models/enums';
 import EditablePayRate from '../../miscallaneous/editable/EditablePayRate.Component';
 import { useNavigate } from 'react-router-dom';
 import { FC, useEffect, useState } from 'react';
@@ -16,13 +16,14 @@ import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.R
 import Employee from '../../../../../models/Employee.Model';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 import { useTranslation } from 'react-i18next';
+import { userKey } from '../../../../../constants/api.constants';
 
 interface ProfessionalProp {
 	editable: boolean;
 	originalRole: Role;
 	originalFeetRate: number | null;
 	originalBodyRate: number | null;
-	// originalAccupunctureRate: number | null;
+	originalAcupunctureRate: number | null;
 	originalPerHour: number | null;
 }
 
@@ -31,7 +32,7 @@ const Professional: FC<ProfessionalProp> = ({
 	originalRole,
 	originalFeetRate,
 	originalBodyRate,
-	// originalAccupunctureRate,
+	originalAcupunctureRate,
 	originalPerHour,
 }) => {
 	const { t } = useTranslation();
@@ -44,17 +45,17 @@ const Professional: FC<ProfessionalProp> = ({
 	const [feetRateInput, setFeetRateInput] = useState<number | null>(
 		originalFeetRate
 	);
-	// const [accupunctureInput, setAccupunctureInput] = useState<number | null>(
-	// 	originalAccupunctureRate
-	// );
+	const [acupunctureRateInput, setAcupunctureRateInput] = useState<
+		number | null
+	>(originalAcupunctureRate);
 	const [perHourInput, setPerHourInput] = useState<number | null>(
 		originalPerHour
 	);
 
 	const [invalidBodyRate, setInvalidBodyRate] = useState<boolean>(false);
 	const [invalidFeetRate, setInvalidFeetRate] = useState<boolean>(false);
-	// const [invalidAccupunctureRate, setInvalidAccupunctureRate] =
-	// 	useState<boolean>(false);
+	const [invalidAcupunctureRate, setInvalidAcupunctureRate] =
+		useState<boolean>(false);
 	const [invalidPerHour, setInvalidPerHour] = useState<boolean>(false);
 
 	const [changesMade, setChangesMade] = useState<boolean>(false);
@@ -66,21 +67,21 @@ const Professional: FC<ProfessionalProp> = ({
 		setRoleInput(originalRole);
 		setBodyRateInput(originalBodyRate);
 		setFeetRateInput(originalFeetRate);
-		// setAccupunctureInput(originalAccupunctureRate)
+		setAcupunctureRateInput(originalAcupunctureRate);
 		setPerHourInput(originalPerHour);
 
 		setChangesMade(false);
 		setMissingRequiredInput(false);
 		setInvalidBodyRate(false);
 		setInvalidFeetRate(false);
-		// setInvalidAccupunctureRate(false);
+		setInvalidAcupunctureRate(false);
 		setInvalidPerHour(false);
 		setInvalidInput(false);
 	}, [
 		originalRole,
 		originalBodyRate,
 		originalFeetRate,
-		// originalAccupunctureRate,
+		originalAcupunctureRate,
 		originalPerHour,
 	]);
 
@@ -91,10 +92,10 @@ const Professional: FC<ProfessionalProp> = ({
 			bodyRateInput === originalBodyRate ? undefined : bodyRateInput;
 		const feet_rate: number | null | undefined =
 			feetRateInput === originalFeetRate ? undefined : feetRateInput;
-		// const accupuncture_rate: number | null | undefined =
-		// 	accupunctureInput === originalAccupunctureRate
-		// 		? undefined
-		// 		: accupunctureInput;
+		const acupuncture_rate: number | null | undefined =
+			acupunctureRateInput === originalAcupunctureRate
+				? undefined
+				: acupunctureRateInput;
 		const per_hour: number | null | undefined =
 			perHourInput === originalPerHour ? undefined : perHourInput;
 
@@ -102,7 +103,7 @@ const Professional: FC<ProfessionalProp> = ({
 			role !== undefined ||
 			body_rate !== undefined ||
 			feet_rate !== undefined ||
-			//accupuncture_rate !== undefined ||
+			acupuncture_rate !== undefined ||
 			per_hour !== undefined;
 
 		setChangesMade(changesMade);
@@ -114,7 +115,7 @@ const Professional: FC<ProfessionalProp> = ({
 		roleInput,
 		bodyRateInput,
 		feetRateInput,
-		//accupunctureInput,
+		acupunctureRateInput,
 		perHourInput,
 	]);
 
@@ -122,26 +123,19 @@ const Professional: FC<ProfessionalProp> = ({
 		const invalidInput =
 			invalidBodyRate ||
 			invalidFeetRate ||
-			//invalidAccupunctureRate ||
+			invalidAcupunctureRate ||
 			invalidPerHour;
 
 		setInvalidInput(invalidInput);
 	}, [
 		invalidBodyRate,
 		invalidFeetRate,
-		//invalidAccupunctureRate,
+		invalidAcupunctureRate,
 		invalidPerHour,
 	]);
 
 	const { user, setUser } = useUserContext();
-	let employees: Employee[] | undefined = undefined;
-	let setEmployees: ((employees: Employee[]) => void) | undefined = undefined;
-
-	try {
-		const employeesContext = useEmployeesContext();
-		employees = employeesContext.employees;
-		setEmployees = employeesContext.setEmployees;
-	} catch {}
+	const { employees, setEmployees } = useEmployeesContext();
 
 	const onSave = async () => {
 		const role: Role | undefined =
@@ -150,10 +144,10 @@ const Professional: FC<ProfessionalProp> = ({
 			bodyRateInput === originalBodyRate ? undefined : bodyRateInput;
 		const feet_rate: number | null | undefined =
 			feetRateInput === originalFeetRate ? undefined : feetRateInput;
-		// const accupuncture_rate: number | null | undefined =
-		// 	accupunctureInput === originalAccupunctureRate
-		// 		? undefined
-		// 		: accupunctureInput;
+		const acupuncture_rate: number | null | undefined =
+			acupunctureRateInput === originalAcupunctureRate
+				? undefined
+				: acupunctureRateInput;
 		const per_hour: number | null | undefined =
 			perHourInput === originalPerHour ? undefined : perHourInput;
 
@@ -161,7 +155,7 @@ const Professional: FC<ProfessionalProp> = ({
 			...(role && { role }),
 			...(body_rate && { body_rate }),
 			...(feet_rate && { feet_rate }),
-			// ...(accupuncture_rate && { accupuncture_rate }),
+			...(acupuncture_rate && { acupuncture_rate }),
 			...(per_hour && { per_hour }),
 		};
 
@@ -173,12 +167,12 @@ const Professional: FC<ProfessionalProp> = ({
 					...user,
 					...updateEmployeeRequest,
 				};
-				sessionStorage.setItem('user', JSON.stringify(updatedUser));
+				sessionStorage.setItem(userKey, JSON.stringify(updatedUser));
 				setUser(updatedUser);
 				const updatedEmployee = Object(updatedUser);
 				delete updatedEmployee['language'];
 				delete updatedEmployee['dark_mode'];
-				if (employees !== undefined && setEmployees !== undefined) {
+				if (user.permissions.includes(Permissions.PERMISSION_GET_EMPLOYEE)) {
 					setEmployees(
 						employees.map((employee) =>
 							employee.employee_id == user.employee_id
@@ -186,6 +180,8 @@ const Professional: FC<ProfessionalProp> = ({
 								: employee
 						)
 					);
+				} else {
+					setEmployees([]);
 				}
 
 				toast.update(toastId, {
@@ -287,23 +283,23 @@ const Professional: FC<ProfessionalProp> = ({
 				missingPermissionMessage={ERRORS.employee.permissions.edit}
 			/>
 
-			{/* <EditablePayRate
-				originalAmount={originalAccupunctureRate}
-				amount={accupunctureRateInput}
-				setAmount={setAccupunctureRateInput}
-				label={LABELS.employee.accupuncture_rate}
-				name={NAMES.employee.accupuncture_rate}
+			<EditablePayRate
+				originalAmount={originalAcupunctureRate}
+				amount={acupunctureRateInput}
+				setAmount={setAcupunctureRateInput}
+				label={LABELS.employee.acupuncture_rate}
+				name={NAMES.employee.acupuncture_rate}
 				validationProp={{
-					max: NUMBERS.employee.accupuncture_rate,
+					max: NUMBERS.employee.acupuncture_rate,
 					required: false,
-					requiredMessage: ERRORS.employee.accupuncture_rate.required,
-					invalid: invalidAccupunctureRate,
-					setInvalid: setInvalidAccupunctureRate,
-					invalidMessage: ERRORS.employee.accupuncture_rate.invalid,
+					invalid: invalidAcupunctureRate,
+					setInvalid: setInvalidAcupunctureRate,
+					invalidMessage: ERRORS.employee.acupuncture_rate.invalid,
 				}}
+				placeholder={PLACEHOLDERS.employee.acupuncture_rate}
 				editable={editable}
 				missingPermissionMessage={ERRORS.employee.permissions.edit}
-			/> */}
+			/>
 
 			<EditablePayRate
 				originalAmount={originalPerHour}

@@ -16,13 +16,18 @@ import PermissionsButton, {
 	ButtonType,
 } from '../miscallaneous/PermissionsButton.Component';
 import AddCustomerModal from '../miscallaneous/modals/customer/AddCustomerModal.Component';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import AddInput from '../miscallaneous/add/AddInput.Component';
 import ERRORS from '../../../../constants/error.constants';
 import { useTranslation } from 'react-i18next';
 import LABELS from '../../../../constants/label.constants';
 import NAMES from '../../../../constants/name.constants';
 import PLACEHOLDERS from '../../../../constants/placeholder.constants';
+import {
+	createToast,
+	errorToast,
+	updateToast,
+} from '../../../../utils/toast.utils';
 
 const Customers: FC = () => {
 	const { t } = useTranslation();
@@ -35,6 +40,9 @@ const Customers: FC = () => {
 	const { customers, setCustomers } = useCustomersContext();
 	const { user } = useUserContext();
 
+	const gettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_CUSTOMER
+	);
 	const creatable = user.permissions.includes(
 		Permissions.PERMISSION_ADD_CUSTOMER
 	);
@@ -58,43 +66,24 @@ const Customers: FC = () => {
 		: customers;
 
 	const onAddCustomer = async (request: AddCustomerRequest) => {
-		const toastId = toast.loading(t('Adding Customer...'));
+		const toastId = createToast(t('Adding Customer...'));
 		addCustomer(navigate, request)
 			.then((response) => {
-				setCustomers([...customers, response]);
-				toast.update(toastId, {
-					render: t('Customer Added Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				if (gettable) {
+					setCustomers([...customers, response]);
+				} else {
+					setCustomers([]);
+				}
+				updateToast(toastId, t('Customer Added Successfully'));
 			})
 			.catch((error) => {
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Add Customer')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				errorToast(
+					toastId,
+					<h1>
+						{t('Failed to Add Customer')} <br />
+						{error.message}
+					</h1>
+				);
 			});
 	};
 
@@ -102,105 +91,71 @@ const Customers: FC = () => {
 		phoneNumber: string,
 		request: UpdateCustomerRequest
 	) => {
-		const toastId = toast.loading(t('Updating Customer...'));
+		const toastId = createToast(t('Updating Customer...'));
 		updateCustomer(navigate, phoneNumber, request)
 			.then(() => {
-				const oldCustomer = customers.find(
-					(customer) => customer.phone_number === phoneNumber
-				);
-				if (oldCustomer) {
-					const updatedCustomer = {
-						...oldCustomer,
-						...request,
-					};
-					setCustomers(
-						customers.map((customer) =>
-							customer.phone_number === phoneNumber ? updatedCustomer : customer
-						)
+				if (gettable) {
+					const oldCustomer = customers.find(
+						(customer) => customer.phone_number === phoneNumber
 					);
+					if (oldCustomer) {
+						const updatedCustomer = {
+							...oldCustomer,
+							...request,
+						};
+						setCustomers(
+							customers.map((customer) =>
+								customer.phone_number === phoneNumber
+									? updatedCustomer
+									: customer
+							)
+						);
+					}
+				} else {
+					setCustomers([]);
 				}
-				toast.update(toastId, {
-					render: t('Customer Updated Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Customer Updated Successfully'));
 			})
 			.catch((error) => {
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Update Customer')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				errorToast(
+					toastId,
+					<h1>
+						{t('Failed to Update Customer')} <br />
+						{error.message}
+					</h1>
+				);
 			});
 	};
 
 	const onDeleteCustomer = async (phoneNumber: string) => {
-		const toastId = toast.loading(t('Deleting Customer...'));
+		const toastId = createToast(t('Deleting Customer...'));
 		deleteCustomer(navigate, phoneNumber)
 			.then(() => {
-				setCustomers(
-					customers.filter((customer) => customer.phone_number !== phoneNumber)
-				);
-				toast.update(toastId, {
-					render: t('Customer Deleted Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				if (gettable) {
+					setCustomers(
+						customers.filter(
+							(customer) => customer.phone_number !== phoneNumber
+						)
+					);
+				} else {
+					setCustomers([]);
+				}
+				updateToast(toastId, t('Customer Deleted Successfully'));
 			})
 			.catch((error) => {
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Delete Customer')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				errorToast(
+					toastId,
+					<h1>
+						{t('Failed to Delete Customer')} <br />
+						{error.message}
+					</h1>
+				);
 			});
 	};
 
 	return (
 		<>
-			<div className="w-11/12 mx-auto h-screen flex flex-col">
+			<div className="non-sidebar">
 				<div className="h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
 					<h1 className="my-auto text-gray-600 text-3xl">{t('Customers')}</h1>
 					<div className="h-fit my-auto flex">
@@ -232,6 +187,7 @@ const Customers: FC = () => {
 				/>
 				<CustomerList
 					customers={filteredCustomers}
+					gettable={gettable}
 					editable={editable}
 					onEditCustomer={onEditCustomer}
 					deletable={deletable}

@@ -60,7 +60,7 @@ const EditableToggleSwitch: FC<EditableToggleSwitchProp> = ({
 	return (
 		<div className="mb-4">
 			<label className="label" htmlFor={name}>
-				{label}
+				{t(label)}
 			</label>
 			<div className="flex rounded-md shadow-sm">
 				<label
@@ -76,7 +76,7 @@ const EditableToggleSwitch: FC<EditableToggleSwitchProp> = ({
 					/>
 					<span
 						className={`label flex items-center text-sm font-medium ${textColour}`}>
-						{falseText}
+						{t(falseText)}
 					</span>
 					<span
 						className={`slider mx-4 flex h-8 w-[60px] items-center rounded-full p-1 duration-200 ${
@@ -90,14 +90,14 @@ const EditableToggleSwitch: FC<EditableToggleSwitchProp> = ({
 					</span>
 					<span
 						className={`label flex items-center text-sm font-medium ${textColour}`}>
-						{trueText}
+						{t(trueText)}
 					</span>
 				</label>
 				<div className="ms-auto">
 					<PermissionsButton
 						btnTitle={disabled ? t('Change') : t('Cancel')}
 						disabled={!editable}
-						missingPermissionMessage={missingPermissionMessage}
+						missingPermissionMessage={t(missingPermissionMessage)}
 						onClick={handleDisableBtnClick}
 					/>
 				</div>

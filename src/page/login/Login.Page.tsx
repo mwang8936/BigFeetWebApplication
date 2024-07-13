@@ -4,7 +4,7 @@ import Logo from '../../assets/Logo.png';
 
 export default function Login() {
 	return (
-		<div className='center'>
+		<div className="center-page">
 			<img src={Logo} />
 			<LoginForm />
 		</div>

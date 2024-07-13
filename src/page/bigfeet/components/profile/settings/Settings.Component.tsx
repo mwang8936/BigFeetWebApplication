@@ -15,6 +15,7 @@ import NAMES from '../../../../../constants/name.constants';
 import EditableToggleSwitch from '../../miscallaneous/editable/EditableToggleSwitch.Component';
 import { useTranslation } from 'react-i18next';
 import { getLanguageFile } from '../../../../../constants/language.constants';
+import { userKey } from '../../../../../constants/api.constants';
 
 interface SettingsProp {
 	originalLanguage: Language;
@@ -80,9 +81,9 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 					...user,
 					...updateProfileRequest,
 				};
-				sessionStorage.setItem('user', JSON.stringify(updatedUser));
+				sessionStorage.setItem(userKey, JSON.stringify(updatedUser));
 				setUser(updatedUser);
-				i18n.changeLanguage(getLanguageFile(user.language));
+				i18n.changeLanguage(getLanguageFile(updatedUser.language));
 
 				toast.update(toastId, {
 					render: t('Profile Updated Successfully'),
@@ -152,8 +153,8 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 				originalChecked={originalDarkMode}
 				checked={darkModeInput}
 				setChecked={setDarkModeInput}
-				falseText={t('Light')}
-				trueText={t('Dark')}
+				falseText={'Light'}
+				trueText={'Dark'}
 				toggleColour={ToggleColor.BLACK}
 				label={LABELS.profile.dark_mode}
 				name={NAMES.profile.dark_mode}

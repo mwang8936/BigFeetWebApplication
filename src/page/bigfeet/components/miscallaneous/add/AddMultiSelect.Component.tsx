@@ -24,7 +24,7 @@ const AddMultiSelect: FC<AddMultiSelectProp> = ({
 	return (
 		<div className="mb-4">
 			<label className="label" htmlFor={name}>
-				{label}
+				{t(label)}
 			</label>
 			<div className="flex rounded-md shadow-sm">
 				<div className="editable-input" id={name}>

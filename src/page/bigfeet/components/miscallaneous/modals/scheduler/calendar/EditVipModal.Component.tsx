@@ -6,13 +6,12 @@ import {
 	UpdateVipPackageRequest,
 } from '../../../../../../../models/requests/Vip-Package.Request.Model';
 import Vip from './Vip.Component';
+import EditVip from './EditVip.Component';
 
-interface VipModalProp {
+interface EditVipModalProp {
 	open: boolean;
 	setOpen(open: boolean): void;
-	vipPackages: VipPackage[];
-	creatable: boolean;
-	onAddVipPackage(request: AddVipPackageRequest): Promise<void>;
+	vipPackage: VipPackage;
 	editable: boolean;
 	onEditVipPackage(
 		serial: string,
@@ -22,12 +21,10 @@ interface VipModalProp {
 	onDeleteVipPackage(serial: string): Promise<void>;
 }
 
-const VipModal: FC<VipModalProp> = ({
+const EditVipModal: FC<EditVipModalProp> = ({
 	open,
 	setOpen,
-	vipPackages,
-	creatable,
-	onAddVipPackage,
+	vipPackage,
 	editable,
 	onEditVipPackage,
 	deletable,
@@ -38,11 +35,9 @@ const VipModal: FC<VipModalProp> = ({
 			open={open}
 			setOpen={setOpen}
 			contentElement={
-				<Vip
+				<EditVip
 					setOpen={setOpen}
-					vipPackages={vipPackages}
-					creatable={creatable}
-					onAddVipPackage={onAddVipPackage}
+					vipPackage={vipPackage}
 					editable={editable}
 					onEditVipPackage={onEditVipPackage}
 					deletable={deletable}
@@ -53,4 +48,4 @@ const VipModal: FC<VipModalProp> = ({
 	);
 };
 
-export default VipModal;
+export default EditVipModal;

@@ -5,12 +5,17 @@ import NUMBERS from '../../../../../constants/numbers.constants';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 import { useTranslation } from 'react-i18next';
 
+interface InvalidMessage {
+	key: string;
+	value: Record<string, string | number>;
+}
+
 interface BodyValidationProp {
 	required: boolean;
 	requiredMessage?: string;
 	invalid: boolean;
 	setInvalid(invalid: boolean): void;
-	invalidMessage: string;
+	invalidMessage: InvalidMessage;
 }
 
 interface FeetValidationProp {
@@ -18,69 +23,67 @@ interface FeetValidationProp {
 	requiredMessage?: string;
 	invalid: boolean;
 	setInvalid(invalid: boolean): void;
-	invalidMessage: string;
+	invalidMessage: InvalidMessage;
 }
 
-interface AccupunctureValidationProp {
+interface AcupunctureValidationProp {
 	required: boolean;
 	requiredMessage?: string;
 	invalid: boolean;
 	setInvalid(invalid: boolean): void;
-	invalidMessage: string;
+	invalidMessage: InvalidMessage;
 }
 
-interface AddBodyFeetAccupunctureServiceProp {
+interface AddBodyFeetAcupunctureServiceProp {
 	body: number | null;
 	setBody(body: number | null): void;
 	bodyValidationProp: BodyValidationProp;
 	feet: number | null;
 	setFeet(feet: number | null): void;
 	feetValidationProp: FeetValidationProp;
-	accupuncture: number | null;
-	setAccupuncture(accupuncture: number | null): void;
-	accupunctureValidationProp: AccupunctureValidationProp;
+	acupuncture: number | null;
+	setAcupuncture(acupuncture: number | null): void;
+	acupunctureValidationProp: AcupunctureValidationProp;
 }
 
-const AddBodyFeetAccupunctureService: FC<
-	AddBodyFeetAccupunctureServiceProp
-> = ({
+const AddBodyFeetAcupunctureService: FC<AddBodyFeetAcupunctureServiceProp> = ({
 	body,
 	setBody,
 	bodyValidationProp,
 	feet,
 	setFeet,
 	feetValidationProp,
-	accupuncture,
-	setAccupuncture,
-	accupunctureValidationProp,
+	acupuncture,
+	setAcupuncture,
+	acupunctureValidationProp,
 }) => {
 	const { t } = useTranslation();
 
 	useEffect(() => {
 		if (body) {
 			setFeet(0);
-			setAccupuncture(0);
+			setAcupuncture(0);
 		}
 	}, [body]);
 
 	useEffect(() => {
 		if (feet) {
 			setBody(0);
-			setAccupuncture(0);
+			setAcupuncture(0);
 		}
 	}, [feet]);
 
 	useEffect(() => {
-		if (accupuncture) {
+		if (acupuncture) {
 			setBody(0);
 			setFeet(0);
 		}
-	}, [accupuncture]);
+	}, [acupuncture]);
 	return (
 		<>
 			<div>
 				<label className="label" htmlFor={NAMES.service.body}>
-					{LABELS.service.body}
+					{t(LABELS.service.body)}
 				</label>
 				<div className="flex relative rounded-md shadow-sm">
 					<input
@@ -108,14 +111,19 @@ const AddBodyFeetAccupunctureService: FC<
 					<p className="error-label">{bodyValidationProp.requiredMessage}</p>
 				) : (
 					bodyValidationProp.invalid && (
-						<p className="error-label">{bodyValidationProp.invalidMessage}</p>
+						<p className="error-label">
+							{t(
+								bodyValidationProp.invalidMessage.key,
+								bodyValidationProp.invalidMessage.key
+							)}
+						</p>
 					)
 				)}
 			</div>
 
 			<div>
 				<label className="label" htmlFor={NAMES.service.feet}>
-					{LABELS.service.feet}
+					{t(LABELS.service.feet)}
 				</label>
 				<div className="flex relative rounded-md shadow-sm">
 					<input
@@ -143,47 +151,55 @@ const AddBodyFeetAccupunctureService: FC<
 					<p className="error-label">{feetValidationProp.requiredMessage}</p>
 				) : (
 					feetValidationProp.invalid && (
-						<p className="error-label">{feetValidationProp.invalidMessage}</p>
+						<p className="error-label">
+							{t(
+								feetValidationProp.invalidMessage.key,
+								feetValidationProp.invalidMessage.key
+							)}
+						</p>
 					)
 				)}
 			</div>
 
 			<div>
-				<label className="label" htmlFor={NAMES.service.accupuncture}>
-					{LABELS.service.accupuncture}
+				<label className="label" htmlFor={NAMES.service.acupuncture}>
+					{t(LABELS.service.acupuncture)}
 				</label>
 				<div className="flex relative rounded-md shadow-sm">
 					<input
 						className="add-input pl-9"
-						id={NAMES.service.accupuncture}
+						id={NAMES.service.acupuncture}
 						type="number"
-						value={accupuncture !== null ? accupuncture : ''}
+						value={acupuncture !== null ? acupuncture : ''}
 						onChange={(event) => {
 							const text = event.target.value.trimStart();
 
-							setAccupuncture(text.length !== 0 ? parseFloat(text) : null);
-							accupunctureValidationProp.setInvalid(
+							setAcupuncture(text.length !== 0 ? parseFloat(text) : null);
+							acupunctureValidationProp.setInvalid(
 								!event.target.validity.valid
 							);
 						}}
 						min={0}
-						max={NUMBERS.service.accupuncture}
+						max={NUMBERS.service.acupuncture}
 						step={0.5}
 						required={true}
-						placeholder={PLACEHOLDERS.service.accupuncture}
+						placeholder={PLACEHOLDERS.service.acupuncture}
 					/>
 					<div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4">
 						<span className="text-gray-500">{t('A')}</span>
 					</div>
 				</div>
-				{accupunctureValidationProp.required && accupuncture === null ? (
+				{acupunctureValidationProp.required && acupuncture === null ? (
 					<p className="error-label">
-						{accupunctureValidationProp.requiredMessage}
+						{acupunctureValidationProp.requiredMessage}
 					</p>
 				) : (
-					accupunctureValidationProp.invalid && (
+					acupunctureValidationProp.invalid && (
 						<p className="error-label">
-							{accupunctureValidationProp.invalidMessage}
+							{t(
+								acupunctureValidationProp.invalidMessage.key,
+								acupunctureValidationProp.invalidMessage.key
+							)}
 						</p>
 					)
 				)}
@@ -192,4 +208,4 @@ const AddBodyFeetAccupunctureService: FC<
 	);
 };
 
-export default AddBodyFeetAccupunctureService;
+export default AddBodyFeetAcupunctureService;

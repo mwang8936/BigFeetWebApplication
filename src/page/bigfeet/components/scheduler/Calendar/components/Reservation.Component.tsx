@@ -168,20 +168,20 @@ const ReservationTag: FC<ReservationTagProp> = ({
 
 	const customerNameText = reservation.customer && (
 		<span className="font-medium">
-			{t('Customer:')} <br /> {reservation.customer.customer_name}
+			{t('Customer')}: <br /> {reservation.customer.customer_name}
 		</span>
 	);
 
 	const customerPhoneText = reservation.customer && (
 		<span className="font-medium">
-			{t('Customer Phone #:')} <br />
+			{t('Customer Phone #')}: <br />
 			{formatPhoneNumber(reservation.customer.phone_number)}
 		</span>
 	);
 
 	const customerNoteText = reservation.customer?.notes && (
 		<span className="font-medium">
-			{t('Customer Notes:')} <br /> {reservation.customer.notes}
+			{t('Customer Notes')}: <br /> {reservation.customer.notes}
 		</span>
 	);
 
@@ -292,7 +292,7 @@ const ReservationTag: FC<ReservationTagProp> = ({
 					className={`py-1 ${serviceColour} h-full w-[6px] me-3 rounded-2xl border-2`}
 				/>
 
-				<div className="flex flex-col text-sm text-black font-bold overflow-hidden">
+				<div className="flex flex-col text-sm text-black font-bold truncate">
 					{serviceText}
 
 					{isCompleted ? (

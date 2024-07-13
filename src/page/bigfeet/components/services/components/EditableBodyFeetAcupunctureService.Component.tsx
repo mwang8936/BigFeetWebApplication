@@ -7,12 +7,17 @@ import NAMES from '../../../../../constants/name.constants';
 import LABELS from '../../../../../constants/label.constants';
 import { useTranslation } from 'react-i18next';
 
+interface InvalidMessage {
+	key: string;
+	value: Record<string, string | number>;
+}
+
 interface BodyValidationProp {
 	required: boolean;
 	requiredMessage?: string;
 	invalid: boolean;
 	setInvalid(invalid: boolean): void;
-	invalidMessage: string;
+	invalidMessage: InvalidMessage;
 }
 
 interface FeetValidationProp {
@@ -20,18 +25,18 @@ interface FeetValidationProp {
 	requiredMessage?: string;
 	invalid: boolean;
 	setInvalid(invalid: boolean): void;
-	invalidMessage: string;
+	invalidMessage: InvalidMessage;
 }
 
-interface AccupunctureValidationProp {
+interface AcupunctureValidationProp {
 	required: boolean;
 	requiredMessage?: string;
 	invalid: boolean;
 	setInvalid(invalid: boolean): void;
-	invalidMessage: string;
+	invalidMessage: InvalidMessage;
 }
 
-interface EditableBodyFeetAccupunctureServiceProp {
+interface EditableBodyFeetAcupunctureServiceProp {
 	originalBody: number | null;
 	body: number | null;
 	setBody(body: number | null): void;
@@ -40,16 +45,16 @@ interface EditableBodyFeetAccupunctureServiceProp {
 	feet: number | null;
 	setFeet(feet: number | null): void;
 	feetValidationProp: FeetValidationProp;
-	originalAccupuncture: number | null;
-	accupuncture: number | null;
-	setAccupuncture(accupuncture: number | null): void;
-	accupunctureValidationProp: AccupunctureValidationProp;
+	originalAcupuncture: number | null;
+	acupuncture: number | null;
+	setAcupuncture(acupuncture: number | null): void;
+	acupunctureValidationProp: AcupunctureValidationProp;
 	editable: boolean;
 	missingPermissionMessage: string;
 }
 
-const EditableBodyFeetAccupunctureService: FC<
-	EditableBodyFeetAccupunctureServiceProp
+const EditableBodyFeetAcupunctureService: FC<
+	EditableBodyFeetAcupunctureServiceProp
 > = ({
 	originalBody,
 	body,
@@ -59,10 +64,10 @@ const EditableBodyFeetAccupunctureService: FC<
 	feet,
 	setFeet,
 	feetValidationProp,
-	originalAccupuncture,
-	accupuncture,
-	setAccupuncture,
-	accupunctureValidationProp,
+	originalAcupuncture,
+	acupuncture,
+	setAcupuncture,
+	acupunctureValidationProp,
 	editable,
 	missingPermissionMessage,
 }) => {
@@ -72,7 +77,7 @@ const EditableBodyFeetAccupunctureService: FC<
 
 	const [disabledFeet, setDisabledFeet] = useState(true);
 
-	const [disabledAccupuncture, setDisabledAccupuncture] = useState(true);
+	const [disabledAcupuncture, setDisabledAcupuncture] = useState(true);
 
 	useEffect(() => {
 		setDisabledBody(true);
@@ -83,8 +88,8 @@ const EditableBodyFeetAccupunctureService: FC<
 	}, [originalFeet]);
 
 	useEffect(() => {
-		setDisabledAccupuncture(true);
-	}, [originalAccupuncture]);
+		setDisabledAcupuncture(true);
+	}, [originalAcupuncture]);
 
 	useEffect(() => {
 		if (body?.toString() && parseFloat(body.toString())) {
@@ -93,9 +98,9 @@ const EditableBodyFeetAccupunctureService: FC<
 				setDisabledFeet(false);
 			}
 
-			if (accupuncture?.toString() && parseFloat(accupuncture.toString())) {
-				setAccupuncture(0);
-				setDisabledAccupuncture(false);
+			if (acupuncture?.toString() && parseFloat(acupuncture.toString())) {
+				setAcupuncture(0);
+				setDisabledAcupuncture(false);
 			}
 		}
 	}, [body]);
@@ -107,15 +112,15 @@ const EditableBodyFeetAccupunctureService: FC<
 				setDisabledBody(false);
 			}
 
-			if (accupuncture?.toString() && parseFloat(accupuncture.toString())) {
-				setAccupuncture(0);
-				setDisabledAccupuncture(false);
+			if (acupuncture?.toString() && parseFloat(acupuncture.toString())) {
+				setAcupuncture(0);
+				setDisabledAcupuncture(false);
 			}
 		}
 	}, [feet]);
 
 	useEffect(() => {
-		if (accupuncture?.toString() && parseFloat(accupuncture.toString())) {
+		if (acupuncture?.toString() && parseFloat(acupuncture.toString())) {
 			if (body?.toString() && parseFloat(body.toString())) {
 				setBody(0);
 				setDisabledBody(false);
@@ -126,7 +131,7 @@ const EditableBodyFeetAccupunctureService: FC<
 				setDisabledFeet(false);
 			}
 		}
-	}, [accupuncture]);
+	}, [acupuncture]);
 
 	const handleDisableBodyBtnClick = () => {
 		if (!disabledBody) {
@@ -144,26 +149,26 @@ const EditableBodyFeetAccupunctureService: FC<
 		setDisabledFeet(!disabledFeet);
 	};
 
-	const handleDisableAccupunctureBtnClick = () => {
-		if (!disabledAccupuncture) {
-			setAccupuncture(originalAccupuncture);
-			accupunctureValidationProp.setInvalid(false);
+	const handleDisableAcupunctureBtnClick = () => {
+		if (!disabledAcupuncture) {
+			setAcupuncture(originalAcupuncture);
+			acupunctureValidationProp.setInvalid(false);
 		}
-		setDisabledAccupuncture(!disabledAccupuncture);
+		setDisabledAcupuncture(!disabledAcupuncture);
 	};
 
 	return (
 		<>
 			<div>
 				<label className="label" htmlFor={NAMES.service.body}>
-					{LABELS.service.body}
+					{t(LABELS.service.body)}
 				</label>
 				<div className="flex relative rounded-md shadow-sm">
 					<input
 						className="editable-input pl-9"
 						id={NAMES.service.body}
 						type="number"
-						value={body !== null ? parseFloat(body.toString()) : ''}
+						value={body ? parseFloat(body.toString()) : ''}
 						onChange={(event) => {
 							const text = event.target.value.trimStart();
 
@@ -193,21 +198,26 @@ const EditableBodyFeetAccupunctureService: FC<
 					<p className="error-label">{bodyValidationProp.requiredMessage}</p>
 				) : (
 					bodyValidationProp.invalid && (
-						<p className="error-label">{bodyValidationProp.invalidMessage}</p>
+						<p className="error-label">
+							{t(
+								bodyValidationProp.invalidMessage.key,
+								bodyValidationProp.invalidMessage.key
+							)}
+						</p>
 					)
 				)}
 			</div>
 
 			<div>
 				<label className="label" htmlFor={NAMES.service.feet}>
-					{LABELS.service.feet}
+					{t(LABELS.service.feet)}
 				</label>
 				<div className="flex relative rounded-md shadow-sm">
 					<input
 						className="editable-input pl-9"
 						id={NAMES.service.feet}
 						type="number"
-						value={feet !== null ? parseFloat(feet.toString()) : ''}
+						value={feet ? parseFloat(feet.toString()) : ''}
 						onChange={(event) => {
 							const text = event.target.value.trimStart();
 
@@ -222,7 +232,7 @@ const EditableBodyFeetAccupunctureService: FC<
 						placeholder={PLACEHOLDERS.service.feet}
 					/>
 					<div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4">
-						<span className="text-gray-500">{t('R')}</span>
+						<span className="text-gray-500">{t('F')}</span>
 					</div>
 					<div className="ms-3">
 						<PermissionsButton
@@ -237,58 +247,64 @@ const EditableBodyFeetAccupunctureService: FC<
 					<p className="error-label">{feetValidationProp.requiredMessage}</p>
 				) : (
 					feetValidationProp.invalid && (
-						<p className="error-label">{feetValidationProp.invalidMessage}</p>
+						<p className="error-label">
+							{t(
+								feetValidationProp.invalidMessage.key,
+								feetValidationProp.invalidMessage.key
+							)}
+						</p>
 					)
 				)}
 			</div>
 
 			<div>
-				<label className="label" htmlFor={NAMES.service.accupuncture}>
-					{LABELS.service.accupuncture}
+				<label className="label" htmlFor={NAMES.service.acupuncture}>
+					{t(LABELS.service.acupuncture)}
 				</label>
 				<div className="flex relative rounded-md shadow-sm">
 					<input
 						className="editable-input pl-9"
-						id={NAMES.service.accupuncture}
+						id={NAMES.service.acupuncture}
 						type="number"
-						value={
-							accupuncture !== null ? parseFloat(accupuncture.toString()) : ''
-						}
+						value={acupuncture ? parseFloat(acupuncture.toString()) : ''}
 						onChange={(event) => {
 							const text = event.target.value.trimStart();
 
-							setAccupuncture(text.length !== 0 ? parseFloat(text) : null);
-							accupunctureValidationProp.setInvalid(
+							setAcupuncture(text.length !== 0 ? parseFloat(text) : null);
+							acupunctureValidationProp.setInvalid(
 								!event.target.validity.valid
 							);
 						}}
 						min={0}
-						max={NUMBERS.service.accupuncture}
+						max={NUMBERS.service.acupuncture}
 						step={0.5}
 						required={true}
-						disabled={disabledAccupuncture}
-						placeholder={PLACEHOLDERS.service.accupuncture}
+						disabled={disabledAcupuncture}
+						placeholder={PLACEHOLDERS.service.acupuncture}
 					/>
 					<div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4">
 						<span className="text-gray-500">{t('A')}</span>
 					</div>
 					<div className="ms-3">
 						<PermissionsButton
-							btnTitle={disabledAccupuncture ? t('Change') : t('Cancel')}
+							btnTitle={disabledAcupuncture ? t('Change') : t('Cancel')}
 							disabled={!editable}
 							missingPermissionMessage={missingPermissionMessage}
-							onClick={handleDisableAccupunctureBtnClick}
+							onClick={handleDisableAcupunctureBtnClick}
 						/>
 					</div>
 				</div>
-				{accupunctureValidationProp.required && accupuncture === null ? (
+				{acupunctureValidationProp.required && acupuncture === null ? (
 					<p className="error-label">
-						{accupunctureValidationProp.requiredMessage}
+						{acupunctureValidationProp.requiredMessage}
 					</p>
 				) : (
-					accupunctureValidationProp.invalid && (
+					acupunctureValidationProp.invalid && (
 						<p className="error-label">
-							{accupunctureValidationProp.invalidMessage}
+							{t(
+								acupunctureValidationProp.invalidMessage.key,
+								acupunctureValidationProp.invalidMessage.key
+							)}
 						</p>
 					)
 				)}
@@ -297,4 +313,4 @@ const EditableBodyFeetAccupunctureService: FC<
 	);
 };
 
-export default EditableBodyFeetAccupunctureService;
+export default EditableBodyFeetAcupunctureService;

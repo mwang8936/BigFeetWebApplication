@@ -4,7 +4,8 @@
 
 @layer components {
 
-  .center {
+  /* Login Page */
+  .center-page {
     @apply flex flex-col items-center justify-center h-screen
   }
 
@@ -14,6 +15,18 @@
 
   .login-title {
     @apply block text-gray-700 font-bold text-center text-xl mb-3
+  }
+
+  .label {
+    @apply block text-gray-700 text-sm font-bold mb-2 
+  }
+
+  .error-label {
+    @apply my-auto text-red-500 text-sm
+  }
+
+  .success-label {
+    @apply my-auto text-green-600 text-sm
   }
 
   .input-form {
@@ -32,21 +45,25 @@
     focus:invalid:border-pink-500 focus:invalid:ring-pink-500
   }
 
-  .label {
-    @apply block text-gray-700 text-sm font-bold mb-2 
-  }
-
-  .error-label {
-    @apply my-auto text-red-500 text-sm
-  }
-
-  .success-label {
-    @apply my-auto text-green-600 text-sm
+  .pointer-icon {
+    @apply h-6 w-6 text-gray-500 cursor-pointer
   }
 
   .white-spin {
     @apply animate-spin -ml-1 mr-3 h-5 w-5 text-white
   }
+
+  /* BigFeet Page */
+
+  /* SideBar */
+
+  /* Non-SideBar */
+  .non-sidebar {
+    @apply w-11/12 mx-auto h-screen flex flex-col
+  }
+
+  /* Customers */
+
 
   .button {
     @apply relative inline-flex w-fit justify-center text-white font-bold py-2 px-4 my-2 rounded-md
@@ -132,6 +149,11 @@
 
   .tips-tip {
     @apply absolute w-[178px] h-auto p-2 mx-auto bottom-[10%] rounded-md shadow-md text-white flex flex-col
+    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom
+  }
+
+  .vip-tip {
+    @apply absolute w-[178px] h-auto p-2 mx-auto bottom-[5%] rounded-md shadow-md text-white flex flex-col
     bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom
   }
 }

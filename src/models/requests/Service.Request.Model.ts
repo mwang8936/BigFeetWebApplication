@@ -7,7 +7,8 @@ export interface UpdateServiceRequest {
 	money?: number;
 	body?: number;
 	feet?: number;
-	accupuncture?: number;
+	acupuncture?: number;
+	bed_required?: boolean;
 	color?: ServiceColor;
 }
 
@@ -18,6 +19,7 @@ export interface AddServiceRequest {
 	money: number;
 	body?: number;
 	feet?: number;
-	accupuncture?: number;
+	acupuncture?: number;
+	bed_required: boolean;
 	color: ServiceColor;
 }

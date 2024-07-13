@@ -45,9 +45,9 @@ const AddEmployee: FC<AddEmployeeProp> = ({
 	const [permissionsInput, setPermissionsInput] = useState<Permissions[]>([]);
 	const [bodyRateInput, setBodyRateInput] = useState<number | null>(null);
 	const [feetRateInput, setFeetRateInput] = useState<number | null>(null);
-	// const [accupunctureInput, setAccupunctureInput] = useState<number | null>(
-	// 	null
-	// );
+	const [acupunctureRateInput, setAcupunctureRateInput] = useState<
+		number | null
+	>(null);
 	const [perHourInput, setPerHourInput] = useState<number | null>(null);
 
 	const [invalidUsername, setInvalidUsername] = useState<boolean>(false);
@@ -57,8 +57,8 @@ const AddEmployee: FC<AddEmployeeProp> = ({
 	const [invalidLastName, setInvalidLastName] = useState<boolean>(false);
 	const [invalidBodyRate, setInvalidBodyRate] = useState<boolean>(false);
 	const [invalidFeetRate, setInvalidFeetRate] = useState<boolean>(false);
-	// const [invalidAccupunctureRate, setInvalidAccupunctureRate] =
-	// 	useState<boolean>(false);
+	const [invalidAcupunctureRate, setInvalidAcupunctureRate] =
+		useState<boolean>(false);
 	const [invalidPerHour, setInvalidPerHour] = useState<boolean>(false);
 
 	const [missingRequiredInput, setMissingRequiredInput] =
@@ -93,7 +93,7 @@ const AddEmployee: FC<AddEmployeeProp> = ({
 			invalidLastName ||
 			invalidBodyRate ||
 			invalidFeetRate ||
-			// invalidAccupunctureRate ||
+			invalidAcupunctureRate ||
 			invalidPerHour;
 
 		setInvalidInput(invalidInput);
@@ -105,7 +105,7 @@ const AddEmployee: FC<AddEmployeeProp> = ({
 		invalidLastName,
 		invalidBodyRate,
 		invalidFeetRate,
-		// invalidAccupunctureRate,
+		invalidAcupunctureRate,
 		invalidPerHour,
 	]);
 
@@ -130,7 +130,8 @@ const AddEmployee: FC<AddEmployeeProp> = ({
 		const permissions = permissionsInput as Permissions[];
 		const body_rate = bodyRateInput !== null ? bodyRateInput : undefined;
 		const feet_rate = feetRateInput !== null ? feetRateInput : undefined;
-		// const accupuncture_rate = accupunctureRateInput === null ? accupunctureRateInput : undefined
+		const acupuncture_rate =
+			acupunctureRateInput !== null ? acupunctureRateInput : undefined;
 		const per_hour = perHourInput !== null ? perHourInput : undefined;
 
 		const addEmployeeRequest: AddEmployeeRequest = {
@@ -143,6 +144,7 @@ const AddEmployee: FC<AddEmployeeProp> = ({
 			permissions,
 			body_rate,
 			feet_rate,
+			acupuncture_rate,
 			per_hour,
 		};
 
@@ -328,19 +330,20 @@ const AddEmployee: FC<AddEmployeeProp> = ({
 								placeholder={PLACEHOLDERS.employee.feet_rate}
 							/>
 
-							{/* <AddPayRate
-								amount={accupunctureRateInput}
-								setAmount={setAccupunctureRateInput}
-								label={LABELS.employee.accupuncture_rate}
-								name={NAMES.employee.accupuncture_rate}
+							<AddPayRate
+								amount={acupunctureRateInput}
+								setAmount={setAcupunctureRateInput}
+								label={LABELS.employee.acupuncture_rate}
+								name={NAMES.employee.acupuncture_rate}
 								validationProp={{
-									max: NUMBERS.employee.accupuncture_rate,
+									max: NUMBERS.employee.acupuncture_rate,
 									required: false,
-									invalid: invalidAccupunctureRate,
-									setInvalid: setInvalidAccupunctureRate,
-									invalidMessage: ERRORS.employee.accupuncture_rate.invalid,
+									invalid: invalidAcupunctureRate,
+									setInvalid: setInvalidAcupunctureRate,
+									invalidMessage: ERRORS.employee.acupuncture_rate.invalid,
 								}}
-							/> */}
+								placeholder={PLACEHOLDERS.employee.acupuncture_rate}
+							/>
 
 							<AddPayRate
 								amount={perHourInput}

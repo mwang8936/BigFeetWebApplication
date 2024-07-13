@@ -96,33 +96,12 @@ const AddReservation: FC<AddReservationProp> = ({
 	const [conflict, setConflict] = useState<boolean>(false);
 
 	const { schedules } = useSchedulesContext();
+	const { customers } = useCustomersContext();
+	const { employees } = useEmployeesContext();
+	const { services } = useServicesContext();
 
-	let allCustomers: Customer[] = [];
-
-	try {
-		const { customers } = useCustomersContext();
-		allCustomers.push(...customers);
-	} catch {}
-
-	let allEmployees: Employee[] = [];
-
-	try {
-		const { employees } = useEmployeesContext();
-		allEmployees.push(...employees);
-	} catch {
-		const { user } = useUserContext();
-		allEmployees.push(user);
-	}
-
-	let allServices: Service[] = [];
-
-	try {
-		const { services } = useServicesContext();
-		allServices.push(...services);
-	} catch {}
-
-	const employeeDropDownItems = getEmployeeDropDownItems(allEmployees);
-	const serviceDropDownItems = getServiceDropDownItems(allServices);
+	const employeeDropDownItems = getEmployeeDropDownItems(employees);
+	const serviceDropDownItems = getServiceDropDownItems(services);
 
 	useEffect(() => {
 		const missingCustomerInput =
@@ -164,7 +143,7 @@ const AddReservation: FC<AddReservationProp> = ({
 
 	useEffect(() => {
 		if (customerPhoneNumberInput?.length === 10) {
-			const customer = allCustomers.find(
+			const customer = customers.find(
 				(customer) => customer.phone_number === customerPhoneNumberInput
 			);
 			if (customer) {
@@ -183,7 +162,7 @@ const AddReservation: FC<AddReservationProp> = ({
 
 	useEffect(() => {
 		if (dateInput && serviceIdInput) {
-			const service = allServices.find(
+			const service = services.find(
 				(service) => service.service_id === serviceIdInput
 			);
 			if (service) {
@@ -202,9 +181,12 @@ const AddReservation: FC<AddReservationProp> = ({
 					);
 
 				const bodyReservationsAtSameTime = reservationsAtSameTime.filter(
-					(reservation) => reservation.service.body > 0
+					(reservation) => reservation.service.bed_required
 				);
-				if (bodyReservationsAtSameTime.length >= STORES.beds) {
+				if (
+					bodyReservationsAtSameTime.length >= STORES.beds &&
+					service.bed_required
+				) {
 					setNoBeds(true);
 					setOpenBedWarningModal(true);
 				} else {
@@ -366,8 +348,8 @@ const AddReservation: FC<AddReservationProp> = ({
 							<AddToggleSwitch
 								setChecked={setRequestedInput}
 								checked={requestedInput}
-								falseText={t('Not Requested')}
-								trueText={t('Requested')}
+								falseText={'Not Requested'}
+								trueText={'Requested'}
 								toggleColour={ToggleColor.GREEN}
 								label={LABELS.reservation.requested_employee}
 								name={NAMES.reservation.requested_employee}
@@ -387,7 +369,7 @@ const AddReservation: FC<AddReservationProp> = ({
 
 							<div className="flex flex-col border-t-2 border-black p-2">
 								<span className="font-bold mb-2">
-									{t('Customer (Optional):')}
+									{t('Customer (Optional)')}:
 								</span>
 								<AddPhoneNumber
 									phoneNumber={customerPhoneNumberInput}
@@ -470,7 +452,10 @@ const AddReservation: FC<AddReservationProp> = ({
 				open={openBedWarningModal}
 				setOpen={setOpenBedWarningModal}
 				title={ERRORS.warnings.no_beds.title}
-				message={ERRORS.warnings.no_beds.message}
+				message={t(
+					ERRORS.warnings.no_beds.message.key,
+					ERRORS.warnings.no_beds.message.value
+				)}
 			/>
 			<WarningModal
 				open={openConflictWarningModal}

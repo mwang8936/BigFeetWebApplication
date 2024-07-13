@@ -129,8 +129,8 @@ const AddSchedule: FC<AddScheduleProp> = ({
 							<AddToggleSwitch
 								checked={isWorkingInput}
 								setChecked={setIsWorkingInput}
-								falseText={t('Not Working')}
-								trueText={t('Working')}
+								falseText={'Not Working'}
+								trueText={'Working'}
 								toggleColour={ToggleColor.GREEN}
 								label={LABELS.schedule.is_working}
 								name={NAMES.schedule.is_working}

@@ -24,6 +24,9 @@ const Employees: FC = () => {
 	const { employees, setEmployees } = useEmployeesContext();
 	const { user } = useUserContext();
 
+	const gettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_EMPLOYEE
+	);
 	const creatable = user.permissions.includes(
 		Permissions.PERMISSION_ADD_EMPLOYEE
 	);
@@ -40,7 +43,11 @@ const Employees: FC = () => {
 		const toastId = toast.loading(t('Adding Employee...'));
 		addEmployee(navigate, addEmployeeRequest)
 			.then((response) => {
-				setEmployees([...employees, response]);
+				if (gettable) {
+					setEmployees([...employees, response]);
+				} else {
+					setEmployees([]);
+				}
 				toast.update(toastId, {
 					render: t('Employee Added Successfully'),
 					type: 'success',
@@ -77,6 +84,32 @@ const Employees: FC = () => {
 			});
 	};
 
+	const employeesElement =
+		employees.length !== 0 ? (
+			<>
+				{employees[selectedTab] && (
+					<EditEmployee
+						gettable={gettable}
+						editable={editable}
+						deletable={deletable}
+						employee={employees[selectedTab]}
+					/>
+				)}
+			</>
+		) : (
+			<h1 className="m-auto text-gray-600 text-3xl">
+				{t('No Employees Created')}
+			</h1>
+		);
+
+	const permissionsElement = gettable ? (
+		employeesElement
+	) : (
+		<h1 className="m-auto text-gray-600 text-3xl">
+			{t('Missing Get Employees Perissions')}
+		</h1>
+	);
+
 	return (
 		<div className="w-11/12 mx-auto h-full flex-col">
 			<div className="h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
@@ -105,23 +138,7 @@ const Employees: FC = () => {
 				creatable={creatable}
 				onAddEmployee={onAdd}
 			/>
-			<div className="mt-8 mb-4">
-				{employees.length <= 0 ? (
-					<h1 className="m-auto text-gray-600 text-3xl">
-						{t('No Employees Created')}
-					</h1>
-				) : (
-					<>
-						{employees[selectedTab] && (
-							<EditEmployee
-								editable={editable}
-								deletable={deletable}
-								employee={employees[selectedTab]}
-							/>
-						)}
-					</>
-				)}
-			</div>
+			<div className="mt-8 mb-4">{permissionsElement}</div>
 		</div>
 	);
 };

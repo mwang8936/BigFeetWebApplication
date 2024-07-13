@@ -6,6 +6,7 @@ import {
 	AddServiceRequest,
 	UpdateServiceRequest,
 } from '../models/requests/Service.Request.Model';
+
 import { servicePath } from '../constants/api.constants';
 
 export async function getServices(navigate: NavigateFunction) {
@@ -43,9 +44,5 @@ export async function deleteService(
 	navigate: NavigateFunction,
 	service_id: number
 ) {
-	return authorizedRequest(
-		navigate,
-		`${servicePath}/${service_id}`,
-		'delete'
-	);
+	return authorizedRequest(navigate, `${servicePath}/${service_id}`, 'delete');
 }

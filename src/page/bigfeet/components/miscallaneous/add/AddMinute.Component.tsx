@@ -1,6 +1,12 @@
 import { FC } from 'react';
 import { ClockIcon } from '@heroicons/react/24/outline';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
+import { useTranslation } from 'react-i18next';
+
+interface InvalidMessage {
+	key: string;
+	value: Record<string, string | number>;
+}
 
 interface ValidationProp {
 	max?: number;
@@ -8,7 +14,7 @@ interface ValidationProp {
 	requiredMessage?: string;
 	invalid: boolean;
 	setInvalid(invalid: boolean): void;
-	invalidMessage: string;
+	invalidMessage: InvalidMessage;
 }
 
 interface AddMinuteProp {
@@ -26,10 +32,12 @@ const AddMinute: FC<AddMinuteProp> = ({
 	name,
 	validationProp,
 }) => {
+	const { t } = useTranslation();
+
 	return (
 		<div className="mb-4">
 			<label className="label" htmlFor={name}>
-				{label}
+				{t(label)}
 			</label>
 			<div className="flex relative rounded-md shadow-sm">
 				<input
@@ -54,10 +62,17 @@ const AddMinute: FC<AddMinuteProp> = ({
 				</div>
 			</div>
 			{validationProp.required && minutes === null ? (
-				<p className="error-label">{validationProp.requiredMessage}</p>
+				<p className="error-label">
+					{validationProp.requiredMessage && t(validationProp.requiredMessage)}
+				</p>
 			) : (
 				validationProp.invalid && (
-					<p className="error-label">{validationProp.invalidMessage}</p>
+					<p className="error-label">
+						{t(
+							validationProp.invalidMessage.key,
+							validationProp.invalidMessage.value
+						)}
+					</p>
 				)
 			)}
 		</div>

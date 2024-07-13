@@ -2,6 +2,7 @@ const NUMBERS = {
 	employee: {
 		body_rate: 99.99,
 		feet_rate: 99.99,
+		acupuncture_rate: 99.99,
 		per_hour: 99.99,
 	},
 	reservation: {
@@ -15,7 +16,7 @@ const NUMBERS = {
 		money: 999.99,
 		body: 9.9,
 		feet: 9.9,
-		accupuncture: 9.9,
+		acupuncture: 9.9,
 	},
 	vip_package: {
 		amount: 999999.99,

@@ -12,9 +12,13 @@ const DatesDisplay: FC<DatesDisplayProp> = ({ updatedAt, createdAt }) => {
 	return (
 		<div className="flex flex-col text-sm font-medium text-gray-500 italic">
 			<div>
-				{t('Last Updated', { updated_at: updatedAt.toLocaleDateString() })}
+				{t('Last Updated')}
+				{updatedAt.toLocaleDateString()}
 			</div>
-			<div>{t('Created', { created_at: createdAt.toLocaleDateString() })}</div>
+			<div>
+				{t('Created')}
+				{createdAt.toLocaleDateString()}
+			</div>
 		</div>
 	);
 };

@@ -2,6 +2,12 @@ import { FC, useEffect } from 'react';
 import { LocalizationProvider, DesktopTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
+
+interface InvalidMessage {
+	key: string;
+	value: Record<string, string | number>;
+}
 
 interface ValidationProp {
 	min: number;
@@ -10,7 +16,7 @@ interface ValidationProp {
 	requiredMessage?: string;
 	invalid: boolean;
 	setInvalid(invalid: boolean): void;
-	invalidMessage: string;
+	invalidMessage: InvalidMessage;
 }
 
 interface AddTimeProp {
@@ -21,6 +27,8 @@ interface AddTimeProp {
 }
 
 const AddTime: FC<AddTimeProp> = ({ time, setTime, label, validationProp }) => {
+	const { t } = useTranslation();
+
 	useEffect(() => {
 		if (time) {
 			const updatedTime = new Date(time);
@@ -53,7 +61,7 @@ const AddTime: FC<AddTimeProp> = ({ time, setTime, label, validationProp }) => {
 				<LocalizationProvider dateAdapter={AdapterDayjs}>
 					<DesktopTimePicker
 						className="add-input"
-						label={label}
+						label={t(label)}
 						value={time ? dayjs(time) : null}
 						onChange={(time: dayjs.Dayjs | null) => {
 							if (time === null) {
@@ -76,10 +84,17 @@ const AddTime: FC<AddTimeProp> = ({ time, setTime, label, validationProp }) => {
 			</div>
 
 			{validationProp.required && time === null ? (
-				<p className="error-label">{validationProp.requiredMessage}</p>
+				<p className="error-label">
+					{validationProp.requiredMessage && t(validationProp.requiredMessage)}
+				</p>
 			) : (
 				validationProp.invalid && (
-					<p className="error-label">{validationProp.invalidMessage}</p>
+					<p className="error-label">
+						{t(
+							validationProp.invalidMessage.key,
+							validationProp.invalidMessage.value
+						)}
+					</p>
 				)
 			)}
 		</div>

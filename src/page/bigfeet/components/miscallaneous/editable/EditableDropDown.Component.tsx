@@ -60,7 +60,7 @@ const EditableDropDown: FC<EditableDropDownProp> = ({
 			<Listbox value={option} onChange={setOption} disabled={disabled}>
 				{({ open }) => (
 					<>
-						<Listbox.Label className="label">{label}</Listbox.Label>
+						<Listbox.Label className="label">{t(label)}</Listbox.Label>
 						<div className="flex relative rounded-md shadow-sm">
 							<Listbox.Button className="editable-input">
 								<span className="flex items-center">
@@ -71,7 +71,7 @@ const EditableDropDown: FC<EditableDropDownProp> = ({
 											className="h-5 w-5 flex-shrink-0 rounded-full"
 										/>
 									)}
-									<span className="ml-3 block truncate">{option.name}</span>
+									<span className="ml-3 block truncate">{t(option.name)}</span>
 								</span>
 								<span className="pointer-events-none absolute inset-y-0 right-[95px] ml-3 flex items-center pr-2">
 									<ChevronUpDownIcon
@@ -113,7 +113,7 @@ const EditableDropDown: FC<EditableDropDownProp> = ({
 																selected ? 'font-semibold' : 'font-normal',
 																'ml-3 block truncate'
 															)}>
-															{option.name}
+															{t(option.name)}
 														</span>
 													</div>
 
@@ -139,13 +139,16 @@ const EditableDropDown: FC<EditableDropDownProp> = ({
 								<PermissionsButton
 									btnTitle={disabled ? t('Change') : t('Cancel')}
 									disabled={!editable}
-									missingPermissionMessage={missingPermissionMessage}
+									missingPermissionMessage={t(missingPermissionMessage)}
 									onClick={handleDisableBtnClick}
 								/>
 							</div>
 						</div>
 						{validationProp.required && option.id == null && (
-							<p className="error-label">{validationProp.requiredMessage}</p>
+							<p className="error-label">
+								{validationProp.requiredMessage &&
+									t(validationProp.requiredMessage)}
+							</p>
 						)}
 					</>
 				)}

@@ -3,6 +3,7 @@ import { NavigateFunction } from 'react-router-dom';
 import authorizedRequest from './base.service';
 
 import { UpdateProfileRequest } from '../models/requests/Profile.Request.Model';
+
 import { profilePath } from '../constants/api.constants';
 
 export async function getProfile(navigate: NavigateFunction) {

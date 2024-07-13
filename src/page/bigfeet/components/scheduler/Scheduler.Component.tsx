@@ -43,8 +43,15 @@ import {
 } from '../../../../service/schedule.service';
 import { signProfileSchedule } from '../../../../service/profile.service';
 import { GetSchedulesParam } from '../../../../models/params/Schedule.Param';
-import { AddVipPackageRequest } from '../../../../models/requests/Vip-Package.Request.Model';
-import { addVipPackage } from '../../../../service/vip-package.service';
+import {
+	AddVipPackageRequest,
+	UpdateVipPackageRequest,
+} from '../../../../models/requests/Vip-Package.Request.Model';
+import {
+	addVipPackage,
+	deleteVipPackage,
+	updateVipPackage,
+} from '../../../../service/vip-package.service';
 import FilterDateModal from '../miscallaneous/modals/scheduler/FilterDateModal.Component';
 import STORES from '../../../../constants/store.constants';
 import Customer from '../../../../models/Customer.Model';
@@ -91,15 +98,7 @@ export default function Scheduler() {
 	};
 
 	const { user } = useUserContext();
-	let customers: Customer[] | undefined = undefined;
-	let setCustomers: ((customers: Customer[]) => void) | undefined = undefined;
-
-	try {
-		const customersContext = useCustomersContext();
-		customers = customersContext.customers;
-		setCustomers = customersContext.setCustomers;
-	} catch {}
-
+	const { customers, setCustomers } = useCustomersContext();
 	const { schedules, setSchedules } = useSchedulesContext();
 
 	let employeeList: Employee[] = [];
@@ -240,7 +239,22 @@ export default function Scheduler() {
 	const onAddVipPackage = async (request: AddVipPackageRequest) => {
 		const toastId = toast.loading(t('Adding Vip Package...'));
 		addVipPackage(navigate, request)
-			.then((response) => {
+			.then((response: Schedule[]) => {
+				const updatedSchedules = [...schedules];
+				response.forEach((respSchedule) => {
+					const scheduleIndex = updatedSchedules.findIndex(
+						(schedule) =>
+							schedule.date.getTime() === respSchedule.date.getTime() &&
+							schedule.employee.employee_id ===
+								respSchedule.employee.employee_id
+					);
+					if (scheduleIndex === -1) {
+						updatedSchedules.push(respSchedule);
+					} else {
+						updatedSchedules[scheduleIndex] = respSchedule;
+					}
+				});
+				setSchedules(updatedSchedules);
 				toast.update(toastId, {
 					render: t('Vip Package Added Successfully'),
 					type: 'success',
@@ -418,6 +432,70 @@ export default function Scheduler() {
 			);
 	};
 
+	const onEditVipPackage = async (
+		serial: string,
+		updateVipPackageRequest: UpdateVipPackageRequest
+	) => {
+		const toastId = toast.loading(t('Updating Vip Package...'));
+		updateVipPackage(navigate, serial, updateVipPackageRequest)
+			.then((response: Schedule[]) => {
+				const updatedSchedules = [...schedules];
+				updatedSchedules.forEach((schedule) => {
+					schedule.vip_packages = schedule.vip_packages.filter(
+						(vipPackage) => vipPackage.serial !== serial
+					);
+				});
+				console.log(updatedSchedules);
+				console.log(response);
+				const test = updatedSchedules.map((schedule) => {
+					const updatedSchedule = response.find(
+						(respSchedule) =>
+							sameDate(respSchedule.date, schedule.date) &&
+							respSchedule.employee.employee_id ===
+								schedule.employee.employee_id
+					);
+
+					return updatedSchedule ? updatedSchedule : schedule;
+				});
+				console.log(test);
+
+				setSchedules(test);
+				toast.update(toastId, {
+					render: t('Vip Package Updated Successfully'),
+					type: 'success',
+					isLoading: false,
+					position: 'top-right',
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					pauseOnFocusLoss: true,
+					draggable: true,
+					theme: 'light',
+				});
+			})
+			.catch((error) =>
+				toast.update(toastId, {
+					render: (
+						<h1>
+							{t('Failed to Update Vip Package')} <br />
+							{error.message}
+						</h1>
+					),
+					type: 'error',
+					isLoading: false,
+					position: 'top-right',
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					pauseOnFocusLoss: true,
+					draggable: true,
+					theme: 'light',
+				})
+			);
+	};
+
 	const deletable = [
 		Permissions.PERMISSION_DELETE_RESERVATION,
 		Permissions.PERMISSION_DELETE_SCHEDULE,
@@ -454,6 +532,53 @@ export default function Scheduler() {
 					render: (
 						<h1>
 							{t('Failed to Delete Reservation')} <br />
+							{error.message}
+						</h1>
+					),
+					type: 'error',
+					isLoading: false,
+					position: 'top-right',
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					pauseOnFocusLoss: true,
+					draggable: true,
+					theme: 'light',
+				})
+			);
+	};
+
+	const onDeleteVipPackage = async (serial: string) => {
+		const toastId = toast.loading(t('Deleting Vip Package...'));
+		deleteVipPackage(navigate, serial)
+			.then(() => {
+				const updatedSchedules = [...schedules];
+				updatedSchedules.forEach((schedule) => {
+					schedule.vip_packages = schedule.vip_packages.filter(
+						(vipPackage) => vipPackage.serial !== serial
+					);
+				});
+				setSchedules(updatedSchedules);
+				toast.update(toastId, {
+					render: t('Vip Package Deleted Successfully'),
+					type: 'success',
+					isLoading: false,
+					position: 'top-right',
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					pauseOnFocusLoss: true,
+					draggable: true,
+					theme: 'light',
+				});
+			})
+			.catch((error) =>
+				toast.update(toastId, {
+					render: (
+						<h1>
+							{t('Failed to Delete Vip Package')} <br />
 							{error.message}
 						</h1>
 					),
@@ -620,8 +745,7 @@ export default function Scheduler() {
 					/>
 				</div>
 				<div className="h-fit my-auto flex text-gray-600 text-xl">
-					{t('Total Cash:')}
-					<span className="font-bold ms-2">{totalCash}</span>
+					{t('Total Cash')}:<span className="font-bold ms-2">{totalCash}</span>
 				</div>
 				<div className="h-fit my-auto flex flex-col">
 					<h1 className="my-auto mx-auto text-gray-600 text-3xl">
@@ -630,7 +754,7 @@ export default function Scheduler() {
 					<h1 className="mx-auto text-gray-600 text-xl">{displayDate()}</h1>
 				</div>
 				<div className="h-fit my-auto flex text-gray-600 text-xl">
-					{t('Total Reservations:')}
+					{t('Total Reservations')}:
 					<span className="font-bold ms-2">{totalReservations.length}</span>
 				</div>
 				<AdjustmentsHorizontalIcon
@@ -672,11 +796,14 @@ export default function Scheduler() {
 					creatable={creatable}
 					onAddReservation={onAddReservation}
 					onAddSchedule={onAddSchedule}
+					onAddVipPackage={onAddVipPackage}
 					editable={editable}
 					onEditReservation={onEditReservation}
 					onEditSchedule={onEditSchedule}
+					onEditVipPackage={onEditVipPackage}
 					deletable={deletable}
 					onDeleteReservation={onDeleteReservation}
+					onDeleteVipPackage={onDeleteVipPackage}
 					onScheduleSigned={onScheduleSigned}
 				/>
 			</div>

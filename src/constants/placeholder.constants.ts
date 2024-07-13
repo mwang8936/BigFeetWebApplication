@@ -1,20 +1,19 @@
-import i18n from '../utils/i18n.utils';
-
 const PLACEHOLDERS = {
 	customer: {
-		search_customer: i18n.t('Search by name or phone number'),
+		search_customer: 'Search by name or phone number',
 		phone_number: '(123) 456-7890',
-		customer_name: i18n.t('Add Customer Name'),
-		notes: i18n.t('Add Notes'),
+		customer_name: 'Add Customer Name',
+		notes: 'Add Notes',
 	},
 	employee: {
-		username: i18n.t('Add Username'),
+		username: 'Add Username',
 		password: '******************',
-		first_name: i18n.t('Add First Name'),
-		last_name: i18n.t('Add Last Name'),
-		permissions: i18n.t('Select Permissions'),
+		first_name: 'Add First Name',
+		last_name: 'Add Last Name',
+		permissions: 'Select Permissions',
 		body_rate: '0.00',
 		feet_rate: '0.00',
+		acupuncture_rate: '0.00',
 		per_hour: '0.00',
 	},
 	reservation: {
@@ -22,7 +21,7 @@ const PLACEHOLDERS = {
 		machine: '0.00',
 		vip: '0.00',
 		tips: '0.00',
-		message: i18n.t('Add Message'),
+		message: 'Add Message',
 	},
 	service: {
 		service_name: 'Body',
@@ -31,11 +30,12 @@ const PLACEHOLDERS = {
 		money: '50.00',
 		body: '1',
 		feet: '0',
-		accupuncture: '0',
+		acupuncture: '0',
 	},
 	vip_package: {
 		serial: '123456',
 		amount: '1000.00',
+		employee_ids: 'Select Employees',
 	},
 };
 

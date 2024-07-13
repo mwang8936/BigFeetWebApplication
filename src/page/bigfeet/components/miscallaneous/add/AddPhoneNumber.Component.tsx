@@ -2,13 +2,19 @@ import { FC } from 'react';
 import LENGTHS from '../../../../../constants/lengths.constants';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 import PATTERNS from '../../../../../constants/patterns.constants';
+import { useTranslation } from 'react-i18next';
+
+interface InvalidMessage {
+	key: string;
+	value: Record<string, string | number>;
+}
 
 interface ValidationProp {
 	required: boolean;
 	requiredMessage?: string;
 	invalid: boolean;
 	setInvalid(invalid: boolean): void;
-	invalidMessage: string;
+	invalidMessage: InvalidMessage;
 }
 
 interface AddPhoneNumberProp {
@@ -26,6 +32,8 @@ const AddPhoneNumber: FC<AddPhoneNumberProp> = ({
 	name,
 	validationProp,
 }) => {
+	const { t } = useTranslation();
+
 	const formatPhoneNumber = (number: string): string => {
 		const cleanedNumber = number.replace(/\D/g, ''); // Remove non-numeric characters
 		if (cleanedNumber.length > 6) {
@@ -41,7 +49,7 @@ const AddPhoneNumber: FC<AddPhoneNumberProp> = ({
 	return (
 		<div className="mb-4">
 			<label className="label" htmlFor={name}>
-				{label}
+				{t(label)}
 			</label>
 			<div className="flex rounded-md shadow-sm">
 				<input
@@ -63,11 +71,18 @@ const AddPhoneNumber: FC<AddPhoneNumberProp> = ({
 			</div>
 			{validationProp.required &&
 			(phoneNumber === null || phoneNumber.length === 0) ? (
-				<p className="error-label">{validationProp.requiredMessage}</p>
+				<p className="error-label">
+					{validationProp.requiredMessage && t(validationProp.requiredMessage)}
+				</p>
 			) : (
 				validationProp.invalid &&
 				!(phoneNumber === null || phoneNumber.length === 0) && (
-					<p className="error-label">{validationProp.invalidMessage}</p>
+					<p className="error-label">
+						{t(
+							validationProp.invalidMessage.key,
+							validationProp.invalidMessage.value
+						)}
+					</p>
 				)
 			)}
 		</div>

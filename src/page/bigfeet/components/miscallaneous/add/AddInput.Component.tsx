@@ -1,4 +1,10 @@
 import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+
+interface InvalidMessage {
+	key: string;
+	value: Record<string, string | number>;
+}
 
 interface ValidationProp {
 	maxLength?: number;
@@ -7,7 +13,7 @@ interface ValidationProp {
 	requiredMessage?: string;
 	invalid: boolean;
 	setInvalid(invalid: boolean): void;
-	invalidMessage: string;
+	invalidMessage: InvalidMessage;
 }
 
 interface AddInputProp {
@@ -29,10 +35,12 @@ const AddInput: FC<AddInputProp> = ({
 	placeholder,
 	validationProp,
 }) => {
+	const { t } = useTranslation();
+
 	return (
 		<div className="mb-4">
 			<label className="label" htmlFor={name}>
-				{label}
+				{t(label)}
 			</label>
 			<div className="flex rounded-md shadow-sm">
 				<input
@@ -49,14 +57,21 @@ const AddInput: FC<AddInputProp> = ({
 					maxLength={validationProp.maxLength}
 					pattern={validationProp.pattern}
 					required={validationProp.required}
-					placeholder={placeholder}
+					placeholder={placeholder && t(placeholder)}
 				/>
 			</div>
 			{validationProp.required && (text === null || text.length === 0) ? (
-				<p className="error-label">{validationProp.requiredMessage}</p>
+				<p className="error-label">
+					{validationProp.requiredMessage && t(validationProp.requiredMessage)}
+				</p>
 			) : (
 				validationProp.invalid && (
-					<p className="error-label">{validationProp.invalidMessage}</p>
+					<p className="error-label">
+						{t(
+							validationProp.invalidMessage.key,
+							validationProp.invalidMessage.value
+						)}
+					</p>
 				)
 			)}
 		</div>

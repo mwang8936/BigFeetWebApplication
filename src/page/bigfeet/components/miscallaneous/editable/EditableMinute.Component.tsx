@@ -4,13 +4,18 @@ import PermissionsButton from '../PermissionsButton.Component';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 import { useTranslation } from 'react-i18next';
 
+interface InvalidMessage {
+	key: string;
+	value: Record<string, string | number>;
+}
+
 interface ValidationProp {
 	max?: number;
 	required: boolean;
 	requiredMessage?: string;
 	invalid: boolean;
 	setInvalid(invalid: boolean): void;
-	invalidMessage: string;
+	invalidMessage: InvalidMessage;
 }
 
 interface EditableMinuteProp {
@@ -53,7 +58,7 @@ const EditableMinute: FC<EditableMinuteProp> = ({
 	return (
 		<div className="mb-4">
 			<label className="label" htmlFor={name}>
-				{label}
+				{t(label)}
 			</label>
 			<div className="flex relative rounded-md shadow-sm">
 				<input
@@ -81,16 +86,23 @@ const EditableMinute: FC<EditableMinuteProp> = ({
 					<PermissionsButton
 						btnTitle={disabled ? t('Change') : t('Cancel')}
 						disabled={!editable}
-						missingPermissionMessage={missingPermissionMessage}
+						missingPermissionMessage={t(missingPermissionMessage)}
 						onClick={handleDisableBtnClick}
 					/>
 				</div>
 			</div>
 			{validationProp.required && minutes === null ? (
-				<p className="error-label">{validationProp.requiredMessage}</p>
+				<p className="error-label">
+					{validationProp.requiredMessage && t(validationProp.requiredMessage)}
+				</p>
 			) : (
 				validationProp.invalid && (
-					<p className="error-label">{validationProp.invalidMessage}</p>
+					<p className="error-label">
+						{t(
+							validationProp.invalidMessage.key,
+							validationProp.invalidMessage.value
+						)}
+					</p>
 				)
 			)}
 		</div>

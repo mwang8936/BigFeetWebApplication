@@ -14,6 +14,7 @@ const NAMES = {
 		permissions: 'permissions',
 		body_rate: 'body_rate',
 		feet_rate: 'feet_rate',
+		acupuncture_rate: 'acupuncture_rate',
 		per_hour: 'per_hour',
 	},
 	profile: {
@@ -37,11 +38,13 @@ const NAMES = {
 		money: 'money',
 		body: 'body',
 		feet: 'feet',
-		accupuncture: 'accupuncture',
+		acupuncture: 'acupuncture',
+		bed_required: 'bed_required',
 	},
 	vip_package: {
 		serial: 'serial',
 		amount: 'amount',
+		employee_ids: 'employee_ids',
 	},
 };
 

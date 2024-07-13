@@ -41,7 +41,7 @@ const SignatureGrid: FC<SignatureGridProp> = ({
 						checked={signedOff || false}
 						setChecked={() => {}}
 						falseText=""
-						trueText={t('Signed')}
+						trueText={'Signed'}
 						toggleColour={ToggleColor.BLUE}
 						label=""
 						name=""

@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
 import VipPackage from '../../../../../../../models/Vip-Package.Model';
@@ -6,33 +6,41 @@ import {
 	AddVipPackageRequest,
 	UpdateVipPackageRequest,
 } from '../../../../../../../models/requests/Vip-Package.Request.Model';
+import AddBottom from '../../AddBottom.Component';
+import ERRORS from '../../../../../../../constants/error.constants';
+import { useTranslation } from 'react-i18next';
+import AddVipModal from './AddVipModal.Component';
+import VipItem from '../../../../scheduler/Calendar/components/VipItem.Component';
 
 interface VipProp {
 	setOpen(open: boolean): void;
 	vipPackages: VipPackage[];
-	date: Date;
 	creatable: boolean;
 	onAddVipPackage(request: AddVipPackageRequest): Promise<void>;
 	editable: boolean;
-	onEditVipPakcage(
-		serial: number,
+	onEditVipPackage(
+		serial: string,
 		request: UpdateVipPackageRequest
 	): Promise<void>;
 	deletable: boolean;
-	onDeleteVipPackage(serial: number): Promise<void>;
+	onDeleteVipPackage(serial: string): Promise<void>;
 }
 
 const Vip: FC<VipProp> = ({
 	setOpen,
 	vipPackages,
-	date,
 	creatable,
 	onAddVipPackage,
 	editable,
-	onEditVipPakcage,
+	onEditVipPackage,
 	deletable,
 	onDeleteVipPackage,
 }) => {
+	const { t } = useTranslation();
+
+	const [openAddVipPackageModal, setOpenAddVipPackageModal] =
+		useState<boolean>(false);
+
 	return (
 		<>
 			<div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
@@ -47,27 +55,35 @@ const Vip: FC<VipProp> = ({
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
-							Vip Packages
+							{t('Vip Packages')}
 						</Dialog.Title>
-						<div className="mt-2">TEST</div>
+						<div className="mt-2">
+							{vipPackages.map((vipPackage) => (
+								<VipItem
+									key={vipPackage.serial}
+									vipPackage={vipPackage}
+									editable={editable}
+									onEditVipPackage={onEditVipPackage}
+									deletable={deletable}
+									onDeleteVipPackage={onDeleteVipPackage}
+								/>
+							))}
+						</div>
 					</div>
 				</div>
 			</div>
-			<div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-				<button
-					type="submit"
-					className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto disabled:bg-blue-300 disabled:cursor-not-allowed">
-					Sign
-				</button>
-				<button
-					type="button"
-					className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-					onClick={() => {
-						setOpen(false);
-					}}>
-					Cancel
-				</button>
-			</div>
+			<AddBottom
+				onCancel={() => setOpen(false)}
+				disabledAdd={!creatable}
+				addMissingPermissionMessage={ERRORS.vip_package.permissions.add}
+				onAdd={() => setOpenAddVipPackageModal(true)}
+			/>
+			<AddVipModal
+				open={openAddVipPackageModal}
+				setOpen={setOpenAddVipPackageModal}
+				creatable={creatable}
+				onAddVipPackage={onAddVipPackage}
+			/>
 		</>
 	);
 };

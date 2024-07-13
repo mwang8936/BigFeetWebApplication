@@ -21,6 +21,10 @@ import { useUserContext } from '../../../../BigFeet.Page';
 import TotalGrid from './TotalGrid.Component';
 import TipGrid from './TipGrid.Component';
 import VipGrid from './VipGrid.Component';
+import {
+	AddVipPackageRequest,
+	UpdateVipPackageRequest,
+} from '../../../../../../models/requests/Vip-Package.Request.Model';
 
 interface CalendarEmployeeColumnProp {
 	date: Date;
@@ -31,6 +35,7 @@ interface CalendarEmployeeColumnProp {
 	creatable: boolean;
 	onAddReservation(request: AddReservationRequest): Promise<void>;
 	onAddSchedule(request: AddScheduleRequest): Promise<void>;
+	onAddVipPackage(request: AddVipPackageRequest): Promise<void>;
 	editable: boolean;
 	onEditReservation(
 		reservationId: number,
@@ -41,8 +46,13 @@ interface CalendarEmployeeColumnProp {
 		employeeId: number,
 		request: UpdateScheduleRequest
 	): Promise<void>;
+	onEditVipPackage(
+		serial: string,
+		request: UpdateVipPackageRequest
+	): Promise<void>;
 	deletable: boolean;
 	onDeleteReservation(reservationId: number): Promise<void>;
+	onDeleteVipPackage(serial: string): Promise<void>;
 	onScheduleSigned(date: Date): Promise<void>;
 }
 
@@ -55,11 +65,14 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 	creatable,
 	onAddReservation,
 	onAddSchedule,
+	onAddVipPackage,
 	editable,
 	onEditReservation,
 	onEditSchedule,
+	onEditVipPackage,
 	deletable,
 	onDeleteReservation,
+	onDeleteVipPackage,
 	onScheduleSigned,
 }) => {
 	const { user } = useUserContext();
@@ -129,6 +142,12 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 				row={timeArr.length + 4}
 				colNum={colNum}
 				vipPackages={schedule?.vip_packages || []}
+				creatable={creatable}
+				onAddVipPackage={onAddVipPackage}
+				editable={editable}
+				onEditVipPackage={onEditVipPackage}
+				deletable={deletable}
+				onDeleteVipPackage={onDeleteVipPackage}
 			/>
 			<SignatureGrid
 				row={timeArr.length + 5}

@@ -1,4 +1,10 @@
 import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+
+interface InvalidMessage {
+	key: string;
+	value: Record<string, string | number>;
+}
 
 interface ValidationProp {
 	max?: number;
@@ -6,7 +12,7 @@ interface ValidationProp {
 	requiredMessage?: string;
 	invalid: boolean;
 	setInvalid(invalid: boolean): void;
-	invalidMessage: string;
+	invalidMessage: InvalidMessage;
 }
 
 interface AddPayRateProp {
@@ -26,10 +32,12 @@ const AddPayRate: FC<AddPayRateProp> = ({
 	validationProp,
 	placeholder,
 }) => {
+	const { t } = useTranslation();
+
 	return (
 		<div className="mb-4">
 			<label className="label" htmlFor={name}>
-				{label}
+				{t(label)}
 			</label>
 			<div className="flex relative rounded-md shadow-sm">
 				<input
@@ -54,10 +62,17 @@ const AddPayRate: FC<AddPayRateProp> = ({
 				</div>
 			</div>
 			{validationProp.required && amount === null ? (
-				<p className="error-label">{validationProp.requiredMessage}</p>
+				<p className="error-label">
+					{validationProp.requiredMessage && t(validationProp.requiredMessage)}
+				</p>
 			) : (
 				validationProp.invalid && (
-					<p className="error-label">{validationProp.invalidMessage}</p>
+					<p className="error-label">
+						{t(
+							validationProp.invalidMessage.key,
+							validationProp.invalidMessage.value
+						)}
+					</p>
 				)
 			)}
 		</div>

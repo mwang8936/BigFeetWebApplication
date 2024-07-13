@@ -1,8 +1,9 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
-import Cookies from 'js-cookie';
 import { NavigateFunction } from 'react-router-dom';
 
-import BASE_API_URL from '../constants/api.constants';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import Cookies from 'js-cookie';
+
+import BASE_API_URL, { tokenKey } from '../constants/api.constants';
 
 export default async function authorizedRequest(
 	navigate: NavigateFunction,
@@ -11,7 +12,8 @@ export default async function authorizedRequest(
 	data?: any,
 	params?: any
 ) {
-	const accessToken = Cookies.get('accessToken');
+	const accessToken = Cookies.get(tokenKey);
+
 	const config: AxiosRequestConfig = {
 		method: method,
 		baseURL: BASE_API_URL,
@@ -20,11 +22,16 @@ export default async function authorizedRequest(
 		data: data,
 		params: params,
 	};
+	console.log('API Request:', config);
+
 	return axios(config)
 		.then((response) => {
+			console.log('API Response:', response);
 			return parseData(response.data);
 		})
 		.catch((error: AxiosError) => {
+			console.error('API Error:', error);
+
 			const message = onError(error, navigate);
 			if (typeof message === 'string') throw new Error(message);
 		});
@@ -38,16 +45,18 @@ function parseData(data: any) {
 			Object.keys(data).forEach((key) => {
 				const property = data[key];
 				if (typeof property === 'string') {
-					if (
+					if (/^\d{4}-\d{2}-\d{2}$/.test(property)) {
+						const [year, month, day] = property.split('-').map(Number);
+						const date = new Date(year, month - 1, day);
+						data[key] = date;
+					} else if (
 						/(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/.exec(
 							property
 						)
 					)
 						data[key] = new Date(property);
 					else if (
-						/((?:2[0-3]|[01]?[0-9]):[0-5][0-9]:[0-5][0-9])/.exec(
-							property
-						)
+						/((?:2[0-3]|[01]?[0-9]):[0-5][0-9]:[0-5][0-9])/.exec(property)
 					) {
 						const hours = parseInt(property.split(':')[0]);
 						const minutes = parseInt(property.split(':')[1]);

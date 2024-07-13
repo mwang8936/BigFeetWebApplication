@@ -25,7 +25,7 @@ export default function CalendarFixedColumn(prop: CalendarFixedColumnProp) {
 				key={`row-1 col-${index + 2}`}
 				ref={isScrollable ? currentTimeRef : null}
 				style={{ gridRowStart: index + 2 }}
-				className={`col-start-[1] border-slate-300 border-r text-xs p-1.5 text-right text-slate-400 uppercase sticky left-0 bg-white font-medium ${
+				className={`col-start-[1] border-slate-300 border-r text-xs p-1.5 text-right text-black uppercase sticky left-0 bg-white font-medium ${
 					isScrollable ? 'scroll-mt-10' : ''
 				}`}>
 				{time}

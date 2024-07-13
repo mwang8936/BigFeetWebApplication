@@ -18,7 +18,7 @@ import LABELS from '../../../../../constants/label.constants.ts';
 import NAMES from '../../../../../constants/name.constants.ts';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants.ts';
 import ERRORS from '../../../../../constants/error.constants.ts';
-import EditableBodyFeetAccupunctureService from './EditableBodyFeetAccupunctureService.Component.tsx';
+import EditableBodyFeetAcupunctureService from './EditableBodyFeetAcupunctureService.Component.tsx';
 import { UpdateServiceRequest } from '../../../../../models/requests/Service.Request.Model.ts';
 import { ToastContainer, toast } from 'react-toastify';
 import PermissionsButton, {
@@ -27,6 +27,8 @@ import PermissionsButton, {
 import DeleteServiceModal from '../../miscallaneous/modals/service/DeleteServiceModal.Component.tsx';
 import NUMBERS from '../../../../../constants/numbers.constants.ts';
 import { useTranslation } from 'react-i18next';
+import EditableToggleSwitch from '../../miscallaneous/editable/EditableToggleSwitch.Component.tsx';
+import { ToggleColor } from '../../miscallaneous/add/AddToggleSwitch.Component.tsx';
 
 interface EditServiceProp {
 	editable: boolean;
@@ -48,9 +50,10 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 	const [moneyInput, setMoneyInput] = useState<number | null>(service.money);
 	const [bodyInput, setBodyInput] = useState<number | null>(service.body);
 	const [feetInput, setFeetInput] = useState<number | null>(service.feet);
-	const [accupunctureInput, setAccupunctureInput] = useState<number | null>(
-		service.accupuncture
+	const [acupunctureInput, setAcupunctureInput] = useState<number | null>(
+		service.acupuncture
 	);
+	const [bedRequiredInput, setBedRequiredInput] = useState<boolean>(false);
 	const [colorInput, setColorInput] = useState<ServiceColor | null>(
 		service.color
 	);
@@ -61,8 +64,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 	const [invalidMoney, setInvalidMoney] = useState<boolean>(false);
 	const [invalidBody, setInvalidBody] = useState<boolean>(false);
 	const [invalidFeet, setInvalidFeet] = useState<boolean>(false);
-	const [invalidAccupuncture, setInvalidAccupuncture] =
-		useState<boolean>(false);
+	const [invalidAcupuncture, setInvalidAcupuncture] = useState<boolean>(false);
 
 	const [changesMade, setChangesMade] = useState<boolean>(false);
 	const [missingRequiredInput, setMissingRequiredInput] =
@@ -78,7 +80,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 		setMoneyInput(service.money);
 		setBodyInput(service.body);
 		setFeetInput(service.feet);
-		setAccupunctureInput(service.accupuncture);
+		setAcupunctureInput(service.acupuncture);
 		setColorInput(service.color);
 
 		setChangesMade(false);
@@ -88,7 +90,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 		setInvalidMoney(false);
 		setInvalidBody(false);
 		setInvalidFeet(false);
-		setInvalidAccupuncture(false);
+		setInvalidAcupuncture(false);
 		setInvalidInput(false);
 	}, [service]);
 
@@ -111,10 +113,8 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			bodyInput === service.body ? undefined : bodyInput;
 		const feet: number | null | undefined =
 			feetInput === service.feet ? undefined : feetInput;
-		const accupuncture: number | null | undefined =
-			accupunctureInput === service.accupuncture
-				? undefined
-				: accupunctureInput;
+		const acupuncture: number | null | undefined =
+			acupunctureInput === service.acupuncture ? undefined : acupunctureInput;
 		const color: ServiceColor | null | undefined =
 			colorInput === service.color ? undefined : colorInput;
 
@@ -125,7 +125,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			money !== undefined ||
 			body !== undefined ||
 			feet !== undefined ||
-			accupuncture !== undefined ||
+			acupuncture !== undefined ||
 			color !== undefined;
 
 		setChangesMade(changesMade);
@@ -137,7 +137,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			money === null ||
 			body === null ||
 			feet === null ||
-			accupuncture === null ||
+			acupuncture === null ||
 			color === null;
 
 		setMissingRequiredInput(missingRequiredInput);
@@ -148,7 +148,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 		moneyInput,
 		bodyInput,
 		feetInput,
-		accupunctureInput,
+		acupunctureInput,
 		colorInput,
 	]);
 
@@ -160,7 +160,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			invalidMoney ||
 			invalidBody ||
 			invalidFeet ||
-			invalidAccupuncture;
+			invalidAcupuncture;
 
 		setInvalidInput(invalidInput);
 	}, [
@@ -170,7 +170,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 		invalidMoney,
 		invalidBody,
 		invalidFeet,
-		invalidAccupuncture,
+		invalidAcupuncture,
 	]);
 
 	const { services, setServices } = useServicesContext();
@@ -192,10 +192,12 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			bodyInput === service.body ? undefined : (bodyInput as number);
 		const feet: number | undefined =
 			feetInput === service.feet ? undefined : (feetInput as number);
-		const accupuncture: number | undefined =
-			accupunctureInput === service.accupuncture
+		const acupuncture: number | undefined =
+			acupunctureInput === service.acupuncture
 				? undefined
-				: (accupunctureInput as number);
+				: (acupunctureInput as number);
+		const bed_required: boolean | undefined =
+			bedRequiredInput === service.bed_required ? undefined : bedRequiredInput;
 		const color: ServiceColor | undefined =
 			colorInput === service.color ? undefined : (colorInput as ServiceColor);
 
@@ -206,7 +208,8 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			...(money && { money }),
 			...(body && { body }),
 			...(feet && { feet }),
-			...(feet && { accupuncture }),
+			...(feet && { acupuncture }),
+			...(bed_required && { bed_required }),
 			...(color && { color }),
 		};
 
@@ -386,7 +389,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 				missingPermissionMessage={ERRORS.service.permissions.edit}
 			/>
 
-			<EditableBodyFeetAccupunctureService
+			<EditableBodyFeetAcupunctureService
 				originalBody={service.body}
 				body={bodyInput}
 				setBody={setBodyInput}
@@ -407,18 +410,31 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 					setInvalid: setInvalidFeet,
 					invalidMessage: ERRORS.service.feet.invalid,
 				}}
-				originalAccupuncture={service.accupuncture}
-				accupuncture={accupunctureInput}
-				setAccupuncture={setAccupunctureInput}
-				accupunctureValidationProp={{
+				originalAcupuncture={service.acupuncture}
+				acupuncture={acupunctureInput}
+				setAcupuncture={setAcupunctureInput}
+				acupunctureValidationProp={{
 					required: true,
-					requiredMessage: ERRORS.service.accupuncture.required,
-					invalid: invalidAccupuncture,
-					setInvalid: setInvalidAccupuncture,
-					invalidMessage: ERRORS.service.accupuncture.invalid,
+					requiredMessage: ERRORS.service.acupuncture.required,
+					invalid: invalidAcupuncture,
+					setInvalid: setInvalidAcupuncture,
+					invalidMessage: ERRORS.service.acupuncture.invalid,
 				}}
 				editable={editable}
 				missingPermissionMessage={ERRORS.service.permissions.edit}
+			/>
+
+			<EditableToggleSwitch
+				originalChecked={service.bed_required}
+				setChecked={setBedRequiredInput}
+				checked={bedRequiredInput}
+				falseText={'No Bed Required'}
+				trueText={'Bed Required'}
+				toggleColour={ToggleColor.BLUE}
+				label={LABELS.service.bed_required}
+				name={NAMES.service.bed_required}
+				editable={editable}
+				missingPermissionMessage={ERRORS.reservation.permissions.edit}
 			/>
 
 			<EditableDropDown

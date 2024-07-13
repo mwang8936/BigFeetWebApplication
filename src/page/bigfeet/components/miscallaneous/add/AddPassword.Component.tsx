@@ -5,6 +5,12 @@ import LABELS from '../../../../../constants/label.constants';
 import NAMES from '../../../../../constants/name.constants';
 import ERRORS from '../../../../../constants/error.constants';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
+import { useTranslation } from 'react-i18next';
+
+interface InvalidMessage {
+	key: string;
+	value: Record<string, string | number>;
+}
 
 interface ValidationProp {
 	maxLength?: number;
@@ -12,7 +18,7 @@ interface ValidationProp {
 	requiredMessage?: string;
 	invalid: boolean;
 	setInvalid(invalid: boolean): void;
-	invalidMessage: string;
+	invalidMessage: InvalidMessage;
 	matching: boolean;
 	setMatching(matching: boolean): void;
 }
@@ -28,6 +34,8 @@ const AddPassword: FC<AddPasswordProp> = ({
 	setPassword,
 	validationProp,
 }) => {
+	const { t } = useTranslation();
+
 	const [showPassword, setShowPassword] = useState<boolean>(false);
 	const [retypePassword, setRetypePassword] = useState<string | null>(null);
 	const [showRetypePassword, setShowRetypePassword] = useState<boolean>(false);
@@ -36,7 +44,7 @@ const AddPassword: FC<AddPasswordProp> = ({
 		<>
 			<div className="mb-4">
 				<label className="label" htmlFor={NAMES.employee.password}>
-					{LABELS.employee.password}
+					{t(LABELS.employee.password)}
 				</label>
 				<div className="flex relative rounded-md shadow-sm">
 					<input
@@ -72,18 +80,26 @@ const AddPassword: FC<AddPasswordProp> = ({
 				</div>
 				{validationProp.required &&
 				(password === null || password.length === 0) ? (
-					<p className="error-label">{validationProp.requiredMessage}</p>
+					<p className="error-label">
+						{validationProp.requiredMessage &&
+							t(validationProp.requiredMessage)}
+					</p>
 				) : validationProp.invalid ? (
-					<p className="error-label">{validationProp.invalidMessage}</p>
+					<p className="error-label">
+						{t(
+							validationProp.invalidMessage.key,
+							validationProp.invalidMessage.value
+						)}
+					</p>
 				) : (
 					!validationProp.matching && (
-						<p className="error-label">{ERRORS.employee.password.match}</p>
+						<p className="error-label">{t(ERRORS.employee.password.match)}</p>
 					)
 				)}
 			</div>
 			<div className="mb-4">
 				<label className="label" htmlFor={NAMES.employee.retype_password}>
-					{LABELS.employee.retype_password}
+					{t(LABELS.employee.retype_password)}
 				</label>
 				<div className="flex relative rounded-md shadow-sm">
 					<input
@@ -121,10 +137,13 @@ const AddPassword: FC<AddPasswordProp> = ({
 					</div>
 				</div>
 				{(retypePassword === null || retypePassword.length === 0) && (
-					<p className="error-label">{ERRORS.employee.password.required}</p>
+					<p className="error-label">
+						{validationProp.requiredMessage &&
+							t(validationProp.requiredMessage)}
+					</p>
 				)}
 				{!validationProp.matching && (
-					<p className="error-label">{ERRORS.employee.password.match}</p>
+					<p className="error-label">{t(ERRORS.employee.password.match)}</p>
 				)}
 			</div>
 		</>

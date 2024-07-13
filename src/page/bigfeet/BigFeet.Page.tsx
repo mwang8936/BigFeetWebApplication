@@ -1,30 +1,37 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { useTranslation } from 'react-i18next';
+
+import { getCustomers } from '../../service/customer.service';
+import { getEmployees } from '../../service/employee.service';
+import { getProfile, getProfileSchedules } from '../../service/profile.service';
+import { getSchedules } from '../../service/schedule.service';
+import { getServices } from '../../service/service.service';
+
 import Loading from './components/Loading.Component';
 import SideBar from './components/SideBar.Component';
-import User from '../../models/User.Model';
-import { Permissions } from '../../models/enums';
-import Service from '../../models/Service.Model';
-import Profile from './components/profile/Profile.Component';
-import Services from './components/services/Services.Component';
-import Scheduler from './components/scheduler/Scheduler.Component';
-import { getProfile, getProfileSchedules } from '../../service/profile.service';
-import { getServices } from '../../service/service.service';
-import { getEmployees } from '../../service/employee.service';
 import Retry from './components/Retry.Component';
-import PayRoll from './components/payroll/PayRoll.Component';
-import Employees from './components/employees/Employees.Component';
-import Customer from '../../models/Customer.Model';
-import { getCustomers } from '../../service/customer.service';
 import Customers from './components/customers/Customers.Component';
-import { useNavigate } from 'react-router-dom';
-import { getSchedules } from '../../service/schedule.service';
+import Employees from './components/employees/Employees.Component';
+import PayRoll from './components/payroll/PayRoll.Component';
+import Profile from './components/profile/Profile.Component';
+import Scheduler from './components/scheduler/Scheduler.Component';
+import Services from './components/services/Services.Component';
+
+import Customer from '../../models/Customer.Model';
 import Employee from '../../models/Employee.Model';
+import { Permissions } from '../../models/enums';
 import Schedule from '../../models/Schedule.Model';
+import Service from '../../models/Service.Model';
+import User from '../../models/User.Model';
+
 import {
 	getBeginningOfMonth,
 	getBeginningOfNextMonth,
 } from '../../utils/date.utils';
-import { useTranslation } from 'react-i18next';
+
+import { userKey } from '../../constants/api.constants';
 import { getLanguageFile } from '../../constants/language.constants';
 
 export const enum SideBarItems {
@@ -49,59 +56,40 @@ export function useUserContext() {
 	return context;
 }
 
-const CustomersContext = createContext<
-	| { customers: Customer[]; setCustomers(customers: Customer[]): void }
-	| undefined
->(undefined);
+const CustomersContext = createContext<{
+	customers: Customer[];
+	setCustomers(customers: Customer[]): void;
+}>({ customers: [], setCustomers: () => {} });
 
 export function useCustomersContext() {
-	const context = useContext(CustomersContext);
-	if (context === undefined) {
-		throw new Error('useCustomersContext must be within CustomersProvider.');
-	}
-
-	return context;
+	return useContext(CustomersContext);
 }
 
-const EmployeesContext = createContext<
-	| { employees: Employee[]; setEmployees(employees: Employee[]): void }
-	| undefined
->(undefined);
+const EmployeesContext = createContext<{
+	employees: Employee[];
+	setEmployees(employees: Employee[]): void;
+}>({ employees: [], setEmployees: () => {} });
 
 export function useEmployeesContext() {
-	const context = useContext(EmployeesContext);
-	if (context === undefined) {
-		throw new Error('useEmployeesContext must be within EmployeesProvider.');
-	}
-
-	return context;
+	return useContext(EmployeesContext);
 }
 
-const ServicesContext = createContext<
-	{ services: Service[]; setServices(services: Service[]): void } | undefined
->(undefined);
+const ServicesContext = createContext<{
+	services: Service[];
+	setServices(services: Service[]): void;
+}>({ services: [], setServices: () => {} });
 
 export function useServicesContext() {
-	const context = useContext(ServicesContext);
-	if (context === undefined) {
-		throw new Error('useServicesContext must be within ServicesProvider.');
-	}
-
-	return context;
+	return useContext(ServicesContext);
 }
 
-const SchedulesContext = createContext<
-	| { schedules: Schedule[]; setSchedules(schedules: Schedule[]): void }
-	| undefined
->(undefined);
+const SchedulesContext = createContext<{
+	schedules: Schedule[];
+	setSchedules(schedules: Schedule[]): void;
+}>({ schedules: [], setSchedules: () => {} });
 
 export function useSchedulesContext() {
-	const context = useContext(SchedulesContext);
-	if (context === undefined) {
-		throw new Error('useSchedulesContext must be within SchedulesProvider.');
-	}
-
-	return context;
+	return useContext(SchedulesContext);
 }
 
 export default function BigFeet() {
@@ -113,25 +101,25 @@ export default function BigFeet() {
 	const [retryingUser, setRetryingUser] = useState(false);
 	const [userError, setUserError] = useState('');
 
-	const [customers, setCustomers] = useState<Customer[]>();
+	const [customers, setCustomers] = useState<Customer[]>([]);
 	const [retryingCustomers, setRetryingCustomers] = useState(false);
 	const [customersError, setCustomersError] = useState('');
 
-	const [employees, setEmployees] = useState<Employee[]>();
+	const [employees, setEmployees] = useState<Employee[]>([]);
 	const [retryingEmployees, setRetryingEmployees] = useState(false);
 	const [employeesError, setEmployeesError] = useState('');
 
-	const [schedules, setSchedules] = useState<Schedule[]>();
+	const [schedules, setSchedules] = useState<Schedule[]>([]);
 	const [retryingSchedules, setRetryingSchedules] = useState(false);
 	const [schedulesError, setSchedulesError] = useState('');
 
-	const [services, setServices] = useState<Service[]>();
+	const [services, setServices] = useState<Service[]>([]);
 	const [retryingServices, setRetryingServices] = useState(false);
 	const [servicesError, setServicesError] = useState('');
 
 	const [sideBarItems] = useState([SideBarItems.Profile]);
 
-	const [selectedIndex, setSelectedIndex] = useState(1);
+	const [selectedIndex, setSelectedIndex] = useState(0);
 
 	useEffect(() => {
 		setLoading(true);
@@ -141,7 +129,7 @@ export default function BigFeet() {
 	const { i18n } = useTranslation();
 
 	const getItems = async () => {
-		const storageUser = sessionStorage.getItem('user');
+		const storageUser = sessionStorage.getItem(userKey);
 		if (storageUser) {
 			const reviveDateTime = (_: any, value: any): any => {
 				if (typeof value === 'string') {
@@ -160,6 +148,7 @@ export default function BigFeet() {
 			const user: User = JSON.parse(storageUser, reviveDateTime);
 			setUser(user);
 			i18n.changeLanguage(getLanguageFile(user.language));
+			setSelectedIndex(1);
 
 			sideBarItems.push(SideBarItems.Scheduler, SideBarItems.PayRoll);
 
@@ -226,7 +215,7 @@ export default function BigFeet() {
 		setRetryingUser(true);
 		getProfile(navigate)
 			.then((response) => {
-				sessionStorage.setItem('user', JSON.stringify(response));
+				sessionStorage.setItem(userKey, JSON.stringify(response));
 				setUser(response);
 				i18n.changeLanguage(getLanguageFile(response.language));
 
@@ -305,46 +294,6 @@ export default function BigFeet() {
 		);
 	};
 
-	const ServicesContainer = (children: React.ReactNode) => {
-		return services ? (
-			<ServicesContext.Provider value={{ services, setServices }}>
-				{children}
-			</ServicesContext.Provider>
-		) : (
-			<>{children}</>
-		);
-	};
-
-	const EmployeesContainer = (children: React.ReactNode) => {
-		return employees ? (
-			<EmployeesContext.Provider value={{ employees, setEmployees }}>
-				{children}
-			</EmployeesContext.Provider>
-		) : (
-			<>{children}</>
-		);
-	};
-
-	const CustomersContainer = (children: React.ReactNode) => {
-		return customers ? (
-			<CustomersContext.Provider value={{ customers, setCustomers }}>
-				{children}
-			</CustomersContext.Provider>
-		) : (
-			<>{children}</>
-		);
-	};
-
-	const SchedulesContainer = (children: React.ReactNode) => {
-		return schedules ? (
-			<SchedulesContext.Provider value={{ schedules, setSchedules }}>
-				{children}
-			</SchedulesContext.Provider>
-		) : (
-			<>{children}</>
-		);
-	};
-
 	return (
 		<div className="flex min-h-screen">
 			<SideBar
@@ -354,10 +303,10 @@ export default function BigFeet() {
 			/>
 
 			{UserContainer(
-				ServicesContainer(
-					EmployeesContainer(
-						CustomersContainer(
-							SchedulesContainer(
+				<SchedulesContext.Provider value={{ schedules, setSchedules }}>
+					<ServicesContext.Provider value={{ services, setServices }}>
+						<EmployeesContext.Provider value={{ employees, setEmployees }}>
+							<CustomersContext.Provider value={{ customers, setCustomers }}>
 								<div className="grid landscape:grow landscape:h-screen landscape:ml-[9%] portrait:w-screen portrait:mt-[20%] portrait:sm:mt-[12%]">
 									{loading ? (
 										<Loading />
@@ -424,10 +373,10 @@ export default function BigFeet() {
 										))
 									)}
 								</div>
-							)
-						)
-					)
-				)
+							</CustomersContext.Provider>
+						</EmployeesContext.Provider>
+					</ServicesContext.Provider>
+				</SchedulesContext.Provider>
 			)}
 		</div>
 	);

@@ -52,16 +52,16 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 		);
 	});
 
-	const accReservations = reservations.filter(
-		(reservation) => reservation.service.accupuncture > 0
+	const acupunctureReservations = reservations.filter(
+		(reservation) => reservation.service.acupuncture > 0
 	);
-	accReservations.sort(
+	acupunctureReservations.sort(
 		(a, b) => a.reserved_date.getTime() - b.reserved_date.getTime()
 	);
-	const accTotal = accReservations
-		.map((reservation) => reservation.service.accupuncture)
+	const acupunctureTotal = acupunctureReservations
+		.map((reservation) => reservation.service.acupuncture)
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
-	const accTexts = accReservations.map((reservation) => {
+	const acupunctureTexts = acupunctureReservations.map((reservation) => {
 		const startTimeText = formatTimeFromDate(reservation.reserved_date);
 		const endTime =
 			new Date(reservation.reserved_date).getTime() +
@@ -86,31 +86,28 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 					{t('F')}: <span className="font-bold">{feetTotal}</span>
 				</span>
 				<span>
-					{t('A')}: <span className="font-bold">{accTotal}</span>
+					{t('A')}: <span className="font-bold">{acupunctureTotal}</span>
 				</span>
 				{(bodyReservations.length > 0 ||
 					feetReservations.length > 0 ||
-					accReservations.length > 0) && (
+					acupunctureReservations.length > 0) && (
 					<span className="total-tip group-hover:scale-100 z-[3]">
 						{bodyReservations.length > 0 && (
 							<span className="flex flex-col">
-								{t('Body Services:')}
-								{bodyTexts}
+								{t('Body Services')}:{bodyTexts}
 								{(feetReservations.length > 0 ||
-									accReservations.length > 0) && <br />}
+									acupunctureReservations.length > 0) && <br />}
 							</span>
 						)}
 						{feetReservations.length > 0 && (
 							<span className="flex flex-col">
-								{t('Feet Services:')}
-								{feetTexts}
-								{accReservations.length > 0 && <br />}
+								{t('Feet Services')}:{feetTexts}
+								{acupunctureReservations.length > 0 && <br />}
 							</span>
 						)}
-						{accReservations.length > 0 && (
+						{acupunctureReservations.length > 0 && (
 							<span className="flex flex-col">
-								{t('Accupuncture Services:')}
-								{accTexts}
+								{t('Acupuncture Services')}:{acupunctureTexts}
 							</span>
 						)}
 					</span>

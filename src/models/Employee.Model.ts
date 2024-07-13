@@ -10,6 +10,7 @@ export default interface Employee {
 	permissions: Permissions[];
 	body_rate: number | null;
 	feet_rate: number | null;
+	acupuncture_rate: number | null;
 	per_hour: number | null;
 	created_at: Date;
 	updated_at: Date;

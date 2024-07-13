@@ -6,6 +6,7 @@ import {
 	AddVipPackageRequest,
 	UpdateVipPackageRequest,
 } from '../models/requests/Vip-Package.Request.Model';
+
 import { vipPackagePath } from '../constants/api.constants';
 
 export async function getVipPackages(navigate: NavigateFunction) {

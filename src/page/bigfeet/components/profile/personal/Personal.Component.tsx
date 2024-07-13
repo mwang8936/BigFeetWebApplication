@@ -4,7 +4,7 @@ import { FC, useEffect, useState } from 'react';
 import { updateEmployee } from '../../../../../service/employee.service';
 import { useNavigate } from 'react-router-dom';
 import { useEmployeesContext, useUserContext } from '../../../BigFeet.Page';
-import { Gender } from '../../../../../models/enums';
+import { Gender, Permissions } from '../../../../../models/enums';
 import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
 import { genderDropDownItems } from '../../../../../constants/drop-down.constants';
 import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
@@ -15,8 +15,8 @@ import NAMES from '../../../../../constants/name.constants';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
 import { ToastContainer, toast } from 'react-toastify';
-import Employee from '../../../../../models/Employee.Model';
 import { useTranslation } from 'react-i18next';
+import { userKey } from '../../../../../constants/api.constants';
 
 interface PersonalProp {
 	editable: boolean;
@@ -107,14 +107,7 @@ const Personal: FC<PersonalProp> = ({
 	}, [invalidUsername, invalidFirstName, invalidLastName]);
 
 	const { user, setUser } = useUserContext();
-	let employees: Employee[] | undefined = undefined;
-	let setEmployees: ((employees: Employee[]) => void) | undefined = undefined;
-
-	try {
-		const employeesContext = useEmployeesContext();
-		employees = employeesContext.employees;
-		setEmployees = employeesContext.setEmployees;
-	} catch {}
+	const { employees, setEmployees } = useEmployeesContext();
 
 	const onSave = async () => {
 		const username: string | undefined =
@@ -147,12 +140,12 @@ const Personal: FC<PersonalProp> = ({
 					...user,
 					...updateEmployeeRequest,
 				};
-				sessionStorage.setItem('user', JSON.stringify(updatedUser));
+				sessionStorage.setItem(userKey, JSON.stringify(updatedUser));
 				setUser(updatedUser);
 				const updatedEmployee = Object(updatedUser);
 				delete updatedEmployee['language'];
 				delete updatedEmployee['dark_mode'];
-				if (employees !== undefined && setEmployees !== undefined) {
+				if (user.permissions.includes(Permissions.PERMISSION_GET_EMPLOYEE)) {
 					setEmployees(
 						employees.map((employee) =>
 							employee.employee_id == user.employee_id
@@ -160,6 +153,8 @@ const Personal: FC<PersonalProp> = ({
 								: employee
 						)
 					);
+				} else {
+					setEmployees([]);
 				}
 
 				toast.update(toastId, {

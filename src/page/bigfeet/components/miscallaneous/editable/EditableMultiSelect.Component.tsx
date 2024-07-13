@@ -44,7 +44,7 @@ const EditableMultiSelect: FC<EditableMultiSelectProp> = ({
 	return (
 		<div className="mb-4">
 			<label className="label" htmlFor={name}>
-				{label}
+				{t(label)}
 			</label>
 			<div className="flex rounded-md shadow-sm">
 				<div className="editable-input" id={name}>
@@ -53,7 +53,7 @@ const EditableMultiSelect: FC<EditableMultiSelectProp> = ({
 						selectedValues={values}
 						onSelect={setValues}
 						onRemove={setValues}
-						placeholder={placeholder}
+						placeholder={t(placeholder)}
 						emptyRecordMsg={t('No Items Found')}
 						displayValue="label"
 						hidePlaceholder={true}
@@ -64,7 +64,7 @@ const EditableMultiSelect: FC<EditableMultiSelectProp> = ({
 					<PermissionsButton
 						btnTitle={disabled ? t('Change') : t('Cancel')}
 						disabled={!editable}
-						missingPermissionMessage={missingPermissionMessage}
+						missingPermissionMessage={t(missingPermissionMessage)}
 						onClick={handleDisableBtnClick}
 					/>
 				</div>

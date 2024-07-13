@@ -5,6 +5,11 @@ import dayjs from 'dayjs';
 import PermissionsButton from '../PermissionsButton.Component';
 import { useTranslation } from 'react-i18next';
 
+interface InvalidMessage {
+	key: string;
+	value: Record<string, string | number>;
+}
+
 interface ValidationProp {
 	minDate?: Date;
 	maxDate?: Date;
@@ -12,7 +17,7 @@ interface ValidationProp {
 	requiredMessage?: string;
 	invalid: boolean;
 	setInvalid(invalid: boolean): void;
-	invalidMessage: string;
+	invalidMessage: InvalidMessage;
 }
 
 interface EditableDateProp {
@@ -77,7 +82,7 @@ const EditableDate: FC<EditableDateProp> = ({
 				<LocalizationProvider dateAdapter={AdapterDayjs}>
 					<DesktopDatePicker
 						className="editable-input"
-						label={label}
+						label={t(label)}
 						value={date ? dayjs(date) : null}
 						onChange={(date: dayjs.Dayjs | null) => {
 							if (date === null) {
@@ -100,17 +105,24 @@ const EditableDate: FC<EditableDateProp> = ({
 					<PermissionsButton
 						btnTitle={disabled ? t('Change') : t('Cancel')}
 						disabled={!editable}
-						missingPermissionMessage={missingPermissionMessage}
+						missingPermissionMessage={t(missingPermissionMessage)}
 						onClick={handleDisableBtnClick}
 					/>
 				</div>
 			</div>
 
 			{validationProp.required && date === null ? (
-				<p className="error-label">{validationProp.requiredMessage}</p>
+				<p className="error-label">
+					{validationProp.requiredMessage && t(validationProp.requiredMessage)}
+				</p>
 			) : (
 				validationProp.invalid && (
-					<p className="error-label">{validationProp.invalidMessage}</p>
+					<p className="error-label">
+						{t(
+							validationProp.invalidMessage.key,
+							validationProp.invalidMessage.value
+						)}
+					</p>
 				)
 			)}
 		</div>

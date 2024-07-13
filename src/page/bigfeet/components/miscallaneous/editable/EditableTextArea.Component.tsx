@@ -48,7 +48,7 @@ const EditableTextArea: FC<EditableTextAreaProp> = ({
 	return (
 		<div className="mb-4">
 			<label className="label" htmlFor={name}>
-				{label}
+				{t(label)}
 			</label>
 			<div className="flex rounded-md shadow-sm">
 				<textarea
@@ -62,19 +62,21 @@ const EditableTextArea: FC<EditableTextAreaProp> = ({
 					}}
 					required={validationProp.required}
 					disabled={disabled}
-					placeholder={placeholder}
+					placeholder={placeholder && t(placeholder)}
 				/>
 				<div className="ms-3">
 					<PermissionsButton
 						btnTitle={disabled ? t('Change') : t('Cancel')}
 						disabled={!editable}
-						missingPermissionMessage={missingPermissionMessage}
+						missingPermissionMessage={t(missingPermissionMessage)}
 						onClick={handleDisableBtnClick}
 					/>
 				</div>
 			</div>
 			{validationProp.required && (text === null || text.length === 0) && (
-				<p className="error-label">{validationProp.requiredMessage}</p>
+				<p className="error-label">
+					{validationProp.requiredMessage && t(validationProp.requiredMessage)}
+				</p>
 			)}
 		</div>
 	);

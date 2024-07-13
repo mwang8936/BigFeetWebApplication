@@ -5,6 +5,7 @@ import CustomerItem from './CustomerItem.Component';
 
 interface CustomerListProp {
 	customers: Customer[];
+	gettable: boolean;
 	editable: boolean;
 	onEditCustomer(
 		phoneNumber: string,
@@ -16,14 +17,15 @@ interface CustomerListProp {
 
 const CustomerList: FC<CustomerListProp> = ({
 	customers,
+	gettable,
 	editable,
 	onEditCustomer,
 	deletable,
 	onDeleteCustomer,
 }) => {
-	return (
-		<div className="flex flex-col flex-1 h-full w-full mx-auto border-black border-2 my-2 overflow-auto">
-			{customers.map((customer) => (
+	const customersElement =
+		customers.length !== 0 ? (
+			customers.map((customer) => (
 				<CustomerItem
 					key={customer.phone_number}
 					customer={customer}
@@ -32,7 +34,20 @@ const CustomerList: FC<CustomerListProp> = ({
 					deletable={deletable}
 					onDeleteCustomer={onDeleteCustomer}
 				/>
-			))}
+			))
+		) : (
+			<h1 className="text-3xl">No Customers</h1>
+		);
+
+	const permissionsElement = gettable ? (
+		customersElement
+	) : (
+		<h1 className="text-3xl">Missing Get Customers Permissions</h1>
+	);
+
+	return (
+		<div className="flex flex-col flex-1 h-full w-full mx-auto border-black border-2 overflow-auto">
+			{permissionsElement}
 		</div>
 	);
 };

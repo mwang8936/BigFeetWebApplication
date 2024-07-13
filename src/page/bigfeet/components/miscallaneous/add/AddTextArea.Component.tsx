@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ValidationProp {
 	required: boolean;
@@ -22,10 +23,12 @@ const AddTextArea: FC<AddTextAreaProp> = ({
 	validationProp,
 	placeholder,
 }) => {
+	const { t } = useTranslation();
+
 	return (
 		<div className="mb-4">
 			<label className="label" htmlFor={name}>
-				{label}
+				{t(label)}
 			</label>
 			<div className="flex rounded-md shadow-sm">
 				<textarea
@@ -38,11 +41,13 @@ const AddTextArea: FC<AddTextAreaProp> = ({
 						setText(text.length !== 0 ? text : null);
 					}}
 					required={validationProp.required}
-					placeholder={placeholder}
+					placeholder={placeholder && t(placeholder)}
 				/>
 			</div>
 			{validationProp.required && (text === null || text.length === 0) && (
-				<p className="error-label">{validationProp.requiredMessage}</p>
+				<p className="error-label">
+					{validationProp.requiredMessage && t(validationProp.requiredMessage)}
+				</p>
 			)}
 		</div>
 	);

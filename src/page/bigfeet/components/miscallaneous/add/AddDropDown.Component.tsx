@@ -1,6 +1,7 @@
 import { FC, Fragment } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
+import { useTranslation } from 'react-i18next';
 
 export interface DropDownItem {
 	id: number | string | null;
@@ -32,12 +33,14 @@ const AddDropDown: FC<AddDropDownProp> = ({
 	label,
 	validationProp,
 }) => {
+	const { t } = useTranslation();
+
 	return (
 		<div className="mb-4">
 			<Listbox value={option} onChange={setOption}>
 				{({ open }) => (
 					<>
-						<Listbox.Label className="label">{label}</Listbox.Label>
+						<Listbox.Label className="label">{t(label)}</Listbox.Label>
 						<div className="flex relative rounded-md shadow-sm">
 							<Listbox.Button className="editable-input">
 								<span className="flex items-center">
@@ -48,7 +51,7 @@ const AddDropDown: FC<AddDropDownProp> = ({
 											className="h-5 w-5 flex-shrink-0 rounded-full"
 										/>
 									)}
-									<span className="ml-3 block truncate">{option.name}</span>
+									<span className="ml-3 block truncate">{t(option.name)}</span>
 								</span>
 								<span className="pointer-events-none absolute inset-y-0 right-[5px] ml-3 flex items-center pr-2">
 									<ChevronUpDownIcon
@@ -90,7 +93,7 @@ const AddDropDown: FC<AddDropDownProp> = ({
 																selected ? 'font-semibold' : 'font-normal',
 																'ml-3 block truncate'
 															)}>
-															{option.name}
+															{t(option.name)}
 														</span>
 													</div>
 
@@ -114,7 +117,10 @@ const AddDropDown: FC<AddDropDownProp> = ({
 							</Transition>
 						</div>
 						{validationProp.required && option.id == null && (
-							<p className="error-label">{validationProp.requiredMessage}</p>
+							<p className="error-label">
+								{validationProp.requiredMessage &&
+									t(validationProp.requiredMessage)}
+							</p>
 						)}
 					</>
 				)}

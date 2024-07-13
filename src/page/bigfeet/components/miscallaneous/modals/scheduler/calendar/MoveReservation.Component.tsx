@@ -55,21 +55,12 @@ const MoveReservation: FC<MoveReservationProp> = ({
 	const [conflict, setConflict] = useState<boolean>(false);
 
 	const { schedules } = useSchedulesContext();
+	const { employees } = useEmployeesContext();
 
-	let allEmployees: Employee[] = [];
-
-	try {
-		const { employees } = useEmployeesContext();
-		allEmployees.push(...employees);
-	} catch {
-		const { user } = useUserContext();
-		allEmployees.push(user);
-	}
-
-	const prevEmployeeUsername = allEmployees.find(
+	const prevEmployeeUsername = employees.find(
 		(employee) => employee.employee_id === reservation.employee_id
 	)?.username;
-	const newEmployeeUsername = allEmployees.find(
+	const newEmployeeUsername = employees.find(
 		(employee) => employee.employee_id === newEmployeeId
 	)?.username;
 
@@ -95,9 +86,12 @@ const MoveReservation: FC<MoveReservationProp> = ({
 			);
 
 		const bodyReservationsAtSameTime = reservationsAtSameTime.filter(
-			(reservation) => reservation.service.body > 0
+			(reservation) => reservation.service.bed_required
 		);
-		if (bodyReservationsAtSameTime.length >= STORES.beds) {
+		if (
+			bodyReservationsAtSameTime.length >= STORES.beds &&
+			service.bed_required
+		) {
 			setNoBeds(true);
 			setOpenBedWarningModal(true);
 		} else {
@@ -157,7 +151,7 @@ const MoveReservation: FC<MoveReservationProp> = ({
 									newEmployeeUsername &&
 									prevEmployeeUsername !== newEmployeeUsername && (
 										<span className="flex flex-row">
-											<span className="me-3 font-medium">{t('Employee:')}</span>
+											<span className="me-3 font-medium">{t('Employee')}:</span>
 											{prevEmployeeUsername}
 											<ArrowLongRightIcon
 												className="h-6 w-6 mx-3 text-black"
@@ -168,7 +162,7 @@ const MoveReservation: FC<MoveReservationProp> = ({
 									)}
 								{newTime && (
 									<span className="flex flex-row">
-										<span className="me-3 font-medium">{t('Time:')}</span>
+										<span className="me-3 font-medium">{t('Time')}:</span>
 										{formatTimeFromDate(reservation.reserved_date)}
 										<ArrowLongRightIcon
 											className="h-6 w-6 mx-3 text-black"
@@ -203,7 +197,10 @@ const MoveReservation: FC<MoveReservationProp> = ({
 				open={openBedWarningModal}
 				setOpen={setOpenBedWarningModal}
 				title={ERRORS.warnings.no_beds.title}
-				message={ERRORS.warnings.no_beds.message}
+				message={t(
+					ERRORS.warnings.no_beds.message.key,
+					ERRORS.warnings.no_beds.message.value
+				)}
 			/>
 			<WarningModal
 				open={openConflictWarningModal}
