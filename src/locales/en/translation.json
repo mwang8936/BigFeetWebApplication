@@ -337,6 +337,8 @@
     "Body": "Body",
     "Feet": "Feet",
     "Acupuncture": "Acupuncture",
+    "Bed Required": "Bed Required",
+    "No Bed Required": "No Bed Required",
     "Color": "Color",
 
     "Search by name or phone number": "Search by name or phone number",
@@ -350,5 +352,7 @@
     
     "Add Message": "Add Message",
 
-    "Select Employees": "Select Employees"
+    "Select Employees": "Select Employees",
+
+    "": ""
 }

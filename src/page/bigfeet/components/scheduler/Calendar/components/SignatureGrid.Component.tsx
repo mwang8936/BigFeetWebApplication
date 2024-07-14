@@ -3,7 +3,8 @@ import AddToggleSwitch, {
 	ToggleColor,
 } from '../../../miscallaneous/add/AddToggleSwitch.Component';
 import SignScheduleModal from '../../../miscallaneous/modals/scheduler/calendar/SignScheduleModal.Component';
-import { useTranslation } from 'react-i18next';
+import LABELS from '../../../../../../constants/label.constants';
+import NAMES from '../../../../../../constants/name.constants';
 
 interface SignatureGridProp {
 	row: number;
@@ -22,7 +23,6 @@ const SignatureGrid: FC<SignatureGridProp> = ({
 	signable,
 	onScheduleSigned,
 }) => {
-	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
 
 	return (
@@ -43,8 +43,8 @@ const SignatureGrid: FC<SignatureGridProp> = ({
 						falseText=""
 						trueText={'Signed'}
 						toggleColour={ToggleColor.BLUE}
-						label=""
-						name=""
+						label={''}
+						name={NAMES.schedule.sign_off}
 						disabled={signedOff}
 					/>
 				</div>

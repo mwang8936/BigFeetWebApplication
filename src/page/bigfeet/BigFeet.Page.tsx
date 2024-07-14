@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { useTranslation } from 'react-i18next';
@@ -35,7 +35,6 @@ import {
 
 import { userKey } from '../../constants/api.constants';
 import { getLanguageFile } from '../../constants/language.constants';
-import { ToastContainer } from 'react-toastify';
 
 export const enum SideBarItems {
 	Profile = 0,

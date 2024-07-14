@@ -336,6 +336,8 @@
     "Body": "身体按摩",
     "Feet": "足底按摩",
     "Acupuncture": "针灸",
+    "Bed Required": "Bed Required",
+    "No Bed Required": "No Bed Required",
     "Color": "颜色",
 
     "Search by name or phone number": "通过名字或者电话号码搜索",
@@ -349,5 +351,7 @@
     
     "Add Message": "添加讯息",
 
-    "Select Employees": "选择员工"
+    "Select Employees": "选择员工",
+
+    "": ""
 }

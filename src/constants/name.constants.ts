@@ -30,6 +30,7 @@ const NAMES = {
 	},
 	schedule: {
 		is_working: 'is_working',
+		sign_off: 'sign_off',
 	},
 	service: {
 		service_name: 'service_name',
