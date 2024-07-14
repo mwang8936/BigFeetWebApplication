@@ -8,7 +8,6 @@ import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Comp
 import { languageDropDownItems } from '../../../../../constants/drop-down.constants';
 import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
 import ERRORS from '../../../../../constants/error.constants';
-import { ToastContainer, toast } from 'react-toastify';
 import { UpdateProfileRequest } from '../../../../../models/requests/Profile.Request.Model';
 import LABELS from '../../../../../constants/label.constants';
 import NAMES from '../../../../../constants/name.constants';
@@ -16,6 +15,11 @@ import EditableToggleSwitch from '../../miscallaneous/editable/EditableToggleSwi
 import { useTranslation } from 'react-i18next';
 import { getLanguageFile } from '../../../../../constants/language.constants';
 import { userKey } from '../../../../../constants/api.constants';
+import {
+	createToast,
+	errorToast,
+	updateToast,
+} from '../../../../../utils/toast.utils';
 
 interface SettingsProp {
 	originalLanguage: Language;
@@ -73,7 +77,7 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 			...(dark_mode && { dark_mode }),
 		};
 
-		const toastId = toast.loading(t('Updating Profile...'));
+		const toastId = createToast(t('Updating Profile...'));
 
 		updateProfile(navigate, updateProfileRequest)
 			.then(() => {
@@ -85,39 +89,10 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 				setUser(updatedUser);
 				i18n.changeLanguage(getLanguageFile(updatedUser.language));
 
-				toast.update(toastId, {
-					render: t('Profile Updated Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Profile Updated Successfully'));
 			})
 			.catch((error) => {
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Update Profile')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				errorToast(toastId, t('Failed to Update Profile'), error.message);
 			});
 	};
 
@@ -177,7 +152,6 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 					onClick={onSave}
 				/>
 			</div>
-			<ToastContainer limit={5} />
 		</>
 	);
 };

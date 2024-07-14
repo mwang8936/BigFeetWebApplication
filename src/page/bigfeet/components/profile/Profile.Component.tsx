@@ -15,8 +15,12 @@ import PermissionsButton, {
 } from '../miscallaneous/PermissionsButton.Component.tsx';
 import ERRORS from '../../../../constants/error.constants.ts';
 import DeleteProfileModal from '../miscallaneous/modals/profile/DeleteProfileModal.Component.tsx';
-import { ToastContainer, toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import {
+	createToast,
+	errorToast,
+	updateToast,
+} from '../../../../utils/toast.utils.tsx';
 
 const Profile: FC = () => {
 	const { t } = useTranslation();
@@ -38,44 +42,15 @@ const Profile: FC = () => {
 	);
 
 	const onDelete = async (userId: number) => {
-		const toastId = toast.loading(t('Deleting Profile...'));
+		const toastId = createToast(t('Deleting Profile...'));
 
 		deleteEmployee(navigate, userId)
 			.then(() => {
-				toast.update(toastId, {
-					render: t('Profile Deleted Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Profile Deleted Successfully'));
 				logout(setAuthentication);
 			})
 			.catch((error) => {
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Delete Profile')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				errorToast(toastId, t('Failed to Delete Profile'), error.message);
 			});
 	};
 
@@ -126,6 +101,7 @@ const Profile: FC = () => {
 						originalRole={user.role}
 						originalFeetRate={user.feet_rate}
 						originalBodyRate={user.body_rate}
+						originalAcupunctureRate={user.acupuncture_rate}
 						originalPerHour={user.per_hour}
 					/>
 				) : (
@@ -136,7 +112,6 @@ const Profile: FC = () => {
 				)}
 			</div>
 			<DatesDisplay updatedAt={user.updated_at} createdAt={user.created_at} />
-			<ToastContainer limit={5} />
 		</div>
 	);
 };

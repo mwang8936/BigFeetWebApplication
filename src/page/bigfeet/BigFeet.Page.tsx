@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import 'react-toastify/dist/ReactToastify.css';
+
 import { useTranslation } from 'react-i18next';
 
 import { getCustomers } from '../../service/customer.service';
@@ -33,6 +35,7 @@ import {
 
 import { userKey } from '../../constants/api.constants';
 import { getLanguageFile } from '../../constants/language.constants';
+import { ToastContainer } from 'react-toastify';
 
 export const enum SideBarItems {
 	Profile = 0,
@@ -372,6 +375,7 @@ export default function BigFeet() {
 											/>
 										))
 									)}
+									<ToastContainer limit={5} />
 								</div>
 							</CustomersContext.Provider>
 						</EmployeesContext.Provider>

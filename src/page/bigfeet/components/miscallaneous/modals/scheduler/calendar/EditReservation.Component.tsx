@@ -403,7 +403,7 @@ const EditReservation: FC<EditReservationProp> = ({
 			...(employee_id && { employee_id }),
 			...(service_id && { service_id }),
 			...(requested_gender && { requested_gender }),
-			...(requested_employee && { requested_employee }),
+			...(requested_employee !== undefined && { requested_employee }),
 			...(cash && { cash }),
 			...(machine && { machine }),
 			...(vip && { vip }),

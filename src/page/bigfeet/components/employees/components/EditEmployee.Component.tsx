@@ -21,7 +21,6 @@ import { useAuthenticationContext } from '../../../../../App';
 import { logout } from '../../../../../service/auth.service';
 import DeleteEmployeeModal from '../../miscallaneous/modals/employee/DeleteEmployeeModal.Component';
 import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
-import { ToastContainer, toast } from 'react-toastify';
 import PermissionsButton, {
 	ButtonType,
 } from '../../miscallaneous/PermissionsButton.Component';
@@ -33,6 +32,11 @@ import NUMBERS from '../../../../../constants/numbers.constants';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 import { useTranslation } from 'react-i18next';
 import { userKey } from '../../../../../constants/api.constants';
+import {
+	createToast,
+	errorToast,
+	updateToast,
+} from '../../../../../utils/toast.utils';
 
 interface EditEmployeeProp {
 	gettable: boolean;
@@ -266,7 +270,7 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 			...(per_hour && { per_hour }),
 		};
 
-		const toastId = toast.loading(t('Updating Employee...'));
+		const toastId = createToast(t('Updating Employee...'));
 
 		updateEmployee(navigate, employee.employee_id, updateEmployeeRequest)
 			.then(() => {
@@ -301,86 +305,28 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 					setEmployees([]);
 				}
 
-				toast.update(toastId, {
-					render: t('Employee Updated Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Employee Updated Successfully'));
 			})
 			.catch((error) => {
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Update Employee')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				errorToast(toastId, t('Failed to Update Employee'), error.message);
 			});
 	};
 
 	const onDelete = async (employeeId: number) => {
-		const toastId = toast.loading(t('Deleting Employee...'));
+		const toastId = createToast(t('Deleting Employee...'));
 
 		deleteEmployee(navigate, employeeId)
 			.then(() => {
 				setEmployees(
 					employees.filter((employee) => employee.employee_id !== employeeId)
 				);
-				toast.update(toastId, {
-					render: t('Employee Deleted Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Employee Deleted Successfully'));
 				if (employee.employee_id === user.employee_id) {
 					logout(setAuthentication);
 				}
 			})
 			.catch((error) => {
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Delete Employee')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				errorToast(toastId, t('Failed to Delete Employee'), error.message);
 			});
 	};
 
@@ -646,7 +592,6 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 				updatedAt={employee.updated_at}
 				createdAt={employee.created_at}
 			/>
-			<ToastContainer limit={5} />
 		</>
 	);
 };

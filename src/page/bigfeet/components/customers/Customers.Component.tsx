@@ -16,7 +16,6 @@ import PermissionsButton, {
 	ButtonType,
 } from '../miscallaneous/PermissionsButton.Component';
 import AddCustomerModal from '../miscallaneous/modals/customer/AddCustomerModal.Component';
-import { ToastContainer } from 'react-toastify';
 import AddInput from '../miscallaneous/add/AddInput.Component';
 import ERRORS from '../../../../constants/error.constants';
 import { useTranslation } from 'react-i18next';
@@ -77,13 +76,7 @@ const Customers: FC = () => {
 				updateToast(toastId, t('Customer Added Successfully'));
 			})
 			.catch((error) => {
-				errorToast(
-					toastId,
-					<h1>
-						{t('Failed to Add Customer')} <br />
-						{error.message}
-					</h1>
-				);
+				errorToast(toastId, t('Failed to Add Customer'), error.message);
 			});
 	};
 
@@ -117,13 +110,7 @@ const Customers: FC = () => {
 				updateToast(toastId, t('Customer Updated Successfully'));
 			})
 			.catch((error) => {
-				errorToast(
-					toastId,
-					<h1>
-						{t('Failed to Update Customer')} <br />
-						{error.message}
-					</h1>
-				);
+				errorToast(toastId, t('Failed to Update Customer'), error.message);
 			});
 	};
 
@@ -143,13 +130,7 @@ const Customers: FC = () => {
 				updateToast(toastId, t('Customer Deleted Successfully'));
 			})
 			.catch((error) => {
-				errorToast(
-					toastId,
-					<h1>
-						{t('Failed to Delete Customer')} <br />
-						{error.message}
-					</h1>
-				);
+				errorToast(toastId, t('Failed to Delete Customer'), error.message);
 			});
 	};
 
@@ -194,7 +175,6 @@ const Customers: FC = () => {
 					onDeleteCustomer={onDeleteCustomer}
 				/>
 			</div>
-			<ToastContainer limit={5} />
 			<AddCustomerModal
 				open={openAddCustomerModal}
 				setOpen={setOpenAddCustomerModal}

@@ -14,9 +14,13 @@ import LABELS from '../../../../../constants/label.constants';
 import NAMES from '../../../../../constants/name.constants';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
-import { ToastContainer, toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { userKey } from '../../../../../constants/api.constants';
+import {
+	createToast,
+	errorToast,
+	updateToast,
+} from '../../../../../utils/toast.utils';
 
 interface PersonalProp {
 	editable: boolean;
@@ -132,7 +136,7 @@ const Personal: FC<PersonalProp> = ({
 			...(gender && { gender }),
 		};
 
-		const toastId = toast.loading(t('Updating Profile...'));
+		const toastId = createToast(t('Updating Profile...'));
 
 		updateEmployee(navigate, user.employee_id, updateEmployeeRequest)
 			.then(() => {
@@ -157,39 +161,10 @@ const Personal: FC<PersonalProp> = ({
 					setEmployees([]);
 				}
 
-				toast.update(toastId, {
-					render: t('Profile Updated Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Profile Updated Successfully'));
 			})
 			.catch((error) => {
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Update Profile')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				errorToast(toastId, t('Failed to Update Profile'), error.message);
 			});
 	};
 	return (
@@ -304,7 +279,6 @@ const Personal: FC<PersonalProp> = ({
 					onClick={onSave}
 				/>
 			</div>
-			<ToastContainer limit={5} />
 		</>
 	);
 };

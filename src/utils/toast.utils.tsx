@@ -20,9 +20,14 @@ export function updateToast(toastId: Id, message: string) {
 	});
 }
 
-export function errorToast(toastId: Id, error: string | React.ReactNode) {
+export function errorToast(toastId: Id, title: string, message: string) {
 	toast.update(toastId, {
-		render: error,
+		render: (
+			<h1>
+				{title} <br />
+				{message}
+			</h1>
+		),
 		type: 'error',
 		isLoading: false,
 		position: 'top-right',

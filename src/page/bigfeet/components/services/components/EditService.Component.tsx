@@ -20,7 +20,6 @@ import PLACEHOLDERS from '../../../../../constants/placeholder.constants.ts';
 import ERRORS from '../../../../../constants/error.constants.ts';
 import EditableBodyFeetAcupunctureService from './EditableBodyFeetAcupunctureService.Component.tsx';
 import { UpdateServiceRequest } from '../../../../../models/requests/Service.Request.Model.ts';
-import { ToastContainer, toast } from 'react-toastify';
 import PermissionsButton, {
 	ButtonType,
 } from '../../miscallaneous/PermissionsButton.Component.tsx';
@@ -29,6 +28,11 @@ import NUMBERS from '../../../../../constants/numbers.constants.ts';
 import { useTranslation } from 'react-i18next';
 import EditableToggleSwitch from '../../miscallaneous/editable/EditableToggleSwitch.Component.tsx';
 import { ToggleColor } from '../../miscallaneous/add/AddToggleSwitch.Component.tsx';
+import {
+	createToast,
+	errorToast,
+	updateToast,
+} from '../../../../../utils/toast.utils';
 
 interface EditServiceProp {
 	editable: boolean;
@@ -53,7 +57,9 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 	const [acupunctureInput, setAcupunctureInput] = useState<number | null>(
 		service.acupuncture
 	);
-	const [bedRequiredInput, setBedRequiredInput] = useState<boolean>(false);
+	const [bedRequiredInput, setBedRequiredInput] = useState<boolean>(
+		service.bed_required
+	);
 	const [colorInput, setColorInput] = useState<ServiceColor | null>(
 		service.color
 	);
@@ -81,6 +87,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 		setBodyInput(service.body);
 		setFeetInput(service.feet);
 		setAcupunctureInput(service.acupuncture);
+		setBedRequiredInput(service.bed_required);
 		setColorInput(service.color);
 
 		setChangesMade(false);
@@ -115,6 +122,8 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			feetInput === service.feet ? undefined : feetInput;
 		const acupuncture: number | null | undefined =
 			acupunctureInput === service.acupuncture ? undefined : acupunctureInput;
+		const bed_required: boolean | undefined =
+			bedRequiredInput === service.bed_required ? undefined : bedRequiredInput;
 		const color: ServiceColor | null | undefined =
 			colorInput === service.color ? undefined : colorInput;
 
@@ -126,6 +135,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			body !== undefined ||
 			feet !== undefined ||
 			acupuncture !== undefined ||
+			bed_required !== undefined ||
 			color !== undefined;
 
 		setChangesMade(changesMade);
@@ -149,6 +159,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 		bodyInput,
 		feetInput,
 		acupunctureInput,
+		bedRequiredInput,
 		colorInput,
 	]);
 
@@ -209,11 +220,11 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			...(body && { body }),
 			...(feet && { feet }),
 			...(feet && { acupuncture }),
-			...(bed_required && { bed_required }),
+			...(bed_required !== undefined && { bed_required }),
 			...(color && { color }),
 		};
 
-		const toastId = toast.loading(t('Updating Service...'));
+		const toastId = createToast(t('Updating Service...'));
 
 		updateService(navigate, service.service_id, updateServiceRequest)
 			.then(() => {
@@ -228,83 +239,25 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 							: serviceItem
 					)
 				);
-				toast.update(toastId, {
-					render: t('Service Updated Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Service Updated Successfully'));
 			})
 			.catch((error) => {
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Update Service')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				errorToast(toastId, t('Failed to Update Service'), error.message);
 			});
 	};
 
 	const onDelete = async (serviceId: number) => {
-		const toastId = toast.loading(t('Deleting Service...'));
+		const toastId = createToast(t('Deleting Service...'));
 
 		deleteService(navigate, serviceId)
 			.then(() => {
 				setServices(
 					services.filter((service) => serviceId !== service.service_id)
 				);
-				toast.update(toastId, {
-					render: t('Service Deleted Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Service Deleted Successfully'));
 			})
 			.catch((error) => {
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Delete Service')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				errorToast(toastId, t('Failed to Delete Service'), error.message);
 			});
 	};
 
@@ -505,7 +458,6 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 					onDeleteService={onDelete}
 				/>
 			</div>
-			<ToastContainer limit={5} />
 		</>
 	);
 };

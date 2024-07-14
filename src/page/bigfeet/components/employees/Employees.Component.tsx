@@ -11,8 +11,12 @@ import PermissionsButton, {
 import ERRORS from '../../../../constants/error.constants';
 import AddEmployeeModal from '../miscallaneous/modals/employee/AddEmployeeModal.Component';
 import { AddEmployeeRequest } from '../../../../models/requests/Employee.Request.Model';
-import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import {
+	createToast,
+	errorToast,
+	updateToast,
+} from '../../../../utils/toast.utils';
 
 const Employees: FC = () => {
 	const { t } = useTranslation();
@@ -40,7 +44,7 @@ const Employees: FC = () => {
 	const tabs = employees.map((employee) => employee.username);
 
 	const onAdd = async (addEmployeeRequest: AddEmployeeRequest) => {
-		const toastId = toast.loading(t('Adding Employee...'));
+		const toastId = createToast(t('Adding Employee...'));
 		addEmployee(navigate, addEmployeeRequest)
 			.then((response) => {
 				if (gettable) {
@@ -48,39 +52,10 @@ const Employees: FC = () => {
 				} else {
 					setEmployees([]);
 				}
-				toast.update(toastId, {
-					render: t('Employee Added Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Employee Added Successfully'));
 			})
 			.catch((error) => {
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Add Employee')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				errorToast(toastId, t('Failed to Add Employee'), error.message);
 			});
 	};
 

@@ -30,8 +30,6 @@ import {
 } from '../../../../service/reservation.service';
 import { useNavigate } from 'react-router-dom';
 import AddReservationModal from '../miscallaneous/modals/scheduler/calendar/AddReservationModal.Component';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import PermissionsButton, {
 	ButtonType,
 } from '../miscallaneous/PermissionsButton.Component';
@@ -58,6 +56,11 @@ import Customer from '../../../../models/Customer.Model';
 import { sortEmployees } from '../../../../utils/employee.utils';
 import ERRORS from '../../../../constants/error.constants';
 import { useTranslation } from 'react-i18next';
+import {
+	createToast,
+	errorToast,
+	updateToast,
+} from '../../../../utils/toast.utils';
 
 const ScheduleDateContext = createContext<
 	{ date: Date; setDate(date: Date): void } | undefined
@@ -117,7 +120,7 @@ export default function Scheduler() {
 	].every((permission) => user.permissions.includes(permission));
 
 	const onAddReservation = async (request: AddReservationRequest) => {
-		const toastId = toast.loading(t('Adding Reservation...'));
+		const toastId = createToast(t('Adding Reservation...'));
 		addReservation(navigate, request)
 			.then((response: Schedule) => {
 				const updatedSchedules = [...schedules];
@@ -157,87 +160,29 @@ export default function Scheduler() {
 					}
 				}
 
-				toast.update(toastId, {
-					render: t('Reservation Added Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Reservation Added Successfully'));
 			})
 			.catch((error) =>
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Add Reservation')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				})
+				errorToast(toastId, t('Failed to Add Reservation'), error.message)
 			);
 	};
 
 	const onAddSchedule = async (request: AddScheduleRequest) => {
-		const toastId = toast.loading(t('Adding Schedule...'));
+		const toastId = createToast(t('Adding Schedule...'));
 		addSchedule(navigate, request)
 			.then((response) => {
 				const updatedSchedules = [...schedules];
 				updatedSchedules.push(response);
 				setSchedules(updatedSchedules);
-				toast.update(toastId, {
-					render: t('Schedule Added Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Schedule Added Successfully'));
 			})
 			.catch((error) =>
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Add Schedule')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				})
+				errorToast(toastId, t('Failed to Add Schedule'), error.message)
 			);
 	};
 
 	const onAddVipPackage = async (request: AddVipPackageRequest) => {
-		const toastId = toast.loading(t('Adding Vip Package...'));
+		const toastId = createToast(t('Adding Vip Package...'));
 		addVipPackage(navigate, request)
 			.then((response: Schedule[]) => {
 				const updatedSchedules = [...schedules];
@@ -255,39 +200,10 @@ export default function Scheduler() {
 					}
 				});
 				setSchedules(updatedSchedules);
-				toast.update(toastId, {
-					render: t('Vip Package Added Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Vip Package Added Successfully'));
 			})
 			.catch((error) =>
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Add Vip Package')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				})
+				errorToast(toastId, t('Failed to Add Vip Package'), error.message)
 			);
 	};
 
@@ -300,7 +216,7 @@ export default function Scheduler() {
 		reservationId: number,
 		request: UpdateReservationRequest
 	) => {
-		const toastId = toast.loading(t('Updating Reservation...'));
+		const toastId = createToast(t('Updating Reservation...'));
 		updateReservation(navigate, reservationId, request)
 			.then((response: Schedule) => {
 				const updatedSchedules = [...schedules];
@@ -333,39 +249,10 @@ export default function Scheduler() {
 					}
 				}
 				setSchedules(updatedSchedules);
-				toast.update(toastId, {
-					render: t('Reservation Updated Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Reservation Updated Successfully'));
 			})
 			.catch((error) =>
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Update Reservation')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				})
+				errorToast(toastId, t('Failed to Update Reservation'), error.message)
 			);
 	};
 
@@ -374,7 +261,7 @@ export default function Scheduler() {
 		employeeId: number,
 		request: UpdateScheduleRequest
 	) => {
-		const toastId = toast.loading(t('Updating Schedule...'));
+		const toastId = createToast(t('Updating Schedule...'));
 		updateSchedule(navigate, date, employeeId, request)
 			.then(() => {
 				const oldSchedule = schedules.find(
@@ -396,39 +283,10 @@ export default function Scheduler() {
 						)
 					);
 				}
-				toast.update(toastId, {
-					render: t('Schedule Updated Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Schedule Updated Successfully'));
 			})
 			.catch((error) =>
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Update Schedule')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				})
+				errorToast(toastId, t('Failed to Update Schedule'), error.message)
 			);
 	};
 
@@ -436,7 +294,7 @@ export default function Scheduler() {
 		serial: string,
 		updateVipPackageRequest: UpdateVipPackageRequest
 	) => {
-		const toastId = toast.loading(t('Updating Vip Package...'));
+		const toastId = createToast(t('Updating Vip Package...'));
 		updateVipPackage(navigate, serial, updateVipPackageRequest)
 			.then((response: Schedule[]) => {
 				const updatedSchedules = [...schedules];
@@ -460,39 +318,10 @@ export default function Scheduler() {
 				console.log(test);
 
 				setSchedules(test);
-				toast.update(toastId, {
-					render: t('Vip Package Updated Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Vip Package Updated Successfully'));
 			})
 			.catch((error) =>
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Update Vip Package')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				})
+				errorToast(toastId, t('Failed to Update Vip Package'), error.message)
 			);
 	};
 
@@ -502,7 +331,7 @@ export default function Scheduler() {
 	].every((permission) => user.permissions.includes(permission));
 
 	const onDeleteReservation = async (reservationId: number) => {
-		const toastId = toast.loading(t('Deleting Reservation...'));
+		const toastId = createToast(t('Deleting Reservation...'));
 		deleteReservation(navigate, reservationId)
 			.then(() => {
 				const updatedSchedules = [...schedules];
@@ -513,44 +342,15 @@ export default function Scheduler() {
 						))
 				);
 				setSchedules(updatedSchedules);
-				toast.update(toastId, {
-					render: t('Reservation Deleted Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Reservation Deleted Successfully'));
 			})
 			.catch((error) =>
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Delete Reservation')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				})
+				errorToast(toastId, t('Failed to Delete Reservation'), error.message)
 			);
 	};
 
 	const onDeleteVipPackage = async (serial: string) => {
-		const toastId = toast.loading(t('Deleting Vip Package...'));
+		const toastId = createToast(t('Deleting Vip Package...'));
 		deleteVipPackage(navigate, serial)
 			.then(() => {
 				const updatedSchedules = [...schedules];
@@ -560,44 +360,15 @@ export default function Scheduler() {
 					);
 				});
 				setSchedules(updatedSchedules);
-				toast.update(toastId, {
-					render: t('Vip Package Deleted Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Vip Package Deleted Successfully'));
 			})
 			.catch((error) =>
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Delete Vip Package')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				})
+				errorToast(toastId, t('Failed to Delete Vip Package'), error.message)
 			);
 	};
 
 	const onScheduleSigned = async (date: Date) => {
-		const toastId = toast.loading(t('Signing Schedule...'));
+		const toastId = createToast(t('Signing Schedule...'));
 		signProfileSchedule(navigate, date)
 			.then(() => {
 				const updatedSchedules = [...schedules];
@@ -612,39 +383,10 @@ export default function Scheduler() {
 					updatedSchedules[updatedScheduleIndex] = updatedSchedule;
 					setSchedules(updatedSchedules);
 				}
-				toast.update(toastId, {
-					render: t('Schedule Signed Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Schedule Signed Successfully'));
 			})
 			.catch((error) =>
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{'Failed to Sign Schedule'} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				})
+				errorToast(toastId, t('Failed to Sign Schedule'), error.message)
 			);
 	};
 
@@ -653,43 +395,14 @@ export default function Scheduler() {
 	);
 
 	const onGetSchedules = async (params: GetSchedulesParam) => {
-		const toastId = toast.loading(t('Getting Schedules...'));
+		const toastId = createToast(t('Getting Schedules...'));
 		getSchedules(navigate, params)
 			.then((response) => {
 				setSchedules(response);
-				toast.update(toastId, {
-					render: t('Schedule Retrieved Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Schedule Retrieved Successfully'));
 			})
 			.catch((error) => {
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Get Schedules')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				errorToast(toastId, t('Failed to Get Schedules'), error.message);
 			});
 	};
 
@@ -807,7 +520,6 @@ export default function Scheduler() {
 					onScheduleSigned={onScheduleSigned}
 				/>
 			</div>
-			<ToastContainer limit={5} />
 			<AddReservationModal
 				open={openAddReservationModal}
 				setOpen={setOpenAddReservationModal}

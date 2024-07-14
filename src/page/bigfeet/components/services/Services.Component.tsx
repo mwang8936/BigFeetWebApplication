@@ -11,8 +11,12 @@ import PermissionsButton, {
 import ERRORS from '../../../../constants/error.constants.ts';
 import AddServiceModal from '../miscallaneous/modals/service/AddServiceModal.Component.tsx';
 import { AddServiceRequest } from '../../../../models/requests/Service.Request.Model.ts';
-import { ToastContainer, toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import {
+	createToast,
+	errorToast,
+	updateToast,
+} from '../../../../utils/toast.utils.tsx';
 
 const Services: FC = () => {
 	const { t } = useTranslation();
@@ -38,43 +42,14 @@ const Services: FC = () => {
 	const tabs = services.map((service) => service.service_name);
 
 	const onAdd = async (addServiceRequest: AddServiceRequest) => {
-		const toastId = toast.loading(t('Adding Service...'));
+		const toastId = createToast(t('Adding Service...'));
 		addService(navigate, addServiceRequest)
 			.then((response) => {
 				setServices([...services, response]);
-				toast.update(toastId, {
-					render: t('Service Added Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Service Added Successfully'));
 			})
 			.catch((error) => {
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Add Service')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				errorToast(toastId, t('Failed to Add Service'), error.message);
 			});
 	};
 
@@ -123,7 +98,6 @@ const Services: FC = () => {
 					</>
 				)}
 			</div>
-			<ToastContainer limit={5} />
 		</div>
 	);
 };

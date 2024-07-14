@@ -6,17 +6,20 @@ import { useEmployeesContext, useUserContext } from '../../../BigFeet.Page';
 import { updateEmployee } from '../../../../../service/employee.service';
 import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
 import { roleDropDownItems } from '../../../../../constants/drop-down.constants';
-import { ToastContainer, toast } from 'react-toastify';
 import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
 import ERRORS from '../../../../../constants/error.constants';
 import LABELS from '../../../../../constants/label.constants';
 import NAMES from '../../../../../constants/name.constants';
 import NUMBERS from '../../../../../constants/numbers.constants';
 import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
-import Employee from '../../../../../models/Employee.Model';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 import { useTranslation } from 'react-i18next';
 import { userKey } from '../../../../../constants/api.constants';
+import {
+	createToast,
+	errorToast,
+	updateToast,
+} from '../../../../../utils/toast.utils';
 
 interface ProfessionalProp {
 	editable: boolean;
@@ -159,7 +162,7 @@ const Professional: FC<ProfessionalProp> = ({
 			...(per_hour && { per_hour }),
 		};
 
-		const toastId = toast.loading(t('Updating Profile...'));
+		const toastId = createToast(t('Updating Profile...'));
 
 		updateEmployee(navigate, user.employee_id, updateEmployeeRequest)
 			.then(() => {
@@ -184,39 +187,10 @@ const Professional: FC<ProfessionalProp> = ({
 					setEmployees([]);
 				}
 
-				toast.update(toastId, {
-					render: t('Profile Updated Successfully'),
-					type: 'success',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				updateToast(toastId, t('Profile Updated Successfully'));
 			})
 			.catch((error) => {
-				toast.update(toastId, {
-					render: (
-						<h1>
-							{t('Failed to Update Profile')} <br />
-							{error.message}
-						</h1>
-					),
-					type: 'error',
-					isLoading: false,
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					pauseOnFocusLoss: true,
-					draggable: true,
-					theme: 'light',
-				});
+				errorToast(toastId, t('Failed to Update Profile'), error.message);
 			});
 	};
 
@@ -340,7 +314,6 @@ const Professional: FC<ProfessionalProp> = ({
 					onClick={onSave}
 				/>
 			</div>
-			<ToastContainer limit={5} />
 		</>
 	);
 };
