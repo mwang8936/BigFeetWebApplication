@@ -21,11 +21,9 @@ import Profile from './components/profile/Profile.Component';
 import Scheduler from './components/scheduler/Scheduler.Component';
 import Services from './components/services/Services.Component';
 
-import Customer from '../../models/Customer.Model';
 import Employee from '../../models/Employee.Model';
 import { Permissions } from '../../models/enums';
 import Schedule from '../../models/Schedule.Model';
-import Service from '../../models/Service.Model';
 import User from '../../models/User.Model';
 
 import {
@@ -68,15 +66,6 @@ export function useEmployeesContext() {
 	return useContext(EmployeesContext);
 }
 
-const ServicesContext = createContext<{
-	services: Service[];
-	setServices(services: Service[]): void;
-}>({ services: [], setServices: () => {} });
-
-export function useServicesContext() {
-	return useContext(ServicesContext);
-}
-
 const SchedulesContext = createContext<{
 	schedules: Schedule[];
 	setSchedules(schedules: Schedule[]): void;
@@ -102,10 +91,6 @@ export default function BigFeet() {
 	const [schedules, setSchedules] = useState<Schedule[]>([]);
 	const [retryingSchedules, setRetryingSchedules] = useState(false);
 	const [schedulesError, setSchedulesError] = useState('');
-
-	const [services, setServices] = useState<Service[]>([]);
-	const [retryingServices, setRetryingServices] = useState(false);
-	const [servicesError, setServicesError] = useState('');
 
 	const [sideBarItems] = useState([SideBarItems.Profile]);
 
@@ -162,12 +147,6 @@ export default function BigFeet() {
 					.catch((error) => setSchedulesError(error.message));
 			}
 
-			if (permissions.includes(Permissions.PERMISSION_GET_SERVICE)) {
-				getServices(navigate)
-					.then((response) => setServices(response))
-					.catch((error) => setServicesError(error.message));
-			}
-
 			if (
 				permissions.includes(Permissions.PERMISSION_GET_EMPLOYEE) ||
 				permissions.includes(Permissions.PERMISSION_ADD_EMPLOYEE) ||
@@ -207,17 +186,6 @@ export default function BigFeet() {
 			})
 			.catch((error) => setUserError(error.message))
 			.finally(() => setRetryingUser(false));
-	};
-
-	const retryGetServices = async () => {
-		setRetryingServices(true);
-		getServices(navigate)
-			.then((response) => {
-				setServices(response);
-				setServicesError('');
-			})
-			.catch((error) => setServicesError(error.message))
-			.finally(() => setRetryingServices(false));
 	};
 
 	const retryGetEmployees = async () => {
@@ -276,68 +244,58 @@ export default function BigFeet() {
 
 			{UserContainer(
 				<SchedulesContext.Provider value={{ schedules, setSchedules }}>
-					<ServicesContext.Provider value={{ services, setServices }}>
-						<EmployeesContext.Provider value={{ employees, setEmployees }}>
-							<div className="grid landscape:grow landscape:h-screen landscape:ml-[9%] portrait:w-screen portrait:mt-[20%] portrait:sm:mt-[12%]">
-								{loading ? (
-									<Loading />
-								) : selectedIndex == 0 ? (
-									user ? (
-										<Profile />
-									) : (
-										<Retry
-											retrying={retryingUser}
-											error={userError}
-											onRetry={retryGetUser}
-										/>
-									)
-								) : selectedIndex == 1 ? (
-									schedules ? (
-										<Scheduler />
-									) : (
-										<Retry
-											retrying={retryingSchedules}
-											error={schedulesError}
-											onRetry={retryGetSchedules}
-										/>
-									)
-								) : selectedIndex == 2 ? (
-									schedules ? (
-										<PayRoll />
-									) : (
-										<Retry
-											retrying={retryingSchedules}
-											error={schedulesError}
-											onRetry={retryGetSchedules}
-										/>
-									)
-								) : selectedIndex == 3 ? (
-									employees ? (
-										<Employees />
-									) : (
-										<Retry
-											retrying={retryingEmployees}
-											error={employeesError}
-											onRetry={retryGetEmployees}
-										/>
-									)
-								) : selectedIndex == 4 ? (
-									services ? (
-										<Services />
-									) : (
-										<Retry
-											retrying={retryingServices}
-											error={servicesError}
-											onRetry={retryGetServices}
-										/>
-									)
+					<EmployeesContext.Provider value={{ employees, setEmployees }}>
+						<div className="grid landscape:grow landscape:h-screen landscape:ml-[9%] portrait:w-screen portrait:mt-[20%] portrait:sm:mt-[12%]">
+							{loading ? (
+								<Loading />
+							) : selectedIndex == 0 ? (
+								user ? (
+									<Profile />
 								) : (
-									selectedIndex == 5 && <Customers />
-								)}
-								<ToastContainer limit={5} />
-							</div>
-						</EmployeesContext.Provider>
-					</ServicesContext.Provider>
+									<Retry
+										retrying={retryingUser}
+										error={userError}
+										onRetry={retryGetUser}
+									/>
+								)
+							) : selectedIndex == 1 ? (
+								schedules ? (
+									<Scheduler />
+								) : (
+									<Retry
+										retrying={retryingSchedules}
+										error={schedulesError}
+										onRetry={retryGetSchedules}
+									/>
+								)
+							) : selectedIndex == 2 ? (
+								schedules ? (
+									<PayRoll />
+								) : (
+									<Retry
+										retrying={retryingSchedules}
+										error={schedulesError}
+										onRetry={retryGetSchedules}
+									/>
+								)
+							) : selectedIndex == 3 ? (
+								employees ? (
+									<Employees />
+								) : (
+									<Retry
+										retrying={retryingEmployees}
+										error={employeesError}
+										onRetry={retryGetEmployees}
+									/>
+								)
+							) : selectedIndex == 4 ? (
+								<Services />
+							) : (
+								selectedIndex == 5 && <Customers />
+							)}
+							<ToastContainer limit={5} />
+						</div>
+					</EmployeesContext.Provider>
 				</SchedulesContext.Provider>
 			)}
 		</div>

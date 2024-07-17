@@ -51,7 +51,6 @@ import {
 } from '../../../../service/vip-package.service';
 import FilterDateModal from '../miscallaneous/modals/scheduler/FilterDateModal.Component';
 import STORES from '../../../../constants/store.constants';
-import Customer from '../../../../models/Customer.Model';
 import { sortEmployees } from '../../../../utils/employee.utils';
 import ERRORS from '../../../../constants/error.constants';
 import { useTranslation } from 'react-i18next';
@@ -62,6 +61,7 @@ import {
 } from '../../../../utils/toast.utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCustomers } from '../../../../service/customer.service';
+import { getServices } from '../../../../service/service.service';
 
 const ScheduleDateContext = createContext<
 	{ date: Date; setDate(date: Date): void } | undefined
@@ -107,10 +107,20 @@ export default function Scheduler() {
 	const customerGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_CUSTOMER
 	);
+	const serviceGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_SERVICE
+	);
+
 	useQuery({
 		queryKey: ['customers'],
 		queryFn: () => getCustomers(navigate),
 		enabled: customerGettable,
+		refetchInterval: 1000 * 60 * 5,
+	});
+	useQuery({
+		queryKey: ['services'],
+		queryFn: () => getServices(navigate),
+		enabled: serviceGettable,
 		refetchInterval: 1000 * 60 * 5,
 	});
 

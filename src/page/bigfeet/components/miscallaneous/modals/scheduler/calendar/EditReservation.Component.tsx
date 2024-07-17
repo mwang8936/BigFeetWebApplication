@@ -9,7 +9,6 @@ import {
 import {
 	useEmployeesContext,
 	useSchedulesContext,
-	useServicesContext,
 	useUserContext,
 } from '../../../../../BigFeet.Page';
 import Employee from '../../../../../../../models/Employee.Model';
@@ -51,6 +50,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { getCustomers } from '../../../../../../../service/customer.service';
 import { useNavigate } from 'react-router-dom';
+import { getServices } from '../../../../../../../service/service.service';
 
 interface EditReservationProp {
 	setOpen(open: boolean): void;
@@ -145,6 +145,9 @@ const EditReservation: FC<EditReservationProp> = ({
 	const customerGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_CUSTOMER
 	);
+	const serviceGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_SERVICE
+	);
 
 	const { schedules } = useSchedulesContext();
 	const customerQuery = useQuery({
@@ -154,7 +157,12 @@ const EditReservation: FC<EditReservationProp> = ({
 	});
 	const customers: Customer[] = customerQuery.data;
 	const { employees } = useEmployeesContext();
-	const { services } = useServicesContext();
+	const serviceQuery = useQuery({
+		queryKey: ['services'],
+		queryFn: () => getServices(navigate),
+		enabled: serviceGettable,
+	});
+	const services: Service[] = serviceQuery.data;
 
 	const employeeDropDownItems = getEmployeeDropDownItems(employees);
 	const serviceDropDownItems = getServiceDropDownItems(services);
