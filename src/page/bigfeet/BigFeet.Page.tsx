@@ -35,6 +35,7 @@ import {
 
 import { userKey } from '../../constants/api.constants';
 import { getLanguageFile } from '../../constants/language.constants';
+import { useQuery } from '@tanstack/react-query';
 
 export const enum SideBarItems {
 	Profile = 0,
@@ -56,15 +57,6 @@ export function useUserContext() {
 	}
 
 	return context;
-}
-
-const CustomersContext = createContext<{
-	customers: Customer[];
-	setCustomers(customers: Customer[]): void;
-}>({ customers: [], setCustomers: () => {} });
-
-export function useCustomersContext() {
-	return useContext(CustomersContext);
 }
 
 const EmployeesContext = createContext<{
@@ -102,10 +94,6 @@ export default function BigFeet() {
 	const [user, setUser] = useState<User>();
 	const [retryingUser, setRetryingUser] = useState(false);
 	const [userError, setUserError] = useState('');
-
-	const [customers, setCustomers] = useState<Customer[]>([]);
-	const [retryingCustomers, setRetryingCustomers] = useState(false);
-	const [customersError, setCustomersError] = useState('');
 
 	const [employees, setEmployees] = useState<Employee[]>([]);
 	const [retryingEmployees, setRetryingEmployees] = useState(false);
@@ -150,17 +138,10 @@ export default function BigFeet() {
 			const user: User = JSON.parse(storageUser, reviveDateTime);
 			setUser(user);
 			i18n.changeLanguage(getLanguageFile(user.language));
-			setSelectedIndex(1);
 
 			sideBarItems.push(SideBarItems.Scheduler, SideBarItems.PayRoll);
 
 			const permissions = user.permissions;
-
-			if (permissions.includes(Permissions.PERMISSION_GET_CUSTOMER)) {
-				getCustomers(navigate)
-					.then((response) => setCustomers(response))
-					.catch((error) => setCustomersError(error.message));
-			}
 
 			if (permissions.includes(Permissions.PERMISSION_GET_EMPLOYEE)) {
 				getEmployees(navigate)
@@ -250,17 +231,6 @@ export default function BigFeet() {
 			.finally(() => setRetryingEmployees(false));
 	};
 
-	const retryGetCustomers = async () => {
-		setRetryingCustomers(true);
-		getCustomers(navigate)
-			.then((response) => {
-				setCustomers(response);
-				setCustomersError('');
-			})
-			.catch((error) => setCustomersError(error.message))
-			.finally(() => setRetryingCustomers(false));
-	};
-
 	const retryGetSchedules = async () => {
 		if (user) {
 			setRetryingSchedules(true);
@@ -308,75 +278,64 @@ export default function BigFeet() {
 				<SchedulesContext.Provider value={{ schedules, setSchedules }}>
 					<ServicesContext.Provider value={{ services, setServices }}>
 						<EmployeesContext.Provider value={{ employees, setEmployees }}>
-							<CustomersContext.Provider value={{ customers, setCustomers }}>
-								<div className="grid landscape:grow landscape:h-screen landscape:ml-[9%] portrait:w-screen portrait:mt-[20%] portrait:sm:mt-[12%]">
-									{loading ? (
-										<Loading />
-									) : selectedIndex == 0 ? (
-										user ? (
-											<Profile />
-										) : (
-											<Retry
-												retrying={retryingUser}
-												error={userError}
-												onRetry={retryGetUser}
-											/>
-										)
-									) : selectedIndex == 1 ? (
-										schedules ? (
-											<Scheduler />
-										) : (
-											<Retry
-												retrying={retryingSchedules}
-												error={schedulesError}
-												onRetry={retryGetSchedules}
-											/>
-										)
-									) : selectedIndex == 2 ? (
-										schedules ? (
-											<PayRoll />
-										) : (
-											<Retry
-												retrying={retryingSchedules}
-												error={schedulesError}
-												onRetry={retryGetSchedules}
-											/>
-										)
-									) : selectedIndex == 3 ? (
-										employees ? (
-											<Employees />
-										) : (
-											<Retry
-												retrying={retryingEmployees}
-												error={employeesError}
-												onRetry={retryGetEmployees}
-											/>
-										)
-									) : selectedIndex == 4 ? (
-										services ? (
-											<Services />
-										) : (
-											<Retry
-												retrying={retryingServices}
-												error={servicesError}
-												onRetry={retryGetServices}
-											/>
-										)
+							<div className="grid landscape:grow landscape:h-screen landscape:ml-[9%] portrait:w-screen portrait:mt-[20%] portrait:sm:mt-[12%]">
+								{loading ? (
+									<Loading />
+								) : selectedIndex == 0 ? (
+									user ? (
+										<Profile />
 									) : (
-										selectedIndex == 5 &&
-										(customers ? (
-											<Customers />
-										) : (
-											<Retry
-												retrying={retryingCustomers}
-												error={customersError}
-												onRetry={retryGetCustomers}
-											/>
-										))
-									)}
-									<ToastContainer limit={5} />
-								</div>
-							</CustomersContext.Provider>
+										<Retry
+											retrying={retryingUser}
+											error={userError}
+											onRetry={retryGetUser}
+										/>
+									)
+								) : selectedIndex == 1 ? (
+									schedules ? (
+										<Scheduler />
+									) : (
+										<Retry
+											retrying={retryingSchedules}
+											error={schedulesError}
+											onRetry={retryGetSchedules}
+										/>
+									)
+								) : selectedIndex == 2 ? (
+									schedules ? (
+										<PayRoll />
+									) : (
+										<Retry
+											retrying={retryingSchedules}
+											error={schedulesError}
+											onRetry={retryGetSchedules}
+										/>
+									)
+								) : selectedIndex == 3 ? (
+									employees ? (
+										<Employees />
+									) : (
+										<Retry
+											retrying={retryingEmployees}
+											error={employeesError}
+											onRetry={retryGetEmployees}
+										/>
+									)
+								) : selectedIndex == 4 ? (
+									services ? (
+										<Services />
+									) : (
+										<Retry
+											retrying={retryingServices}
+											error={servicesError}
+											onRetry={retryGetServices}
+										/>
+									)
+								) : (
+									selectedIndex == 5 && <Customers />
+								)}
+								<ToastContainer limit={5} />
+							</div>
 						</EmployeesContext.Provider>
 					</ServicesContext.Provider>
 				</SchedulesContext.Provider>

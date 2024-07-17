@@ -8,6 +8,11 @@ import { SideBarItems } from '../BigFeet.Page';
 import { logout } from '../../../service/auth.service';
 import { useAuthenticationContext } from '../../../App';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
+import { getCustomers } from '../../../service/customer.service';
+import { useNavigate } from 'react-router-dom';
+import { getServices } from '../../../service/service.service';
+import { getEmployees } from '../../../service/employee.service';
 
 interface SideBarProp {
 	selectedIndex: number;
@@ -16,8 +21,33 @@ interface SideBarProp {
 }
 
 export default function SideBar(prop: SideBarProp) {
+	const navigate = useNavigate();
 	const { t } = useTranslation();
 	const { setAuthentication } = useAuthenticationContext();
+
+	const queryClient = useQueryClient();
+
+	const prefetchEmployees = async () => {
+		await queryClient.prefetchQuery({
+			queryKey: ['employees'],
+			queryFn: () => getEmployees(navigate),
+		});
+	};
+
+	const prefetchServices = async () => {
+		await queryClient.prefetchQuery({
+			queryKey: ['services'],
+			queryFn: () => getServices(navigate),
+		});
+	};
+
+	const prefetchCustomers = async () => {
+		await queryClient.prefetchQuery({
+			queryKey: ['customers'],
+			queryFn: () => getCustomers(navigate),
+		});
+	};
+
 	return (
 		<div className="sidebar">
 			{prop.sideBarItems.includes(SideBarItems.Profile) && (
@@ -78,6 +108,7 @@ export default function SideBar(prop: SideBarProp) {
 							? 'sidebar-icon-selected group'
 							: 'sidebar-icon group'
 					}
+					onMouseEnter={prefetchEmployees}
 					onClick={() => {
 						prop.onIndexSelected(SideBarItems.Employees);
 					}}>
@@ -95,6 +126,7 @@ export default function SideBar(prop: SideBarProp) {
 							? 'sidebar-icon-selected group'
 							: 'sidebar-icon group'
 					}
+					onMouseEnter={prefetchServices}
 					onClick={() => {
 						prop.onIndexSelected(SideBarItems.Services);
 					}}>
@@ -112,6 +144,7 @@ export default function SideBar(prop: SideBarProp) {
 							? 'sidebar-icon-selected group'
 							: 'sidebar-icon group'
 					}
+					onMouseEnter={prefetchCustomers}
 					onClick={() => {
 						prop.onIndexSelected(SideBarItems.Customers);
 					}}>

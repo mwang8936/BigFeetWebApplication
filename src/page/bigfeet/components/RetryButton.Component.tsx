@@ -3,15 +3,24 @@ import { useTranslation } from 'react-i18next';
 interface RetryButtonProp {
 	loading: boolean;
 	onRetry(): void;
+	enabled?: boolean;
 }
 
-export default function RetryButton(prop: RetryButtonProp) {
+const RetryButton: React.FC<RetryButtonProp> = ({
+	loading,
+	onRetry,
+	enabled = true,
+}) => {
 	const { t } = useTranslation();
 
 	return (
 		<div className="justify-center">
-			<button type="button" className="button group" onClick={prop.onRetry}>
-				{prop.loading && (
+			<button
+				type="button"
+				className="button group"
+				onClick={onRetry}
+				disabled={!enabled}>
+				{loading && (
 					<svg
 						className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
 						xmlns="http://www.w3.org/2000/svg"
@@ -32,8 +41,10 @@ export default function RetryButton(prop: RetryButtonProp) {
 						/>
 					</svg>
 				)}
-				{prop.loading ? t('Retrying') : t('Retry')}
+				{loading ? t('Retrying') : t('Retry')}
 			</button>
 		</div>
 	);
-}
+};
+
+export default RetryButton;

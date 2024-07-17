@@ -1,10 +1,12 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import BigFeet from './page/bigfeet/BigFeet.Page';
 import Login from './page/login/Login.Page';
 
 import { authenticate } from './service/auth.service';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const AuthenticationContext = createContext<{
 	authenticated: boolean;
@@ -14,6 +16,14 @@ const AuthenticationContext = createContext<{
 export function useAuthenticationContext() {
 	return useContext(AuthenticationContext);
 }
+
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			staleTime: 1000 * 30,
+		},
+	},
+});
 
 export default function App() {
 	const [authenticated, setAuthentication] = useState(false);
@@ -43,15 +53,18 @@ export default function App() {
 	const loginElement = authenticated ? <Navigate replace to="/" /> : <Login />;
 
 	return (
-		<BrowserRouter>
-			<AuthenticationContext.Provider
-				value={{ authenticated, setAuthentication }}>
-				<Routes>
-					<Route index element={mainElement} />
-					<Route path="/login" element={loginElement} />
-					<Route path="*" element={<h1>404 PAGE NOT FOUND</h1>} />
-				</Routes>
-			</AuthenticationContext.Provider>
-		</BrowserRouter>
+		<QueryClientProvider client={queryClient}>
+			<BrowserRouter>
+				<AuthenticationContext.Provider
+					value={{ authenticated, setAuthentication }}>
+					<Routes>
+						<Route index element={mainElement} />
+						<Route path="/login" element={loginElement} />
+						<Route path="*" element={<h1>404 PAGE NOT FOUND</h1>} />
+					</Routes>
+				</AuthenticationContext.Provider>
+			</BrowserRouter>
+			<ReactQueryDevtools initialIsOpen={false} />
+		</QueryClientProvider>
 	);
 }

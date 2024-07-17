@@ -1,9 +1,10 @@
 import { FC, useState } from 'react';
-import { useCustomersContext, useUserContext } from '../../BigFeet.Page';
+import { useUserContext } from '../../BigFeet.Page';
 import { Permissions } from '../../../../models/enums';
 import {
 	addCustomer,
 	deleteCustomer,
+	getCustomers,
 	updateCustomer,
 } from '../../../../service/customer.service';
 import { useNavigate } from 'react-router-dom';
@@ -27,16 +28,23 @@ import {
 	errorToast,
 	updateToast,
 } from '../../../../utils/toast.utils';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import Loading from '../Loading.Component';
+import Customer from '../../../../models/Customer.Model';
+import Retry from '../Retry.Component';
 
 const Customers: FC = () => {
 	const { t } = useTranslation();
+	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 
 	const [openAddCustomerModal, setOpenAddCustomerModal] = useState(false);
 	const [searchFilter, setSearchFilter] = useState<string | null>(null);
 	const [invalidSearch, setInvalidSearch] = useState<boolean>(false);
 
-	const { customers, setCustomers } = useCustomersContext();
+	const [retryingCustomerQuery, setRetryingCustomerQuery] =
+		useState<boolean>(false);
+
 	const { user } = useUserContext();
 
 	const gettable = user.permissions.includes(
@@ -52,6 +60,22 @@ const Customers: FC = () => {
 		Permissions.PERMISSION_DELETE_CUSTOMER
 	);
 
+	const customerQuery = useQuery({
+		queryKey: ['customers'],
+		queryFn: () => getCustomers(navigate),
+		enabled: gettable,
+	});
+
+	const customers: Customer[] = customerQuery.data;
+
+	const isCustomerLoading = customerQuery.isLoading;
+
+	const retryCustomerQuery = customerQuery.refetch;
+	const isCustomerError = customerQuery.isError;
+	const customerError = customerQuery.error;
+
+	const isCustomerPaused = customerQuery.isPaused;
+
 	const filteredCustomers = searchFilter
 		? customers.filter(
 				(customer) =>
@@ -64,74 +88,80 @@ const Customers: FC = () => {
 		  )
 		: customers;
 
+	const addCustomerMutation = useMutation({
+		mutationFn: (data: { request: AddCustomerRequest }) =>
+			addCustomer(navigate, data.request),
+		onMutate: async () => {
+			const toastId = createToast(t('Adding Customer...'));
+			return { toastId };
+		},
+		onSuccess: (_data, _variables, context) => {
+			queryClient.invalidateQueries({ queryKey: ['customers'] });
+			updateToast(context.toastId, t('Customer Added Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(context.toastId, t('Failed to Add Customer'), error.message);
+		},
+	});
+
 	const onAddCustomer = async (request: AddCustomerRequest) => {
-		const toastId = createToast(t('Adding Customer...'));
-		addCustomer(navigate, request)
-			.then((response) => {
-				if (gettable) {
-					setCustomers([...customers, response]);
-				} else {
-					setCustomers([]);
-				}
-				updateToast(toastId, t('Customer Added Successfully'));
-			})
-			.catch((error) => {
-				errorToast(toastId, t('Failed to Add Customer'), error.message);
-			});
+		addCustomerMutation.mutate({ request });
 	};
+
+	const editCustomerMutation = useMutation({
+		mutationFn: (data: {
+			phoneNumber: string;
+			request: UpdateCustomerRequest;
+		}) => updateCustomer(navigate, data.phoneNumber, data.request),
+		onMutate: async () => {
+			const toastId = createToast(t('Updating Customer...'));
+			return { toastId };
+		},
+		onSuccess: (_data, _variables, context) => {
+			queryClient.invalidateQueries({ queryKey: ['customers'] });
+			updateToast(context.toastId, t('Customer Updated Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Update Customer'),
+					error.message
+				);
+		},
+	});
 
 	const onEditCustomer = async (
 		phoneNumber: string,
 		request: UpdateCustomerRequest
 	) => {
-		const toastId = createToast(t('Updating Customer...'));
-		updateCustomer(navigate, phoneNumber, request)
-			.then(() => {
-				if (gettable) {
-					const oldCustomer = customers.find(
-						(customer) => customer.phone_number === phoneNumber
-					);
-					if (oldCustomer) {
-						const updatedCustomer = {
-							...oldCustomer,
-							...request,
-						};
-						setCustomers(
-							customers.map((customer) =>
-								customer.phone_number === phoneNumber
-									? updatedCustomer
-									: customer
-							)
-						);
-					}
-				} else {
-					setCustomers([]);
-				}
-				updateToast(toastId, t('Customer Updated Successfully'));
-			})
-			.catch((error) => {
-				errorToast(toastId, t('Failed to Update Customer'), error.message);
-			});
+		editCustomerMutation.mutate({ phoneNumber, request });
 	};
 
+	const deleteCustomerMutation = useMutation({
+		mutationFn: (data: { phoneNumber: string }) =>
+			deleteCustomer(navigate, data.phoneNumber),
+		onMutate: async () => {
+			const toastId = createToast(t('Deleting Customer...'));
+			return { toastId };
+		},
+		onSuccess: (_data, _variables, context) => {
+			queryClient.invalidateQueries({ queryKey: ['customers'] });
+			updateToast(context.toastId, t('Customer Deleted Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Delete Customer'),
+					error.message
+				);
+		},
+	});
+
 	const onDeleteCustomer = async (phoneNumber: string) => {
-		const toastId = createToast(t('Deleting Customer...'));
-		deleteCustomer(navigate, phoneNumber)
-			.then(() => {
-				if (gettable) {
-					setCustomers(
-						customers.filter(
-							(customer) => customer.phone_number !== phoneNumber
-						)
-					);
-				} else {
-					setCustomers([]);
-				}
-				updateToast(toastId, t('Customer Deleted Successfully'));
-			})
-			.catch((error) => {
-				errorToast(toastId, t('Failed to Delete Customer'), error.message);
-			});
+		deleteCustomerMutation.mutate({ phoneNumber });
 	};
 
 	return (
@@ -166,14 +196,40 @@ const Customers: FC = () => {
 					}}
 					placeholder={PLACEHOLDERS.customer.search_customer}
 				/>
-				<CustomerList
-					customers={filteredCustomers}
-					gettable={gettable}
-					editable={editable}
-					onEditCustomer={onEditCustomer}
-					deletable={deletable}
-					onDeleteCustomer={onDeleteCustomer}
-				/>
+				{isCustomerLoading ? (
+					<Loading />
+				) : isCustomerError ? (
+					<Retry
+						retrying={retryingCustomerQuery}
+						error={
+							gettable
+								? ERRORS.customer.permissions.get
+								: (customerError?.message as string)
+						}
+						onRetry={() => {
+							setRetryingCustomerQuery(true);
+							retryCustomerQuery().finally(() =>
+								setRetryingCustomerQuery(false)
+							);
+						}}
+						enabled={gettable}
+					/>
+				) : isCustomerPaused ? (
+					<Retry
+						retrying={retryingCustomerQuery}
+						error={'Network Connection Issue'}
+						onRetry={() => {}}
+						enabled={false}
+					/>
+				) : (
+					<CustomerList
+						customers={filteredCustomers}
+						editable={editable}
+						onEditCustomer={onEditCustomer}
+						deletable={deletable}
+						onDeleteCustomer={onDeleteCustomer}
+					/>
+				)}
 			</div>
 			<AddCustomerModal
 				open={openAddCustomerModal}

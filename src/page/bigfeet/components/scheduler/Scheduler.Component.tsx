@@ -2,7 +2,6 @@ import { useState, createContext, useContext } from 'react';
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import Calendar from './Calendar/Calendar.Component';
 import {
-	useCustomersContext,
 	useEmployeesContext,
 	useSchedulesContext,
 	useUserContext,
@@ -61,6 +60,8 @@ import {
 	errorToast,
 	updateToast,
 } from '../../../../utils/toast.utils';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getCustomers } from '../../../../service/customer.service';
 
 const ScheduleDateContext = createContext<
 	{ date: Date; setDate(date: Date): void } | undefined
@@ -79,6 +80,7 @@ export function useScheduleDateContext() {
 
 export default function Scheduler() {
 	const { t } = useTranslation();
+	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 
 	const [openAddReservationModal, setOpenAddReservationModal] = useState(false);
@@ -101,7 +103,17 @@ export default function Scheduler() {
 	};
 
 	const { user } = useUserContext();
-	const { customers, setCustomers } = useCustomersContext();
+
+	const customerGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_CUSTOMER
+	);
+	useQuery({
+		queryKey: ['customers'],
+		queryFn: () => getCustomers(navigate),
+		enabled: customerGettable,
+		refetchInterval: 1000 * 60 * 5,
+	});
+
 	const { schedules, setSchedules } = useSchedulesContext();
 
 	let employeeList: Employee[] = [];
@@ -135,31 +147,7 @@ export default function Scheduler() {
 					updatedSchedules[scheduleIndex] = response;
 				}
 				setSchedules(updatedSchedules);
-				if (request.phone_number && request.customer_name) {
-					if (customers !== undefined && setCustomers !== undefined) {
-						const customer = customers.find(
-							(customer) => customer.phone_number === request.phone_number
-						);
-						const updatedCustomer: Customer = {
-							phone_number: request.phone_number,
-							customer_name: request.customer_name,
-							notes: request.notes || null,
-						};
-
-						if (!customer) {
-							setCustomers([...customers, updatedCustomer]);
-						} else {
-							setCustomers(
-								customers.map((customer) =>
-									customer.phone_number === updatedCustomer.phone_number
-										? updatedCustomer
-										: customer
-								)
-							);
-						}
-					}
-				}
-
+				queryClient.invalidateQueries({ queryKey: ['customers'] });
 				updateToast(toastId, t('Reservation Added Successfully'));
 			})
 			.catch((error) =>
@@ -249,6 +237,7 @@ export default function Scheduler() {
 					}
 				}
 				setSchedules(updatedSchedules);
+				queryClient.invalidateQueries({ queryKey: ['customers'] });
 				updateToast(toastId, t('Reservation Updated Successfully'));
 			})
 			.catch((error) =>

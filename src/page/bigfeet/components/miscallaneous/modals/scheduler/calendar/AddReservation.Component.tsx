@@ -1,9 +1,8 @@
 import { FC, useState, useEffect } from 'react';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
-import { Gender } from '../../../../../../../models/enums';
+import { Gender, Permissions } from '../../../../../../../models/enums';
 import {
-	useCustomersContext,
 	useEmployeesContext,
 	useSchedulesContext,
 	useServicesContext,
@@ -37,6 +36,9 @@ import AddBottom from '../../AddBottom.Component';
 import { doesDateOverlap } from '../../../../../../../utils/date.utils';
 import WarningModal from './WarningModal.Component';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { getCustomers } from '../../../../../../../service/customer.service';
 
 interface AddReservationProp {
 	setOpen(open: boolean): void;
@@ -56,6 +58,7 @@ const AddReservation: FC<AddReservationProp> = ({
 	onAddReservation,
 }) => {
 	const { t } = useTranslation();
+	const navigate = useNavigate();
 
 	const [openBedWarningModal, setOpenBedWarningModal] =
 		useState<boolean>(false);
@@ -95,8 +98,19 @@ const AddReservation: FC<AddReservationProp> = ({
 	const [noBeds, setNoBeds] = useState<boolean>(false);
 	const [conflict, setConflict] = useState<boolean>(false);
 
+	const { user } = useUserContext();
+
+	const customerGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_CUSTOMER
+	);
+
 	const { schedules } = useSchedulesContext();
-	const { customers } = useCustomersContext();
+	const customerQuery = useQuery({
+		queryKey: ['customers'],
+		queryFn: () => getCustomers(navigate),
+		enabled: customerGettable,
+	});
+	const customers: Customer[] = customerQuery.data;
 	const { employees } = useEmployeesContext();
 	const { services } = useServicesContext();
 

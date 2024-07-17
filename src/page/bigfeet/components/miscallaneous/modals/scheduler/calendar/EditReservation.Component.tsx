@@ -1,9 +1,12 @@
 import { FC, useState, useEffect } from 'react';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
-import { Gender, TipMethod } from '../../../../../../../models/enums';
 import {
-	useCustomersContext,
+	Gender,
+	Permissions,
+	TipMethod,
+} from '../../../../../../../models/enums';
+import {
 	useEmployeesContext,
 	useSchedulesContext,
 	useServicesContext,
@@ -45,6 +48,9 @@ import EditableInput from '../../../editable/EditableInput.Component';
 import EditablePhoneNumber from '../../../editable/EditablePhoneNumber.Component';
 import WarningModal from './WarningModal.Component';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
+import { getCustomers } from '../../../../../../../service/customer.service';
+import { useNavigate } from 'react-router-dom';
 
 interface EditReservationProp {
 	setOpen(open: boolean): void;
@@ -71,6 +77,7 @@ const EditReservation: FC<EditReservationProp> = ({
 	onDeleteReservation,
 }) => {
 	const { t } = useTranslation();
+	const navigate = useNavigate();
 
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
 	const [openBedWarningModal, setOpenBedWarningModal] =
@@ -133,8 +140,19 @@ const EditReservation: FC<EditReservationProp> = ({
 	const [noBeds, setNoBeds] = useState<boolean>(false);
 	const [conflict, setConflict] = useState<boolean>(false);
 
+	const { user } = useUserContext();
+
+	const customerGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_CUSTOMER
+	);
+
 	const { schedules } = useSchedulesContext();
-	const { customers } = useCustomersContext();
+	const customerQuery = useQuery({
+		queryKey: ['customers'],
+		queryFn: () => getCustomers(navigate),
+		enabled: customerGettable,
+	});
+	const customers: Customer[] = customerQuery.data;
 	const { employees } = useEmployeesContext();
 	const { services } = useServicesContext();
 
