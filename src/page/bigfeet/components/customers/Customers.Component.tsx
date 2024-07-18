@@ -66,7 +66,7 @@ const Customers: FC = () => {
 		enabled: gettable,
 	});
 
-	const customers: Customer[] = customerQuery.data;
+	const customers: Customer[] = customerQuery.data || [];
 
 	const isCustomerLoading = customerQuery.isLoading;
 
@@ -76,17 +76,20 @@ const Customers: FC = () => {
 
 	const isCustomerPaused = customerQuery.isPaused;
 
-	const filteredCustomers = searchFilter
-		? customers.filter(
-				(customer) =>
-					customer.customer_name
-						.toLowerCase()
-						.includes(searchFilter.toLowerCase()) ||
-					customer.phone_number
-						.toLowerCase()
-						.includes(searchFilter.toLowerCase())
-		  )
-		: customers;
+	let filteredCustomers: Customer[] = [];
+	if (!isCustomerLoading && !isCustomerError && !isCustomerPaused) {
+		filteredCustomers = searchFilter
+			? customers.filter(
+					(customer) =>
+						customer.customer_name
+							.toLowerCase()
+							.includes(searchFilter.toLowerCase()) ||
+						customer.phone_number
+							.toLowerCase()
+							.includes(searchFilter.toLowerCase())
+			  )
+			: customers;
+	}
 
 	const addCustomerMutation = useMutation({
 		mutationFn: (data: { request: AddCustomerRequest }) =>
@@ -164,10 +167,75 @@ const Customers: FC = () => {
 		deleteCustomerMutation.mutate({ phoneNumber });
 	};
 
+	const customersElement = (
+		<CustomerList
+			customers={filteredCustomers}
+			editable={editable}
+			onEditCustomer={onEditCustomer}
+			deletable={deletable}
+			onDeleteCustomer={onDeleteCustomer}
+		/>
+	);
+
+	const searchElement = (
+		<>
+			<AddInput
+				text={searchFilter}
+				setText={setSearchFilter}
+				label={LABELS.customer.search_customer}
+				name={NAMES.customer.search_customer}
+				type="text"
+				validationProp={{
+					required: false,
+					invalid: invalidSearch,
+					setInvalid: setInvalidSearch,
+					invalidMessage: ERRORS.customer.search_customer.invalid,
+				}}
+				placeholder={PLACEHOLDERS.customer.search_customer}
+			/>
+			<div className="mb-4 pr-4 overflow-auto">{customersElement}</div>
+		</>
+	);
+
+	const pausedElement = isCustomerPaused ? (
+		<Retry
+			retrying={retryingCustomerQuery}
+			error={'Network Connection Issue'}
+			onRetry={() => {}}
+			enabled={false}
+		/>
+	) : (
+		searchElement
+	);
+
+	const errorsElement = isCustomerError ? (
+		<Retry
+			retrying={retryingCustomerQuery}
+			error={customerError?.message as string}
+			onRetry={() => {
+				setRetryingCustomerQuery(true);
+				retryCustomerQuery().finally(() => setRetryingCustomerQuery(false));
+			}}
+			enabled={gettable}
+		/>
+	) : (
+		pausedElement
+	);
+
+	const permissionsElement = !gettable ? (
+		<h1 className="m-auto text-gray-600 text-3xl">
+			{t(ERRORS.customer.permissions.get)}
+		</h1>
+	) : (
+		errorsElement
+	);
+
+	const isLoadingElement = isCustomerLoading ? <Loading /> : permissionsElement;
+
 	return (
 		<>
 			<div className="non-sidebar">
-				<div className="h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
+				<div className="py-4 h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
 					<h1 className="my-auto text-gray-600 text-3xl">{t('Customers')}</h1>
 					<div className="h-fit my-auto flex">
 						<PermissionsButton
@@ -182,54 +250,7 @@ const Customers: FC = () => {
 						/>
 					</div>
 				</div>
-				<AddInput
-					text={searchFilter}
-					setText={setSearchFilter}
-					label={LABELS.customer.search_customer}
-					name={NAMES.customer.search_customer}
-					type="text"
-					validationProp={{
-						required: false,
-						invalid: invalidSearch,
-						setInvalid: setInvalidSearch,
-						invalidMessage: ERRORS.customer.search_customer.invalid,
-					}}
-					placeholder={PLACEHOLDERS.customer.search_customer}
-				/>
-				{isCustomerLoading ? (
-					<Loading />
-				) : isCustomerError ? (
-					<Retry
-						retrying={retryingCustomerQuery}
-						error={
-							gettable
-								? ERRORS.customer.permissions.get
-								: (customerError?.message as string)
-						}
-						onRetry={() => {
-							setRetryingCustomerQuery(true);
-							retryCustomerQuery().finally(() =>
-								setRetryingCustomerQuery(false)
-							);
-						}}
-						enabled={gettable}
-					/>
-				) : isCustomerPaused ? (
-					<Retry
-						retrying={retryingCustomerQuery}
-						error={'Network Connection Issue'}
-						onRetry={() => {}}
-						enabled={false}
-					/>
-				) : (
-					<CustomerList
-						customers={filteredCustomers}
-						editable={editable}
-						onEditCustomer={onEditCustomer}
-						deletable={deletable}
-						onDeleteCustomer={onDeleteCustomer}
-					/>
-				)}
+				{isLoadingElement}
 			</div>
 			<AddCustomerModal
 				open={openAddCustomerModal}

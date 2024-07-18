@@ -3,7 +3,7 @@ import LENGTHS from '../../../../../constants/lengths.constants';
 import { FC, useEffect, useState } from 'react';
 import { updateEmployee } from '../../../../../service/employee.service';
 import { useNavigate } from 'react-router-dom';
-import { useEmployeesContext, useUserContext } from '../../../BigFeet.Page';
+import { useUserContext } from '../../../BigFeet.Page';
 import { Gender, Permissions } from '../../../../../models/enums';
 import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
 import { genderDropDownItems } from '../../../../../constants/drop-down.constants';
@@ -21,6 +21,7 @@ import {
 	errorToast,
 	updateToast,
 } from '../../../../../utils/toast.utils';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface PersonalProp {
 	editable: boolean;
@@ -38,6 +39,7 @@ const Personal: FC<PersonalProp> = ({
 	originalGender,
 }) => {
 	const { t } = useTranslation();
+	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 
 	const [usernameInput, setUsernameInput] = useState<string | null>(
@@ -111,7 +113,35 @@ const Personal: FC<PersonalProp> = ({
 	}, [invalidUsername, invalidFirstName, invalidLastName]);
 
 	const { user, setUser } = useUserContext();
-	const { employees, setEmployees } = useEmployeesContext();
+
+	const editProfileMutation = useMutation({
+		mutationFn: (data: {
+			employeeId: number;
+			request: UpdateEmployeeRequest;
+		}) => updateEmployee(navigate, data.employeeId, data.request),
+		onMutate: async () => {
+			const toastId = createToast(t('Updating Profile...'));
+			return { toastId };
+		},
+		onSuccess: (_data, variables, context) => {
+			queryClient.invalidateQueries({ queryKey: ['employees'] });
+			const updatedUser = {
+				...user,
+				...variables.request,
+			};
+			sessionStorage.setItem(userKey, JSON.stringify(updatedUser));
+			setUser(updatedUser);
+			updateToast(context.toastId, t('Profile Updated Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Update Profile'),
+					error.message
+				);
+		},
+	});
 
 	const onSave = async () => {
 		const username: string | undefined =
@@ -129,43 +159,15 @@ const Personal: FC<PersonalProp> = ({
 		const gender: Gender | undefined =
 			genderInput === originalGender ? undefined : (genderInput as Gender);
 
-		const updateEmployeeRequest: UpdateEmployeeRequest = {
+		const employeeId = user.employee_id;
+		const request: UpdateEmployeeRequest = {
 			...(username && { username }),
 			...(first_name && { first_name }),
 			...(last_name && { last_name }),
 			...(gender && { gender }),
 		};
 
-		const toastId = createToast(t('Updating Profile...'));
-
-		updateEmployee(navigate, user.employee_id, updateEmployeeRequest)
-			.then(() => {
-				const updatedUser = {
-					...user,
-					...updateEmployeeRequest,
-				};
-				sessionStorage.setItem(userKey, JSON.stringify(updatedUser));
-				setUser(updatedUser);
-				const updatedEmployee = Object(updatedUser);
-				delete updatedEmployee['language'];
-				delete updatedEmployee['dark_mode'];
-				if (user.permissions.includes(Permissions.PERMISSION_GET_EMPLOYEE)) {
-					setEmployees(
-						employees.map((employee) =>
-							employee.employee_id == user.employee_id
-								? updatedEmployee
-								: employee
-						)
-					);
-				} else {
-					setEmployees([]);
-				}
-
-				updateToast(toastId, t('Profile Updated Successfully'));
-			})
-			.catch((error) => {
-				errorToast(toastId, t('Failed to Update Profile'), error.message);
-			});
+		editProfileMutation.mutate({ employeeId, request });
 	};
 	return (
 		<>

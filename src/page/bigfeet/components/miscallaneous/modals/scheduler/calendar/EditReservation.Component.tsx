@@ -7,7 +7,6 @@ import {
 	TipMethod,
 } from '../../../../../../../models/enums';
 import {
-	useEmployeesContext,
 	useSchedulesContext,
 	useUserContext,
 } from '../../../../../BigFeet.Page';
@@ -51,6 +50,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getCustomers } from '../../../../../../../service/customer.service';
 import { useNavigate } from 'react-router-dom';
 import { getServices } from '../../../../../../../service/service.service';
+import { getEmployees } from '../../../../../../../service/employee.service';
 
 interface EditReservationProp {
 	setOpen(open: boolean): void;
@@ -145,18 +145,29 @@ const EditReservation: FC<EditReservationProp> = ({
 	const customerGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_CUSTOMER
 	);
+	const employeeGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_EMPLOYEE
+	);
 	const serviceGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_SERVICE
 	);
 
 	const { schedules } = useSchedulesContext();
+
 	const customerQuery = useQuery({
 		queryKey: ['customers'],
 		queryFn: () => getCustomers(navigate),
 		enabled: customerGettable,
 	});
 	const customers: Customer[] = customerQuery.data;
-	const { employees } = useEmployeesContext();
+
+	const employeeQuery = useQuery({
+		queryKey: ['employees'],
+		queryFn: () => getEmployees(navigate),
+		enabled: employeeGettable,
+	});
+	const employees: Employee[] = employeeQuery.data;
+
 	const serviceQuery = useQuery({
 		queryKey: ['services'],
 		queryFn: () => getServices(navigate),

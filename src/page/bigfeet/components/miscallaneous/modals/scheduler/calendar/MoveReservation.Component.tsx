@@ -5,7 +5,6 @@ import {
 } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
 import {
-	useEmployeesContext,
 	useSchedulesContext,
 	useUserContext,
 } from '../../../../../BigFeet.Page';
@@ -19,6 +18,10 @@ import WarningModal from './WarningModal.Component';
 import { doesDateOverlap } from '../../../../../../../utils/date.utils';
 import STORES from '../../../../../../../constants/store.constants';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
+import { getEmployees } from '../../../../../../../service/employee.service';
+import { Permissions } from '../../../../../../../models/enums';
+import { useNavigate } from 'react-router-dom';
 
 interface MoveReservationProp {
 	setOpen(open: boolean): void;
@@ -45,6 +48,7 @@ const MoveReservation: FC<MoveReservationProp> = ({
 	onCancel,
 }) => {
 	const { t } = useTranslation();
+	const navigate = useNavigate();
 
 	const [openBedWarningModal, setOpenBedWarningModal] =
 		useState<boolean>(false);
@@ -54,8 +58,18 @@ const MoveReservation: FC<MoveReservationProp> = ({
 	const [noBeds, setNoBeds] = useState<boolean>(false);
 	const [conflict, setConflict] = useState<boolean>(false);
 
+	const { user } = useUserContext();
+	const employeeGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_EMPLOYEE
+	);
+
 	const { schedules } = useSchedulesContext();
-	const { employees } = useEmployeesContext();
+	const employeeQuery = useQuery({
+		queryKey: ['employees'],
+		queryFn: () => getEmployees(navigate),
+		enabled: employeeGettable,
+	});
+	const employees: Employee[] = employeeQuery.data;
 
 	const prevEmployeeUsername = employees.find(
 		(employee) => employee.employee_id === reservation.employee_id

@@ -1,11 +1,7 @@
 import { useState, createContext, useContext } from 'react';
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import Calendar from './Calendar/Calendar.Component';
-import {
-	useEmployeesContext,
-	useSchedulesContext,
-	useUserContext,
-} from '../../BigFeet.Page';
+import { useSchedulesContext, useUserContext } from '../../BigFeet.Page';
 import { Permissions } from '../../../../models/enums';
 import Schedule from '../../../../models/Schedule.Model';
 import {
@@ -62,6 +58,7 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCustomers } from '../../../../service/customer.service';
 import { getServices } from '../../../../service/service.service';
+import { getEmployees } from '../../../../service/employee.service';
 
 const ScheduleDateContext = createContext<
 	{ date: Date; setDate(date: Date): void } | undefined
@@ -107,6 +104,9 @@ export default function Scheduler() {
 	const customerGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_CUSTOMER
 	);
+	const employeeGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_EMPLOYEE
+	);
 	const serviceGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_SERVICE
 	);
@@ -115,6 +115,12 @@ export default function Scheduler() {
 		queryKey: ['customers'],
 		queryFn: () => getCustomers(navigate),
 		enabled: customerGettable,
+		refetchInterval: 1000 * 60 * 5,
+	});
+	const employeeQuery = useQuery({
+		queryKey: ['employees'],
+		queryFn: () => getEmployees(navigate),
+		enabled: employeeGettable,
 		refetchInterval: 1000 * 60 * 5,
 	});
 	useQuery({
@@ -129,7 +135,7 @@ export default function Scheduler() {
 	let employeeList: Employee[] = [];
 
 	try {
-		const { employees } = useEmployeesContext();
+		const employees: Employee[] = employeeQuery.data;
 		employeeList.push(...employees);
 	} catch {
 		employeeList.push(user);

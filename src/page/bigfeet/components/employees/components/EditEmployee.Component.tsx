@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { Role, Permissions, Gender } from '../../../../../models/enums';
-import { useEmployeesContext, useUserContext } from '../../../BigFeet.Page';
+import { useUserContext } from '../../../BigFeet.Page';
 import {
 	deleteEmployee,
 	updateEmployee,
@@ -37,21 +37,21 @@ import {
 	errorToast,
 	updateToast,
 } from '../../../../../utils/toast.utils';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface EditEmployeeProp {
-	gettable: boolean;
 	editable: boolean;
 	deletable: boolean;
 	employee: Employee;
 }
 
 const EditEmployee: FC<EditEmployeeProp> = ({
-	gettable,
 	editable,
 	deletable,
 	employee,
 }) => {
 	const { t } = useTranslation();
+	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 
 	const [usernameInput, setUsernameInput] = useState<string | null>(
@@ -216,8 +216,39 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 	]);
 
 	const { user, setUser } = useUserContext();
-	const { employees, setEmployees } = useEmployeesContext();
 	const { setAuthentication } = useAuthenticationContext();
+
+	const editEmployeeMutation = useMutation({
+		mutationFn: (data: {
+			employeeId: number;
+			request: UpdateEmployeeRequest;
+		}) => updateEmployee(navigate, data.employeeId, data.request),
+		onMutate: async () => {
+			const toastId = createToast(t('Updating Employee...'));
+			return { toastId };
+		},
+		onSuccess: (_data, variables, context) => {
+			queryClient.invalidateQueries({ queryKey: ['employees'] });
+			if (variables.employeeId == user.employee_id) {
+				const updatedUser = {
+					...user,
+					...variables.request,
+				};
+				sessionStorage.setItem(userKey, JSON.stringify(updatedUser));
+				setUser(updatedUser);
+			}
+
+			updateToast(context.toastId, t('Employee Updated Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Update Employee'),
+					error.message
+				);
+		},
+	});
 
 	const onSave = async () => {
 		const username: string | undefined =
@@ -257,7 +288,8 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 		const per_hour: number | null | undefined =
 			perHourInput === employee.per_hour ? undefined : perHourInput;
 
-		const updateEmployeeRequest: UpdateEmployeeRequest = {
+		const employeeId = employee.employee_id;
+		const request: UpdateEmployeeRequest = {
 			...(username && { username }),
 			...(first_name && { first_name }),
 			...(last_name && { last_name }),
@@ -270,64 +302,35 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 			...(per_hour && { per_hour }),
 		};
 
-		const toastId = createToast(t('Updating Employee...'));
-
-		updateEmployee(navigate, employee.employee_id, updateEmployeeRequest)
-			.then(() => {
-				let updatedUser = {
-					...user,
-				};
-				if (employee.employee_id === user.employee_id) {
-					updatedUser = {
-						...user,
-						...updateEmployeeRequest,
-					};
-					sessionStorage.setItem(userKey, JSON.stringify(updatedUser));
-					setUser(updatedUser);
-				}
-
-				if (
-					gettable ||
-					updatedUser.permissions.includes(Permissions.PERMISSION_GET_EMPLOYEE)
-				) {
-					const updatedEmployee = {
-						...employee,
-						...updateEmployeeRequest,
-					};
-					setEmployees(
-						employees.map((employee) =>
-							employee.employee_id == employee.employee_id
-								? updatedEmployee
-								: employee
-						)
-					);
-				} else {
-					setEmployees([]);
-				}
-
-				updateToast(toastId, t('Employee Updated Successfully'));
-			})
-			.catch((error) => {
-				errorToast(toastId, t('Failed to Update Employee'), error.message);
-			});
+		editEmployeeMutation.mutate({ employeeId, request });
 	};
 
-	const onDelete = async (employeeId: number) => {
-		const toastId = createToast(t('Deleting Employee...'));
-
-		deleteEmployee(navigate, employeeId)
-			.then(() => {
-				setEmployees(
-					employees.filter((employee) => employee.employee_id !== employeeId)
+	const deleteEmployeeMutation = useMutation({
+		mutationFn: (data: { employeeId: number }) =>
+			deleteEmployee(navigate, data.employeeId),
+		onMutate: async () => {
+			const toastId = createToast(t('Deleting Employee...'));
+			return { toastId };
+		},
+		onSuccess: (_data, _variables, context) => {
+			queryClient.invalidateQueries({ queryKey: ['employees'] });
+			if (employee.employee_id === user.employee_id) {
+				logout(setAuthentication);
+			}
+			updateToast(context.toastId, t('Employee Deleted Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Delete Employee'),
+					error.message
 				);
-				updateToast(toastId, t('Employee Deleted Successfully'));
-				if (employee.employee_id === user.employee_id) {
-					logout(setAuthentication);
-				}
-			})
-			.catch((error) => {
-				errorToast(toastId, t('Failed to Delete Employee'), error.message);
-			});
+		},
+	});
+
+	const onDelete = async (employeeId: number) => {
+		deleteEmployeeMutation.mutate({ employeeId });
 	};
 
 	const permissionValues = Object.values(Permissions).map(

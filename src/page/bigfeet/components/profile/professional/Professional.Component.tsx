@@ -2,7 +2,7 @@ import { Permissions, Role } from '../../../../../models/enums';
 import EditablePayRate from '../../miscallaneous/editable/EditablePayRate.Component';
 import { useNavigate } from 'react-router-dom';
 import { FC, useEffect, useState } from 'react';
-import { useEmployeesContext, useUserContext } from '../../../BigFeet.Page';
+import { useUserContext } from '../../../BigFeet.Page';
 import { updateEmployee } from '../../../../../service/employee.service';
 import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
 import { roleDropDownItems } from '../../../../../constants/drop-down.constants';
@@ -20,6 +20,7 @@ import {
 	errorToast,
 	updateToast,
 } from '../../../../../utils/toast.utils';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface ProfessionalProp {
 	editable: boolean;
@@ -39,6 +40,7 @@ const Professional: FC<ProfessionalProp> = ({
 	originalPerHour,
 }) => {
 	const { t } = useTranslation();
+	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 
 	const [roleInput, setRoleInput] = useState<Role | null>(originalRole);
@@ -138,7 +140,35 @@ const Professional: FC<ProfessionalProp> = ({
 	]);
 
 	const { user, setUser } = useUserContext();
-	const { employees, setEmployees } = useEmployeesContext();
+
+	const editProfileMutation = useMutation({
+		mutationFn: (data: {
+			employeeId: number;
+			request: UpdateEmployeeRequest;
+		}) => updateEmployee(navigate, data.employeeId, data.request),
+		onMutate: async () => {
+			const toastId = createToast(t('Updating Profile...'));
+			return { toastId };
+		},
+		onSuccess: (_data, variables, context) => {
+			queryClient.invalidateQueries({ queryKey: ['employees'] });
+			const updatedUser = {
+				...user,
+				...variables.request,
+			};
+			sessionStorage.setItem(userKey, JSON.stringify(updatedUser));
+			setUser(updatedUser);
+			updateToast(context.toastId, t('Profile Updated Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Update Profile'),
+					error.message
+				);
+		},
+	});
 
 	const onSave = async () => {
 		const role: Role | undefined =
@@ -154,7 +184,8 @@ const Professional: FC<ProfessionalProp> = ({
 		const per_hour: number | null | undefined =
 			perHourInput === originalPerHour ? undefined : perHourInput;
 
-		const updateEmployeeRequest: UpdateEmployeeRequest = {
+		const employeeId = user.employee_id;
+		const request: UpdateEmployeeRequest = {
 			...(role && { role }),
 			...(body_rate && { body_rate }),
 			...(feet_rate && { feet_rate }),
@@ -162,36 +193,7 @@ const Professional: FC<ProfessionalProp> = ({
 			...(per_hour && { per_hour }),
 		};
 
-		const toastId = createToast(t('Updating Profile...'));
-
-		updateEmployee(navigate, user.employee_id, updateEmployeeRequest)
-			.then(() => {
-				const updatedUser = {
-					...user,
-					...updateEmployeeRequest,
-				};
-				sessionStorage.setItem(userKey, JSON.stringify(updatedUser));
-				setUser(updatedUser);
-				const updatedEmployee = Object(updatedUser);
-				delete updatedEmployee['language'];
-				delete updatedEmployee['dark_mode'];
-				if (user.permissions.includes(Permissions.PERMISSION_GET_EMPLOYEE)) {
-					setEmployees(
-						employees.map((employee) =>
-							employee.employee_id == user.employee_id
-								? updatedEmployee
-								: employee
-						)
-					);
-				} else {
-					setEmployees([]);
-				}
-
-				updateToast(toastId, t('Profile Updated Successfully'));
-			})
-			.catch((error) => {
-				errorToast(toastId, t('Failed to Update Profile'), error.message);
-			});
+		editProfileMutation.mutate({ employeeId, request });
 	};
 
 	return (

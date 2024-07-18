@@ -34,11 +34,11 @@ const CustomerList: FC<CustomerListProp> = ({
 				/>
 			))
 		) : (
-			<h1 className="text-3xl">No Customers</h1>
+			<h1 className="text-3xl mx-auto">No Customers</h1>
 		);
 
 	return (
-		<div className="flex flex-col flex-1 h-full w-full mx-auto border-black border-2 overflow-auto">
+		<div className="flex flex-col flex-1 h-full w-full mx-auto border-black border-2">
 			{customersElement}
 		</div>
 	);

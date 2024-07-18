@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import Reservation from '../../../../../../models/Reservation.Model';
 import {
 	Gender,
+	Permissions,
 	ServiceColor,
 	TipMethod,
 } from '../../../../../../models/enums';
@@ -12,14 +13,13 @@ import Employee from '../../../../../../models/Employee.Model';
 import Draggable from 'react-draggable';
 import MoveReservationModal from '../../../miscallaneous/modals/scheduler/calendar/MoveReservationModal.Component';
 import STORES from '../../../../../../constants/store.constants';
-import {
-	useEmployeesContext,
-	useSchedulesContext,
-	useUserContext,
-} from '../../../../BigFeet.Page';
+import { useSchedulesContext, useUserContext } from '../../../../BigFeet.Page';
 import { sortEmployees } from '../../../../../../utils/employee.utils';
 import { useScheduleDateContext } from '../../Scheduler.Component';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
+import { getEmployees } from '../../../../../../service/employee.service';
+import { useNavigate } from 'react-router-dom';
 
 interface ReservationTagProp {
 	reservation: Reservation;
@@ -42,6 +42,7 @@ const ReservationTag: FC<ReservationTagProp> = ({
 	onDeleteReservation,
 }) => {
 	const { t } = useTranslation();
+	const navigate = useNavigate();
 
 	const [openEdit, setOpenEdit] = useState(false);
 	const [openMove, setOpenMove] = useState(false);
@@ -57,8 +58,17 @@ const ReservationTag: FC<ReservationTagProp> = ({
 
 	let employeeList: Employee[] = [];
 
+	const employeeGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_EMPLOYEE
+	);
+
 	try {
-		const { employees } = useEmployeesContext();
+		const employeeQuery = useQuery({
+			queryKey: ['employees'],
+			queryFn: () => getEmployees(navigate),
+			enabled: employeeGettable,
+		});
+		const employees: Employee[] = employeeQuery.data;
 		employeeList.push(...employees);
 	} catch {
 		employeeList.push(user);
