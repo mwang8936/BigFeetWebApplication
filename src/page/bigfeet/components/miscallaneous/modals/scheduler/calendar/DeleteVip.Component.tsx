@@ -5,10 +5,7 @@ import ERRORS from '../../../../../../../constants/error.constants';
 import DeleteBottom from '../../DeleteBottom.Component';
 import { useTranslation } from 'react-i18next';
 import VipPackage from '../../../../../../../models/Vip-Package.Model';
-import {
-	useEmployeesContext,
-	useUserContext,
-} from '../../../../../BigFeet.Page';
+import { useUserContext } from '../../../../../BigFeet.Page';
 import Employee from '../../../../../../../models/Employee.Model';
 
 interface DeleteVipProp {
@@ -26,7 +23,7 @@ const DeleteVip: FC<DeleteVipProp> = ({
 }) => {
 	const { t } = useTranslation();
 
-	const { employees } = useEmployeesContext();
+	// const { employees } = useEmployeesContext();
 
 	const onDelete = () => {
 		onDeleteVipPackage(vipPackage.serial);
@@ -63,7 +60,7 @@ const DeleteVip: FC<DeleteVipProp> = ({
 							<br />
 							<br />
 							<strong>
-								{vipPackage.schedules
+								{/* {vipPackage.schedules
 									.map((schedule) => schedule.employee_audit_id)
 									.map(
 										(employee_id) =>
@@ -71,7 +68,7 @@ const DeleteVip: FC<DeleteVipProp> = ({
 												(employee) => employee.employee_id === employee_id
 											)?.username || ''
 									)
-									.join(', ')}
+									.join(', ')} */}
 							</strong>
 						</div>
 					</div>

@@ -16,9 +16,9 @@ import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 import { useTranslation } from 'react-i18next';
 import { userKey } from '../../../../../constants/api.constants';
 import {
-	createToast,
+	createLoadingToast,
 	errorToast,
-	updateToast,
+	successToast,
 } from '../../../../../utils/toast.utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -147,7 +147,7 @@ const Professional: FC<ProfessionalProp> = ({
 			request: UpdateEmployeeRequest;
 		}) => updateEmployee(navigate, data.employeeId, data.request),
 		onMutate: async () => {
-			const toastId = createToast(t('Updating Profile...'));
+			const toastId = createLoadingToast(t('Updating Profile...'));
 			return { toastId };
 		},
 		onSuccess: (_data, variables, context) => {
@@ -158,7 +158,7 @@ const Professional: FC<ProfessionalProp> = ({
 			};
 			sessionStorage.setItem(userKey, JSON.stringify(updatedUser));
 			setUser(updatedUser);
-			updateToast(context.toastId, t('Profile Updated Successfully'));
+			successToast(context.toastId, t('Profile Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
 			if (context)

@@ -28,7 +28,8 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 			reservation.service.time * 60 * 1000;
 		const endTimeText = formatTimeFromDate(new Date(endTime));
 		return (
-			<span>{`${startTimeText} - ${endTimeText} (${reservation.service.shorthand})`}</span>
+			<span
+				key={`body-${reservation.reservation_id}`}>{`${startTimeText} - ${endTimeText} (${reservation.service.shorthand})`}</span>
 		);
 	});
 
@@ -48,7 +49,8 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 			reservation.service.time * 60 * 1000;
 		const endTimeText = formatTimeFromDate(new Date(endTime));
 		return (
-			<span>{`${startTimeText} - ${endTimeText} (${reservation.service.shorthand})`}</span>
+			<span
+				key={`feet-${reservation.reservation_id}`}>{`${startTimeText} - ${endTimeText} (${reservation.service.shorthand})`}</span>
 		);
 	});
 
@@ -68,7 +70,8 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 			reservation.service.time * 60 * 1000;
 		const endTimeText = formatTimeFromDate(new Date(endTime));
 		return (
-			<span>{`${startTimeText} - ${endTimeText} (${reservation.service.shorthand})`}</span>
+			<span
+				key={`acupuncture-${reservation.reservation_id}`}>{`${startTimeText} - ${endTimeText} (${reservation.service.shorthand})`}</span>
 		);
 	});
 	return (

@@ -1,14 +1,10 @@
 import { useState, createContext, useContext } from 'react';
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import Calendar from './Calendar/Calendar.Component';
-import { useSchedulesContext, useUserContext } from '../../BigFeet.Page';
+import { useUserContext } from '../../BigFeet.Page';
 import { Permissions } from '../../../../models/enums';
 import Schedule from '../../../../models/Schedule.Model';
-import {
-	getBeginningOfMonth,
-	getBeginningOfNextMonth,
-	sameDate,
-} from '../../../../utils/date.utils';
+import { sameDate } from '../../../../utils/date.utils';
 import Employee from '../../../../models/Employee.Model';
 import {
 	AddReservationRequest,
@@ -34,7 +30,10 @@ import {
 	getSchedules,
 	updateSchedule,
 } from '../../../../service/schedule.service';
-import { signProfileSchedule } from '../../../../service/profile.service';
+import {
+	getProfileSchedules,
+	signProfileSchedule,
+} from '../../../../service/profile.service';
 import { GetSchedulesParam } from '../../../../models/params/Schedule.Param';
 import {
 	AddVipPackageRequest,
@@ -51,14 +50,15 @@ import { sortEmployees } from '../../../../utils/employee.utils';
 import ERRORS from '../../../../constants/error.constants';
 import { useTranslation } from 'react-i18next';
 import {
-	createToast,
+	createLoadingToast,
 	errorToast,
-	updateToast,
+	successToast,
 } from '../../../../utils/toast.utils';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCustomers } from '../../../../service/customer.service';
 import { getServices } from '../../../../service/service.service';
 import { getEmployees } from '../../../../service/employee.service';
+import { formatDateToQueryKey } from '../../../../utils/string.utils';
 
 const ScheduleDateContext = createContext<
 	{ date: Date; setDate(date: Date): void } | undefined
@@ -110,6 +110,9 @@ export default function Scheduler() {
 	const serviceGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_SERVICE
 	);
+	const scheduleGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_SCHEDULE
+	);
 
 	useQuery({
 		queryKey: ['customers'],
@@ -129,13 +132,26 @@ export default function Scheduler() {
 		enabled: serviceGettable,
 		refetchInterval: 1000 * 60 * 5,
 	});
-
-	const { schedules, setSchedules } = useSchedulesContext();
+	const scheduleQuery = useQuery({
+		queryKey: ['schedules', formatDateToQueryKey(date)],
+		queryFn: () => {
+			if (scheduleGettable) {
+				return getSchedules(navigate, {
+					start: date,
+					end: date,
+				});
+			} else {
+				return getProfileSchedules(navigate);
+			}
+		},
+		staleTime: 0,
+	});
+	const schedules: Schedule[] = scheduleQuery.data || [];
 
 	let employeeList: Employee[] = [];
 
 	try {
-		const employees: Employee[] = employeeQuery.data;
+		const employees: Employee[] = employeeQuery.data || [];
 		employeeList.push(...employees);
 	} catch {
 		employeeList.push(user);
@@ -147,68 +163,85 @@ export default function Scheduler() {
 		Permissions.PERMISSION_ADD_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
 
-	const onAddReservation = async (request: AddReservationRequest) => {
-		const toastId = createToast(t('Adding Reservation...'));
-		addReservation(navigate, request)
-			.then((response: Schedule) => {
-				const updatedSchedules = [...schedules];
-				const scheduleIndex = updatedSchedules.findIndex(
-					(schedule) =>
-						schedule.date.getTime() === response.date.getTime() &&
-						schedule.employee.employee_id === response.employee.employee_id
+	const addReservationMutation = useMutation({
+		mutationFn: (data: { request: AddReservationRequest }) =>
+			addReservation(navigate, data.request),
+		onMutate: async () => {
+			const toastId = createLoadingToast(t('Adding Reservation...'));
+			return { toastId };
+		},
+		onSuccess: (_data, variables, context) => {
+			queryClient.invalidateQueries({
+				queryKey: [
+					'schedules',
+					variables.request.reserved_date.toLocaleDateString(),
+				],
+			});
+			queryClient.invalidateQueries({ queryKey: ['customers'] });
+			successToast(context.toastId, t('Reservation Added Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Add Reservation'),
+					error.message
 				);
-				if (scheduleIndex === -1) {
-					updatedSchedules.push(response);
-				} else {
-					updatedSchedules[scheduleIndex] = response;
-				}
-				setSchedules(updatedSchedules);
-				queryClient.invalidateQueries({ queryKey: ['customers'] });
-				updateToast(toastId, t('Reservation Added Successfully'));
-			})
-			.catch((error) =>
-				errorToast(toastId, t('Failed to Add Reservation'), error.message)
-			);
+		},
+	});
+
+	const onAddReservation = async (request: AddReservationRequest) => {
+		addReservationMutation.mutate({ request });
 	};
+
+	const addScheduleMutation = useMutation({
+		mutationFn: (data: { request: AddScheduleRequest }) =>
+			addSchedule(navigate, data.request),
+		onMutate: async () => {
+			const toastId = createLoadingToast(t('Adding Schedule...'));
+			return { toastId };
+		},
+		onSuccess: (_data, variables, context) => {
+			queryClient.invalidateQueries({
+				queryKey: ['schedules', formatDateToQueryKey(variables.request.date)],
+			});
+			successToast(context.toastId, t('Schedule Added Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(context.toastId, t('Failed to Add Schedule'), error.message);
+		},
+	});
 
 	const onAddSchedule = async (request: AddScheduleRequest) => {
-		const toastId = createToast(t('Adding Schedule...'));
-		addSchedule(navigate, request)
-			.then((response) => {
-				const updatedSchedules = [...schedules];
-				updatedSchedules.push(response);
-				setSchedules(updatedSchedules);
-				updateToast(toastId, t('Schedule Added Successfully'));
-			})
-			.catch((error) =>
-				errorToast(toastId, t('Failed to Add Schedule'), error.message)
-			);
+		addScheduleMutation.mutate({ request });
 	};
 
+	const addVipPackageMutation = useMutation({
+		mutationFn: (data: { request: AddVipPackageRequest }) =>
+			addVipPackage(navigate, data.request),
+		onMutate: async () => {
+			const toastId = createLoadingToast(t('Adding Vip Package...'));
+			return { toastId };
+		},
+		onSuccess: (_data, variables, context) => {
+			queryClient.invalidateQueries({
+				queryKey: ['schedules', formatDateToQueryKey(variables.request.date)],
+			});
+			successToast(context.toastId, t('Vip Package Added Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Add Vip Package'),
+					error.message
+				);
+		},
+	});
+
 	const onAddVipPackage = async (request: AddVipPackageRequest) => {
-		const toastId = createToast(t('Adding Vip Package...'));
-		addVipPackage(navigate, request)
-			.then((response: Schedule[]) => {
-				const updatedSchedules = [...schedules];
-				response.forEach((respSchedule) => {
-					const scheduleIndex = updatedSchedules.findIndex(
-						(schedule) =>
-							schedule.date.getTime() === respSchedule.date.getTime() &&
-							schedule.employee.employee_id ===
-								respSchedule.employee.employee_id
-					);
-					if (scheduleIndex === -1) {
-						updatedSchedules.push(respSchedule);
-					} else {
-						updatedSchedules[scheduleIndex] = respSchedule;
-					}
-				});
-				setSchedules(updatedSchedules);
-				updateToast(toastId, t('Vip Package Added Successfully'));
-			})
-			.catch((error) =>
-				errorToast(toastId, t('Failed to Add Vip Package'), error.message)
-			);
+		addVipPackageMutation.mutate({ request });
 	};
 
 	const editable = [
@@ -216,118 +249,101 @@ export default function Scheduler() {
 		Permissions.PERMISSION_UPDATE_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
 
+	const editReservationMutation = useMutation({
+		mutationFn: (data: {
+			reservationId: number;
+			request: UpdateReservationRequest;
+		}) => updateReservation(navigate, data.reservationId, data.request),
+		onMutate: async () => {
+			const toastId = createLoadingToast(t('Updating Reservation...'));
+			return { toastId };
+		},
+		onSuccess: (_data, _variables, context) => {
+			queryClient.invalidateQueries({
+				queryKey: ['schedules', formatDateToQueryKey(date)],
+			});
+			queryClient.invalidateQueries({ queryKey: ['customers'] });
+			successToast(context.toastId, t('Reservation Updated Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Update Reservation'),
+					error.message
+				);
+		},
+	});
+
 	const onEditReservation = async (
 		reservationId: number,
 		request: UpdateReservationRequest
 	) => {
-		const toastId = createToast(t('Updating Reservation...'));
-		updateReservation(navigate, reservationId, request)
-			.then((response: Schedule) => {
-				const updatedSchedules = [...schedules];
-				const oldScheduleIndex = updatedSchedules.findIndex((schedule) =>
-					schedule.reservations.find(
-						(reservation) => reservation.reservation_id === reservationId
-					)
-				);
-				if (oldScheduleIndex > -1) {
-					const oldSchedule = schedules[oldScheduleIndex];
-					if (
-						sameDate(response.date, oldSchedule.date) &&
-						response.employee.employee_id === oldSchedule.employee.employee_id
-					) {
-						updatedSchedules[oldScheduleIndex] = response;
-					} else {
-						oldSchedule.reservations = oldSchedule.reservations.filter(
-							(reservation) => reservation.reservation_id !== reservationId
-						);
-						const newScheduleIndex = updatedSchedules.findIndex(
-							(schedule) =>
-								sameDate(response.date, schedule.date) &&
-								response.employee.employee_id == schedule.employee.employee_id
-						);
-						if (newScheduleIndex > -1) {
-							updatedSchedules[newScheduleIndex] = response;
-						} else {
-							updatedSchedules.push(response);
-						}
-					}
-				}
-				setSchedules(updatedSchedules);
-				queryClient.invalidateQueries({ queryKey: ['customers'] });
-				updateToast(toastId, t('Reservation Updated Successfully'));
-			})
-			.catch((error) =>
-				errorToast(toastId, t('Failed to Update Reservation'), error.message)
-			);
+		editReservationMutation.mutate({ reservationId, request });
 	};
+
+	const editScheduleMutation = useMutation({
+		mutationFn: (data: {
+			date: Date;
+			employeeId: number;
+			request: UpdateScheduleRequest;
+		}) => updateSchedule(navigate, data.date, data.employeeId, data.request),
+		onMutate: async () => {
+			const toastId = createLoadingToast(t('Updating Schedule...'));
+			return { toastId };
+		},
+		onSuccess: (_data, _variables, context) => {
+			queryClient.invalidateQueries({
+				queryKey: ['schedules', formatDateToQueryKey(date)],
+			});
+			successToast(context.toastId, t('Schedule Updated Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Update Schedule'),
+					error.message
+				);
+		},
+	});
 
 	const onEditSchedule = async (
 		date: Date,
 		employeeId: number,
 		request: UpdateScheduleRequest
 	) => {
-		const toastId = createToast(t('Updating Schedule...'));
-		updateSchedule(navigate, date, employeeId, request)
-			.then(() => {
-				const oldSchedule = schedules.find(
-					(schedule) =>
-						sameDate(date, schedule.date) &&
-						employeeId === schedule.employee.employee_id
-				);
-				if (oldSchedule) {
-					const updatedSchedule: Schedule = {
-						...oldSchedule,
-						...request,
-					};
-					setSchedules(
-						schedules.map((schedule) =>
-							sameDate(date, schedule.date) &&
-							employeeId === schedule.employee.employee_id
-								? updatedSchedule
-								: schedule
-						)
-					);
-				}
-				updateToast(toastId, t('Schedule Updated Successfully'));
-			})
-			.catch((error) =>
-				errorToast(toastId, t('Failed to Update Schedule'), error.message)
-			);
+		editScheduleMutation.mutate({ date, employeeId, request });
 	};
+
+	const editVipPackageMutation = useMutation({
+		mutationFn: (data: { serial: string; request: UpdateVipPackageRequest }) =>
+			updateVipPackage(navigate, data.serial, data.request),
+		onMutate: async () => {
+			const toastId = createLoadingToast(t('Updating Vip Package...'));
+			return { toastId };
+		},
+		onSuccess: (_data, _variables, context) => {
+			queryClient.invalidateQueries({
+				queryKey: ['schedules', formatDateToQueryKey(date)],
+			});
+			successToast(context.toastId, t('Vip Package Updated Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Update Vip Package'),
+					error.message
+				);
+		},
+	});
 
 	const onEditVipPackage = async (
 		serial: string,
-		updateVipPackageRequest: UpdateVipPackageRequest
+		request: UpdateVipPackageRequest
 	) => {
-		const toastId = createToast(t('Updating Vip Package...'));
-		updateVipPackage(navigate, serial, updateVipPackageRequest)
-			.then((response: Schedule[]) => {
-				const updatedSchedules = [...schedules];
-				updatedSchedules.forEach((schedule) => {
-					schedule.vip_packages = schedule.vip_packages.filter(
-						(vipPackage) => vipPackage.serial !== serial
-					);
-				});
-				console.log(updatedSchedules);
-				console.log(response);
-				const test = updatedSchedules.map((schedule) => {
-					const updatedSchedule = response.find(
-						(respSchedule) =>
-							sameDate(respSchedule.date, schedule.date) &&
-							respSchedule.employee.employee_id ===
-								schedule.employee.employee_id
-					);
-
-					return updatedSchedule ? updatedSchedule : schedule;
-				});
-				console.log(test);
-
-				setSchedules(test);
-				updateToast(toastId, t('Vip Package Updated Successfully'));
-			})
-			.catch((error) =>
-				errorToast(toastId, t('Failed to Update Vip Package'), error.message)
-			);
+		editVipPackageMutation.mutate({ serial, request });
 	};
 
 	const deletable = [
@@ -335,81 +351,90 @@ export default function Scheduler() {
 		Permissions.PERMISSION_DELETE_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
 
-	const onDeleteReservation = async (reservationId: number) => {
-		const toastId = createToast(t('Deleting Reservation...'));
-		deleteReservation(navigate, reservationId)
-			.then(() => {
-				const updatedSchedules = [...schedules];
-				updatedSchedules.forEach(
-					(schedule) =>
-						(schedule.reservations = schedule.reservations.filter(
-							(reservation) => reservation.reservation_id !== reservationId
-						))
+	const deleteReservationMutation = useMutation({
+		mutationFn: (data: { reservationId: number }) =>
+			deleteReservation(navigate, data.reservationId),
+		onMutate: async () => {
+			const toastId = createLoadingToast(t('Deleting Reservation...'));
+			return { toastId };
+		},
+		onSuccess: (_data, _variables, context) => {
+			queryClient.invalidateQueries({
+				queryKey: ['schedules', formatDateToQueryKey(date)],
+			});
+			successToast(context.toastId, t('Reservation Deleted Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Delete Reservation'),
+					error.message
 				);
-				setSchedules(updatedSchedules);
-				updateToast(toastId, t('Reservation Deleted Successfully'));
-			})
-			.catch((error) =>
-				errorToast(toastId, t('Failed to Delete Reservation'), error.message)
-			);
+		},
+	});
+
+	const onDeleteReservation = async (reservationId: number) => {
+		deleteReservationMutation.mutate({ reservationId });
 	};
+
+	const deleteVipPackageMutation = useMutation({
+		mutationFn: (data: { serial: string }) =>
+			deleteVipPackage(navigate, data.serial),
+		onMutate: async () => {
+			const toastId = createLoadingToast(t('Deleting Vip Package...'));
+			return { toastId };
+		},
+		onSuccess: (_data, _variables, context) => {
+			queryClient.invalidateQueries({
+				queryKey: ['schedules', formatDateToQueryKey(date)],
+			});
+			successToast(context.toastId, t('Vip Package Deleted Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Delete Vip Package'),
+					error.message
+				);
+		},
+	});
 
 	const onDeleteVipPackage = async (serial: string) => {
-		const toastId = createToast(t('Deleting Vip Package...'));
-		deleteVipPackage(navigate, serial)
-			.then(() => {
-				const updatedSchedules = [...schedules];
-				updatedSchedules.forEach((schedule) => {
-					schedule.vip_packages = schedule.vip_packages.filter(
-						(vipPackage) => vipPackage.serial !== serial
-					);
-				});
-				setSchedules(updatedSchedules);
-				updateToast(toastId, t('Vip Package Deleted Successfully'));
-			})
-			.catch((error) =>
-				errorToast(toastId, t('Failed to Delete Vip Package'), error.message)
-			);
+		deleteVipPackageMutation.mutate({ serial });
 	};
 
-	const onScheduleSigned = async (date: Date) => {
-		const toastId = createToast(t('Signing Schedule...'));
-		signProfileSchedule(navigate, date)
-			.then(() => {
-				const updatedSchedules = [...schedules];
-				const updatedScheduleIndex = updatedSchedules.findIndex(
-					(schedule) =>
-						sameDate(date, schedule.date) &&
-						schedule.employee.employee_id === user.employee_id
+	const signProfileScheduleMutation = useMutation({
+		mutationFn: (data: { date: Date }) =>
+			signProfileSchedule(navigate, data.date),
+		onMutate: async () => {
+			const toastId = createLoadingToast(t('Signing Schedule...'));
+			return { toastId };
+		},
+		onSuccess: (_data, _variables, context) => {
+			queryClient.invalidateQueries({
+				queryKey: ['schedules', formatDateToQueryKey(date)],
+			});
+			successToast(context.toastId, t('Schedule Signed Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Sign Schedule'),
+					error.message
 				);
-				if (updatedScheduleIndex > -1) {
-					const updatedSchedule = updatedSchedules[updatedScheduleIndex];
-					updatedSchedule.signed = true;
-					updatedSchedules[updatedScheduleIndex] = updatedSchedule;
-					setSchedules(updatedSchedules);
-				}
-				updateToast(toastId, t('Schedule Signed Successfully'));
-			})
-			.catch((error) =>
-				errorToast(toastId, t('Failed to Sign Schedule'), error.message)
-			);
+		},
+	});
+
+	const onScheduleSigned = async (date: Date) => {
+		signProfileScheduleMutation.mutate({ date });
 	};
 
 	const getPermission = user.permissions.includes(
 		Permissions.PERMISSION_GET_SCHEDULE
 	);
-
-	const onGetSchedules = async (params: GetSchedulesParam) => {
-		const toastId = createToast(t('Getting Schedules...'));
-		getSchedules(navigate, params)
-			.then((response) => {
-				setSchedules(response);
-				updateToast(toastId, t('Schedule Retrieved Successfully'));
-			})
-			.catch((error) => {
-				errorToast(toastId, t('Failed to Get Schedules'), error.message);
-			});
-	};
 
 	const displayDate = () => {
 		return sameDate(new Date(), date)
@@ -425,20 +450,6 @@ export default function Scheduler() {
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
 
 	const onDateFiltered = (selectedDate: Date) => {
-		const oldDateBeginningOfMonth = getBeginningOfMonth(date);
-		const newDateBeginningOfMonth = getBeginningOfMonth(selectedDate);
-
-		if (
-			getPermission &&
-			!sameDate(oldDateBeginningOfMonth, newDateBeginningOfMonth)
-		) {
-			const getSchedulesParam: GetSchedulesParam = {
-				start: newDateBeginningOfMonth,
-				end: getBeginningOfNextMonth(selectedDate),
-			};
-			onGetSchedules(getSchedulesParam);
-		}
-
 		const currentDate = new Date();
 		setFiltered(
 			selectedDate.getFullYear != currentDate.getFullYear ||
@@ -446,6 +457,12 @@ export default function Scheduler() {
 				selectedDate.getDate() != currentDate.getDate()
 		);
 		setDate(selectedDate);
+
+		if (getPermission && !sameDate(date, selectedDate)) {
+			queryClient.invalidateQueries({
+				queryKey: ['schedules', formatDateToQueryKey(selectedDate)],
+			});
+		}
 	};
 
 	return (

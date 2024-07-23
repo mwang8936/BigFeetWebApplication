@@ -114,7 +114,7 @@ const AddBodyFeetAcupunctureService: FC<AddBodyFeetAcupunctureServiceProp> = ({
 						<p className="error-label">
 							{t(
 								bodyValidationProp.invalidMessage.key,
-								bodyValidationProp.invalidMessage.key
+								bodyValidationProp.invalidMessage.value
 							)}
 						</p>
 					)
@@ -154,7 +154,7 @@ const AddBodyFeetAcupunctureService: FC<AddBodyFeetAcupunctureServiceProp> = ({
 						<p className="error-label">
 							{t(
 								feetValidationProp.invalidMessage.key,
-								feetValidationProp.invalidMessage.key
+								feetValidationProp.invalidMessage.value
 							)}
 						</p>
 					)
@@ -198,7 +198,7 @@ const AddBodyFeetAcupunctureService: FC<AddBodyFeetAcupunctureServiceProp> = ({
 						<p className="error-label">
 							{t(
 								acupunctureValidationProp.invalidMessage.key,
-								acupunctureValidationProp.invalidMessage.key
+								acupunctureValidationProp.invalidMessage.value
 							)}
 						</p>
 					)

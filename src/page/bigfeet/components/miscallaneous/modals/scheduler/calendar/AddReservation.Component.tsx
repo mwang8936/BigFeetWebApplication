@@ -2,10 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
 import { Gender, Permissions } from '../../../../../../../models/enums';
-import {
-	useSchedulesContext,
-	useUserContext,
-} from '../../../../../BigFeet.Page';
+import { useUserContext } from '../../../../../BigFeet.Page';
 import Employee from '../../../../../../../models/Employee.Model';
 import Service from '../../../../../../../models/Service.Model';
 import {
@@ -39,6 +36,11 @@ import { useNavigate } from 'react-router-dom';
 import { getCustomers } from '../../../../../../../service/customer.service';
 import { getServices } from '../../../../../../../service/service.service';
 import { getEmployees } from '../../../../../../../service/employee.service';
+import { getSchedules } from '../../../../../../../service/schedule.service';
+import { getProfileSchedules } from '../../../../../../../service/profile.service';
+import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
+import Schedule from '../../../../../../../models/Schedule.Model';
+import { formatDateToQueryKey } from '../../../../../../../utils/string.utils';
 
 interface AddReservationProp {
 	setOpen(open: boolean): void;
@@ -99,6 +101,7 @@ const AddReservation: FC<AddReservationProp> = ({
 	const [conflict, setConflict] = useState<boolean>(false);
 
 	const { user } = useUserContext();
+	const { date } = useScheduleDateContext();
 
 	const customerGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_CUSTOMER
@@ -109,32 +112,50 @@ const AddReservation: FC<AddReservationProp> = ({
 	const serviceGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_SERVICE
 	);
-
-	const { schedules } = useSchedulesContext();
+	const scheduleGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_SCHEDULE
+	);
 
 	const customerQuery = useQuery({
 		queryKey: ['customers'],
 		queryFn: () => getCustomers(navigate),
 		enabled: customerGettable,
 	});
-	const customers: Customer[] = customerQuery.data;
+	const customers: Customer[] = customerQuery.data || [];
 
 	const employeeQuery = useQuery({
 		queryKey: ['employees'],
 		queryFn: () => getEmployees(navigate),
 		enabled: employeeGettable,
 	});
-	const employees: Employee[] = employeeQuery.data;
+	const employees: Employee[] = employeeQuery.data || [];
 
 	const serviceQuery = useQuery({
 		queryKey: ['services'],
 		queryFn: () => getServices(navigate),
 		enabled: serviceGettable,
 	});
-	const services: Service[] = serviceQuery.data;
+	const services: Service[] = serviceQuery.data || [];
+
+	const scheduleQuery = useQuery({
+		queryKey: ['schedules', formatDateToQueryKey(date)],
+		queryFn: () => {
+			if (scheduleGettable) {
+				return getSchedules(navigate, {
+					start: date,
+					end: date,
+				});
+			} else {
+				return getProfileSchedules(navigate);
+			}
+		},
+		staleTime: 0,
+	});
 
 	const employeeDropDownItems = getEmployeeDropDownItems(employees);
 	const serviceDropDownItems = getServiceDropDownItems(services);
+
+	const schedules: Schedule[] = scheduleQuery.data || [];
 
 	useEffect(() => {
 		const missingCustomerInput =

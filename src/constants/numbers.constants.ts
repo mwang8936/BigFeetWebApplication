@@ -9,6 +9,8 @@ const NUMBERS = {
 		cash: 999.99,
 		machine: 999.99,
 		vip: 999.99,
+		gift_card: 999.99,
+		insurance: 999.99,
 		tips: 9999.99,
 	},
 	service: {

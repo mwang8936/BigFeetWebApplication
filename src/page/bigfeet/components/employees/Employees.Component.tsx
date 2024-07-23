@@ -16,9 +16,9 @@ import AddEmployeeModal from '../miscallaneous/modals/employee/AddEmployeeModal.
 import { AddEmployeeRequest } from '../../../../models/requests/Employee.Request.Model';
 import { useTranslation } from 'react-i18next';
 import {
-	createToast,
+	createLoadingToast,
 	errorToast,
-	updateToast,
+	successToast,
 } from '../../../../utils/toast.utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Loading from '../Loading.Component';
@@ -77,12 +77,12 @@ const Employees: FC = () => {
 		mutationFn: (data: { request: AddEmployeeRequest }) =>
 			addEmployee(navigate, data.request),
 		onMutate: async () => {
-			const toastId = createToast(t('Adding Employee...'));
+			const toastId = createLoadingToast(t('Adding Employee...'));
 			return { toastId };
 		},
 		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: ['employees'] });
-			updateToast(context.toastId, t('Employee Added Successfully'));
+			successToast(context.toastId, t('Employee Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
 			if (context)

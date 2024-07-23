@@ -2,7 +2,6 @@ import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import VipPackage from '../../../../../../models/Vip-Package.Model';
 import { UpdateVipPackageRequest } from '../../../../../../models/requests/Vip-Package.Request.Model';
-import { useEmployeesContext } from '../../../../BigFeet.Page';
 import EditVipModal from '../../../miscallaneous/modals/scheduler/calendar/EditVipModal.Component';
 
 interface VipItemProp {
@@ -24,7 +23,7 @@ const VipItem: FC<VipItemProp> = ({
 	onDeleteVipPackage,
 }) => {
 	const { t } = useTranslation();
-	const { employees } = useEmployeesContext();
+	// const { employees } = useEmployeesContext();
 
 	const [open, setOpen] = useState(false);
 
@@ -40,7 +39,7 @@ const VipItem: FC<VipItemProp> = ({
 				<span className="font-bold me-1">{t('Total')}:</span>$
 				{vipPackage.amount}
 			</span>
-			<span className="grid grid-flow-col">
+			{/* <span className="grid grid-flow-col">
 				{vipPackage.schedules.map((schedule) => (
 					<strong key={schedule.employee_audit_id}>
 						{employees.find(
@@ -50,7 +49,7 @@ const VipItem: FC<VipItemProp> = ({
 							vipPackage.amount / vipPackage.schedules.length}
 					</strong>
 				))}
-			</span>
+			</span> */}
 			<EditVipModal
 				open={open}
 				setOpen={setOpen}

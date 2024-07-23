@@ -34,6 +34,8 @@ import {
 import { userKey } from '../../constants/api.constants';
 import { getLanguageFile } from '../../constants/language.constants';
 import { useQuery } from '@tanstack/react-query';
+import { showToast } from '../../utils/toast.utils';
+import { formatDateToQueryKey } from '../../utils/string.utils';
 
 export const enum SideBarItems {
 	Profile = 0,
@@ -57,15 +59,6 @@ export function useUserContext() {
 	return context;
 }
 
-const SchedulesContext = createContext<{
-	schedules: Schedule[];
-	setSchedules(schedules: Schedule[]): void;
-}>({ schedules: [], setSchedules: () => {} });
-
-export function useSchedulesContext() {
-	return useContext(SchedulesContext);
-}
-
 export default function BigFeet() {
 	const navigate = useNavigate();
 
@@ -76,8 +69,6 @@ export default function BigFeet() {
 	const [userError, setUserError] = useState('');
 
 	const [schedules, setSchedules] = useState<Schedule[]>([]);
-	const [retryingSchedules, setRetryingSchedules] = useState(false);
-	const [schedulesError, setSchedulesError] = useState('');
 
 	const [sideBarItems] = useState([SideBarItems.Profile]);
 
@@ -89,6 +80,27 @@ export default function BigFeet() {
 	}, []);
 
 	const { i18n } = useTranslation();
+
+	const scheduleQuery = useQuery({
+		queryKey: ['schedules', formatDateToQueryKey(new Date())],
+		queryFn: () => {
+			if (user) {
+				if (user.permissions.includes(Permissions.PERMISSION_GET_SCHEDULE)) {
+					return getSchedules(navigate, {
+						start: new Date(),
+						end: new Date(),
+					});
+				} else {
+					return getProfileSchedules(navigate);
+				}
+			} else {
+				return [];
+			}
+		},
+		staleTime: 0,
+		refetchInterval: 1000 * 60,
+		refetchIntervalInBackground: true,
+	});
 
 	const getItems = async () => {
 		const storageUser = sessionStorage.getItem(userKey);
@@ -114,19 +126,6 @@ export default function BigFeet() {
 			sideBarItems.push(SideBarItems.Scheduler, SideBarItems.PayRoll);
 
 			const permissions = user.permissions;
-
-			if (permissions.includes(Permissions.PERMISSION_GET_SCHEDULE)) {
-				getSchedules(navigate, {
-					start: getBeginningOfMonth(new Date()),
-					end: getBeginningOfNextMonth(new Date()),
-				})
-					.then((response) => setSchedules(response))
-					.catch((error) => setSchedulesError(error.message));
-			} else {
-				getProfileSchedules(navigate)
-					.then((response) => setSchedules(response))
-					.catch((error) => setSchedulesError(error.message));
-			}
 
 			if (
 				permissions.includes(Permissions.PERMISSION_GET_EMPLOYEE) ||
@@ -169,31 +168,6 @@ export default function BigFeet() {
 			.finally(() => setRetryingUser(false));
 	};
 
-	const retryGetSchedules = async () => {
-		if (user) {
-			setRetryingSchedules(true);
-			if (user.permissions.includes(Permissions.PERMISSION_GET_SCHEDULE)) {
-				getSchedules(navigate, {})
-					.then((response) => {
-						setSchedules(response);
-						setSchedulesError('');
-					})
-					.catch((error) => setSchedulesError(error.message))
-					.finally(() => setRetryingSchedules(false));
-			} else {
-				getProfileSchedules(navigate)
-					.then((response) => {
-						setSchedules(response);
-						setSchedulesError('');
-					})
-					.catch((error) => setSchedulesError(error.message))
-					.finally(() => setRetryingSchedules(false));
-			}
-		} else {
-			setSchedulesError('Reload User Profile First.');
-		}
-	};
-
 	const UserContainer = (children: React.ReactNode) => {
 		return user ? (
 			<UserContext.Provider value={{ user, setUser }}>
@@ -213,50 +187,32 @@ export default function BigFeet() {
 			/>
 
 			{UserContainer(
-				<SchedulesContext.Provider value={{ schedules, setSchedules }}>
-					<div className="grid landscape:grow landscape:h-screen landscape:ml-[9%] portrait:w-screen portrait:mt-[20%] portrait:sm:mt-[12%]">
-						{loading ? (
-							<Loading />
-						) : selectedIndex == 0 ? (
-							user ? (
-								<Profile />
-							) : (
-								<Retry
-									retrying={retryingUser}
-									error={userError}
-									onRetry={retryGetUser}
-								/>
-							)
-						) : selectedIndex == 1 ? (
-							schedules ? (
-								<Scheduler />
-							) : (
-								<Retry
-									retrying={retryingSchedules}
-									error={schedulesError}
-									onRetry={retryGetSchedules}
-								/>
-							)
-						) : selectedIndex == 2 ? (
-							schedules ? (
-								<PayRoll />
-							) : (
-								<Retry
-									retrying={retryingSchedules}
-									error={schedulesError}
-									onRetry={retryGetSchedules}
-								/>
-							)
-						) : selectedIndex == 3 ? (
-							<Employees />
-						) : selectedIndex == 4 ? (
-							<Services />
+				<div className="grid landscape:grow landscape:h-screen landscape:ml-[9%] portrait:w-screen portrait:mt-[20%] portrait:sm:mt-[12%]">
+					{loading ? (
+						<Loading />
+					) : selectedIndex == 0 ? (
+						user ? (
+							<Profile />
 						) : (
-							selectedIndex == 5 && <Customers />
-						)}
-						<ToastContainer limit={5} />
-					</div>
-				</SchedulesContext.Provider>
+							<Retry
+								retrying={retryingUser}
+								error={userError}
+								onRetry={retryGetUser}
+							/>
+						)
+					) : selectedIndex == 1 ? (
+						<Scheduler />
+					) : selectedIndex == 2 ? (
+						<PayRoll />
+					) : selectedIndex == 3 ? (
+						<Employees />
+					) : selectedIndex == 4 ? (
+						<Services />
+					) : (
+						selectedIndex == 5 && <Customers />
+					)}
+					<ToastContainer limit={5} />
+				</div>
 			)}
 		</div>
 	);

@@ -27,3 +27,7 @@ export function formatTimeFromNumber(time: number): string {
 		hour >= 12 ? 'PM' : 'AM'
 	}`;
 }
+
+export function formatDateToQueryKey(date: Date): string {
+	return date.toISOString().split('T')[0];
+}

@@ -149,11 +149,23 @@ const ERRORS = {
 		machine: {
 			invalid: {
 				key: 'Machine Invalid',
-				value: { max: NUMBERS.reservation.cash },
+				value: { max: NUMBERS.reservation.machine },
 			},
 		},
 		vip: {
-			invalid: { key: 'Vip Invalid', value: { max: NUMBERS.reservation.cash } },
+			invalid: { key: 'Vip Invalid', value: { max: NUMBERS.reservation.vip } },
+		},
+		gift_card: {
+			invalid: {
+				key: 'Gift Card Invalid',
+				value: { max: NUMBERS.reservation.gift_card },
+			},
+		},
+		insurance: {
+			invalid: {
+				key: 'Acupuncture Insurance Invalid',
+				value: { max: NUMBERS.reservation.insurance },
+			},
 		},
 		tips: {
 			invalid: {

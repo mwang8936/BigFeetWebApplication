@@ -14,6 +14,8 @@ export default interface Reservation {
 	cash: number | null;
 	machine: number | null;
 	vip: number | null;
+	gift_card: number | null;
+	insurance: number | null;
 	tips: number | null;
 	tip_method: TipMethod | null;
 	message: string | null;

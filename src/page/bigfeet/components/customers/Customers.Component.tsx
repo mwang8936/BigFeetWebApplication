@@ -24,9 +24,9 @@ import LABELS from '../../../../constants/label.constants';
 import NAMES from '../../../../constants/name.constants';
 import PLACEHOLDERS from '../../../../constants/placeholder.constants';
 import {
-	createToast,
+	createLoadingToast,
 	errorToast,
-	updateToast,
+	successToast,
 } from '../../../../utils/toast.utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Loading from '../Loading.Component';
@@ -95,12 +95,12 @@ const Customers: FC = () => {
 		mutationFn: (data: { request: AddCustomerRequest }) =>
 			addCustomer(navigate, data.request),
 		onMutate: async () => {
-			const toastId = createToast(t('Adding Customer...'));
+			const toastId = createLoadingToast(t('Adding Customer...'));
 			return { toastId };
 		},
 		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: ['customers'] });
-			updateToast(context.toastId, t('Customer Added Successfully'));
+			successToast(context.toastId, t('Customer Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
 			if (context)
@@ -118,12 +118,12 @@ const Customers: FC = () => {
 			request: UpdateCustomerRequest;
 		}) => updateCustomer(navigate, data.phoneNumber, data.request),
 		onMutate: async () => {
-			const toastId = createToast(t('Updating Customer...'));
+			const toastId = createLoadingToast(t('Updating Customer...'));
 			return { toastId };
 		},
 		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: ['customers'] });
-			updateToast(context.toastId, t('Customer Updated Successfully'));
+			successToast(context.toastId, t('Customer Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
 			if (context)
@@ -146,12 +146,12 @@ const Customers: FC = () => {
 		mutationFn: (data: { phoneNumber: string }) =>
 			deleteCustomer(navigate, data.phoneNumber),
 		onMutate: async () => {
-			const toastId = createToast(t('Deleting Customer...'));
+			const toastId = createLoadingToast(t('Deleting Customer...'));
 			return { toastId };
 		},
 		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: ['customers'] });
-			updateToast(context.toastId, t('Customer Deleted Successfully'));
+			successToast(context.toastId, t('Customer Deleted Successfully'));
 		},
 		onError: (error, _variables, context) => {
 			if (context)

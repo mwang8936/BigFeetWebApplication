@@ -17,9 +17,9 @@ import ERRORS from '../../../../constants/error.constants.ts';
 import DeleteProfileModal from '../miscallaneous/modals/profile/DeleteProfileModal.Component.tsx';
 import { useTranslation } from 'react-i18next';
 import {
-	createToast,
+	createLoadingToast,
 	errorToast,
-	updateToast,
+	successToast,
 } from '../../../../utils/toast.utils.tsx';
 
 const Profile: FC = () => {
@@ -42,11 +42,11 @@ const Profile: FC = () => {
 	);
 
 	const onDelete = async (userId: number) => {
-		const toastId = createToast(t('Deleting Profile...'));
+		const toastId = createLoadingToast(t('Deleting Profile...'));
 
 		deleteEmployee(navigate, userId)
 			.then(() => {
-				updateToast(toastId, t('Profile Deleted Successfully'));
+				successToast(toastId, t('Profile Deleted Successfully'));
 				logout(setAuthentication);
 			})
 			.catch((error) => {

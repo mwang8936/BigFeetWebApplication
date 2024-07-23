@@ -1,10 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { PencilSquareIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
-import {
-	useEmployeesContext,
-	useUserContext,
-} from '../../../../../BigFeet.Page';
+import { useUserContext } from '../../../../../BigFeet.Page';
 import Employee from '../../../../../../../models/Employee.Model';
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
@@ -65,7 +62,7 @@ const EditVip: FC<EditVipProp> = ({
 		useState<boolean>(false);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
-	const { employees } = useEmployeesContext();
+	// const { employees } = useEmployeesContext();
 
 	const { date } = useScheduleDateContext();
 
@@ -154,7 +151,7 @@ const EditVip: FC<EditVipProp> = ({
 								missingPermissionMessage={ERRORS.vip_package.permissions.edit}
 							/>
 
-							<EditableMultiSelect
+							{/* <EditableMultiSelect
 								originalValues={vipPackage.schedules
 									.map((schedule) => schedule.employee_audit_id)
 									.map((value) => ({
@@ -184,7 +181,7 @@ const EditVip: FC<EditVipProp> = ({
 								placeholder={PLACEHOLDERS.vip_package.employee_ids}
 								editable={editable}
 								missingPermissionMessage={ERRORS.vip_package.permissions.edit}
-							/>
+							/> */}
 						</div>
 					</div>
 				</div>

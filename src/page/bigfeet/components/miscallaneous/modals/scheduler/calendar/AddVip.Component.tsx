@@ -1,10 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
-import {
-	useEmployeesContext,
-	useUserContext,
-} from '../../../../../BigFeet.Page';
+import { useUserContext } from '../../../../../BigFeet.Page';
 import Employee from '../../../../../../../models/Employee.Model';
 import AddInput from '../../../add/AddInput.Component';
 import ERRORS from '../../../../../../../constants/error.constants';
@@ -41,7 +38,7 @@ const AddVip: FC<AddVipProp> = ({ setOpen, creatable, onAddVipPackage }) => {
 		useState<boolean>(true);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
-	const { employees } = useEmployeesContext();
+	// const { employees } = useEmployeesContext();
 	const { date } = useScheduleDateContext();
 
 	useEffect(() => {
@@ -126,7 +123,7 @@ const AddVip: FC<AddVipProp> = ({ setOpen, creatable, onAddVipPackage }) => {
 								placeholder={PLACEHOLDERS.employee.body_rate}
 							/>
 
-							<AddMultiSelect
+							{/* <AddMultiSelect
 								options={employees.map((employee) => ({
 									value: employee.employee_id,
 									label: employee.username,
@@ -145,7 +142,7 @@ const AddVip: FC<AddVipProp> = ({ setOpen, creatable, onAddVipPackage }) => {
 								label={LABELS.vip_package.employee_ids}
 								name={NAMES.vip_package.employee_ids}
 								placeholder={PLACEHOLDERS.vip_package.employee_ids}
-							/>
+							/> */}
 						</div>
 					</div>
 				</div>

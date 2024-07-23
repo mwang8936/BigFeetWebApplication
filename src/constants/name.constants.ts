@@ -25,6 +25,8 @@ const NAMES = {
 		cash: 'cash',
 		machine: 'machine',
 		vip: 'vip',
+		gift_card: 'gift_card',
+		insurance: 'insurance',
 		tips: 'tips',
 		message: 'message',
 	},

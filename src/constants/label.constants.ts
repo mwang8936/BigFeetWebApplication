@@ -33,6 +33,8 @@ const LABELS = {
 		cash: 'Cash',
 		machine: 'Machine',
 		vip: 'VIP',
+		gift_card: 'Gift Card',
+		insurance: 'Acupuncture Insurance',
 		tip_method: 'Tip Method',
 		tips: 'Tips',
 		message: 'Message',

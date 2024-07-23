@@ -4,14 +4,14 @@ import {
 	PencilSquareIcon,
 } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
-import {
-	useSchedulesContext,
-	useUserContext,
-} from '../../../../../BigFeet.Page';
+import { useUserContext } from '../../../../../BigFeet.Page';
 import Employee from '../../../../../../../models/Employee.Model';
 import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
 import Reservation from '../../../../../../../models/Reservation.Model';
-import { formatTimeFromDate } from '../../../../../../../utils/string.utils';
+import {
+	formatDateToQueryKey,
+	formatTimeFromDate,
+} from '../../../../../../../utils/string.utils';
 import EditBottom from '../../EditBottom.Component';
 import ERRORS from '../../../../../../../constants/error.constants';
 import WarningModal from './WarningModal.Component';
@@ -22,6 +22,10 @@ import { useQuery } from '@tanstack/react-query';
 import { getEmployees } from '../../../../../../../service/employee.service';
 import { Permissions } from '../../../../../../../models/enums';
 import { useNavigate } from 'react-router-dom';
+import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
+import { getSchedules } from '../../../../../../../service/schedule.service';
+import { getProfileSchedules } from '../../../../../../../service/profile.service';
+import Schedule from '../../../../../../../models/Schedule.Model';
 
 interface MoveReservationProp {
 	setOpen(open: boolean): void;
@@ -59,17 +63,29 @@ const MoveReservation: FC<MoveReservationProp> = ({
 	const [conflict, setConflict] = useState<boolean>(false);
 
 	const { user } = useUserContext();
+	const { date } = useScheduleDateContext();
+
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
 	);
+	const scheduleGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_SCHEDULE
+	);
 
-	const { schedules } = useSchedulesContext();
 	const employeeQuery = useQuery({
 		queryKey: ['employees'],
 		queryFn: () => getEmployees(navigate),
 		enabled: employeeGettable,
 	});
-	const employees: Employee[] = employeeQuery.data;
+	const employees: Employee[] = employeeQuery.data || [];
+
+	const scheduleQuery = useQuery({
+		queryKey: ['schedules', formatDateToQueryKey(date)],
+		queryFn: () => {},
+		enabled: scheduleGettable,
+		staleTime: Infinity,
+	});
+	const schedules: Schedule[] = scheduleQuery.data || [];
 
 	const prevEmployeeUsername = employees.find(
 		(employee) => employee.employee_id === reservation.employee_id

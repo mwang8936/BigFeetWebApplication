@@ -168,7 +168,7 @@ const EditableBodyFeetAcupunctureService: FC<
 						className="editable-input pl-9"
 						id={NAMES.service.body}
 						type="number"
-						value={body ? parseFloat(body.toString()) : ''}
+						value={body !== null ? parseFloat(body.toString()) : ''}
 						onChange={(event) => {
 							const text = event.target.value.trimStart();
 
@@ -201,7 +201,7 @@ const EditableBodyFeetAcupunctureService: FC<
 						<p className="error-label">
 							{t(
 								bodyValidationProp.invalidMessage.key,
-								bodyValidationProp.invalidMessage.key
+								bodyValidationProp.invalidMessage.value
 							)}
 						</p>
 					)
@@ -217,7 +217,7 @@ const EditableBodyFeetAcupunctureService: FC<
 						className="editable-input pl-9"
 						id={NAMES.service.feet}
 						type="number"
-						value={feet ? parseFloat(feet.toString()) : ''}
+						value={feet !== null ? parseFloat(feet.toString()) : ''}
 						onChange={(event) => {
 							const text = event.target.value.trimStart();
 
@@ -250,7 +250,7 @@ const EditableBodyFeetAcupunctureService: FC<
 						<p className="error-label">
 							{t(
 								feetValidationProp.invalidMessage.key,
-								feetValidationProp.invalidMessage.key
+								feetValidationProp.invalidMessage.value
 							)}
 						</p>
 					)
@@ -266,7 +266,9 @@ const EditableBodyFeetAcupunctureService: FC<
 						className="editable-input pl-9"
 						id={NAMES.service.acupuncture}
 						type="number"
-						value={acupuncture ? parseFloat(acupuncture.toString()) : ''}
+						value={
+							acupuncture !== null ? parseFloat(acupuncture.toString()) : ''
+						}
 						onChange={(event) => {
 							const text = event.target.value.trimStart();
 
@@ -303,7 +305,7 @@ const EditableBodyFeetAcupunctureService: FC<
 						<p className="error-label">
 							{t(
 								acupunctureValidationProp.invalidMessage.key,
-								acupunctureValidationProp.invalidMessage.key
+								acupunctureValidationProp.invalidMessage.value
 							)}
 						</p>
 					)

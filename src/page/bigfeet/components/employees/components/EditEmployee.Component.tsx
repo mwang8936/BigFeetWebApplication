@@ -33,9 +33,9 @@ import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 import { useTranslation } from 'react-i18next';
 import { userKey } from '../../../../../constants/api.constants';
 import {
-	createToast,
+	createLoadingToast,
 	errorToast,
-	updateToast,
+	successToast,
 } from '../../../../../utils/toast.utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -224,7 +224,7 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 			request: UpdateEmployeeRequest;
 		}) => updateEmployee(navigate, data.employeeId, data.request),
 		onMutate: async () => {
-			const toastId = createToast(t('Updating Employee...'));
+			const toastId = createLoadingToast(t('Updating Employee...'));
 			return { toastId };
 		},
 		onSuccess: (_data, variables, context) => {
@@ -238,7 +238,7 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 				setUser(updatedUser);
 			}
 
-			updateToast(context.toastId, t('Employee Updated Successfully'));
+			successToast(context.toastId, t('Employee Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
 			if (context)
@@ -309,7 +309,7 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 		mutationFn: (data: { employeeId: number }) =>
 			deleteEmployee(navigate, data.employeeId),
 		onMutate: async () => {
-			const toastId = createToast(t('Deleting Employee...'));
+			const toastId = createLoadingToast(t('Deleting Employee...'));
 			return { toastId };
 		},
 		onSuccess: (_data, _variables, context) => {
@@ -317,7 +317,7 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 			if (employee.employee_id === user.employee_id) {
 				logout(setAuthentication);
 			}
-			updateToast(context.toastId, t('Employee Deleted Successfully'));
+			successToast(context.toastId, t('Employee Deleted Successfully'));
 		},
 		onError: (error, _variables, context) => {
 			if (context)

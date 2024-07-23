@@ -20,6 +20,8 @@ const PLACEHOLDERS = {
 		cash: '0.00',
 		machine: '0.00',
 		vip: '0.00',
+		gift_card: '0.00',
+		insurance: '0.00',
 		tips: '0.00',
 		message: 'Add Message',
 	},

@@ -6,10 +6,7 @@ import {
 	Permissions,
 	TipMethod,
 } from '../../../../../../../models/enums';
-import {
-	useSchedulesContext,
-	useUserContext,
-} from '../../../../../BigFeet.Page';
+import { useUserContext } from '../../../../../BigFeet.Page';
 import Employee from '../../../../../../../models/Employee.Model';
 import Service from '../../../../../../../models/Service.Model';
 import {
@@ -51,6 +48,11 @@ import { getCustomers } from '../../../../../../../service/customer.service';
 import { useNavigate } from 'react-router-dom';
 import { getServices } from '../../../../../../../service/service.service';
 import { getEmployees } from '../../../../../../../service/employee.service';
+import { getSchedules } from '../../../../../../../service/schedule.service';
+import { getProfileSchedules } from '../../../../../../../service/profile.service';
+import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
+import Schedule from '../../../../../../../models/Schedule.Model';
+import { formatDateToQueryKey } from '../../../../../../../utils/string.utils';
 
 interface EditReservationProp {
 	setOpen(open: boolean): void;
@@ -105,6 +107,12 @@ const EditReservation: FC<EditReservationProp> = ({
 		reservation.machine
 	);
 	const [vipInput, setVipInput] = useState<number | null>(reservation.vip);
+	const [giftCardInput, setGiftCardInput] = useState<number | null>(
+		reservation.gift_card
+	);
+	const [insuranceInput, setInsuranceInput] = useState<number | null>(
+		reservation.insurance
+	);
 	const [tipMethodInput, setTipMethodInput] = useState<TipMethod | null>(
 		reservation.tip_method
 	);
@@ -127,6 +135,8 @@ const EditReservation: FC<EditReservationProp> = ({
 	const [invalidCash, setInvalidCash] = useState<boolean>(false);
 	const [invalidMachine, setInvalidMachine] = useState<boolean>(false);
 	const [invalidVip, setInvalidVip] = useState<boolean>(false);
+	const [invalidGiftCard, setInvalidGiftCard] = useState<boolean>(false);
+	const [invalidInsurance, setInvalidInsurance] = useState<boolean>(false);
 	const [invalidTips, setInvalidTips] = useState<boolean>(false);
 	const [invalidCustomerPhoneNumber, setInvalidCustomerPhoneNumber] =
 		useState<boolean>(false);
@@ -141,6 +151,7 @@ const EditReservation: FC<EditReservationProp> = ({
 	const [conflict, setConflict] = useState<boolean>(false);
 
 	const { user } = useUserContext();
+	const { date } = useScheduleDateContext();
 
 	const customerGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_CUSTOMER
@@ -151,29 +162,46 @@ const EditReservation: FC<EditReservationProp> = ({
 	const serviceGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_SERVICE
 	);
-
-	const { schedules } = useSchedulesContext();
+	const scheduleGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_SCHEDULE
+	);
 
 	const customerQuery = useQuery({
 		queryKey: ['customers'],
 		queryFn: () => getCustomers(navigate),
 		enabled: customerGettable,
 	});
-	const customers: Customer[] = customerQuery.data;
+	const customers: Customer[] = customerQuery.data || [];
 
 	const employeeQuery = useQuery({
 		queryKey: ['employees'],
 		queryFn: () => getEmployees(navigate),
 		enabled: employeeGettable,
 	});
-	const employees: Employee[] = employeeQuery.data;
+	const employees: Employee[] = employeeQuery.data || [];
 
 	const serviceQuery = useQuery({
 		queryKey: ['services'],
 		queryFn: () => getServices(navigate),
 		enabled: serviceGettable,
 	});
-	const services: Service[] = serviceQuery.data;
+	const services: Service[] = serviceQuery.data || [];
+
+	const scheduleQuery = useQuery({
+		queryKey: ['schedules', formatDateToQueryKey(date)],
+		queryFn: () => {
+			if (scheduleGettable) {
+				return getSchedules(navigate, {
+					start: date,
+					end: date,
+				});
+			} else {
+				return getProfileSchedules(navigate);
+			}
+		},
+		staleTime: 0,
+	});
+	const schedules: Schedule[] = scheduleQuery.data || [];
 
 	const employeeDropDownItems = getEmployeeDropDownItems(employees);
 	const serviceDropDownItems = getServiceDropDownItems(services);
@@ -181,10 +209,10 @@ const EditReservation: FC<EditReservationProp> = ({
 	useEffect(() => {
 		const reserved_date: Date | null | undefined =
 			dateInput !== null &&
-			!sameDate(dateInput, reservation.reserved_date) &&
-			sameTime(dateInput, reservation.reserved_date)
-				? undefined
-				: dateInput;
+			(!sameDate(dateInput, reservation.reserved_date) ||
+				!sameTime(dateInput, reservation.reserved_date))
+				? dateInput
+				: undefined;
 		const employee_id: number | null | undefined =
 			employeeIdInput === reservation.employee_id ? undefined : employeeIdInput;
 		const service_id: number | null | undefined =
@@ -203,6 +231,10 @@ const EditReservation: FC<EditReservationProp> = ({
 			machineInput === reservation.machine ? undefined : machineInput;
 		const vip: number | null | undefined =
 			vipInput === reservation.vip ? undefined : vipInput;
+		const gift_card: number | null | undefined =
+			giftCardInput === reservation.gift_card ? undefined : giftCardInput;
+		const insurance: number | null | undefined =
+			insuranceInput === reservation.insurance ? undefined : insuranceInput;
 		const tip_method: TipMethod | null | undefined =
 			tipMethodInput === reservation.tip_method ? undefined : tipMethodInput;
 		const tips: number | null | undefined =
@@ -239,6 +271,8 @@ const EditReservation: FC<EditReservationProp> = ({
 			cash !== undefined ||
 			machine !== undefined ||
 			vip !== undefined ||
+			gift_card !== undefined ||
+			insurance !== undefined ||
 			tip_method !== undefined ||
 			tips !== undefined ||
 			message !== undefined ||
@@ -269,6 +303,8 @@ const EditReservation: FC<EditReservationProp> = ({
 		cashInput,
 		machineInput,
 		vipInput,
+		giftCardInput,
+		insuranceInput,
 		tipMethodInput,
 		tipsInput,
 		messageInput,
@@ -288,6 +324,8 @@ const EditReservation: FC<EditReservationProp> = ({
 			invalidCash ||
 			invalidMachine ||
 			invalidVip ||
+			invalidGiftCard ||
+			invalidInsurance ||
 			invalidTips ||
 			invalidCustomer;
 
@@ -298,6 +336,8 @@ const EditReservation: FC<EditReservationProp> = ({
 		invalidCash,
 		invalidMachine,
 		invalidVip,
+		invalidGiftCard,
+		invalidInsurance,
 		invalidTips,
 		invalidCustomerPhoneNumber,
 		invalidCustomerName,
@@ -384,10 +424,10 @@ const EditReservation: FC<EditReservationProp> = ({
 	const onEdit = async () => {
 		const reserved_date: Date | undefined =
 			dateInput !== null &&
-			!sameDate(dateInput, reservation.reserved_date) &&
-			sameTime(dateInput, reservation.reserved_date)
-				? undefined
-				: (dateInput as Date);
+			(!sameDate(dateInput, reservation.reserved_date) ||
+				!sameTime(dateInput, reservation.reserved_date))
+				? (dateInput as Date)
+				: undefined;
 		const employee_id: number | undefined =
 			employeeIdInput === reservation.employee_id
 				? undefined
@@ -408,6 +448,10 @@ const EditReservation: FC<EditReservationProp> = ({
 			machineInput === reservation.machine ? undefined : machineInput;
 		const vip: number | null | undefined =
 			vipInput === reservation.vip ? undefined : vipInput;
+		const gift_card: number | null | undefined =
+			giftCardInput === reservation.gift_card ? undefined : giftCardInput;
+		const insurance: number | null | undefined =
+			insuranceInput === reservation.insurance ? undefined : insuranceInput;
 		const tip_method: TipMethod | null | undefined =
 			tipMethodInput === reservation.tip_method ? undefined : tipMethodInput;
 		const tips: number | null | undefined =
@@ -436,20 +480,22 @@ const EditReservation: FC<EditReservationProp> = ({
 				: trimmedNotes;
 
 		const updateReservationRequest: UpdateReservationRequest = {
-			...(reserved_date && { reserved_date }),
-			...(employee_id && { employee_id }),
-			...(service_id && { service_id }),
-			...(requested_gender && { requested_gender }),
+			...(reserved_date !== undefined && { reserved_date }),
+			...(employee_id !== undefined && { employee_id }),
+			...(service_id !== undefined && { service_id }),
+			...(requested_gender !== undefined && { requested_gender }),
 			...(requested_employee !== undefined && { requested_employee }),
-			...(cash && { cash }),
-			...(machine && { machine }),
-			...(vip && { vip }),
-			...(tip_method && { tip_method }),
-			...(tips && { tips }),
-			...(message && { message }),
-			...(phone_number && { phone_number }),
-			...(customer_name && { customer_name }),
-			...(notes && { notes }),
+			...(cash !== undefined && { cash }),
+			...(machine !== undefined && { machine }),
+			...(vip !== undefined && { vip }),
+			...(gift_card !== undefined && { gift_card }),
+			...(insurance !== undefined && { insurance }),
+			...(tip_method !== undefined && { tip_method }),
+			...(tips !== undefined && { tips }),
+			...(message !== undefined && { message }),
+			...(phone_number !== undefined && { phone_number }),
+			...(customer_name !== undefined && { customer_name }),
+			...(notes !== undefined && { notes }),
 			updated_by: updatedBy,
 		};
 
@@ -661,6 +707,42 @@ const EditReservation: FC<EditReservationProp> = ({
 									invalidMessage: ERRORS.reservation.vip.invalid,
 								}}
 								placeholder={PLACEHOLDERS.reservation.vip}
+								editable={editable}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+							/>
+
+							<EditablePayRate
+								originalAmount={reservation.gift_card}
+								amount={giftCardInput}
+								setAmount={setGiftCardInput}
+								label={LABELS.reservation.gift_card}
+								name={NAMES.reservation.gift_card}
+								validationProp={{
+									max: NUMBERS.reservation.gift_card,
+									required: false,
+									invalid: invalidGiftCard,
+									setInvalid: setInvalidGiftCard,
+									invalidMessage: ERRORS.reservation.gift_card.invalid,
+								}}
+								placeholder={PLACEHOLDERS.reservation.gift_card}
+								editable={editable}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+							/>
+
+							<EditablePayRate
+								originalAmount={reservation.insurance}
+								amount={insuranceInput}
+								setAmount={setInsuranceInput}
+								label={LABELS.reservation.insurance}
+								name={NAMES.reservation.insurance}
+								validationProp={{
+									max: NUMBERS.reservation.insurance,
+									required: false,
+									invalid: invalidInsurance,
+									setInvalid: setInvalidInsurance,
+									invalidMessage: ERRORS.reservation.insurance.invalid,
+								}}
+								placeholder={PLACEHOLDERS.reservation.insurance}
 								editable={editable}
 								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>

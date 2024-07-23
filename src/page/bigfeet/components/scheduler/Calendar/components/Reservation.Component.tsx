@@ -6,20 +6,26 @@ import {
 	ServiceColor,
 	TipMethod,
 } from '../../../../../../models/enums';
-import { formatPhoneNumber } from '../../../../../../utils/string.utils';
+import {
+	formatDateToQueryKey,
+	formatPhoneNumber,
+} from '../../../../../../utils/string.utils';
 import { UpdateReservationRequest } from '../../../../../../models/requests/Reservation.Request.Model';
 import EditReservationModal from '../../../miscallaneous/modals/scheduler/calendar/EditReservationModal.Component';
 import Employee from '../../../../../../models/Employee.Model';
 import Draggable from 'react-draggable';
 import MoveReservationModal from '../../../miscallaneous/modals/scheduler/calendar/MoveReservationModal.Component';
 import STORES from '../../../../../../constants/store.constants';
-import { useSchedulesContext, useUserContext } from '../../../../BigFeet.Page';
+import { useUserContext } from '../../../../BigFeet.Page';
 import { sortEmployees } from '../../../../../../utils/employee.utils';
 import { useScheduleDateContext } from '../../Scheduler.Component';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { getEmployees } from '../../../../../../service/employee.service';
 import { useNavigate } from 'react-router-dom';
+import { getSchedules } from '../../../../../../service/schedule.service';
+import { getProfileSchedules } from '../../../../../../service/profile.service';
+import Schedule from '../../../../../../models/Schedule.Model';
 
 interface ReservationTagProp {
 	reservation: Reservation;
@@ -53,7 +59,6 @@ const ReservationTag: FC<ReservationTagProp> = ({
 	});
 
 	const { user } = useUserContext();
-	const { schedules } = useSchedulesContext();
 	const { date } = useScheduleDateContext();
 
 	let employeeList: Employee[] = [];
@@ -61,6 +66,25 @@ const ReservationTag: FC<ReservationTagProp> = ({
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
 	);
+	const scheduleGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_SCHEDULE
+	);
+
+	const scheduleQuery = useQuery({
+		queryKey: ['schedules', formatDateToQueryKey(date)],
+		queryFn: () => {
+			if (scheduleGettable) {
+				return getSchedules(navigate, {
+					start: date,
+					end: date,
+				});
+			} else {
+				return getProfileSchedules(navigate);
+			}
+		},
+		staleTime: 0,
+	});
+	const schedules: Schedule[] = scheduleQuery.data || [];
 
 	try {
 		const employeeQuery = useQuery({
@@ -68,7 +92,7 @@ const ReservationTag: FC<ReservationTagProp> = ({
 			queryFn: () => getEmployees(navigate),
 			enabled: employeeGettable,
 		});
-		const employees: Employee[] = employeeQuery.data;
+		const employees: Employee[] = employeeQuery.data || [];
 		employeeList.push(...employees);
 	} catch {
 		employeeList.push(user);
@@ -144,13 +168,17 @@ const ReservationTag: FC<ReservationTagProp> = ({
 		</span>
 	);
 
-	const moneyText = (reservation.cash ||
-		reservation.machine ||
-		reservation.vip) && (
+	const moneyText = (validAmount(reservation.cash) ||
+		validAmount(reservation.machine) ||
+		validAmount(reservation.vip) ||
+		validAmount(reservation.gift_card) ||
+		validAmount(reservation.insurance)) && (
 		<span className="font-medium">
-			{reservation.cash && `C${reservation.cash} `}
-			{reservation.machine && `M${reservation.machine} `}
-			{reservation.vip && `V${reservation.vip}`}
+			{validAmount(reservation.cash) && `C${reservation.cash} `}
+			{validAmount(reservation.machine) && `M${reservation.machine} `}
+			{validAmount(reservation.vip) && `V${reservation.vip} `}
+			{validAmount(reservation.gift_card) && `G${reservation.gift_card} `}
+			{validAmount(reservation.insurance) && `A${reservation.insurance} `}
 		</span>
 	);
 
@@ -344,6 +372,14 @@ const ReservationTag: FC<ReservationTagProp> = ({
 			</div>
 		</Draggable>
 	);
+};
+
+const validAmount = (amount: string | number | null) => {
+	if (typeof amount === 'string') {
+		return parseFloat(amount) !== 0;
+	}
+
+	return amount !== null && amount !== 0;
 };
 
 export default ReservationTag;

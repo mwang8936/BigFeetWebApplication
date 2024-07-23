@@ -16,9 +16,9 @@ import { useTranslation } from 'react-i18next';
 import { getLanguageFile } from '../../../../../constants/language.constants';
 import { userKey } from '../../../../../constants/api.constants';
 import {
-	createToast,
+	createLoadingToast,
 	errorToast,
-	updateToast,
+	successToast,
 } from '../../../../../utils/toast.utils';
 
 interface SettingsProp {
@@ -77,7 +77,7 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 			...(dark_mode && { dark_mode }),
 		};
 
-		const toastId = createToast(t('Updating Profile...'));
+		const toastId = createLoadingToast(t('Updating Profile...'));
 
 		updateProfile(navigate, updateProfileRequest)
 			.then(() => {
@@ -89,7 +89,7 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 				setUser(updatedUser);
 				i18n.changeLanguage(getLanguageFile(updatedUser.language));
 
-				updateToast(toastId, t('Profile Updated Successfully'));
+				successToast(toastId, t('Profile Updated Successfully'));
 			})
 			.catch((error) => {
 				errorToast(toastId, t('Failed to Update Profile'), error.message);

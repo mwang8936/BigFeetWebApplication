@@ -19,7 +19,7 @@ const resources = {
 i18n.use(initReactI18next).init({
 	resources,
 	fallbackLng: 'en',
-	debug: true,
+	// debug: true,
 });
 
 export default i18n;

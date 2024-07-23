@@ -20,11 +20,15 @@ const TipGrid: FC<TipGridProp> = ({ row, colNum, reservations }) => {
 		(a, b) => a.reserved_date.getTime() - b.reserved_date.getTime()
 	);
 	const tips = tipReservations.map((reservation) => reservation.tips as number);
+	const tipsTotal = tips.reduce(
+		(acc, curr) => acc + parseFloat(curr.toString()),
+		0
+	);
+	const tipsPayout = tipsTotal * 0.9;
 
 	const tipsText = tips.join(' + ') + ' = ';
-	const tipsTotalText =
-		'$' +
-		tips.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0).toString();
+	const tipsTotalText = '$' + tipsTotal.toString();
+	const tipsPayoutText = '$' + tipsPayout.toFixed(2).toString();
 
 	const tipsTexts = tipReservations.map((reservation, index) => {
 		const startTimeText = formatTimeFromDate(reservation.reserved_date);
@@ -33,7 +37,7 @@ const TipGrid: FC<TipGridProp> = ({ row, colNum, reservations }) => {
 			reservation.service.time * 60 * 1000;
 		const endTimeText = formatTimeFromDate(new Date(endTime));
 		return (
-			<span className="flex flex-col">
+			<span className="flex flex-col" key={reservation.reservation_id}>
 				<span>
 					{`${startTimeText} - ${endTimeText} = (\$${reservation.tips})`}
 					<br />
@@ -54,6 +58,8 @@ const TipGrid: FC<TipGridProp> = ({ row, colNum, reservations }) => {
 					{tipsText}
 					<span className="font-bold">{tipsTotalText}</span>
 				</span>
+				<br />
+				<span className="font-bold">{`${tipsTotalText} X 90% = ${tipsPayoutText}`}</span>
 				{tipReservations.length > 0 && (
 					<span className="tips-tip group-hover:scale-100 z-[3]">
 						{tipsTexts}

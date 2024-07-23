@@ -16,9 +16,9 @@ import AddServiceModal from '../miscallaneous/modals/service/AddServiceModal.Com
 import { AddServiceRequest } from '../../../../models/requests/Service.Request.Model.ts';
 import { useTranslation } from 'react-i18next';
 import {
-	createToast,
+	createLoadingToast,
 	errorToast,
-	updateToast,
+	successToast,
 } from '../../../../utils/toast.utils.tsx';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Service from '../../../../models/Service.Model.ts';
@@ -77,12 +77,12 @@ const Services: FC = () => {
 		mutationFn: (data: { request: AddServiceRequest }) =>
 			addService(navigate, data.request),
 		onMutate: async () => {
-			const toastId = createToast(t('Adding Service...'));
+			const toastId = createLoadingToast(t('Adding Service...'));
 			return { toastId };
 		},
 		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: ['services'] });
-			updateToast(context.toastId, t('Service Added Successfully'));
+			successToast(context.toastId, t('Service Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
 			if (context)
