@@ -20,7 +20,7 @@ import STORES from '../../../../../../../constants/store.constants';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { getEmployees } from '../../../../../../../service/employee.service';
-import { Permissions } from '../../../../../../../models/enums';
+import { Permissions, Role } from '../../../../../../../models/enums';
 import { useNavigate } from 'react-router-dom';
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
 import { getSchedules } from '../../../../../../../service/schedule.service';
@@ -77,15 +77,30 @@ const MoveReservation: FC<MoveReservationProp> = ({
 		queryFn: () => getEmployees(navigate),
 		enabled: employeeGettable,
 	});
-	const employees: Employee[] = employeeQuery.data || [];
+	const employees: Employee[] =
+		(employeeQuery.data as Employee[]).filter(
+			(employee) => employee.role !== Role.DEVELOPER
+		) || [];
 
 	const scheduleQuery = useQuery({
 		queryKey: ['schedules', formatDateToQueryKey(date)],
-		queryFn: () => {},
+		queryFn: () => {
+			if (scheduleGettable) {
+				return getSchedules(navigate, {
+					start: date,
+					end: date,
+				});
+			} else {
+				return getProfileSchedules(navigate);
+			}
+		},
 		enabled: scheduleGettable,
 		staleTime: Infinity,
 	});
-	const schedules: Schedule[] = scheduleQuery.data || [];
+	const schedules: Schedule[] =
+		(scheduleQuery.data as Schedule[]).filter(
+			(schedule) => schedule.employee.role !== Role.DEVELOPER
+		) || [];
 
 	const prevEmployeeUsername = employees.find(
 		(employee) => employee.employee_id === reservation.employee_id
@@ -115,13 +130,13 @@ const MoveReservation: FC<MoveReservationProp> = ({
 					)
 			);
 
-		const bodyReservationsAtSameTime = reservationsAtSameTime.filter(
-			(reservation) => reservation.service.bed_required
-		);
-		if (
-			bodyReservationsAtSameTime.length >= STORES.beds &&
-			service.bed_required
-		) {
+		const bedsUsedAtSameTime = reservationsAtSameTime
+			.filter((reservation) => reservation.service.beds_required > 0)
+			.reduce(
+				(total, reservation) => total + reservation.service.beds_required,
+				0
+			);
+		if (bedsUsedAtSameTime + service.beds_required > STORES.beds) {
 			setNoBeds(true);
 			setOpenBedWarningModal(true);
 		} else {

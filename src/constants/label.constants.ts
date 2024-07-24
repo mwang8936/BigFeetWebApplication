@@ -54,7 +54,7 @@ const LABELS = {
 		body: 'Body',
 		feet: 'Feet',
 		acupuncture: 'Acupuncture',
-		bed_required: 'Bed Required',
+		beds_required: 'Beds Required',
 		color: 'Color',
 	},
 	vip_package: {

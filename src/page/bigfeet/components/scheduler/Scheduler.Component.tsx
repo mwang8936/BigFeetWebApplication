@@ -2,7 +2,7 @@ import { useState, createContext, useContext } from 'react';
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import Calendar from './Calendar/Calendar.Component';
 import { useUserContext } from '../../BigFeet.Page';
-import { Permissions } from '../../../../models/enums';
+import { Permissions, Role } from '../../../../models/enums';
 import Schedule from '../../../../models/Schedule.Model';
 import { sameDate } from '../../../../utils/date.utils';
 import Employee from '../../../../models/Employee.Model';
@@ -146,12 +146,18 @@ export default function Scheduler() {
 		},
 		staleTime: 0,
 	});
-	const schedules: Schedule[] = scheduleQuery.data || [];
+	const schedules: Schedule[] =
+		(scheduleQuery.data as Schedule[]).filter(
+			(schedule) => schedule.employee.role !== Role.DEVELOPER
+		) || [];
 
 	let employeeList: Employee[] = [];
 
 	try {
-		const employees: Employee[] = employeeQuery.data || [];
+		const employees: Employee[] =
+			(employeeQuery.data as Employee[]).filter(
+				(employee) => employee.role !== Role.DEVELOPER
+			) || [];
 		employeeList.push(...employees);
 	} catch {
 		employeeList.push(user);

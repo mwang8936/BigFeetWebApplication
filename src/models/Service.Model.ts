@@ -9,6 +9,6 @@ export default interface Service {
 	body: number;
 	feet: number;
 	acupuncture: number;
-	bed_required: boolean;
+	beds_required: number;
 	color: ServiceColor;
 }

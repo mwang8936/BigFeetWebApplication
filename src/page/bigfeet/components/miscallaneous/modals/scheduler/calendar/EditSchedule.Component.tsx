@@ -15,7 +15,7 @@ import EditableToggleSwitch from '../../../editable/EditableToggleSwitch.Compone
 import { useTranslation } from 'react-i18next';
 import Employee from '../../../../../../../models/Employee.Model';
 import { useUserContext } from '../../../../../BigFeet.Page';
-import { Permissions } from '../../../../../../../models/enums';
+import { Permissions, Role } from '../../../../../../../models/enums';
 import { getEmployees } from '../../../../../../../service/employee.service';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -76,7 +76,10 @@ const EditSchedule: FC<EditScheduleProp> = ({
 		enabled: employeeGettable,
 		staleTime: Infinity,
 	});
-	const employees: Employee[] = employeeQuery.data || [];
+	const employees: Employee[] =
+		(employeeQuery.data as Employee[]).filter(
+			(employee) => employee.role !== Role.DEVELOPER
+		) || [];
 
 	const scheduleQuery = useQuery({
 		queryKey: ['schedules', formatDateToQueryKey(schedule.date)],
@@ -92,7 +95,10 @@ const EditSchedule: FC<EditScheduleProp> = ({
 		},
 		staleTime: Infinity,
 	});
-	const schedules: Schedule[] = scheduleQuery.data || [];
+	const schedules: Schedule[] =
+		(scheduleQuery.data as Schedule[]).filter(
+			(schedule) => schedule.employee.role !== Role.DEVELOPER
+		) || [];
 
 	const priorityDropDownItems = getPriorityDropDownItems(
 		employees,

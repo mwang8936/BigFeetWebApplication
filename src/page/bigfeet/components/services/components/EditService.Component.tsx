@@ -33,6 +33,8 @@ import {
 	successToast,
 } from '../../../../../utils/toast.utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import EditableNumber from '../../miscallaneous/editable/EditableNumber.Component.tsx';
+import STORES from '../../../../../constants/store.constants.ts';
 
 interface EditServiceProp {
 	editable: boolean;
@@ -58,8 +60,8 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 	const [acupunctureInput, setAcupunctureInput] = useState<number | null>(
 		service.acupuncture
 	);
-	const [bedRequiredInput, setBedRequiredInput] = useState<boolean>(
-		service.bed_required
+	const [bedsRequiredInput, setBedsRequiredInput] = useState<number | null>(
+		service.beds_required
 	);
 	const [colorInput, setColorInput] = useState<ServiceColor | null>(
 		service.color
@@ -72,6 +74,8 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 	const [invalidBody, setInvalidBody] = useState<boolean>(false);
 	const [invalidFeet, setInvalidFeet] = useState<boolean>(false);
 	const [invalidAcupuncture, setInvalidAcupuncture] = useState<boolean>(false);
+	const [invalidBedsRequired, setInvalidBedsRequired] =
+		useState<boolean>(false);
 
 	const [changesMade, setChangesMade] = useState<boolean>(false);
 	const [missingRequiredInput, setMissingRequiredInput] =
@@ -88,7 +92,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 		setBodyInput(service.body);
 		setFeetInput(service.feet);
 		setAcupunctureInput(service.acupuncture);
-		setBedRequiredInput(service.bed_required);
+		setBedsRequiredInput(service.beds_required);
 		setColorInput(service.color);
 
 		setChangesMade(false);
@@ -99,6 +103,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 		setInvalidBody(false);
 		setInvalidFeet(false);
 		setInvalidAcupuncture(false);
+		setInvalidBedsRequired(false);
 		setInvalidInput(false);
 	}, [service]);
 
@@ -123,8 +128,10 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			feetInput === service.feet ? undefined : feetInput;
 		const acupuncture: number | null | undefined =
 			acupunctureInput === service.acupuncture ? undefined : acupunctureInput;
-		const bed_required: boolean | undefined =
-			bedRequiredInput === service.bed_required ? undefined : bedRequiredInput;
+		const beds_required: number | null | undefined =
+			bedsRequiredInput === service.beds_required
+				? undefined
+				: bedsRequiredInput;
 		const color: ServiceColor | null | undefined =
 			colorInput === service.color ? undefined : colorInput;
 
@@ -136,7 +143,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			body !== undefined ||
 			feet !== undefined ||
 			acupuncture !== undefined ||
-			bed_required !== undefined ||
+			beds_required !== undefined ||
 			color !== undefined;
 
 		setChangesMade(changesMade);
@@ -149,6 +156,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			body === null ||
 			feet === null ||
 			acupuncture === null ||
+			beds_required === null ||
 			color === null;
 
 		setMissingRequiredInput(missingRequiredInput);
@@ -160,7 +168,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 		bodyInput,
 		feetInput,
 		acupunctureInput,
-		bedRequiredInput,
+		bedsRequiredInput,
 		colorInput,
 	]);
 
@@ -172,7 +180,8 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			invalidMoney ||
 			invalidBody ||
 			invalidFeet ||
-			invalidAcupuncture;
+			invalidAcupuncture ||
+			invalidBedsRequired;
 
 		setInvalidInput(invalidInput);
 	}, [
@@ -183,6 +192,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 		invalidBody,
 		invalidFeet,
 		invalidAcupuncture,
+		invalidBedsRequired,
 	]);
 
 	const editServiceMutation = useMutation({
@@ -227,8 +237,10 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			acupunctureInput === service.acupuncture
 				? undefined
 				: (acupunctureInput as number);
-		const bed_required: boolean | undefined =
-			bedRequiredInput === service.bed_required ? undefined : bedRequiredInput;
+		const beds_required: number | undefined =
+			bedsRequiredInput === service.beds_required
+				? undefined
+				: (bedsRequiredInput as number);
 		const color: ServiceColor | undefined =
 			colorInput === service.color ? undefined : (colorInput as ServiceColor);
 
@@ -241,7 +253,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			...(body !== undefined && { body }),
 			...(feet !== undefined && { feet }),
 			...(acupuncture !== undefined && { acupuncture }),
-			...(bed_required !== undefined && { bed_required }),
+			...(beds_required !== undefined && { beds_required }),
 			...(color !== undefined && { color }),
 		};
 
@@ -389,17 +401,23 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 				missingPermissionMessage={ERRORS.service.permissions.edit}
 			/>
 
-			<EditableToggleSwitch
-				originalChecked={service.bed_required}
-				setChecked={setBedRequiredInput}
-				checked={bedRequiredInput}
-				falseText={'No Bed Required'}
-				trueText={'Bed Required'}
-				toggleColour={ToggleColor.BLUE}
-				label={LABELS.service.bed_required}
-				name={NAMES.service.bed_required}
+			<EditableNumber
+				originalInput={service.beds_required}
+				input={bedsRequiredInput}
+				setInput={setBedsRequiredInput}
+				label={LABELS.service.beds_required}
+				name={NAMES.service.beds_required}
+				validationProp={{
+					max: STORES.beds,
+					required: true,
+					invalid: invalidBedsRequired,
+					setInvalid: setInvalidBedsRequired,
+					invalidMessage: ERRORS.service.beds_required.invalid,
+					requiredMessage: ERRORS.service.beds_required.required,
+				}}
+				placeholder={PLACEHOLDERS.service.beds_required}
 				editable={editable}
-				missingPermissionMessage={ERRORS.reservation.permissions.edit}
+				missingPermissionMessage={ERRORS.service.permissions.edit}
 			/>
 
 			<EditableDropDown

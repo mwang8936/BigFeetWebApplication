@@ -43,7 +43,7 @@ const NAMES = {
 		body: 'body',
 		feet: 'feet',
 		acupuncture: 'acupuncture',
-		bed_required: 'bed_required',
+		beds_required: 'beds_required',
 	},
 	vip_package: {
 		serial: 'serial',

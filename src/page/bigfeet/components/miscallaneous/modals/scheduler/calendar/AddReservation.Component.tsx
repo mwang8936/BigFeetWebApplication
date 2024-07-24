@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
-import { Gender, Permissions } from '../../../../../../../models/enums';
+import { Gender, Permissions, Role } from '../../../../../../../models/enums';
 import { useUserContext } from '../../../../../BigFeet.Page';
 import Employee from '../../../../../../../models/Employee.Model';
 import Service from '../../../../../../../models/Service.Model';
@@ -128,7 +128,10 @@ const AddReservation: FC<AddReservationProp> = ({
 		queryFn: () => getEmployees(navigate),
 		enabled: employeeGettable,
 	});
-	const employees: Employee[] = employeeQuery.data || [];
+	const employees: Employee[] =
+		(employeeQuery.data as Employee[]).filter(
+			(employee) => employee.role !== Role.DEVELOPER
+		) || [];
 
 	const serviceQuery = useQuery({
 		queryKey: ['services'],
@@ -155,7 +158,10 @@ const AddReservation: FC<AddReservationProp> = ({
 	const employeeDropDownItems = getEmployeeDropDownItems(employees);
 	const serviceDropDownItems = getServiceDropDownItems(services);
 
-	const schedules: Schedule[] = scheduleQuery.data || [];
+	const schedules: Schedule[] =
+		(scheduleQuery.data as Schedule[]).filter(
+			(schedule) => schedule.employee.role !== Role.DEVELOPER
+		) || [];
 
 	useEffect(() => {
 		const missingCustomerInput =
@@ -234,13 +240,13 @@ const AddReservation: FC<AddReservationProp> = ({
 						)
 					);
 
-				const bodyReservationsAtSameTime = reservationsAtSameTime.filter(
-					(reservation) => reservation.service.bed_required
-				);
-				if (
-					bodyReservationsAtSameTime.length >= STORES.beds &&
-					service.bed_required
-				) {
+				const bedsUsedAtSameTime = reservationsAtSameTime
+					.filter((reservation) => reservation.service.beds_required > 0)
+					.reduce(
+						(total, reservation) => total + reservation.service.beds_required,
+						0
+					);
+				if (bedsUsedAtSameTime + service.beds_required > STORES.beds) {
 					setNoBeds(true);
 					setOpenBedWarningModal(true);
 				} else {

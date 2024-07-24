@@ -33,6 +33,7 @@ const PLACEHOLDERS = {
 		body: '1',
 		feet: '0',
 		acupuncture: '0',
+		beds_required: '0',
 	},
 	vip_package: {
 		serial: '123456',

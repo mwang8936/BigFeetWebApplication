@@ -271,6 +271,7 @@
     "Feet Invalid": "Feet must be between 0-{{max}} and limited to 1 decimal places and in intervals of 0.5.",
     "Acupuncture cannot be empty.": "Acupuncture cannot be empty.",
     "Acupuncture Invalid": "Acupuncture must be between 0-{{max}} and limited to 1 decimal places and in intervals of 0.5.",
+    "Beds Required Invalid": "Beds Required must be between 0-{{max}} and an integer.",
     "A color must be selected.": "A color must be selected.",
     "You do not have permissions to get services.": "You do not have permissions to get services.",
     "You do not have permissions to edit services.": "You do not have permissions to edit services.",
@@ -346,8 +347,7 @@
     "Body": "Body",
     "Feet": "Feet",
     "Acupuncture": "Acupuncture",
-    "Bed Required": "Bed Required",
-    "No Bed Required": "No Bed Required",
+    "Beds Required": "Beds Required",
     "Color": "Color",
 
     "Search by name or phone number": "Search by name or phone number",

@@ -17,7 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getEmployees } from '../../../../../../../service/employee.service';
 import { useNavigate } from 'react-router-dom';
 import { useUserContext } from '../../../../../BigFeet.Page';
-import { Permissions } from '../../../../../../../models/enums';
+import { Permissions, Role } from '../../../../../../../models/enums';
 import Employee from '../../../../../../../models/Employee.Model';
 import { formatDateToQueryKey } from '../../../../../../../utils/string.utils';
 import { getProfileSchedules } from '../../../../../../../service/profile.service';
@@ -70,7 +70,10 @@ const AddSchedule: FC<AddScheduleProp> = ({
 		enabled: employeeGettable,
 		staleTime: Infinity,
 	});
-	const employees: Employee[] = employeeQuery.data || [];
+	const employees: Employee[] =
+		(employeeQuery.data as Employee[]).filter(
+			(employee) => employee.role !== Role.DEVELOPER
+		) || [];
 
 	const scheduleQuery = useQuery({
 		queryKey: ['schedules', formatDateToQueryKey(date)],
@@ -86,7 +89,10 @@ const AddSchedule: FC<AddScheduleProp> = ({
 		},
 		staleTime: Infinity,
 	});
-	const schedules: Schedule[] = scheduleQuery.data || [];
+	const schedules: Schedule[] =
+		(scheduleQuery.data as Schedule[]).filter(
+			(schedule) => schedule.employee.role !== Role.DEVELOPER
+		) || [];
 
 	const priorityDropDownItems = getPriorityDropDownItems(employees, schedules);
 

@@ -21,6 +21,8 @@ import { useTranslation } from 'react-i18next';
 import AddToggleSwitch, {
 	ToggleColor,
 } from '../../add/AddToggleSwitch.Component';
+import STORES from '../../../../../../constants/store.constants';
+import AddNumber from '../../add/AddNumber.Component';
 
 interface AddServiceProp {
 	setOpen(open: boolean): void;
@@ -42,7 +44,7 @@ const AddService: FC<AddServiceProp> = ({
 	const [bodyInput, setBodyInput] = useState<number | null>(0);
 	const [feetInput, setFeetInput] = useState<number | null>(0);
 	const [acupunctureInput, setAcupunctureInput] = useState<number | null>(0);
-	const [bedRequiredInput, setBedRequiredInput] = useState<boolean>(false);
+	const [bedsRequiredInput, setBedsRequiredInput] = useState<number | null>(0);
 	const [colorInput, setColorInput] = useState<ServiceColor | null>(null);
 
 	const [invalidServiceName, setInvalidServiceName] = useState<boolean>(false);
@@ -52,6 +54,8 @@ const AddService: FC<AddServiceProp> = ({
 	const [invalidBody, setInvalidBody] = useState<boolean>(false);
 	const [invalidFeet, setInvalidFeet] = useState<boolean>(false);
 	const [invalidAcupuncture, setInvalidAcupuncture] = useState<boolean>(false);
+	const [invalidBedsRequired, setInvalidBedsRequired] =
+		useState<boolean>(false);
 
 	const [missingRequiredInput, setMissingRequiredInput] =
 		useState<boolean>(true);
@@ -68,6 +72,7 @@ const AddService: FC<AddServiceProp> = ({
 			bodyInput === null ||
 			feetInput === null ||
 			acupunctureInput === null ||
+			bedsRequiredInput === null ||
 			colorInput === null;
 
 		setMissingRequiredInput(missingRequiredInput);
@@ -79,6 +84,7 @@ const AddService: FC<AddServiceProp> = ({
 		bodyInput,
 		feetInput,
 		acupunctureInput,
+		bedsRequiredInput,
 		colorInput,
 	]);
 
@@ -90,7 +96,8 @@ const AddService: FC<AddServiceProp> = ({
 			invalidMoney ||
 			invalidBody ||
 			invalidFeet ||
-			invalidAcupuncture;
+			invalidAcupuncture ||
+			invalidBedsRequired;
 
 		setInvalidInput(invalidInput);
 	}, [
@@ -101,6 +108,7 @@ const AddService: FC<AddServiceProp> = ({
 		invalidBody,
 		invalidFeet,
 		invalidAcupuncture,
+		invalidBedsRequired,
 	]);
 
 	const onAdd = async () => {
@@ -111,7 +119,7 @@ const AddService: FC<AddServiceProp> = ({
 		const body: number = bodyInput as number;
 		const feet: number = feetInput as number;
 		const acupuncture: number = acupunctureInput as number;
-		const bed_required: boolean = bedRequiredInput;
+		const beds_required: number = bedsRequiredInput as number;
 		const color: ServiceColor = colorInput as ServiceColor;
 
 		const addServiceRequest: AddServiceRequest = {
@@ -122,7 +130,7 @@ const AddService: FC<AddServiceProp> = ({
 			body,
 			feet,
 			acupuncture,
-			bed_required,
+			beds_required,
 			color,
 		};
 
@@ -244,15 +252,20 @@ const AddService: FC<AddServiceProp> = ({
 								}}
 							/>
 
-							<AddToggleSwitch
-								setChecked={setBedRequiredInput}
-								checked={bedRequiredInput}
-								falseText={'No Bed Required'}
-								trueText={'Bed Required'}
-								toggleColour={ToggleColor.GREEN}
-								label={LABELS.service.bed_required}
-								name={NAMES.service.bed_required}
-								disabled={false}
+							<AddNumber
+								input={bedsRequiredInput}
+								setInput={setBedsRequiredInput}
+								label={LABELS.service.beds_required}
+								name={NAMES.service.beds_required}
+								validationProp={{
+									max: STORES.beds,
+									required: true,
+									invalid: invalidBedsRequired,
+									setInvalid: setInvalidBedsRequired,
+									invalidMessage: ERRORS.service.beds_required.invalid,
+									requiredMessage: ERRORS.service.beds_required.required,
+								}}
+								placeholder={PLACEHOLDERS.service.beds_required}
 							/>
 
 							<AddDropDown

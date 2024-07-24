@@ -4,6 +4,7 @@ import { Dialog } from '@headlessui/react';
 import {
 	Gender,
 	Permissions,
+	Role,
 	TipMethod,
 } from '../../../../../../../models/enums';
 import { useUserContext } from '../../../../../BigFeet.Page';
@@ -179,7 +180,10 @@ const EditReservation: FC<EditReservationProp> = ({
 		queryFn: () => getEmployees(navigate),
 		enabled: employeeGettable,
 	});
-	const employees: Employee[] = employeeQuery.data || [];
+	const employees: Employee[] =
+		(employeeQuery.data as Employee[]).filter(
+			(employee) => employee.role !== Role.DEVELOPER
+		) || [];
 
 	const serviceQuery = useQuery({
 		queryKey: ['services'],
@@ -202,7 +206,10 @@ const EditReservation: FC<EditReservationProp> = ({
 		},
 		staleTime: 0,
 	});
-	const schedules: Schedule[] = scheduleQuery.data || [];
+	const schedules: Schedule[] =
+		(scheduleQuery.data as Schedule[]).filter(
+			(schedule) => schedule.employee.role !== Role.DEVELOPER
+		) || [];
 
 	const employeeDropDownItems = getEmployeeDropDownItems(employees);
 	const serviceDropDownItems = getServiceDropDownItems(services);
@@ -386,13 +393,13 @@ const EditReservation: FC<EditReservationProp> = ({
 							)
 					);
 
-				const bodyReservationsAtSameTime = reservationsAtSameTime.filter(
-					(reservation) => reservation.service.bed_required
-				);
-				if (
-					bodyReservationsAtSameTime.length >= STORES.beds &&
-					service.bed_required
-				) {
+				const bedsUsedAtSameTime = reservationsAtSameTime
+					.filter((reservation) => reservation.service.beds_required > 0)
+					.reduce(
+						(total, reservation) => total + reservation.service.beds_required,
+						0
+					);
+				if (bedsUsedAtSameTime + service.beds_required > STORES.beds) {
 					setNoBeds(true);
 					setOpenBedWarningModal(true);
 				} else {

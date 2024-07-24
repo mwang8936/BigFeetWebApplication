@@ -260,6 +260,15 @@ const ERRORS = {
 				},
 			},
 		},
+		beds_required: {
+			required: 'Beds Required cannot be empty.',
+			invalid: {
+				key: 'Beds Required Invalid',
+				value: {
+					max: STORES.beds,
+				},
+			},
+		},
 		color: {
 			required: 'A color must be selected.',
 		},
