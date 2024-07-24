@@ -99,6 +99,8 @@
     "Body Services": "已完成身体按摩",
     "Feet Services": "已完成足底按摩",
     "Acupuncture Services": "已完成针灸",
+    "Requested Services": "Requested Services",
+    "Holiday": "Holiday",
     "Tips: ": "小费: ",
     "No Tips": "无小费",
     "Invalid": "无效",
@@ -156,6 +158,8 @@
 
     "Change": "更换",
     "Cancel": "取消",
+    "Fill": "Fill",
+    "No remaining amount left.": "No remaining amount left.",
     "Add": "添加",
     "Edit": "编辑",
 
@@ -328,6 +332,7 @@
 
     "Select Start Time": "选择上班时间",
     "Select End Time": "选择下班时间",
+    "Select Priority": "Select Priority",
     "Is Working": "当班",
 
     "Serial": "卡号",

@@ -174,7 +174,7 @@ export default function Scheduler() {
 			queryClient.invalidateQueries({
 				queryKey: [
 					'schedules',
-					variables.request.reserved_date.toLocaleDateString(),
+					formatDateToQueryKey(variables.request.reserved_date),
 				],
 			});
 			queryClient.invalidateQueries({ queryKey: ['customers'] });

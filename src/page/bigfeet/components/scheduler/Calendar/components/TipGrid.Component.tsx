@@ -53,7 +53,7 @@ const TipGrid: FC<TipGridProp> = ({ row, colNum, reservations }) => {
 					gridColumnStart: colNum,
 					gridRowStart: row,
 				}}
-				className="border-slate-500 border-b border-r border-t-2 p-2 z-[2] bg-white hover:bg-slate-300 group overflow-visible">
+				className="relative border-slate-500 border-b border-r border-t-2 p-2 z-[2] bg-white hover:bg-slate-300 group overflow-visible">
 				<span>
 					{tipsText}
 					<span className="font-bold">{tipsTotalText}</span>
@@ -61,7 +61,7 @@ const TipGrid: FC<TipGridProp> = ({ row, colNum, reservations }) => {
 				<br />
 				<span className="font-bold">{`${tipsTotalText} X 90% = ${tipsPayoutText}`}</span>
 				{tipReservations.length > 0 && (
-					<span className="tips-tip group-hover:scale-100 z-[3]">
+					<span className="grid-tip group-hover:scale-100 z-[3]">
 						{tipsTexts}
 					</span>
 				)}

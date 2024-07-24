@@ -25,6 +25,7 @@ import {
 	AddVipPackageRequest,
 	UpdateVipPackageRequest,
 } from '../../../../../../models/requests/Vip-Package.Request.Model';
+import { doesDateOverlap } from '../../../../../../utils/date.utils';
 
 interface CalendarEmployeeColumnProp {
 	date: Date;
@@ -83,6 +84,26 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 			const gridDate = new Date(date);
 			gridDate.setHours(timeHourToNumber(timeArr[i - 2]));
 			gridDate.setMinutes(timeMinuteToNumber(timeArr[i - 2]));
+
+			const overlappingReservation = schedule?.reservations.find(
+				(reservation) => {
+					const startDate = reservation.reserved_date;
+					const endDate = new Date(
+						startDate.getTime() + reservation.service.time * 60000
+					);
+					return doesDateOverlap(gridDate, startDate, endDate);
+				}
+			);
+
+			if (overlappingReservation) {
+				const startDate = new Date(
+					overlappingReservation.reserved_date.getTime() +
+						overlappingReservation.service.time * 60000
+				);
+				gridDate.setHours(startDate.getHours());
+				gridDate.setMinutes(startDate.getMinutes());
+			}
+
 			const grid = (
 				<CalendarGrid
 					key={`row-${i} col-${colNum}`}

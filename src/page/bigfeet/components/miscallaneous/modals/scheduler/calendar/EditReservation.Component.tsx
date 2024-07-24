@@ -53,6 +53,7 @@ import { getProfileSchedules } from '../../../../../../../service/profile.servic
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
 import Schedule from '../../../../../../../models/Schedule.Model';
 import { formatDateToQueryKey } from '../../../../../../../utils/string.utils';
+import EditablePayRateAutomatic from '../../../editable/EditablePayRateAutomatic.Component';
 
 interface EditReservationProp {
 	setOpen(open: boolean): void;
@@ -508,6 +509,17 @@ const EditReservation: FC<EditReservationProp> = ({
 		setOpen(false);
 	};
 
+	const remainingAmount = Number(
+		(
+			reservation.service.money -
+			(cashInput ?? 0) -
+			(machineInput ?? 0) -
+			(vipInput ?? 0) -
+			(giftCardInput ?? 0) -
+			(insuranceInput ?? 0)
+		).toFixed(2)
+	);
+
 	return (
 		<>
 			<div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
@@ -657,9 +669,11 @@ const EditReservation: FC<EditReservationProp> = ({
 								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
-							<EditablePayRate
+							<EditablePayRateAutomatic
 								originalAmount={reservation.cash}
 								amount={cashInput}
+								remainingAmount={remainingAmount}
+								roundToTheNearestDollar={true}
 								setAmount={setCashInput}
 								label={LABELS.reservation.cash}
 								name={NAMES.reservation.cash}
@@ -675,9 +689,11 @@ const EditReservation: FC<EditReservationProp> = ({
 								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
-							<EditablePayRate
+							<EditablePayRateAutomatic
 								originalAmount={reservation.machine}
 								amount={machineInput}
+								remainingAmount={remainingAmount}
+								roundToTheNearestDollar={false}
 								setAmount={setMachineInput}
 								label={LABELS.reservation.machine}
 								name={NAMES.reservation.machine}
@@ -693,9 +709,11 @@ const EditReservation: FC<EditReservationProp> = ({
 								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
-							<EditablePayRate
+							<EditablePayRateAutomatic
 								originalAmount={reservation.vip}
 								amount={vipInput}
+								remainingAmount={remainingAmount}
+								roundToTheNearestDollar={false}
 								setAmount={setVipInput}
 								label={LABELS.reservation.vip}
 								name={NAMES.reservation.vip}
@@ -711,9 +729,11 @@ const EditReservation: FC<EditReservationProp> = ({
 								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
-							<EditablePayRate
+							<EditablePayRateAutomatic
 								originalAmount={reservation.gift_card}
 								amount={giftCardInput}
+								remainingAmount={remainingAmount}
+								roundToTheNearestDollar={false}
 								setAmount={setGiftCardInput}
 								label={LABELS.reservation.gift_card}
 								name={NAMES.reservation.gift_card}
@@ -729,9 +749,11 @@ const EditReservation: FC<EditReservationProp> = ({
 								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
-							<EditablePayRate
+							<EditablePayRateAutomatic
 								originalAmount={reservation.insurance}
 								amount={insuranceInput}
+								remainingAmount={remainingAmount}
+								roundToTheNearestDollar={false}
 								setAmount={setInsuranceInput}
 								label={LABELS.reservation.insurance}
 								name={NAMES.reservation.insurance}
@@ -746,6 +768,12 @@ const EditReservation: FC<EditReservationProp> = ({
 								editable={editable}
 								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
+
+							{remainingAmount > 0 && (
+								<p className="error-label mb-4">
+									{`Total Amount Missing: \$${remainingAmount.toFixed(2)}`}
+								</p>
+							)}
 
 							<EditableDropDown
 								originalOption={

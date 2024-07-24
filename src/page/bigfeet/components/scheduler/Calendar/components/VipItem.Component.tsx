@@ -37,7 +37,7 @@ const VipItem: FC<VipItemProp> = ({
 			</span>
 			<span>
 				<span className="font-bold me-1">{t('Total')}:</span>$
-				{vipPackage.amount}
+				{vipPackage.sold_amount}
 			</span>
 			{/* <span className="grid grid-flow-col">
 				{vipPackage.schedules.map((schedule) => (

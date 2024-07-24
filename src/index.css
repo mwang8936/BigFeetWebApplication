@@ -142,18 +142,8 @@
     bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-top
   }
 
-  .total-tip {
-    @apply absolute w-[178px] h-auto p-2 mx-auto bottom-[13%] rounded-md shadow-md text-white flex flex-col
-    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom
-  }
-
-  .tips-tip {
-    @apply absolute w-[178px] h-auto p-2 mx-auto bottom-[10%] rounded-md shadow-md text-white flex flex-col
-    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom
-  }
-
-  .vip-tip {
-    @apply absolute w-[178px] h-auto p-2 mx-auto bottom-[5%] rounded-md shadow-md text-white flex flex-col
+  .grid-tip {
+    @apply absolute w-[178px] h-auto p-2 mx-auto bottom-[100%] rounded-md shadow-md text-white flex flex-col
     bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom
   }
 }

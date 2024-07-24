@@ -13,6 +13,18 @@ import EditBottom from '../../EditBottom.Component';
 import EditableTime from '../../../editable/EditableTime.Component';
 import EditableToggleSwitch from '../../../editable/EditableToggleSwitch.Component';
 import { useTranslation } from 'react-i18next';
+import Employee from '../../../../../../../models/Employee.Model';
+import { useUserContext } from '../../../../../BigFeet.Page';
+import { Permissions } from '../../../../../../../models/enums';
+import { getEmployees } from '../../../../../../../service/employee.service';
+import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { formatDateToQueryKey } from '../../../../../../../utils/string.utils';
+import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
+import { getSchedules } from '../../../../../../../service/schedule.service';
+import { getProfileSchedules } from '../../../../../../../service/profile.service';
+import { getPriorityDropDownItems } from '../../../../../../../constants/drop-down.constants';
+import EditableDropDown from '../../../editable/EditableDropDown.Component';
 
 interface EditScheduleProp {
 	setOpen(open: boolean): void;
@@ -32,7 +44,11 @@ const EditSchedule: FC<EditScheduleProp> = ({
 	onEditSchedule,
 }) => {
 	const { t } = useTranslation();
+	const navigate = useNavigate();
 
+	const [priorityInput, setPriorityInput] = useState<number | null>(
+		schedule.priority
+	);
 	const [startInput, setStartInput] = useState<Date | null>(schedule.start);
 	const [endInput, setEndInput] = useState<Date | null>(schedule.end);
 	const [isWorkingInput, setIsWorkingInput] = useState<boolean>(
@@ -44,6 +60,46 @@ const EditSchedule: FC<EditScheduleProp> = ({
 
 	const [changesMade, setChangesMade] = useState<boolean>(false);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
+
+	const { user } = useUserContext();
+
+	const employeeGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_EMPLOYEE
+	);
+	const scheduleGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_SCHEDULE
+	);
+
+	const employeeQuery = useQuery({
+		queryKey: ['employees'],
+		queryFn: () => getEmployees(navigate),
+		enabled: employeeGettable,
+		staleTime: Infinity,
+	});
+	const employees: Employee[] = employeeQuery.data || [];
+
+	const scheduleQuery = useQuery({
+		queryKey: ['schedules', formatDateToQueryKey(schedule.date)],
+		queryFn: () => {
+			if (scheduleGettable) {
+				return getSchedules(navigate, {
+					start: schedule.date,
+					end: schedule.date,
+				});
+			} else {
+				return getProfileSchedules(navigate);
+			}
+		},
+		staleTime: Infinity,
+	});
+	const schedules: Schedule[] = scheduleQuery.data || [];
+
+	const priorityDropDownItems = getPriorityDropDownItems(
+		employees,
+		schedules.filter(
+			(filteredSchedule) => filteredSchedule.priority !== schedule.priority
+		)
+	);
 
 	useEffect(() => {
 		const start: Date | null | undefined =
@@ -58,14 +114,19 @@ const EditSchedule: FC<EditScheduleProp> = ({
 				: endInput === schedule.end
 				? undefined
 				: endInput;
+		const priority: number | null | undefined =
+			priorityInput === schedule.priority ? undefined : priorityInput;
 		const is_working: boolean | undefined =
 			isWorkingInput === schedule.is_working ? undefined : isWorkingInput;
 
 		const changesMade =
-			start !== undefined || end !== undefined || is_working !== undefined;
+			start !== undefined ||
+			end !== undefined ||
+			priority !== undefined ||
+			is_working !== undefined;
 
 		setChangesMade(changesMade);
-	}, [startInput, endInput, isWorkingInput]);
+	}, [startInput, endInput, priorityInput, isWorkingInput]);
 
 	useEffect(() => {
 		const invalidInput = invalidStart || invalidEnd;
@@ -77,17 +138,31 @@ const EditSchedule: FC<EditScheduleProp> = ({
 		if (startInput === null || invalidStart) {
 			setEndInput(null);
 			setInvalidEnd(false);
-		} else {
-			setEndInput(schedule.start);
 		}
 	}, [startInput, invalidStart]);
 
 	const onEdit = () => {
+		const start: Date | null | undefined =
+			startInput && schedule.start && sameTime(startInput, schedule.start)
+				? undefined
+				: startInput === schedule.start
+				? undefined
+				: startInput;
+		const end: Date | null | undefined =
+			endInput && schedule.end && sameTime(endInput, schedule.end)
+				? undefined
+				: endInput === schedule.end
+				? undefined
+				: endInput;
+		const priority: number | null | undefined =
+			priorityInput === schedule.priority ? undefined : priorityInput;
 		const is_working: boolean | undefined =
 			isWorkingInput === schedule.is_working ? undefined : isWorkingInput;
+
 		const updateScheduleRequest: UpdateScheduleRequest = {
-			start: startInput,
-			end: endInput,
+			...(start !== undefined && { start }),
+			...(end !== undefined && { end }),
+			...(priority !== undefined && { priority }),
 			...(is_working !== undefined && { is_working }),
 		};
 
@@ -116,6 +191,32 @@ const EditSchedule: FC<EditScheduleProp> = ({
 							{t('Edit Schedule')}
 						</Dialog.Title>
 						<div className="mt-2">
+							<EditableDropDown
+								originalOption={
+									priorityDropDownItems[
+										priorityDropDownItems.findIndex(
+											(option) => option.id === schedule.priority
+										) || 0
+									]
+								}
+								option={
+									priorityDropDownItems[
+										priorityDropDownItems.findIndex(
+											(option) => option.id === priorityInput
+										) || 0
+									]
+								}
+								options={priorityDropDownItems}
+								setOption={(option) => {
+									setPriorityInput(option.id as number | null);
+								}}
+								label={LABELS.schedule.priority}
+								validationProp={{
+									required: false,
+								}}
+								editable={editable}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+							/>
 							<EditableTime
 								originalTime={schedule.start}
 								time={startInput}

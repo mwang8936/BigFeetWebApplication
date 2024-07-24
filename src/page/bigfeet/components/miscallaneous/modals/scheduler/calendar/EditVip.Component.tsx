@@ -49,7 +49,7 @@ const EditVip: FC<EditVipProp> = ({
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
 	const [amountInput, setAmountInput] = useState<number | null>(
-		vipPackage.amount
+		vipPackage.sold_amount
 	);
 	const [employeesInput, setEmployeesInput] = useState<number[]>(
 		vipPackage.schedules.map((schedule) => schedule.employee_audit_id)
@@ -68,7 +68,7 @@ const EditVip: FC<EditVipProp> = ({
 
 	useEffect(() => {
 		const amount: number | null | undefined =
-			amountInput === vipPackage.amount ? undefined : amountInput;
+			amountInput === vipPackage.sold_amount ? undefined : amountInput;
 		const employee_ids: number[] | undefined = arraysHaveSameContent(
 			employeesInput,
 			vipPackage.schedules.map((schedule) => schedule.employee_audit_id)
@@ -92,7 +92,9 @@ const EditVip: FC<EditVipProp> = ({
 
 	const onEdit = () => {
 		const amount: number | undefined =
-			amountInput === vipPackage.amount ? undefined : (amountInput as number);
+			amountInput === vipPackage.sold_amount
+				? undefined
+				: (amountInput as number);
 		const employee_ids: number[] | undefined = arraysHaveSameContent(
 			employeesInput,
 			vipPackage.schedules.map((schedule) => schedule.employee_audit_id)
@@ -101,7 +103,7 @@ const EditVip: FC<EditVipProp> = ({
 			: (employeesInput as number[]);
 
 		const editVipPackageRequest: UpdateVipPackageRequest = {
-			...(amount && { amount }),
+			...(amount && { sold_amount: amount }),
 			...(employee_ids && { date }),
 			...(employee_ids && { employee_ids }),
 		};
@@ -133,7 +135,7 @@ const EditVip: FC<EditVipProp> = ({
 						</Dialog.Title>
 						<div className="mt-2">
 							<EditablePayRate
-								originalAmount={vipPackage.amount}
+								originalAmount={vipPackage.sold_amount}
 								amount={amountInput}
 								setAmount={setAmountInput}
 								label={LABELS.vip_package.amount}

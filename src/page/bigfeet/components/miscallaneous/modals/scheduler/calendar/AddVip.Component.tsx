@@ -63,7 +63,7 @@ const AddVip: FC<AddVipProp> = ({ setOpen, creatable, onAddVipPackage }) => {
 
 		const addVipPackageRequest: AddVipPackageRequest = {
 			serial,
-			amount,
+			sold_amount: amount,
 			date,
 			employee_ids,
 		};

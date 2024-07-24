@@ -1,3 +1,5 @@
+import HOLIDAYS from '../constants/holiday.constants';
+
 export function sameDate(date1: Date, date2: Date): boolean {
 	return (
 		date1.getFullYear() == date2.getFullYear() &&
@@ -75,4 +77,16 @@ export function doesDateOverlap(
 			targetDateTrimmed <= endDateTrimmed
 		);
 	}
+}
+
+export function isHoliday(date: Date): boolean {
+	const year = date.getFullYear();
+	if (HOLIDAYS[year]) {
+		return HOLIDAYS[year].some(
+			(holiday) =>
+				holiday.getDate() === date.getDate() &&
+				holiday.getMonth() === date.getMonth()
+		);
+	}
+	return false;
 }

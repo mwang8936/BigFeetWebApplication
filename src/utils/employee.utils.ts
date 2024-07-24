@@ -19,6 +19,13 @@ export const sortEmployees = (
 				schedule.employee.employee_id === b.employee_id
 		);
 
+		if (aSchedule?.priority && bSchedule?.priority) {
+			return aSchedule.priority - bSchedule.priority;
+		}
+
+		if (aSchedule?.priority) return -1;
+		if (bSchedule?.priority) return 1;
+
 		const aIsWorking = aSchedule?.is_working ? -1 : 1;
 		const bIsWorking = bSchedule?.is_working ? -1 : 1;
 

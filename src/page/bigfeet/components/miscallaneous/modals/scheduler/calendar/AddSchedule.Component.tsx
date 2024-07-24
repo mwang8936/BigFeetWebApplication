@@ -12,6 +12,18 @@ import STORES from '../../../../../../../constants/store.constants';
 import { PlusCircleIcon } from '@heroicons/react/20/solid';
 import AddBottom from '../../AddBottom.Component';
 import { useTranslation } from 'react-i18next';
+import AddDropDown from '../../../add/AddDropDown.Component';
+import { useQuery } from '@tanstack/react-query';
+import { getEmployees } from '../../../../../../../service/employee.service';
+import { useNavigate } from 'react-router-dom';
+import { useUserContext } from '../../../../../BigFeet.Page';
+import { Permissions } from '../../../../../../../models/enums';
+import Employee from '../../../../../../../models/Employee.Model';
+import { formatDateToQueryKey } from '../../../../../../../utils/string.utils';
+import { getProfileSchedules } from '../../../../../../../service/profile.service';
+import { getSchedules } from '../../../../../../../service/schedule.service';
+import Schedule from '../../../../../../../models/Schedule.Model';
+import { getPriorityDropDownItems } from '../../../../../../../constants/drop-down.constants';
 
 interface AddScheduleProp {
 	setOpen(open: boolean): void;
@@ -29,7 +41,9 @@ const AddSchedule: FC<AddScheduleProp> = ({
 	onAddSchedule,
 }) => {
 	const { t } = useTranslation();
+	const navigate = useNavigate();
 
+	const [priorityInput, setPriorityInput] = useState<number | null>(null);
 	const [startInput, setStartInput] = useState<Date | null>(null);
 	const [endInput, setEndInput] = useState<Date | null>(null);
 	const [isWorkingInput, setIsWorkingInput] = useState<boolean>(true);
@@ -40,6 +54,41 @@ const AddSchedule: FC<AddScheduleProp> = ({
 	const [missingRequiredInput, setMissingRequiredInput] =
 		useState<boolean>(false);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
+
+	const { user } = useUserContext();
+
+	const employeeGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_EMPLOYEE
+	);
+	const scheduleGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_SCHEDULE
+	);
+
+	const employeeQuery = useQuery({
+		queryKey: ['employees'],
+		queryFn: () => getEmployees(navigate),
+		enabled: employeeGettable,
+		staleTime: Infinity,
+	});
+	const employees: Employee[] = employeeQuery.data || [];
+
+	const scheduleQuery = useQuery({
+		queryKey: ['schedules', formatDateToQueryKey(date)],
+		queryFn: () => {
+			if (scheduleGettable) {
+				return getSchedules(navigate, {
+					start: date,
+					end: date,
+				});
+			} else {
+				return getProfileSchedules(navigate);
+			}
+		},
+		staleTime: Infinity,
+	});
+	const schedules: Schedule[] = scheduleQuery.data || [];
+
+	const priorityDropDownItems = getPriorityDropDownItems(employees, schedules);
 
 	useEffect(() => {
 		const missingRequiredInput = !isWorkingInput;
@@ -63,13 +112,15 @@ const AddSchedule: FC<AddScheduleProp> = ({
 	const onAdd = () => {
 		const start: Date | undefined = startInput || undefined;
 		const end: Date | undefined = endInput || undefined;
+		const priority: number | undefined = priorityInput || undefined;
 		const is_working: boolean = isWorkingInput;
 
 		const addScheduleRequest: AddScheduleRequest = {
 			date,
 			employee_id: employeeId,
-			...(start && { start }),
-			...(end && { end }),
+			...(start !== undefined && { start }),
+			...(end !== undefined && { end }),
+			...(priority !== undefined && { priority }),
 			is_working,
 		};
 		onAddSchedule(addScheduleRequest);
@@ -93,6 +144,23 @@ const AddSchedule: FC<AddScheduleProp> = ({
 							{t('Add Schedule')}
 						</Dialog.Title>
 						<div className="mt-2">
+							<AddDropDown
+								option={
+									priorityDropDownItems[
+										priorityDropDownItems.findIndex(
+											(option) => option.id === priorityInput
+										) || 0
+									]
+								}
+								options={priorityDropDownItems}
+								setOption={(option) => {
+									setPriorityInput(option.id as number | null);
+								}}
+								label={LABELS.schedule.priority}
+								validationProp={{
+									required: false,
+								}}
+							/>
 							<AddTime
 								time={startInput}
 								setTime={setStartInput}

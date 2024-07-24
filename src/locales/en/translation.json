@@ -99,6 +99,8 @@
     "Body Services": "Body Services",
     "Feet Services": "Feet Services",
     "Acupuncture Services": "Acupuncture Services",
+    "Requested Services": "Requested Services",
+    "Holiday": "Holiday",
     "Tips: ": "Tips: ",
     "No Tips": "No Tips",
     "Invalid": "Invalid",
@@ -156,6 +158,8 @@
 
     "Change": "Change",
     "Cancel": "Cancel",
+    "Fill": "Fill",
+    "No remaining amount left.": "No remaining amount left.",
     "Add": "Add",
     "Edit": "Edit",
 
@@ -329,6 +333,7 @@
 
     "Select Start Time": "Select Start Time",
     "Select End Time": "Select End Time",
+    "Select Priority": "Select Priority",
     "Is Working": "Is Working",
 
     "Serial": "Serial",

@@ -31,6 +31,7 @@ const NAMES = {
 		message: 'message',
 	},
 	schedule: {
+		priority: 'priority',
 		is_working: 'is_working',
 		sign_off: 'sign_off',
 	},

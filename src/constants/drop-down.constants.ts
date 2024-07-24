@@ -23,6 +23,7 @@ import CanadaFlagIcon from '../assets/Canada_Flag.png';
 import ChinaFlagIcon from '../assets/China_Flag.png';
 import Service from '../models/Service.Model';
 import VipPackage from '../models/Vip-Package.Model';
+import Schedule from '../models/Schedule.Model';
 
 export const colorDropDownItems = [
 	{ id: null, name: 'No Color Selected' },
@@ -115,7 +116,30 @@ export const getVipPackageDropDownItems = (vipPackages: VipPackage[]) => {
 	const nullObject = { id: null, name: 'No Vip Package Selected' };
 	const vipPackageDropDownItems = vipPackages.map((vipPackage) => ({
 		id: vipPackage.serial,
-		name: `${vipPackage.serial} (${vipPackage.amount})`,
+		name: `${vipPackage.serial} (${vipPackage.sold_amount})`,
 	}));
 	return [nullObject, ...vipPackageDropDownItems];
+};
+
+export const getPriorityDropDownItems = (
+	employees: Employee[],
+	schedules: Schedule[]
+) => {
+	const nullObject = { id: null, name: 'No Priority Selected' };
+
+	const takenPriorities: number[] = schedules
+		.map((schedule) => schedule.priority)
+		.filter((priority) => priority !== null) as number[];
+
+	const priorityDropDownItems: { id: null | number; name: string }[] = [
+		nullObject,
+	];
+
+	for (let i = 1; i <= employees.length; i++) {
+		if (!takenPriorities.includes(i)) {
+			priorityDropDownItems.push({ id: i, name: i.toString() });
+		}
+	}
+
+	return priorityDropDownItems;
 };

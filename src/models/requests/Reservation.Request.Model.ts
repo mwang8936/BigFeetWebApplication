@@ -11,6 +11,8 @@ export interface UpdateReservationRequest {
 	requested_employee?: boolean;
 	cash?: number | null;
 	machine?: number | null;
+	gift_card?: number | null;
+	insurance?: number | null;
 	vip?: number | null;
 	tips?: number | null;
 	tip_method?: TipMethod | null;

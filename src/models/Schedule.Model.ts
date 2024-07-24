@@ -8,6 +8,7 @@ export default interface Schedule {
 	is_working: boolean;
 	start: Date | null;
 	end: Date | null;
+	priority: number | null;
 	reservations: Reservation[];
 	vip_packages: VipPackage[];
 	signed: boolean;

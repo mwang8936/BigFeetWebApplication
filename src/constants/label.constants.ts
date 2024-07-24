@@ -42,6 +42,7 @@ const LABELS = {
 	schedule: {
 		start: 'Select Start Time',
 		end: 'Select End Time',
+		priority: 'Select Priority',
 		is_working: 'Is Working',
 		filter: 'Select Date',
 	},
