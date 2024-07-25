@@ -77,10 +77,9 @@ const MoveReservation: FC<MoveReservationProp> = ({
 		queryFn: () => getEmployees(navigate),
 		enabled: employeeGettable,
 	});
-	const employees: Employee[] =
-		(employeeQuery.data as Employee[]).filter(
-			(employee) => employee.role !== Role.DEVELOPER
-		) || [];
+	const employees: Employee[] = (
+		(employeeQuery.data as Employee[]) || []
+	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	const scheduleQuery = useQuery({
 		queryKey: ['schedules', formatDateToQueryKey(date)],
@@ -97,10 +96,9 @@ const MoveReservation: FC<MoveReservationProp> = ({
 		enabled: scheduleGettable,
 		staleTime: Infinity,
 	});
-	const schedules: Schedule[] =
-		(scheduleQuery.data as Schedule[]).filter(
-			(schedule) => schedule.employee.role !== Role.DEVELOPER
-		) || [];
+	const schedules: Schedule[] = (
+		(scheduleQuery.data as Schedule[]) || []
+	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
 	const prevEmployeeUsername = employees.find(
 		(employee) => employee.employee_id === reservation.employee_id

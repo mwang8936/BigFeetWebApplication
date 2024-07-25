@@ -279,8 +279,10 @@
 
     "Serial cannot be empty.": "Serial cannot be empty.",
     "Serial Invalid": "Serial must be {{length}} digits.",
-    "Amount cannot be empty.": "Amount cannot be empty.",
-    "Amount Invalid": "Amount must be between $0.01-{{max}} and limited to 2 decimal places.",
+    "Sold Amount cannot be empty.": "Sold Amount cannot be empty.",
+    "Sold Amount Invalid": "Sold Amount must be between $0.01-{{max}} and limited to 2 decimal places.",
+    "Commission Amount cannot be empty.": "Commission Amount cannot be empty.",
+    "Commission Amount Invalid": "Commission Amount must be between $0.01-{{max}} and limited to 2 decimal places.",
     "You do not have permissions to get vip packages.": "You do not have permissions to get vip packages.",
     "You do not have permissions to edit vip packages.": "You do not have permissions to edit vip packages.",
     "You do not have permissions to add vip packages.": "You do not have permissions to add vip packages.",
@@ -337,7 +339,8 @@
     "Is Working": "当班",
 
     "Serial": "卡号",
-    "Amount": "金额",
+    "Sold Amount": "Sold Amount",
+    "Commission Amount": "Commission Amount",
     
     "Service Name": "服务项目名称",
     "Shorthand": "简称",

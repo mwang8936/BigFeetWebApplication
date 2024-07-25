@@ -37,7 +37,8 @@ const PLACEHOLDERS = {
 	},
 	vip_package: {
 		serial: '123456',
-		amount: '1000.00',
+		sold_amount: '1000.00',
+		commission_amount: '100.00',
 		employee_ids: 'Select Employees',
 	},
 };

@@ -7,6 +7,10 @@ import { useTranslation } from 'react-i18next';
 import VipPackage from '../../../../../../../models/Vip-Package.Model';
 import { useUserContext } from '../../../../../BigFeet.Page';
 import Employee from '../../../../../../../models/Employee.Model';
+import { Permissions, Role } from '../../../../../../../models/enums';
+import { useQuery } from '@tanstack/react-query';
+import { getEmployees } from '../../../../../../../service/employee.service';
+import { useNavigate } from 'react-router-dom';
 
 interface DeleteVipProp {
 	setOpen(open: boolean): void;
@@ -22,8 +26,22 @@ const DeleteVip: FC<DeleteVipProp> = ({
 	onDeleteVipPackage,
 }) => {
 	const { t } = useTranslation();
+	const navigate = useNavigate();
 
-	// const { employees } = useEmployeesContext();
+	const { user } = useUserContext();
+
+	const employeeGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_EMPLOYEE
+	);
+
+	const employeeQuery = useQuery({
+		queryKey: ['employees'],
+		queryFn: () => getEmployees(navigate),
+		enabled: employeeGettable,
+	});
+	const employees: Employee[] = (
+		(employeeQuery.data as Employee[]) || []
+	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	const onDelete = () => {
 		onDeleteVipPackage(vipPackage.serial);
@@ -60,15 +78,14 @@ const DeleteVip: FC<DeleteVipProp> = ({
 							<br />
 							<br />
 							<strong>
-								{/* {vipPackage.schedules
-									.map((schedule) => schedule.employee_audit_id)
+								{vipPackage.employee_ids
 									.map(
 										(employee_id) =>
 											employees.find(
 												(employee) => employee.employee_id === employee_id
 											)?.username || ''
 									)
-									.join(', ')} */}
+									.join(', ')}
 							</strong>
 						</div>
 					</div>

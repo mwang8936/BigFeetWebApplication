@@ -17,6 +17,10 @@ import AddMultiSelect from '../../../add/AddMultiSelect.Component';
 import AddPayRate from '../../../add/AddPayRate.Component';
 import NUMBERS from '../../../../../../../constants/numbers.constants';
 import PATTERNS from '../../../../../../../constants/patterns.constants';
+import { Permissions, Role } from '../../../../../../../models/enums';
+import { useQuery } from '@tanstack/react-query';
+import { getEmployees } from '../../../../../../../service/employee.service';
+import { useNavigate } from 'react-router-dom';
 
 interface AddVipProp {
 	setOpen(open: boolean): void;
@@ -26,44 +30,72 @@ interface AddVipProp {
 
 const AddVip: FC<AddVipProp> = ({ setOpen, creatable, onAddVipPackage }) => {
 	const { t } = useTranslation();
+	const navigate = useNavigate();
 
 	const [serialInput, setSerialInput] = useState<string | null>(null);
-	const [amountInput, setAmountInput] = useState<number | null>(null);
+	const [soldAmountInput, setSoldAmountInput] = useState<number | null>(null);
 	const [employeesInput, setEmployeesInput] = useState<number[]>([]);
+	const [commissionAmountInput, setCommissionAmountInput] = useState<
+		number | null
+	>(null);
 
 	const [invalidSerial, setInvalidSerial] = useState<boolean>(false);
-	const [invalidAmount, setInvalidAmount] = useState<boolean>(false);
+	const [invalidSoldAmount, setInvalidSoldAmount] = useState<boolean>(false);
+	const [invalidCommissionAmount, setInvalidCommissionAmount] =
+		useState<boolean>(false);
 
 	const [missingRequiredInput, setMissingRequiredInput] =
 		useState<boolean>(true);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
-	// const { employees } = useEmployeesContext();
+	const { user } = useUserContext();
 	const { date } = useScheduleDateContext();
+
+	const employeeGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_EMPLOYEE
+	);
+
+	const employeeQuery = useQuery({
+		queryKey: ['employees'],
+		queryFn: () => getEmployees(navigate),
+		enabled: employeeGettable,
+	});
+	const employees: Employee[] = (
+		(employeeQuery.data as Employee[]) || []
+	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	useEffect(() => {
 		const missingRequiredInput =
 			serialInput === null ||
-			amountInput === null ||
-			employeesInput.length === 0;
+			soldAmountInput === null ||
+			employeesInput.length === 0 ||
+			commissionAmountInput === null;
 
 		setMissingRequiredInput(missingRequiredInput);
-	}, [serialInput, employeesInput.length, amountInput]);
+	}, [
+		serialInput,
+		soldAmountInput,
+		employeesInput.length,
+		commissionAmountInput,
+	]);
 
 	useEffect(() => {
-		const invalidInput = invalidSerial || invalidAmount;
+		const invalidInput =
+			invalidSerial || invalidSoldAmount || invalidCommissionAmount;
 
 		setInvalidInput(invalidInput);
 	}, [invalidSerial, invalidInput]);
 
 	const onAdd = () => {
 		const serial = serialInput as string;
-		const amount = amountInput as number;
+		const sold_amount = soldAmountInput as number;
 		const employee_ids = employeesInput;
+		const commission_amount = commissionAmountInput as number;
 
 		const addVipPackageRequest: AddVipPackageRequest = {
 			serial,
-			sold_amount: amount,
+			sold_amount,
+			commission_amount,
 			date,
 			employee_ids,
 		};
@@ -108,22 +140,22 @@ const AddVip: FC<AddVipProp> = ({ setOpen, creatable, onAddVipPackage }) => {
 							/>
 
 							<AddPayRate
-								amount={amountInput}
-								setAmount={setAmountInput}
-								label={LABELS.vip_package.amount}
-								name={NAMES.vip_package.amount}
+								amount={soldAmountInput}
+								setAmount={setSoldAmountInput}
+								label={LABELS.vip_package.sold_amount}
+								name={NAMES.vip_package.sold_amount}
 								validationProp={{
-									max: NUMBERS.vip_package.amount,
+									max: NUMBERS.vip_package.sold_amount,
 									required: true,
-									requiredMessage: ERRORS.vip_package.amount.required,
-									invalid: invalidAmount,
-									setInvalid: setInvalidAmount,
-									invalidMessage: ERRORS.vip_package.amount.invalid,
+									requiredMessage: ERRORS.vip_package.sold_amount.required,
+									invalid: invalidSoldAmount,
+									setInvalid: setInvalidSoldAmount,
+									invalidMessage: ERRORS.vip_package.sold_amount.invalid,
 								}}
-								placeholder={PLACEHOLDERS.employee.body_rate}
+								placeholder={PLACEHOLDERS.vip_package.sold_amount}
 							/>
 
-							{/* <AddMultiSelect
+							<AddMultiSelect
 								options={employees.map((employee) => ({
 									value: employee.employee_id,
 									label: employee.username,
@@ -142,7 +174,24 @@ const AddVip: FC<AddVipProp> = ({ setOpen, creatable, onAddVipPackage }) => {
 								label={LABELS.vip_package.employee_ids}
 								name={NAMES.vip_package.employee_ids}
 								placeholder={PLACEHOLDERS.vip_package.employee_ids}
-							/> */}
+							/>
+
+							<AddPayRate
+								amount={commissionAmountInput}
+								setAmount={setCommissionAmountInput}
+								label={LABELS.vip_package.commission_amount}
+								name={NAMES.vip_package.commission_amount}
+								validationProp={{
+									max: NUMBERS.vip_package.commission_amount,
+									required: true,
+									requiredMessage:
+										ERRORS.vip_package.commission_amount.required,
+									invalid: invalidCommissionAmount,
+									setInvalid: setInvalidCommissionAmount,
+									invalidMessage: ERRORS.vip_package.commission_amount.invalid,
+								}}
+								placeholder={PLACEHOLDERS.vip_package.commission_amount}
+							/>
 						</div>
 					</div>
 				</div>

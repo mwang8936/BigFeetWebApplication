@@ -128,10 +128,9 @@ const AddReservation: FC<AddReservationProp> = ({
 		queryFn: () => getEmployees(navigate),
 		enabled: employeeGettable,
 	});
-	const employees: Employee[] =
-		(employeeQuery.data as Employee[]).filter(
-			(employee) => employee.role !== Role.DEVELOPER
-		) || [];
+	const employees: Employee[] = (
+		(employeeQuery.data as Employee[]) || []
+	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	const serviceQuery = useQuery({
 		queryKey: ['services'],
@@ -158,10 +157,9 @@ const AddReservation: FC<AddReservationProp> = ({
 	const employeeDropDownItems = getEmployeeDropDownItems(employees);
 	const serviceDropDownItems = getServiceDropDownItems(services);
 
-	const schedules: Schedule[] =
-		(scheduleQuery.data as Schedule[]).filter(
-			(schedule) => schedule.employee.role !== Role.DEVELOPER
-		) || [];
+	const schedules: Schedule[] = (
+		(scheduleQuery.data as Schedule[]) || []
+	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
 	useEffect(() => {
 		const missingCustomerInput =

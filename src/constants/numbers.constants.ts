@@ -21,7 +21,8 @@ const NUMBERS = {
 		acupuncture: 9.9,
 	},
 	vip_package: {
-		amount: 999999.99,
+		sold_amount: 999999.99,
+		commission_amount: 999999.99,
 	},
 };
 

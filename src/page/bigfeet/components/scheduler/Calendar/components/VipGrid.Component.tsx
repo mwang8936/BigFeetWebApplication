@@ -48,9 +48,7 @@ const VipGrid: FC<VipGridProp> = ({
 						<strong key={vipPackage.serial}>
 							{vipPackage.serial}
 							<span className="font-normal">{`($${
-								vipPackage.schedules.length > 0
-									? vipPackage.sold_amount / vipPackage.schedules.length
-									: vipPackage.sold_amount
+								vipPackage.commission_amount / vipPackage.employee_ids.length
 							})`}</span>
 						</strong>
 					))}
@@ -61,9 +59,7 @@ const VipGrid: FC<VipGridProp> = ({
 							<strong key={vipPackage.serial}>
 								{vipPackage.serial}
 								<span className="font-normal">{`($${
-									vipPackage.schedules.length > 0
-										? vipPackage.sold_amount / vipPackage.schedules.length
-										: vipPackage.sold_amount
+									vipPackage.commission_amount / vipPackage.employee_ids.length
 								})`}</span>
 							</strong>
 						))}

@@ -146,18 +146,16 @@ export default function Scheduler() {
 		},
 		staleTime: 0,
 	});
-	const schedules: Schedule[] =
-		(scheduleQuery.data as Schedule[]).filter(
-			(schedule) => schedule.employee.role !== Role.DEVELOPER
-		) || [];
+	const schedules: Schedule[] = (
+		(scheduleQuery.data as Schedule[]) || []
+	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
 	let employeeList: Employee[] = [];
 
 	try {
-		const employees: Employee[] =
-			(employeeQuery.data as Employee[]).filter(
-				(employee) => employee.role !== Role.DEVELOPER
-			) || [];
+		const employees: Employee[] = (
+			(employeeQuery.data as Employee[]) || []
+		).filter((employee) => employee.role !== Role.DEVELOPER);
 		employeeList.push(...employees);
 	} catch {
 		employeeList.push(user);

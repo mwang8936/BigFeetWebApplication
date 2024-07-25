@@ -23,6 +23,10 @@ import EditableMultiSelect from '../../../editable/EditableMultiSelect.Component
 import EditablePayRate from '../../../editable/EditablePayRate.Component';
 import { arraysHaveSameContent } from '../../../../../../../utils/array.utils';
 import DeleteVipModal from './DeleteVipModal.Component';
+import { useNavigate } from 'react-router-dom';
+import { Permissions, Role } from '../../../../../../../models/enums';
+import { useQuery } from '@tanstack/react-query';
+import { getEmployees } from '../../../../../../../service/employee.service';
 
 interface EditVipProp {
 	setOpen(open: boolean): void;
@@ -45,67 +49,100 @@ const EditVip: FC<EditVipProp> = ({
 	onDeleteVipPackage,
 }) => {
 	const { t } = useTranslation();
+	const navigate = useNavigate();
 
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-	const [amountInput, setAmountInput] = useState<number | null>(
+	const [soldAmountInput, setSoldAmountInput] = useState<number | null>(
 		vipPackage.sold_amount
 	);
 	const [employeesInput, setEmployeesInput] = useState<number[]>(
-		vipPackage.schedules.map((schedule) => schedule.employee_audit_id)
+		vipPackage.employee_ids
 	);
+	const [commissionAmountInput, setCommissionAmountInput] = useState<
+		number | null
+	>(vipPackage.commission_amount);
 
-	const [invalidAmount, setInvalidAmount] = useState<boolean>(false);
+	const [invalidSoldAmount, setInvalidSoldAmount] = useState<boolean>(false);
+	const [invalidCommissionAmount, setInvalidCommissionAmount] =
+		useState<boolean>(false);
 
 	const [changesMade, setChangesMade] = useState<boolean>(false);
 	const [missingRequiredInput, setMissingRequiredInput] =
 		useState<boolean>(false);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
-	// const { employees } = useEmployeesContext();
-
+	const { user } = useUserContext();
 	const { date } = useScheduleDateContext();
 
+	const employeeGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_EMPLOYEE
+	);
+
+	const employeeQuery = useQuery({
+		queryKey: ['employees'],
+		queryFn: () => getEmployees(navigate),
+		enabled: employeeGettable,
+	});
+	const employees: Employee[] = (
+		(employeeQuery.data as Employee[]) || []
+	).filter((employee) => employee.role !== Role.DEVELOPER);
+
 	useEffect(() => {
-		const amount: number | null | undefined =
-			amountInput === vipPackage.sold_amount ? undefined : amountInput;
+		const sold_amount: number | null | undefined =
+			soldAmountInput === vipPackage.sold_amount ? undefined : soldAmountInput;
 		const employee_ids: number[] | undefined = arraysHaveSameContent(
 			employeesInput,
-			vipPackage.schedules.map((schedule) => schedule.employee_audit_id)
+			vipPackage.employee_ids
 		)
 			? undefined
 			: (employeesInput as number[]);
+		const commission_amount: number | null | undefined =
+			commissionAmountInput === vipPackage.commission_amount
+				? undefined
+				: commissionAmountInput;
 
-		const changesMade = amount !== undefined || employee_ids !== undefined;
+		const changesMade =
+			sold_amount !== undefined ||
+			employee_ids !== undefined ||
+			commission_amount !== undefined;
 
 		setChangesMade(changesMade);
 
 		const missingRequiredInput =
-			amountInput === null || employeesInput.length === 0;
+			soldAmountInput === null ||
+			employeesInput.length === 0 ||
+			commissionAmountInput === null;
 
 		setMissingRequiredInput(missingRequiredInput);
-	}, [employeesInput.length, amountInput]);
+	}, [employeesInput.length, soldAmountInput, commissionAmountInput]);
 
 	useEffect(() => {
-		setInvalidInput(invalidAmount);
-	}, [invalidInput]);
+		const invalidInput = invalidSoldAmount || invalidCommissionAmount;
+		setInvalidInput(invalidInput);
+	}, [invalidSoldAmount, invalidCommissionAmount]);
 
 	const onEdit = () => {
-		const amount: number | undefined =
-			amountInput === vipPackage.sold_amount
+		const sold_amount: number | undefined =
+			soldAmountInput === vipPackage.sold_amount
 				? undefined
-				: (amountInput as number);
+				: (soldAmountInput as number);
 		const employee_ids: number[] | undefined = arraysHaveSameContent(
 			employeesInput,
-			vipPackage.schedules.map((schedule) => schedule.employee_audit_id)
+			vipPackage.employee_ids
 		)
 			? undefined
 			: (employeesInput as number[]);
+		const commission_amount: number | undefined =
+			commissionAmountInput === vipPackage.commission_amount
+				? undefined
+				: (commissionAmountInput as number);
 
 		const editVipPackageRequest: UpdateVipPackageRequest = {
-			...(amount && { sold_amount: amount }),
-			...(employee_ids && { date }),
-			...(employee_ids && { employee_ids }),
+			...(sold_amount !== undefined && { sold_amount }),
+			...(employee_ids !== undefined && { date }),
+			...(employee_ids !== undefined && { employee_ids }),
+			...(commission_amount !== undefined && { commission_amount }),
 		};
 
 		onEditVipPackage(vipPackage.serial, editVipPackageRequest);
@@ -136,33 +173,30 @@ const EditVip: FC<EditVipProp> = ({
 						<div className="mt-2">
 							<EditablePayRate
 								originalAmount={vipPackage.sold_amount}
-								amount={amountInput}
-								setAmount={setAmountInput}
-								label={LABELS.vip_package.amount}
-								name={NAMES.vip_package.amount}
+								amount={soldAmountInput}
+								setAmount={setSoldAmountInput}
+								label={LABELS.vip_package.sold_amount}
+								name={NAMES.vip_package.sold_amount}
 								validationProp={{
-									max: NUMBERS.vip_package.amount,
+									max: NUMBERS.vip_package.sold_amount,
 									required: true,
-									requiredMessage: ERRORS.vip_package.amount.required,
-									invalid: invalidAmount,
-									setInvalid: setInvalidAmount,
-									invalidMessage: ERRORS.vip_package.amount.invalid,
+									requiredMessage: ERRORS.vip_package.sold_amount.required,
+									invalid: invalidSoldAmount,
+									setInvalid: setInvalidSoldAmount,
+									invalidMessage: ERRORS.vip_package.sold_amount.invalid,
 								}}
-								placeholder={PLACEHOLDERS.employee.body_rate}
+								placeholder={PLACEHOLDERS.vip_package.sold_amount}
 								editable={editable}
 								missingPermissionMessage={ERRORS.vip_package.permissions.edit}
 							/>
 
-							{/* <EditableMultiSelect
-								originalValues={vipPackage.schedules
-									.map((schedule) => schedule.employee_audit_id)
-									.map((value) => ({
-										value: value,
-										label:
-											employees.find(
-												(employee) => employee.employee_id === value
-											)?.username || '',
-									}))}
+							<EditableMultiSelect
+								originalValues={vipPackage.employee_ids.map((value) => ({
+									value: value,
+									label:
+										employees.find((employee) => employee.employee_id === value)
+											?.username || '',
+								}))}
 								options={employees.map((employee) => ({
 									value: employee.employee_id,
 									label: employee.username,
@@ -183,7 +217,27 @@ const EditVip: FC<EditVipProp> = ({
 								placeholder={PLACEHOLDERS.vip_package.employee_ids}
 								editable={editable}
 								missingPermissionMessage={ERRORS.vip_package.permissions.edit}
-							/> */}
+							/>
+
+							<EditablePayRate
+								originalAmount={vipPackage.commission_amount}
+								amount={commissionAmountInput}
+								setAmount={setCommissionAmountInput}
+								label={LABELS.vip_package.commission_amount}
+								name={NAMES.vip_package.commission_amount}
+								validationProp={{
+									max: NUMBERS.vip_package.commission_amount,
+									required: true,
+									requiredMessage:
+										ERRORS.vip_package.commission_amount.required,
+									invalid: invalidCommissionAmount,
+									setInvalid: setInvalidCommissionAmount,
+									invalidMessage: ERRORS.vip_package.commission_amount.invalid,
+								}}
+								placeholder={PLACEHOLDERS.vip_package.commission_amount}
+								editable={editable}
+								missingPermissionMessage={ERRORS.vip_package.permissions.edit}
+							/>
 						</div>
 					</div>
 				</div>

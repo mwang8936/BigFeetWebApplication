@@ -287,12 +287,21 @@ const ERRORS = {
 				value: { length: LENGTHS.vip_package.serial },
 			},
 		},
-		amount: {
-			required: 'Amount cannot be empty.',
+		sold_amount: {
+			required: 'Sold Amount cannot be empty.',
 			invalid: {
-				key: 'Amount Invalid',
+				key: 'Sold Amount Invalid',
 				value: {
-					max: NUMBERS.vip_package.amount,
+					max: NUMBERS.vip_package.sold_amount,
+				},
+			},
+		},
+		commission_amount: {
+			required: 'Commission Amount cannot be empty.',
+			invalid: {
+				key: 'Commission Amount Invalid',
+				value: {
+					max: NUMBERS.vip_package.commission_amount,
 				},
 			},
 		},

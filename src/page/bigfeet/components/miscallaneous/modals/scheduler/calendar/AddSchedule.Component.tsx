@@ -70,10 +70,9 @@ const AddSchedule: FC<AddScheduleProp> = ({
 		enabled: employeeGettable,
 		staleTime: Infinity,
 	});
-	const employees: Employee[] =
-		(employeeQuery.data as Employee[]).filter(
-			(employee) => employee.role !== Role.DEVELOPER
-		) || [];
+	const employees: Employee[] = (
+		(employeeQuery.data as Employee[]) || []
+	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	const scheduleQuery = useQuery({
 		queryKey: ['schedules', formatDateToQueryKey(date)],
@@ -89,10 +88,9 @@ const AddSchedule: FC<AddScheduleProp> = ({
 		},
 		staleTime: Infinity,
 	});
-	const schedules: Schedule[] =
-		(scheduleQuery.data as Schedule[]).filter(
-			(schedule) => schedule.employee.role !== Role.DEVELOPER
-		) || [];
+	const schedules: Schedule[] = (
+		(scheduleQuery.data as Schedule[]) || []
+	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
 	const priorityDropDownItems = getPriorityDropDownItems(employees, schedules);
 

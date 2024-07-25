@@ -47,7 +47,8 @@ const NAMES = {
 	},
 	vip_package: {
 		serial: 'serial',
-		amount: 'amount',
+		sold_amount: 'sold_amount',
+		commission_amount: 'commission_amount',
 		employee_ids: 'employee_ids',
 	},
 };

@@ -181,7 +181,7 @@ const EditReservation: FC<EditReservationProp> = ({
 		enabled: employeeGettable,
 	});
 	const employees: Employee[] =
-		(employeeQuery.data as Employee[]).filter(
+		((employeeQuery.data as Employee[]) || []).filter(
 			(employee) => employee.role !== Role.DEVELOPER
 		) || [];
 
@@ -206,10 +206,9 @@ const EditReservation: FC<EditReservationProp> = ({
 		},
 		staleTime: 0,
 	});
-	const schedules: Schedule[] =
-		(scheduleQuery.data as Schedule[]).filter(
-			(schedule) => schedule.employee.role !== Role.DEVELOPER
-		) || [];
+	const schedules: Schedule[] = (
+		(scheduleQuery.data as Schedule[]) || []
+	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
 	const employeeDropDownItems = getEmployeeDropDownItems(employees);
 	const serviceDropDownItems = getServiceDropDownItems(services);
