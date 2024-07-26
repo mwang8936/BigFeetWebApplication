@@ -65,7 +65,7 @@ const EditablePayRate: FC<EditablePayRateProp> = ({
 					className="editable-input pl-9"
 					id={name}
 					type="number"
-					value={amount === null ? '' : amount}
+					value={amount === null ? '' : disabled ? amount.toFixed(2) : amount}
 					onChange={(event) => {
 						const amount = parseFloat(event.target.value);
 

@@ -2,6 +2,7 @@ import { FC } from 'react';
 import Reservation from '../../../../../../models/Reservation.Model';
 import { TipMethod } from '../../../../../../models/enums';
 import { formatTimeFromDate } from '../../../../../../utils/string.utils';
+import { moneyToString } from '../../../../../../utils/number.utils';
 
 interface TipGridProp {
 	row: number;
@@ -26,8 +27,8 @@ const TipGrid: FC<TipGridProp> = ({ row, colNum, reservations }) => {
 	);
 	const tipsPayout = tipsTotal * 0.9;
 
-	const tipsText = tips.join(' + ') + ' = ';
-	const tipsTotalText = '$' + tipsTotal.toString();
+	const tipsText = tips.map((tip) => moneyToString(tip)).join(' + ') + ' = ';
+	const tipsTotalText = '$' + moneyToString(tipsTotal);
 	const tipsPayoutText = '$' + tipsPayout.toFixed(2).toString();
 
 	const tipsTexts = tipReservations.map((reservation, index) => {
@@ -39,7 +40,9 @@ const TipGrid: FC<TipGridProp> = ({ row, colNum, reservations }) => {
 		return (
 			<span className="flex flex-col" key={reservation.reservation_id}>
 				<span>
-					{`${startTimeText} - ${endTimeText} = (\$${reservation.tips})`}
+					{`${startTimeText} - ${endTimeText} = (\$${
+						reservation.tips && moneyToString(reservation.tips)
+					})`}
 					<br />
 					{index !== tipReservations.length - 1 && <br />}
 				</span>

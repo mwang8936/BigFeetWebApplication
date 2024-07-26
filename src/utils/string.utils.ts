@@ -29,5 +29,10 @@ export function formatTimeFromNumber(time: number): string {
 }
 
 export function formatDateToQueryKey(date: Date): string {
-	return date.toISOString().split('T')[0];
+	return date.toLocaleString('en-US', {
+		timeZone: 'America/Los_Angeles',
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+	});
 }

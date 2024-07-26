@@ -3,6 +3,13 @@ import { useTranslation } from 'react-i18next';
 import VipPackage from '../../../../../../models/Vip-Package.Model';
 import { UpdateVipPackageRequest } from '../../../../../../models/requests/Vip-Package.Request.Model';
 import EditVipModal from '../../../miscallaneous/modals/scheduler/calendar/EditVipModal.Component';
+import { moneyToString } from '../../../../../../utils/number.utils';
+import { useNavigate } from 'react-router-dom';
+import { useUserContext } from '../../../../BigFeet.Page';
+import { Permissions, Role } from '../../../../../../models/enums';
+import { useQuery } from '@tanstack/react-query';
+import { getEmployees } from '../../../../../../service/employee.service';
+import Employee from '../../../../../../models/Employee.Model';
 
 interface VipItemProp {
 	vipPackage: VipPackage;
@@ -23,9 +30,24 @@ const VipItem: FC<VipItemProp> = ({
 	onDeleteVipPackage,
 }) => {
 	const { t } = useTranslation();
-	// const { employees } = useEmployeesContext();
+	const navigate = useNavigate();
 
 	const [open, setOpen] = useState(false);
+
+	const { user } = useUserContext();
+
+	const employeeGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_EMPLOYEE
+	);
+
+	const employeeQuery = useQuery({
+		queryKey: ['employees'],
+		queryFn: () => getEmployees(navigate),
+		enabled: employeeGettable,
+	});
+	const employees: Employee[] = (
+		(employeeQuery.data as Employee[]) || []
+	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	return (
 		<div
@@ -36,20 +58,25 @@ const VipItem: FC<VipItemProp> = ({
 				{vipPackage.serial}
 			</span>
 			<span>
-				<span className="font-bold me-1">{t('Total')}:</span>$
-				{vipPackage.sold_amount}
+				<span className="font-bold me-1">{t('Sold Amount')}:</span>$
+				{moneyToString(vipPackage.sold_amount)}
 			</span>
-			{/* <span className="grid grid-flow-col">
-				{vipPackage.schedules.map((schedule) => (
-					<strong key={schedule.employee_audit_id}>
-						{employees.find(
-							(employee) => employee.employee_id === schedule.employee_audit_id
-						)?.username +
+			<span>
+				<span className="font-bold me-1">{t('Commission Amount')}:</span>$
+				{moneyToString(vipPackage.commission_amount)}
+			</span>
+			<span className="grid grid-flow-col">
+				{vipPackage.employee_ids.map((employeeId) => (
+					<strong key={employeeId}>
+						{employees.find((employee) => employee.employee_id === employeeId)
+							?.username +
 							' - $' +
-							vipPackage.amount / vipPackage.schedules.length}
+							moneyToString(
+								vipPackage.commission_amount / vipPackage.employee_ids.length
+							)}
 					</strong>
 				))}
-			</span> */}
+			</span>
 			<EditVipModal
 				open={open}
 				setOpen={setOpen}

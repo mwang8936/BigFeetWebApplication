@@ -5,7 +5,8 @@ import {
 	AddVipPackageRequest,
 	UpdateVipPackageRequest,
 } from '../../../../../../models/requests/Vip-Package.Request.Model';
-import VipItem from './VipItem.Component';
+import { moneyToString } from '../../../../../../utils/number.utils';
+import { useTranslation } from 'react-i18next';
 
 interface VipGridProp {
 	row: number;
@@ -33,7 +34,16 @@ const VipGrid: FC<VipGridProp> = ({
 	deletable,
 	onDeleteVipPackage,
 }) => {
+	const { t } = useTranslation();
+
 	const [open, setOpen] = useState<boolean>(false);
+
+	const vipPackagesCommissionTotal = vipPackages
+		.map(
+			(vipPackage) =>
+				vipPackage.commission_amount / vipPackage.employee_ids.length
+		)
+		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
 	return (
 		<>
 			<div
@@ -47,9 +57,9 @@ const VipGrid: FC<VipGridProp> = ({
 					{vipPackages.map((vipPackage) => (
 						<strong key={vipPackage.serial}>
 							{vipPackage.serial}
-							<span className="font-normal">{`($${
+							<span className="font-normal">{`($${moneyToString(
 								vipPackage.commission_amount / vipPackage.employee_ids.length
-							})`}</span>
+							)})`}</span>
 						</strong>
 					))}
 				</div>
@@ -58,13 +68,19 @@ const VipGrid: FC<VipGridProp> = ({
 						{vipPackages.map((vipPackage) => (
 							<strong key={vipPackage.serial}>
 								{vipPackage.serial}
-								<span className="font-normal">{`($${
+								<span className="font-normal">{`(\$${moneyToString(
 									vipPackage.commission_amount / vipPackage.employee_ids.length
-								})`}</span>
+								)}) - \$${moneyToString(vipPackage.sold_amount)}`}</span>
 							</strong>
 						))}
 					</span>
 				)}
+				<span>
+					{t('Total')}{' '}
+					<span className="font-bold">{`= \$${moneyToString(
+						vipPackagesCommissionTotal
+					)}`}</span>
+				</span>
 			</div>
 			<VipModal
 				open={open}

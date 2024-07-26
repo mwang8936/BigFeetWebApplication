@@ -4,6 +4,7 @@ import { formatTimeFromDate } from '../../../../../../utils/string.utils';
 import { useTranslation } from 'react-i18next';
 import { isHoliday } from '../../../../../../utils/date.utils';
 import { useScheduleDateContext } from '../../Scheduler.Component';
+import { moneyToString } from '../../../../../../utils/number.utils';
 
 interface TotalGridProp {
 	row: number;
@@ -126,7 +127,9 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 				</span>
 				<span>
 					{t('Requested')}:{' '}
-					<span className="font-bold">{`${requestedTotal} X \$1 = \$${requestedTotal}`}</span>
+					<span className="font-bold">{`${requestedTotal} X \$1 = \$${moneyToString(
+						requestedTotal
+					)}`}</span>
 				</span>
 				{isHoliday(date) && (
 					<span>
@@ -139,9 +142,11 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 								acupunctureTotal > 0 &&
 								' + '}
 							{acupunctureTotal > 0 && `${acupunctureTotal}${t('A')}`}
-							{` = ${bodyTotal + feetTotal + acupunctureTotal} X $2 = $${
+							{` = ${
+								bodyTotal + feetTotal + acupunctureTotal
+							} X $2 = $${moneyToString(
 								(bodyTotal + feetTotal + acupunctureTotal) * 2
-							}`}
+							)}`}
 						</span>
 					</span>
 				)}

@@ -193,9 +193,9 @@ const ReservationTag: FC<ReservationTagProp> = ({
 				(reservation.tip_method === TipMethod.CASH
 					? '自'
 					: reservation.tip_method === TipMethod.MACHINE
-					? `\$${reservation.tips}` || t('No Tips')
+					? `\$${reservation.tips?.toFixed(2)}` || t('No Tips')
 					: reservation.tip_method === TipMethod.HALF && reservation.tips
-					? `\$${reservation.tips} / 自`
+					? `\$${reservation.tips?.toFixed(2)} / 自`
 					: reservation.tip_method === TipMethod.HALF
 					? '自'
 					: t('Invalid'))}

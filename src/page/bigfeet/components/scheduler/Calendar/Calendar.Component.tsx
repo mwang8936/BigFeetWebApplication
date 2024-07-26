@@ -74,7 +74,7 @@ const Calendar: FC<CalendarProp> = ({
 		<div
 			className="grid h-fit relative"
 			style={{
-				gridTemplateRows: `auto repeat(${timeArr.length},100px) auto auto auto auto`,
+				gridTemplateRows: `auto repeat(${timeArr.length},100px) auto auto auto auto auto`,
 				gridTemplateColumns: `70px repeat(${employees.length},200px)`,
 			}}>
 			<CalendarFixedColumn timeArr={timeArr} />

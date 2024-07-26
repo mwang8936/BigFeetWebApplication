@@ -26,6 +26,7 @@ import {
 	UpdateVipPackageRequest,
 } from '../../../../../../models/requests/Vip-Package.Request.Model';
 import { doesDateOverlap } from '../../../../../../utils/date.utils';
+import PayoutGrid from './PayoutGrid.Component';
 
 interface CalendarEmployeeColumnProp {
 	date: Date;
@@ -170,8 +171,14 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 				deletable={deletable}
 				onDeleteVipPackage={onDeleteVipPackage}
 			/>
-			<SignatureGrid
+			<PayoutGrid
 				row={timeArr.length + 5}
+				colNum={colNum}
+				reservations={schedule?.reservations || []}
+				vipPackages={schedule?.vip_packages || []}
+			/>
+			<SignatureGrid
+				row={timeArr.length + 6}
 				colNum={colNum}
 				date={date}
 				signedOff={schedule?.signed || false}

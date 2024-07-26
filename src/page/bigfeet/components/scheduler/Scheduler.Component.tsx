@@ -59,6 +59,7 @@ import { getCustomers } from '../../../../service/customer.service';
 import { getServices } from '../../../../service/service.service';
 import { getEmployees } from '../../../../service/employee.service';
 import { formatDateToQueryKey } from '../../../../utils/string.utils';
+import { moneyToString } from '../../../../utils/number.utils';
 
 const ScheduleDateContext = createContext<
 	{ date: Date; setDate(date: Date): void } | undefined
@@ -484,7 +485,8 @@ export default function Scheduler() {
 					/>
 				</div>
 				<div className="h-fit my-auto flex text-gray-600 text-xl">
-					{t('Total Cash')}:<span className="font-bold ms-2">{totalCash}</span>
+					{t('Total Cash')}:
+					<span className="font-bold ms-2">{moneyToString(totalCash)}</span>
 				</div>
 				<div className="h-fit my-auto flex flex-col">
 					<h1 className="my-auto mx-auto text-gray-600 text-3xl">

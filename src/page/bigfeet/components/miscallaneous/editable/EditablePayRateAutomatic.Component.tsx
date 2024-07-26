@@ -1,7 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import PermissionsButton, { ButtonType } from '../PermissionsButton.Component';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@mui/material';
 
 interface InvalidMessage {
 	key: string;
@@ -76,7 +75,7 @@ const EditablePayRateAutomatic: FC<EditablePayRateAutomaticProp> = ({
 					className="editable-input pl-9"
 					id={name}
 					type="number"
-					value={amount === null ? '' : amount}
+					value={amount === null ? '' : disabled ? amount.toFixed(2) : amount}
 					onChange={(event) => {
 						const amount = parseFloat(event.target.value);
 
