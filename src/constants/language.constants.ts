@@ -1,6 +1,6 @@
 import { Language } from '../models/enums';
 
-export const getLanguageFile = (language: Language): string => {
+const getLanguageFile = (language: Language): string => {
 	if (language === Language.ENGLISH) {
 		return 'en';
 	} else if (language === Language.SIMPLIFIED_CHINESE) {
@@ -11,3 +11,5 @@ export const getLanguageFile = (language: Language): string => {
 		return 'en';
 	}
 };
+
+export default getLanguageFile;

@@ -13,7 +13,7 @@ import LABELS from '../../../../../constants/label.constants';
 import NAMES from '../../../../../constants/name.constants';
 import EditableToggleSwitch from '../../miscallaneous/editable/EditableToggleSwitch.Component';
 import { useTranslation } from 'react-i18next';
-import { getLanguageFile } from '../../../../../constants/language.constants';
+import getLanguageFile from '../../../../../constants/language.constants';
 import { userKey } from '../../../../../constants/api.constants';
 import {
 	createLoadingToast,

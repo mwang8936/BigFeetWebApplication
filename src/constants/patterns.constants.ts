@@ -1,5 +1,4 @@
 import LENGTHS from './lengths.constants';
-import STORES from './store.constants';
 
 const PATTERNS = {
 	customer: {

@@ -32,7 +32,7 @@ import {
 } from '../../utils/date.utils';
 
 import { userKey } from '../../constants/api.constants';
-import { getLanguageFile } from '../../constants/language.constants';
+import getLanguageFile from '../../constants/language.constants';
 import { useQuery } from '@tanstack/react-query';
 import { showToast } from '../../utils/toast.utils';
 import { formatDateToQueryKey } from '../../utils/string.utils';
