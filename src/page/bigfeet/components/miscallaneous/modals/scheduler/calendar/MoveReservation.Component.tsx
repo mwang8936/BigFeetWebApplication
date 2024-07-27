@@ -131,10 +131,14 @@ const MoveReservation: FC<MoveReservationProp> = ({
 		const bedsUsedAtSameTime = reservationsAtSameTime
 			.filter((reservation) => reservation.service.beds_required > 0)
 			.reduce(
-				(total, reservation) => total + reservation.service.beds_required,
+				(total, reservation) =>
+					total + reservation.service.beds_required,
 				0
 			);
-		if (bedsUsedAtSameTime + service.beds_required > STORES.beds) {
+		if (
+			service.beds_required > 0 &&
+			bedsUsedAtSameTime + service.beds_required > STORES.beds
+		) {
 			setNoBeds(true);
 			setOpenBedWarningModal(true);
 		} else {
@@ -142,7 +146,9 @@ const MoveReservation: FC<MoveReservationProp> = ({
 		}
 
 		const employeeId =
-			newEmployeeId === undefined ? reservation.employee_id : newEmployeeId;
+			newEmployeeId === undefined
+				? reservation.employee_id
+				: newEmployeeId;
 		const conflictingReservations = reservationsAtSameTime.filter(
 			(reservation) => reservation.employee_id === employeeId
 		);
@@ -157,59 +163,71 @@ const MoveReservation: FC<MoveReservationProp> = ({
 	const onEdit = () => {
 		if (
 			newTime ||
-			(newEmployeeId !== undefined && newEmployeeId !== reservation.employee_id)
+			(newEmployeeId !== undefined &&
+				newEmployeeId !== reservation.employee_id)
 		) {
 			const updateReservationRequest: UpdateReservationRequest = {
 				reserved_date: newTime,
 				employee_id: newEmployeeId,
 				updated_by: updatedBy,
 			};
-			onEditReservation(reservation.reservation_id, updateReservationRequest);
+			onEditReservation(
+				reservation.reservation_id,
+				updateReservationRequest
+			);
 			setOpen(false);
 		}
 	};
 
 	return (
 		<>
-			<div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-				<div className="sm:flex sm:items-start">
-					<div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+			<div className='bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4'>
+				<div className='sm:flex sm:items-start'>
+					<div className='mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10'>
 						<PencilSquareIcon
-							className="h-6 w-6 text-blue-600"
-							aria-hidden="true"
+							className='h-6 w-6 text-blue-600'
+							aria-hidden='true'
 						/>
 					</div>
-					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
+					<div className='mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full'>
 						<Dialog.Title
-							as="h3"
-							className="text-base font-semibold leading-6 text-gray-900">
+							as='h3'
+							className='text-base font-semibold leading-6 text-gray-900'
+						>
 							{t('Edit Reservation')}
 						</Dialog.Title>
-						<div className="mt-2">
+						<div className='mt-2'>
 							{t(
 								'Would you like to make the following changes to the reservation?'
 							)}
-							<div className="flex flex-col text-m text-black font-bold mt-3">
+							<div className='flex flex-col text-m text-black font-bold mt-3'>
 								{prevEmployeeUsername &&
 									newEmployeeUsername &&
-									prevEmployeeUsername !== newEmployeeUsername && (
-										<span className="flex flex-row">
-											<span className="me-3 font-medium">{t('Employee')}:</span>
+									prevEmployeeUsername !==
+										newEmployeeUsername && (
+										<span className='flex flex-row'>
+											<span className='me-3 font-medium'>
+												{t('Employee')}:
+											</span>
 											{prevEmployeeUsername}
 											<ArrowLongRightIcon
-												className="h-6 w-6 mx-3 text-black"
-												aria-hidden="true"
+												className='h-6 w-6 mx-3 text-black'
+												aria-hidden='true'
 											/>
 											{newEmployeeUsername}
 										</span>
 									)}
 								{newTime && (
-									<span className="flex flex-row">
-										<span className="me-3 font-medium">{t('Time')}:</span>
-										{formatTimeFromDate(reservation.reserved_date)}
+									<span className='flex flex-row'>
+										<span className='me-3 font-medium'>
+											{t('Time')}:
+										</span>
+										{formatTimeFromDate(
+											reservation.reserved_date
+										)}
 										<ArrowLongRightIcon
-											className="h-6 w-6 mx-3 text-black"
-											aria-hidden="true"
+											className='h-6 w-6 mx-3 text-black'
+											aria-hidden='true'
 										/>
 										{newTime && formatTimeFromDate(newTime)}
 									</span>
