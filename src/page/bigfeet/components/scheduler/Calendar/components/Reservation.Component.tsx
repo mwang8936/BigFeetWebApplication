@@ -153,14 +153,19 @@ const ReservationTag: FC<ReservationTagProp> = ({
 		[ServiceColor.BLACK, 'bg-slate-700 border-slate-700'],
 	]);
 
+	const startDate = new Date(reservation.reserved_date);
+
 	const endDate = new Date(reservation.reserved_date);
 	endDate.setMinutes(
 		reservation.reserved_date.getMinutes() + reservation.service.time
 	);
 
+	const isActive = new Date() >= startDate && new Date() < endDate;
 	const isCompleted = new Date() >= endDate;
 	const completionColour = isCompleted
 		? 'bg-green-400/60 hover:bg-green-400 border-green-700/40 hover:border-green-700'
+		: isActive
+		? 'bg-blue-400/60 hover:bg-blue-400 border-blue-700/40 hover:border-blue-700'
 		: 'bg-red-400/60 hover:bg-red-400 border-red-700/40 hover:border-red-700';
 
 	const serviceColour =
