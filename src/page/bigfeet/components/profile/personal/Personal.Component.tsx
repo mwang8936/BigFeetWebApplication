@@ -161,10 +161,10 @@ const Personal: FC<PersonalProp> = ({
 
 		const employeeId = user.employee_id;
 		const request: UpdateEmployeeRequest = {
-			...(username && { username }),
-			...(first_name && { first_name }),
-			...(last_name && { last_name }),
-			...(gender && { gender }),
+			...(username !== undefined && { username }),
+			...(first_name !== undefined && { first_name }),
+			...(last_name !== undefined && { last_name }),
+			...(gender !== undefined && { gender }),
 		};
 
 		editProfileMutation.mutate({ employeeId, request });

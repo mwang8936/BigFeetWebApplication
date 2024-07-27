@@ -290,16 +290,16 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 
 		const employeeId = employee.employee_id;
 		const request: UpdateEmployeeRequest = {
-			...(username && { username }),
-			...(first_name && { first_name }),
-			...(last_name && { last_name }),
-			...(gender && { gender }),
-			...(role && { role }),
-			...(permissions && { permissions }),
-			...(body_rate && { body_rate }),
-			...(feet_rate && { feet_rate }),
-			...(acupuncture_rate && { acupuncture_rate }),
-			...(per_hour && { per_hour }),
+			...(username !== undefined && { username }),
+			...(first_name !== undefined && { first_name }),
+			...(last_name !== undefined && { last_name }),
+			...(gender !== undefined && { gender }),
+			...(role !== undefined && { role }),
+			...(permissions !== undefined && { permissions }),
+			...(body_rate !== undefined && { body_rate }),
+			...(feet_rate !== undefined && { feet_rate }),
+			...(acupuncture_rate !== undefined && { acupuncture_rate }),
+			...(per_hour !== undefined && { per_hour }),
 		};
 
 		editEmployeeMutation.mutate({ employeeId, request });
