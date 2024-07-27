@@ -38,11 +38,10 @@ const AddCustomer: FC<AddCustomerProp> = ({
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
 	useEffect(() => {
-		const missingRequiredInput =
-			phoneNumberInput === null || nameInput === null;
+		const missingRequiredInput = phoneNumberInput === null;
 
 		setMissingRequiredInput(missingRequiredInput);
-	}, [phoneNumberInput, nameInput, notesInput]);
+	}, [phoneNumberInput]);
 
 	useEffect(() => {
 		const invalidInput = invalidPhoneNumber || invalidName;
@@ -52,7 +51,7 @@ const AddCustomer: FC<AddCustomerProp> = ({
 
 	const onAdd = async () => {
 		const phone_number = (phoneNumberInput as string).trim();
-		const customer_name = (nameInput as string).trim();
+		const customer_name = nameInput?.trim();
 		const notes = notesInput?.trim();
 
 		const addCustomerRequest: AddCustomerRequest = {
@@ -103,8 +102,7 @@ const AddCustomer: FC<AddCustomerProp> = ({
 								type="text"
 								validationProp={{
 									maxLength: LENGTHS.customer.customer_name,
-									required: true,
-									requiredMessage: ERRORS.customer.customer_name.required,
+									required: false,
 									invalid: invalidName,
 									setInvalid: setInvalidName,
 									invalidMessage: ERRORS.customer.customer_name.invalid,

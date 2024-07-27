@@ -47,8 +47,6 @@ const EditCustomer: FC<EditCustomerProp> = ({
 	const [invalidName, setInvalidName] = useState<boolean>(false);
 
 	const [changesMade, setChangesMade] = useState<boolean>(false);
-	const [missingRequiredInput, setMissingRequiredInput] =
-		useState<boolean>(true);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -64,10 +62,6 @@ const EditCustomer: FC<EditCustomerProp> = ({
 		const changesMade = customer_name !== undefined || notes !== undefined;
 
 		setChangesMade(changesMade);
-
-		const missingRequiredInput = customer_name === null;
-
-		setMissingRequiredInput(missingRequiredInput);
 	}, [nameInput, notesInput]);
 
 	useEffect(() => {
@@ -75,15 +69,15 @@ const EditCustomer: FC<EditCustomerProp> = ({
 	}, [invalidName]);
 
 	const onEdit = () => {
-		const customer_name: string | undefined =
-			nameInput?.trim() === customer.customer_name
-				? undefined
-				: (nameInput as string).trim();
+		const trimmedName = nameInput ? nameInput.trim() : null;
+		const customer_name: string | null | undefined =
+			trimmedName === customer.customer_name ? undefined : trimmedName;
 		const trimmedNotes = notesInput ? notesInput.trim() : null;
-		const notes = trimmedNotes === customer.notes ? undefined : trimmedNotes;
+		const notes: string | null | undefined =
+			trimmedNotes === customer.notes ? undefined : trimmedNotes;
 
 		const updateCustomerRequest: UpdateCustomerRequest = {
-			...(customer_name && { customer_name }),
+			...(customer_name !== undefined && { customer_name }),
 			...(notes !== undefined && { notes }),
 		};
 		onEditCustomer(customer.phone_number, updateCustomerRequest);
@@ -124,8 +118,7 @@ const EditCustomer: FC<EditCustomerProp> = ({
 								placeholder={PLACEHOLDERS.customer.customer_name}
 								validationProp={{
 									maxLength: LENGTHS.customer.customer_name,
-									required: true,
-									requiredMessage: ERRORS.customer.customer_name.required,
+									required: false,
 									invalid: invalidName,
 									setInvalid: setInvalidName,
 									invalidMessage: ERRORS.customer.customer_name.invalid,
@@ -153,15 +146,11 @@ const EditCustomer: FC<EditCustomerProp> = ({
 			</div>
 			<EditBottom
 				onCancel={() => setOpen(false)}
-				disabledEdit={
-					!editable || !changesMade || missingRequiredInput || invalidInput
-				}
+				disabledEdit={!editable || !changesMade || invalidInput}
 				editMissingPermissionMessage={
 					!editable
 						? ERRORS.customer.permissions.edit
 						: !changesMade
-						? ERRORS.no_changes
-						: missingRequiredInput
 						? ERRORS.required
 						: invalidInput
 						? ERRORS.invalid

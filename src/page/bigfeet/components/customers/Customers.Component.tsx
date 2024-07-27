@@ -82,8 +82,8 @@ const Customers: FC = () => {
 			? customers.filter(
 					(customer) =>
 						customer.customer_name
-							.toLowerCase()
-							.includes(searchFilter.toLowerCase()) ||
+							?.toLowerCase()
+							?.includes(searchFilter.toLowerCase()) ||
 						customer.phone_number
 							.toLowerCase()
 							.includes(searchFilter.toLowerCase())

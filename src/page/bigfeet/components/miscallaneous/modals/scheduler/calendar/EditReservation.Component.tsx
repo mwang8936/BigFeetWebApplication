@@ -221,17 +221,13 @@ const EditReservation: FC<EditReservationProp> = ({
 				? dateInput
 				: undefined;
 		const employee_id: number | null | undefined =
-			employeeIdInput === reservation.employee_id
-				? undefined
-				: employeeIdInput;
+			employeeIdInput === reservation.employee_id ? undefined : employeeIdInput;
 		const service_id: number | null | undefined =
 			serviceIdInput === reservation.service.service_id
 				? undefined
 				: serviceIdInput;
 		const requested_gender: Gender | null | undefined =
-			genderInput === reservation.requested_gender
-				? undefined
-				: genderInput;
+			genderInput === reservation.requested_gender ? undefined : genderInput;
 		const requested_employee: boolean | undefined =
 			requestedInput === reservation.requested_employee
 				? undefined
@@ -245,13 +241,9 @@ const EditReservation: FC<EditReservationProp> = ({
 		const gift_card: number | null | undefined =
 			giftCardInput === reservation.gift_card ? undefined : giftCardInput;
 		const insurance: number | null | undefined =
-			insuranceInput === reservation.insurance
-				? undefined
-				: insuranceInput;
+			insuranceInput === reservation.insurance ? undefined : insuranceInput;
 		const tip_method: TipMethod | null | undefined =
-			tipMethodInput === reservation.tip_method
-				? undefined
-				: tipMethodInput;
+			tipMethodInput === reservation.tip_method ? undefined : tipMethodInput;
 		const tips: number | null | undefined =
 			tipsInput === reservation.tips ? undefined : tipsInput;
 		const trimmedMessage = messageInput ? messageInput.trim() : null;
@@ -268,13 +260,10 @@ const EditReservation: FC<EditReservationProp> = ({
 			? customerNameInput.trim()
 			: null;
 		const customer_name: string | null | undefined =
-			trimmedCustomerName ===
-			(reservation.customer?.customer_name || null)
+			trimmedCustomerName === (reservation.customer?.customer_name || null)
 				? undefined
 				: trimmedCustomerName;
-		const trimmedNotes = customerNotesInput
-			? customerNotesInput.trim()
-			: null;
+		const trimmedNotes = customerNotesInput ? customerNotesInput.trim() : null;
 		const notes: string | null | undefined =
 			trimmedNotes === (reservation.customer?.notes || null)
 				? undefined
@@ -300,16 +289,8 @@ const EditReservation: FC<EditReservationProp> = ({
 
 		setChangesMade(changesMade);
 
-		const missingCustomerInput =
-			customerPhoneNumberInput !== null &&
-			customerPhoneNumberInput.length === 10
-				? customerNameInput === null
-				: false;
 		const missingRequiredInput =
-			dateInput === null ||
-			employeeIdInput === null ||
-			serviceIdInput === null ||
-			missingCustomerInput;
+			dateInput === null || employeeIdInput === null || serviceIdInput === null;
 
 		setMissingRequiredInput(missingRequiredInput);
 	}, [
@@ -388,9 +369,7 @@ const EditReservation: FC<EditReservationProp> = ({
 			);
 			if (service) {
 				const startDate = new Date(dateInput);
-				const endDate = new Date(
-					startDate.getTime() + service.time * 60000
-				);
+				const endDate = new Date(startDate.getTime() + service.time * 60000);
 
 				const reservationsAtSameTime = schedules
 					.flatMap((schedule) => schedule.reservations)
@@ -406,12 +385,9 @@ const EditReservation: FC<EditReservationProp> = ({
 					);
 
 				const bedsUsedAtSameTime = reservationsAtSameTime
-					.filter(
-						(reservation) => reservation.service.beds_required > 0
-					)
+					.filter((reservation) => reservation.service.beds_required > 0)
 					.reduce(
-						(total, reservation) =>
-							total + reservation.service.beds_required,
+						(total, reservation) => total + reservation.service.beds_required,
 						0
 					);
 				if (
@@ -425,11 +401,9 @@ const EditReservation: FC<EditReservationProp> = ({
 				}
 
 				if (employeeIdInput) {
-					const conflictingReservations =
-						reservationsAtSameTime.filter(
-							(reservation) =>
-								reservation.employee_id === employeeIdInput
-						);
+					const conflictingReservations = reservationsAtSameTime.filter(
+						(reservation) => reservation.employee_id === employeeIdInput
+					);
 					if (conflictingReservations.length > 0) {
 						setConflict(true);
 						setOpenConflictWarningModal(true);
@@ -465,9 +439,7 @@ const EditReservation: FC<EditReservationProp> = ({
 				? undefined
 				: (serviceIdInput as number);
 		const requested_gender: Gender | null | undefined =
-			genderInput === reservation.requested_gender
-				? undefined
-				: genderInput;
+			genderInput === reservation.requested_gender ? undefined : genderInput;
 		const requested_employee: boolean | undefined =
 			requestedInput === reservation.requested_employee
 				? undefined
@@ -481,40 +453,37 @@ const EditReservation: FC<EditReservationProp> = ({
 		const gift_card: number | null | undefined =
 			giftCardInput === reservation.gift_card ? undefined : giftCardInput;
 		const insurance: number | null | undefined =
-			insuranceInput === reservation.insurance
-				? undefined
-				: insuranceInput;
+			insuranceInput === reservation.insurance ? undefined : insuranceInput;
 		const tip_method: TipMethod | null | undefined =
-			tipMethodInput === reservation.tip_method
-				? undefined
-				: tipMethodInput;
+			tipMethodInput === reservation.tip_method ? undefined : tipMethodInput;
 		const tips: number | null | undefined =
 			tipsInput === reservation.tips ? undefined : tipsInput;
 		const trimmedMessage = messageInput ? messageInput.trim() : null;
 		const message: string | null | undefined =
 			trimmedMessage === reservation.message ? undefined : trimmedMessage;
-		const trimmedPhoneNumber = customerPhoneNumberInput
-			? customerPhoneNumberInput.trim()
-			: null;
-		const phone_number: string | null | undefined =
-			trimmedPhoneNumber === (reservation.customer?.phone_number || null)
-				? undefined
-				: trimmedPhoneNumber;
+
 		const trimmedCustomerName = customerNameInput
 			? customerNameInput.trim()
 			: null;
 		const customer_name: string | null | undefined =
-			trimmedCustomerName ===
-			(reservation.customer?.customer_name || null)
+			trimmedCustomerName === (reservation.customer?.customer_name || null)
 				? undefined
 				: trimmedCustomerName;
-		const trimmedNotes = customerNotesInput
-			? customerNotesInput.trim()
-			: null;
+		const trimmedNotes = customerNotesInput ? customerNotesInput.trim() : null;
 		const notes: string | null | undefined =
 			trimmedNotes === (reservation.customer?.notes || null)
 				? undefined
 				: trimmedNotes;
+
+		const trimmedPhoneNumber = customerPhoneNumberInput
+			? customerPhoneNumberInput.trim()
+			: null;
+		const phone_number: string | null | undefined =
+			trimmedPhoneNumber === (reservation.customer?.phone_number || null) &&
+			customer_name === undefined &&
+			notes === undefined
+				? undefined
+				: trimmedPhoneNumber;
 
 		const updateReservationRequest: UpdateReservationRequest = {
 			...(reserved_date !== undefined && { reserved_date }),
@@ -558,22 +527,21 @@ const EditReservation: FC<EditReservationProp> = ({
 
 	return (
 		<>
-			<div className='bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4'>
-				<div className='sm:flex sm:items-start'>
-					<div className='mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10'>
+			<div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+				<div className="sm:flex sm:items-start">
+					<div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
 						<PencilSquareIcon
-							className='h-6 w-6 text-blue-600'
-							aria-hidden='true'
+							className="h-6 w-6 text-blue-600"
+							aria-hidden="true"
 						/>
 					</div>
-					<div className='mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full'>
+					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
-							as='h3'
-							className='text-base font-semibold leading-6 text-gray-900'
-						>
+							as="h3"
+							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Edit Reservation')}
 						</Dialog.Title>
-						<div className='mt-2'>
+						<div className="mt-2">
 							<EditableDate
 								originalDate={reservation.reserved_date}
 								date={dateInput}
@@ -583,17 +551,13 @@ const EditReservation: FC<EditReservationProp> = ({
 									minDate: undefined,
 									maxDate: undefined,
 									required: true,
-									requiredMessage:
-										ERRORS.reservation.date.required,
+									requiredMessage: ERRORS.reservation.date.required,
 									invalid: invalidDate,
 									setInvalid: setInvalidDate,
-									invalidMessage:
-										ERRORS.reservation.date.invalid,
+									invalidMessage: ERRORS.reservation.date.invalid,
 								}}
 								editable={editable}
-								missingPermissionMessage={
-									ERRORS.reservation.permissions.edit
-								}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
 							<EditableTime
@@ -605,106 +569,83 @@ const EditReservation: FC<EditReservationProp> = ({
 									min: STORES.start,
 									max: STORES.end,
 									required: true,
-									requiredMessage:
-										ERRORS.reservation.time.required,
+									requiredMessage: ERRORS.reservation.time.required,
 									invalid: invalidTime,
 									setInvalid: setInvalidTime,
-									invalidMessage:
-										ERRORS.reservation.time.invalid,
+									invalidMessage: ERRORS.reservation.time.invalid,
 								}}
 								editable={editable}
-								missingPermissionMessage={
-									ERRORS.reservation.permissions.edit
-								}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
 							<EditableDropDown
 								originalOption={
 									employeeDropDownItems[
 										employeeDropDownItems.findIndex(
-											(option) =>
-												option.id ===
-												reservation.employee_id
+											(option) => option.id === reservation.employee_id
 										) || 0
 									]
 								}
 								option={
 									employeeDropDownItems[
 										employeeDropDownItems.findIndex(
-											(option) =>
-												option.id === employeeIdInput
+											(option) => option.id === employeeIdInput
 										) || 0
 									]
 								}
 								options={employeeDropDownItems}
 								setOption={(option) => {
-									setEmployeeIdInput(
-										option.id as number | null
-									);
+									setEmployeeIdInput(option.id as number | null);
 								}}
 								label={LABELS.reservation.employee_id}
 								validationProp={{
 									required: true,
-									requiredMessage:
-										ERRORS.reservation.employee_id.required,
+									requiredMessage: ERRORS.reservation.employee_id.required,
 								}}
 								editable={editable}
-								missingPermissionMessage={
-									ERRORS.reservation.permissions.edit
-								}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
 							<EditableDropDown
 								originalOption={
 									serviceDropDownItems[
 										serviceDropDownItems.findIndex(
-											(option) =>
-												option.id ===
-												reservation.service.service_id
+											(option) => option.id === reservation.service.service_id
 										) || 0
 									]
 								}
 								option={
 									serviceDropDownItems[
 										serviceDropDownItems.findIndex(
-											(option) =>
-												option.id === serviceIdInput
+											(option) => option.id === serviceIdInput
 										) || 0
 									]
 								}
 								options={serviceDropDownItems}
 								setOption={(option) => {
-									setServiceIdInput(
-										option.id as number | null
-									);
+									setServiceIdInput(option.id as number | null);
 								}}
 								label={LABELS.reservation.service_id}
 								validationProp={{
 									required: true,
-									requiredMessage:
-										ERRORS.reservation.service_id.required,
+									requiredMessage: ERRORS.reservation.service_id.required,
 								}}
 								editable={editable}
-								missingPermissionMessage={
-									ERRORS.reservation.permissions.edit
-								}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
 							<EditableDropDown
 								originalOption={
 									genderDropDownItems[
 										genderDropDownItems.findIndex(
-											(option) =>
-												option.id ===
-												reservation.requested_gender
+											(option) => option.id === reservation.requested_gender
 										) || 0
 									]
 								}
 								option={
 									genderDropDownItems[
 										genderDropDownItems.findIndex(
-											(option) =>
-												option.id === genderInput
+											(option) => option.id === genderInput
 										) || 0
 									]
 								}
@@ -717,9 +658,7 @@ const EditReservation: FC<EditReservationProp> = ({
 									required: false,
 								}}
 								editable={editable}
-								missingPermissionMessage={
-									ERRORS.reservation.permissions.edit
-								}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
 							<EditableToggleSwitch
@@ -732,9 +671,7 @@ const EditReservation: FC<EditReservationProp> = ({
 								label={LABELS.reservation.requested_employee}
 								name={NAMES.reservation.requested_employee}
 								editable={editable}
-								missingPermissionMessage={
-									ERRORS.reservation.permissions.edit
-								}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
 							<EditablePayRateAutomatic
@@ -750,14 +687,11 @@ const EditReservation: FC<EditReservationProp> = ({
 									required: false,
 									invalid: invalidCash,
 									setInvalid: setInvalidCash,
-									invalidMessage:
-										ERRORS.reservation.cash.invalid,
+									invalidMessage: ERRORS.reservation.cash.invalid,
 								}}
 								placeholder={PLACEHOLDERS.reservation.cash}
 								editable={editable}
-								missingPermissionMessage={
-									ERRORS.reservation.permissions.edit
-								}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
 							<EditablePayRateAutomatic
@@ -773,14 +707,11 @@ const EditReservation: FC<EditReservationProp> = ({
 									required: false,
 									invalid: invalidMachine,
 									setInvalid: setInvalidMachine,
-									invalidMessage:
-										ERRORS.reservation.machine.invalid,
+									invalidMessage: ERRORS.reservation.machine.invalid,
 								}}
 								placeholder={PLACEHOLDERS.reservation.machine}
 								editable={editable}
-								missingPermissionMessage={
-									ERRORS.reservation.permissions.edit
-								}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
 							<EditablePayRateAutomatic
@@ -796,14 +727,11 @@ const EditReservation: FC<EditReservationProp> = ({
 									required: false,
 									invalid: invalidVip,
 									setInvalid: setInvalidVip,
-									invalidMessage:
-										ERRORS.reservation.vip.invalid,
+									invalidMessage: ERRORS.reservation.vip.invalid,
 								}}
 								placeholder={PLACEHOLDERS.reservation.vip}
 								editable={editable}
-								missingPermissionMessage={
-									ERRORS.reservation.permissions.edit
-								}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
 							<EditablePayRateAutomatic
@@ -819,14 +747,11 @@ const EditReservation: FC<EditReservationProp> = ({
 									required: false,
 									invalid: invalidGiftCard,
 									setInvalid: setInvalidGiftCard,
-									invalidMessage:
-										ERRORS.reservation.gift_card.invalid,
+									invalidMessage: ERRORS.reservation.gift_card.invalid,
 								}}
 								placeholder={PLACEHOLDERS.reservation.gift_card}
 								editable={editable}
-								missingPermissionMessage={
-									ERRORS.reservation.permissions.edit
-								}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
 							<EditablePayRateAutomatic
@@ -842,21 +767,16 @@ const EditReservation: FC<EditReservationProp> = ({
 									required: false,
 									invalid: invalidInsurance,
 									setInvalid: setInvalidInsurance,
-									invalidMessage:
-										ERRORS.reservation.insurance.invalid,
+									invalidMessage: ERRORS.reservation.insurance.invalid,
 								}}
 								placeholder={PLACEHOLDERS.reservation.insurance}
 								editable={editable}
-								missingPermissionMessage={
-									ERRORS.reservation.permissions.edit
-								}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
 							{remainingAmount > 0 && (
-								<p className='error-label mb-4'>
-									{`Total Amount Missing: \$${remainingAmount.toFixed(
-										2
-									)}`}
+								<p className="error-label mb-4">
+									{`Total Amount Missing: \$${remainingAmount.toFixed(2)}`}
 								</p>
 							)}
 
@@ -865,8 +785,7 @@ const EditReservation: FC<EditReservationProp> = ({
 									tipMethodDropDownItems[
 										tipMethodDropDownItems.findIndex(
 											(tipMethodDropDownItem) =>
-												tipMethodDropDownItem.id ===
-												reservation.tip_method
+												tipMethodDropDownItem.id === reservation.tip_method
 										) || 0
 									]
 								}
@@ -874,20 +793,14 @@ const EditReservation: FC<EditReservationProp> = ({
 									tipMethodDropDownItems[
 										tipMethodDropDownItems.findIndex(
 											(tipMethodDropDownItem) =>
-												tipMethodDropDownItem.id ===
-												tipMethodInput
+												tipMethodDropDownItem.id === tipMethodInput
 										) || 0
 									]
 								}
 								options={tipMethodDropDownItems}
 								setOption={(option) => {
-									setTipMethodInput(
-										option.id as TipMethod | null
-									);
-									if (
-										option.id === TipMethod.CASH ||
-										option.id === null
-									) {
+									setTipMethodInput(option.id as TipMethod | null);
+									if (option.id === TipMethod.CASH || option.id === null) {
 										setTipsInput(null);
 									}
 								}}
@@ -896,9 +809,7 @@ const EditReservation: FC<EditReservationProp> = ({
 									required: false,
 								}}
 								editable={editable}
-								missingPermissionMessage={
-									ERRORS.reservation.permissions.edit
-								}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
 							{(tipMethodInput === TipMethod.HALF ||
@@ -914,14 +825,11 @@ const EditReservation: FC<EditReservationProp> = ({
 										required: false,
 										invalid: invalidTips,
 										setInvalid: setInvalidTips,
-										invalidMessage:
-											ERRORS.reservation.tips.invalid,
+										invalidMessage: ERRORS.reservation.tips.invalid,
 									}}
 									placeholder={PLACEHOLDERS.reservation.tips}
 									editable={editable}
-									missingPermissionMessage={
-										ERRORS.reservation.permissions.edit
-									}
+									missingPermissionMessage={ERRORS.reservation.permissions.edit}
 								/>
 							)}
 
@@ -936,41 +844,30 @@ const EditReservation: FC<EditReservationProp> = ({
 									required: false,
 								}}
 								editable={editable}
-								missingPermissionMessage={
-									ERRORS.reservation.permissions.edit
-								}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
-							<div className='flex flex-col border-t-2 border-black p-2'>
-								<span className='font-bold mb-2'>
+							<div className="flex flex-col border-t-2 border-black p-2">
+								<span className="font-bold mb-2">
 									{t('Customer (Optional)')}:
 								</span>
 								<EditablePhoneNumber
 									originalPhoneNumber={
-										reservation.customer?.phone_number ||
-										null
+										reservation.customer?.phone_number || null
 									}
 									phoneNumber={customerPhoneNumberInput}
 									setPhoneNumber={setCustomerPhoneNumberInput}
 									label={LABELS.customer.phone_number}
 									name={NAMES.customer.phone_number}
 									validationProp={{
-										required:
-											customerPhoneNumberInput !== null,
-										requiredMessage:
-											ERRORS.customer.phone_number
-												.required,
+										required: customerPhoneNumberInput !== null,
+										requiredMessage: ERRORS.customer.phone_number.required,
 										invalid: invalidCustomerPhoneNumber,
-										setInvalid:
-											setInvalidCustomerPhoneNumber,
-										invalidMessage:
-											ERRORS.customer.phone_number
-												.invalid,
+										setInvalid: setInvalidCustomerPhoneNumber,
+										invalidMessage: ERRORS.customer.phone_number.invalid,
 									}}
 									editable={editable}
-									missingPermissionMessage={
-										ERRORS.reservation.permissions.edit
-									}
+									missingPermissionMessage={ERRORS.reservation.permissions.edit}
 								/>
 
 								{customerPhoneNumberInput !== null &&
@@ -979,69 +876,40 @@ const EditReservation: FC<EditReservationProp> = ({
 										<>
 											<EditableInput
 												originalText={
-													reservation.customer
-														?.customer_name || null
+													reservation.customer?.customer_name || null
 												}
 												text={customerNameInput}
 												setText={setCustomerNameInput}
-												label={
-													LABELS.customer
-														.customer_name
-												}
-												name={
-													NAMES.customer.customer_name
-												}
-												type='text'
-												placeholder={
-													PLACEHOLDERS.customer
-														.customer_name
-												}
+												label={LABELS.customer.customer_name}
+												name={NAMES.customer.customer_name}
+												type="text"
+												placeholder={PLACEHOLDERS.customer.customer_name}
 												validationProp={{
-													maxLength:
-														LENGTHS.customer
-															.customer_name,
-													required:
-														customerPhoneNumberInput.length ===
-														10,
-													requiredMessage:
-														ERRORS.customer
-															.customer_name
-															.required,
-													invalid:
-														invalidCustomerName,
-													setInvalid:
-														setInvalidCustomerName,
-													invalidMessage:
-														ERRORS.customer
-															.customer_name
-															.invalid,
+													maxLength: LENGTHS.customer.customer_name,
+													required: false,
+													invalid: invalidCustomerName,
+													setInvalid: setInvalidCustomerName,
+													invalidMessage: ERRORS.customer.customer_name.invalid,
 												}}
 												editable={editable}
 												missingPermissionMessage={
-													ERRORS.reservation
-														.permissions.edit
+													ERRORS.reservation.permissions.edit
 												}
 											/>
 
 											<EditableTextArea
-												originalText={
-													reservation.customer
-														?.notes || null
-												}
+												originalText={reservation.customer?.notes || null}
 												text={customerNotesInput}
 												setText={setCustomerNotesInput}
 												label={LABELS.customer.notes}
 												name={NAMES.customer.notes}
-												placeholder={
-													PLACEHOLDERS.customer.notes
-												}
+												placeholder={PLACEHOLDERS.customer.notes}
 												validationProp={{
 													required: false,
 												}}
 												editable={editable}
 												missingPermissionMessage={
-													ERRORS.reservation
-														.permissions.edit
+													ERRORS.reservation.permissions.edit
 												}
 											/>
 										</>
@@ -1078,9 +946,7 @@ const EditReservation: FC<EditReservationProp> = ({
 				}
 				onEdit={onEdit}
 				disabledDelete={!deletable}
-				deleteMissingPermissionMessage={
-					ERRORS.reservation.permissions.delete
-				}
+				deleteMissingPermissionMessage={ERRORS.reservation.permissions.delete}
 				onDelete={() => setOpenDeleteModal(true)}
 			/>
 			<DeleteReservationModal

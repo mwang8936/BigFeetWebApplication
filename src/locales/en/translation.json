@@ -204,7 +204,6 @@
     "Invalid search field.": "Invalid search field.",
     "Phone Number cannot be empty.": "Phone Number cannot be empty.",
     "Phone Number Invalid": "Phone Number can only contain numbers and must be {{length}} characters long.",
-    "Customer Name cannot be empty.": "Customer Name cannot be empty.",
     "Customer Name Invalid": "Customer Name must be between 1-{{length}} characters long.",
     "You do not have permissions to get customers.": "You do not have permissions to get customers.",
     "You do not have permissions to edit customers.": "You do not have permissions to edit customers.",

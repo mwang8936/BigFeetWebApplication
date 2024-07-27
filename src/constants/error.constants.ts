@@ -21,7 +21,6 @@ const ERRORS = {
 			},
 		},
 		customer_name: {
-			required: 'Customer Name cannot be empty.',
 			invalid: {
 				key: 'Customer Name Invalid',
 				value: {

@@ -162,26 +162,11 @@ const AddReservation: FC<AddReservationProp> = ({
 	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
 	useEffect(() => {
-		const missingCustomerInput =
-			customerPhoneNumberInput !== null &&
-			customerPhoneNumberInput.length === 10
-				? customerNameInput === null
-				: false;
 		const missingRequiredInput =
-			dateInput === null ||
-			employeeIdInput === null ||
-			serviceIdInput === null ||
-			missingCustomerInput;
+			dateInput === null || employeeIdInput === null || serviceIdInput === null;
 
 		setMissingRequiredInput(missingRequiredInput);
-	}, [
-		dateInput,
-		employeeIdInput,
-		serviceIdInput,
-		genderInput,
-		customerPhoneNumberInput,
-		customerNameInput,
-	]);
+	}, [dateInput, employeeIdInput, serviceIdInput, genderInput]);
 
 	useEffect(() => {
 		const invalidCustomer =
@@ -225,9 +210,7 @@ const AddReservation: FC<AddReservationProp> = ({
 			);
 			if (service) {
 				const startDate = new Date(dateInput);
-				const endDate = new Date(
-					startDate.getTime() + service.time * 60000
-				);
+				const endDate = new Date(startDate.getTime() + service.time * 60000);
 
 				const reservationsAtSameTime = schedules
 					.flatMap((schedule) => schedule.reservations)
@@ -241,12 +224,9 @@ const AddReservation: FC<AddReservationProp> = ({
 					);
 
 				const bedsUsedAtSameTime = reservationsAtSameTime
-					.filter(
-						(reservation) => reservation.service.beds_required > 0
-					)
+					.filter((reservation) => reservation.service.beds_required > 0)
 					.reduce(
-						(total, reservation) =>
-							total + reservation.service.beds_required,
+						(total, reservation) => total + reservation.service.beds_required,
 						0
 					);
 				if (
@@ -260,11 +240,9 @@ const AddReservation: FC<AddReservationProp> = ({
 				}
 
 				if (employeeIdInput) {
-					const conflictingReservations =
-						reservationsAtSameTime.filter(
-							(reservation) =>
-								reservation.employee_id === employeeIdInput
-						);
+					const conflictingReservations = reservationsAtSameTime.filter(
+						(reservation) => reservation.employee_id === employeeIdInput
+					);
 					if (conflictingReservations.length > 0) {
 						setConflict(true);
 						setOpenConflictWarningModal(true);
@@ -312,22 +290,21 @@ const AddReservation: FC<AddReservationProp> = ({
 
 	return (
 		<>
-			<div className='bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4'>
-				<div className='sm:flex sm:items-start'>
-					<div className='mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10'>
+			<div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+				<div className="sm:flex sm:items-start">
+					<div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
 						<PlusCircleIcon
-							className='h-6 w-6 text-green-600'
-							aria-hidden='true'
+							className="h-6 w-6 text-green-600"
+							aria-hidden="true"
 						/>
 					</div>
-					<div className='mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full'>
+					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
-							as='h3'
-							className='text-base font-semibold leading-6 text-gray-900'
-						>
+							as="h3"
+							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Add Reservation')}
 						</Dialog.Title>
-						<div className='mt-2'>
+						<div className="mt-2">
 							<AddDate
 								date={dateInput}
 								setDate={setDateInput}
@@ -336,12 +313,10 @@ const AddReservation: FC<AddReservationProp> = ({
 									minDate: undefined,
 									maxDate: undefined,
 									required: true,
-									requiredMessage:
-										ERRORS.reservation.date.required,
+									requiredMessage: ERRORS.reservation.date.required,
 									invalid: invalidDate,
 									setInvalid: setInvalidDate,
-									invalidMessage:
-										ERRORS.reservation.date.invalid,
+									invalidMessage: ERRORS.reservation.date.invalid,
 								}}
 							/>
 
@@ -353,12 +328,10 @@ const AddReservation: FC<AddReservationProp> = ({
 									min: STORES.start,
 									max: STORES.end,
 									required: true,
-									requiredMessage:
-										ERRORS.reservation.time.required,
+									requiredMessage: ERRORS.reservation.time.required,
 									invalid: invalidTime,
 									setInvalid: setInvalidTime,
-									invalidMessage:
-										ERRORS.reservation.time.invalid,
+									invalidMessage: ERRORS.reservation.time.invalid,
 								}}
 							/>
 
@@ -366,22 +339,18 @@ const AddReservation: FC<AddReservationProp> = ({
 								option={
 									employeeDropDownItems[
 										employeeDropDownItems.findIndex(
-											(option) =>
-												option.id === employeeIdInput
+											(option) => option.id === employeeIdInput
 										) || 0
 									]
 								}
 								options={employeeDropDownItems}
 								setOption={(option) => {
-									setEmployeeIdInput(
-										option.id as number | null
-									);
+									setEmployeeIdInput(option.id as number | null);
 								}}
 								label={LABELS.reservation.employee_id}
 								validationProp={{
 									required: true,
-									requiredMessage:
-										ERRORS.reservation.employee_id.required,
+									requiredMessage: ERRORS.reservation.employee_id.required,
 								}}
 							/>
 
@@ -389,22 +358,18 @@ const AddReservation: FC<AddReservationProp> = ({
 								option={
 									serviceDropDownItems[
 										serviceDropDownItems.findIndex(
-											(option) =>
-												option.id === serviceIdInput
+											(option) => option.id === serviceIdInput
 										) || 0
 									]
 								}
 								options={serviceDropDownItems}
 								setOption={(option) => {
-									setServiceIdInput(
-										option.id as number | null
-									);
+									setServiceIdInput(option.id as number | null);
 								}}
 								label={LABELS.reservation.service_id}
 								validationProp={{
 									required: true,
-									requiredMessage:
-										ERRORS.reservation.service_id.required,
+									requiredMessage: ERRORS.reservation.service_id.required,
 								}}
 							/>
 
@@ -412,8 +377,7 @@ const AddReservation: FC<AddReservationProp> = ({
 								option={
 									genderDropDownItems[
 										genderDropDownItems.findIndex(
-											(option) =>
-												option.id === genderInput
+											(option) => option.id === genderInput
 										) || 0
 									]
 								}
@@ -449,8 +413,8 @@ const AddReservation: FC<AddReservationProp> = ({
 								placeholder={PLACEHOLDERS.reservation.message}
 							/>
 
-							<div className='flex flex-col border-t-2 border-black p-2'>
-								<span className='font-bold mb-2'>
+							<div className="flex flex-col border-t-2 border-black p-2">
+								<span className="font-bold mb-2">
 									{t('Customer (Optional)')}:
 								</span>
 								<AddPhoneNumber
@@ -459,17 +423,11 @@ const AddReservation: FC<AddReservationProp> = ({
 									label={LABELS.customer.phone_number}
 									name={NAMES.customer.phone_number}
 									validationProp={{
-										required:
-											customerPhoneNumberInput !== null,
-										requiredMessage:
-											ERRORS.customer.phone_number
-												.required,
+										required: customerPhoneNumberInput !== null,
+										requiredMessage: ERRORS.customer.phone_number.required,
 										invalid: invalidCustomerPhoneNumber,
-										setInvalid:
-											setInvalidCustomerPhoneNumber,
-										invalidMessage:
-											ERRORS.customer.phone_number
-												.invalid,
+										setInvalid: setInvalidCustomerPhoneNumber,
+										invalidMessage: ERRORS.customer.phone_number.invalid,
 									}}
 								/>
 
@@ -480,38 +438,17 @@ const AddReservation: FC<AddReservationProp> = ({
 											<AddInput
 												text={customerNameInput}
 												setText={setCustomerNameInput}
-												label={
-													LABELS.customer
-														.customer_name
-												}
-												name={
-													NAMES.customer.customer_name
-												}
-												type='text'
+												label={LABELS.customer.customer_name}
+												name={NAMES.customer.customer_name}
+												type="text"
 												validationProp={{
-													maxLength:
-														LENGTHS.customer
-															.customer_name,
-													required:
-														customerPhoneNumberInput.length ===
-														10,
-													requiredMessage:
-														ERRORS.customer
-															.customer_name
-															.required,
-													invalid:
-														invalidCustomerName,
-													setInvalid:
-														setInvalidCustomerName,
-													invalidMessage:
-														ERRORS.customer
-															.customer_name
-															.invalid,
+													maxLength: LENGTHS.customer.customer_name,
+													required: false,
+													invalid: invalidCustomerName,
+													setInvalid: setInvalidCustomerName,
+													invalidMessage: ERRORS.customer.customer_name.invalid,
 												}}
-												placeholder={
-													PLACEHOLDERS.customer
-														.customer_name
-												}
+												placeholder={PLACEHOLDERS.customer.customer_name}
 											/>
 
 											<AddTextArea
@@ -522,9 +459,7 @@ const AddReservation: FC<AddReservationProp> = ({
 												validationProp={{
 													required: false,
 												}}
-												placeholder={
-													PLACEHOLDERS.customer.notes
-												}
+												placeholder={PLACEHOLDERS.customer.notes}
 											/>
 										</>
 									)}

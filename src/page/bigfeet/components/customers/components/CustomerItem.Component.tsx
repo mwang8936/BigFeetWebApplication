@@ -31,13 +31,15 @@ const CustomerItem: FC<CustomerItemProp> = ({
 			className="w-full h-fit p-2 border-2 border-black flex flex-col hover:bg-slate-300 cursor-pointer"
 			onClick={() => setOpen(true)}>
 			<span>
-				<span className="font-bold me-1">{t('Name')}:</span>
-				{customer.customer_name}
-			</span>
-			<span>
 				<span className="font-bold me-1">{t('Phone Number')}:</span>
 				{formatPhoneNumber(customer.phone_number)}
 			</span>
+			{customer.customer_name && (
+				<span>
+					<span className="font-bold me-1">{t('Name')}:</span>
+					{customer.customer_name}
+				</span>
+			)}
 			{customer.notes && (
 				<span>
 					<span className="font-bold me-1">{t('Notes')}:</span>

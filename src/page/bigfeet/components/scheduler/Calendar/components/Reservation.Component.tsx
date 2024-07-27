@@ -214,7 +214,7 @@ const ReservationTag: FC<ReservationTagProp> = ({
 		</span>
 	);
 
-	const customerNameText = reservation.customer && (
+	const customerNameText = reservation.customer?.customer_name && (
 		<span className="font-medium">
 			{t('Customer')}: <br /> {reservation.customer.customer_name}
 		</span>
