@@ -73,6 +73,7 @@ const AddTime: FC<AddTimeProp> = ({ time, setTime, label, validationProp }) => {
 								setTime(selectedTime.toDate());
 							}
 						}}
+						closeOnSelect={false}
 						minTime={minTime}
 						maxTime={maxTime}
 						onError={(error) => {

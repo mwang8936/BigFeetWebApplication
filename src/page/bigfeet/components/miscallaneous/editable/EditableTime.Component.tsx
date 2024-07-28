@@ -99,6 +99,7 @@ const EditableTime: FC<EditableTimeProp> = ({
 								setTime(selectedTime.toDate());
 							}
 						}}
+						closeOnSelect={false}
 						minTime={minTime}
 						maxTime={maxTime}
 						disabled={disabled}
