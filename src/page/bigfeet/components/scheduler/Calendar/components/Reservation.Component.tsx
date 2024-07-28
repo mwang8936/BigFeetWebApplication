@@ -172,7 +172,7 @@ const ReservationTag: FC<ReservationTagProp> = ({
 		colourMap.get(reservation.service.color) || 'bg-slate-100 border-slate-200';
 
 	const serviceText = (
-		<span>
+		<span className="text-lg">
 			{reservation.requested_employee && ' • '}
 			{reservation.service.shorthand}
 		</span>
@@ -238,7 +238,7 @@ const ReservationTag: FC<ReservationTagProp> = ({
 	);
 
 	const timeText = (
-		<span className="mt-auto">
+		<span className="mt-auto text-base">
 			{reservation.reserved_date
 				.toLocaleTimeString()
 				.replace(/(.*)\D\d+/, '$1')}{' '}

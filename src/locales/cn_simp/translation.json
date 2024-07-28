@@ -150,7 +150,7 @@
     "Service Deleted Successfully": "服务项目删除成功",
     "Failed to Delete Service": "服务项目删除失败",
     "B": "B",
-    "F": "R",
+    "F": "F",
     "A": "A",
     "Delete Service": "删除服务项目: {{service}}",
     "Are you sure you want to delete this service? This action cannot be reversed.": "请确认是否要删除？",
