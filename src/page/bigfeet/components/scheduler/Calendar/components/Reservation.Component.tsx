@@ -106,7 +106,7 @@ const ReservationTag: FC<ReservationTagProp> = ({
 
 	useEffect(() => {
 		setPosition({ x: 0, y: 0 });
-	}, [reservation]);
+	}, [reservation.employee_id, reservation.reserved_date.getTime()]);
 
 	const employeeOffset = Math.round(position.x / 200);
 	const timeOffset = Math.round(position.y / (100 / 6));

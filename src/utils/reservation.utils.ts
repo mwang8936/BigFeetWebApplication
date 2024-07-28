@@ -52,9 +52,6 @@ export const reservationBedConflict = (
 
 	const endDate = new Date(startDate.getTime() + service.time * 60000);
 
-	console.log(startDate.getTime());
-	console.log(endDate.getTime());
-
 	const newInterval: Interval = {
 		start: startDate.getTime(),
 		end: endDate.getTime(),
