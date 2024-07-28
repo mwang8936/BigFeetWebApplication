@@ -55,6 +55,10 @@ import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Componen
 import Schedule from '../../../../../../../models/Schedule.Model';
 import { formatDateToQueryKey } from '../../../../../../../utils/string.utils';
 import EditablePayRateAutomatic from '../../../editable/EditablePayRateAutomatic.Component';
+import {
+	reservationBedConflict,
+	reservationEmployeeConflict,
+} from '../../../../../../../utils/reservation.utils';
 
 interface EditReservationProp {
 	setOpen(open: boolean): void;
@@ -87,6 +91,8 @@ const EditReservation: FC<EditReservationProp> = ({
 	const [openBedWarningModal, setOpenBedWarningModal] =
 		useState<boolean>(false);
 	const [openConflictWarningModal, setOpenConflictWarningModal] =
+		useState<boolean>(false);
+	const [openGenderMismatchWarningModel, setOpenGenderMismatchWarningModal] =
 		useState<boolean>(false);
 
 	const [dateInput, setDateInput] = useState<Date | null>(
@@ -151,6 +157,7 @@ const EditReservation: FC<EditReservationProp> = ({
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 	const [noBeds, setNoBeds] = useState<boolean>(false);
 	const [conflict, setConflict] = useState<boolean>(false);
+	const [genderMismatch, setGenderMismatch] = useState<boolean>(false);
 
 	const { user } = useUserContext();
 	const { date } = useScheduleDateContext();
@@ -369,31 +376,21 @@ const EditReservation: FC<EditReservationProp> = ({
 			);
 			if (service) {
 				const startDate = new Date(dateInput);
-				const endDate = new Date(startDate.getTime() + service.time * 60000);
 
-				const reservationsAtSameTime = schedules
-					.flatMap((schedule) => schedule.reservations)
-					.filter(
-						(res) =>
-							res.reservation_id !== reservation.reservation_id &&
-							doesDateOverlap(
-								res.reserved_date,
-								startDate,
-								endDate,
-								res.service.time
-							)
-					);
+				const reservationId = reservation.reservation_id;
 
-				const bedsUsedAtSameTime = reservationsAtSameTime
-					.filter((reservation) => reservation.service.beds_required > 0)
-					.reduce(
-						(total, reservation) => total + reservation.service.beds_required,
-						0
-					);
-				if (
-					service.beds_required > 0 &&
-					bedsUsedAtSameTime + service.beds_required > STORES.beds
-				) {
+				const reservations = schedules.flatMap(
+					(schedule) => schedule.reservations
+				);
+
+				const bedsConflict = reservationBedConflict(
+					startDate,
+					service,
+					reservations,
+					reservationId
+				);
+
+				if (bedsConflict) {
 					setNoBeds(true);
 					setOpenBedWarningModal(true);
 				} else {
@@ -401,10 +398,15 @@ const EditReservation: FC<EditReservationProp> = ({
 				}
 
 				if (employeeIdInput) {
-					const conflictingReservations = reservationsAtSameTime.filter(
-						(reservation) => reservation.employee_id === employeeIdInput
+					const reservationConflict = reservationEmployeeConflict(
+						startDate,
+						employeeIdInput,
+						service,
+						reservations,
+						reservationId
 					);
-					if (conflictingReservations.length > 0) {
+
+					if (reservationConflict) {
 						setConflict(true);
 						setOpenConflictWarningModal(true);
 					} else {
@@ -422,6 +424,29 @@ const EditReservation: FC<EditReservationProp> = ({
 			setConflict(false);
 		}
 	}, [dateInput, employeeIdInput, serviceIdInput]);
+
+	useEffect(() => {
+		if (employeeIdInput && genderInput) {
+			const employee = employees.find(
+				(employee) => employee.employee_id === employeeIdInput
+			);
+
+			if (employee) {
+				const sameGender = employee.gender === genderInput;
+
+				if (!sameGender) {
+					setGenderMismatch(true);
+					setOpenGenderMismatchWarningModal(true);
+				} else {
+					setGenderMismatch(false);
+				}
+			} else {
+				setGenderMismatch(false);
+			}
+		} else {
+			setGenderMismatch(false);
+		}
+	}, [employeeIdInput, genderInput]);
 
 	const onEdit = async () => {
 		const reserved_date: Date | undefined =
@@ -926,8 +951,9 @@ const EditReservation: FC<EditReservationProp> = ({
 					!changesMade ||
 					missingRequiredInput ||
 					invalidInput ||
+					conflict ||
 					noBeds ||
-					conflict
+					genderMismatch
 				}
 				editMissingPermissionMessage={
 					!editable
@@ -938,10 +964,12 @@ const EditReservation: FC<EditReservationProp> = ({
 						? ERRORS.required
 						: invalidInput
 						? ERRORS.invalid
-						: noBeds
-						? ERRORS.warnings.no_beds.title
 						: conflict
 						? ERRORS.warnings.conflicts.title
+						: noBeds
+						? ERRORS.warnings.no_beds.title
+						: genderMismatch
+						? ERRORS.warnings.gender_mismatch.title
 						: ''
 				}
 				onEdit={onEdit}
@@ -955,6 +983,12 @@ const EditReservation: FC<EditReservationProp> = ({
 				reservationId={reservation.reservation_id}
 				deletable={deletable}
 				onDeleteReservation={onDelete}
+			/>
+			<WarningModal
+				open={openGenderMismatchWarningModel}
+				setOpen={setOpenGenderMismatchWarningModal}
+				title={ERRORS.warnings.gender_mismatch.title}
+				message={ERRORS.warnings.gender_mismatch.message}
 			/>
 			<WarningModal
 				open={openBedWarningModal}

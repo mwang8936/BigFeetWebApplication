@@ -321,6 +321,11 @@ const ERRORS = {
 			message:
 				'There is another reservation at this time. Please choose another time or employee.',
 		},
+		gender_mismatch: {
+			title: 'Gender Mismatch!',
+			message:
+				'This employee does not have the requested gender. Please choose another employee.',
+		},
 	},
 	required: 'You are missing a required input.',
 	invalid: 'An input is invalid.',

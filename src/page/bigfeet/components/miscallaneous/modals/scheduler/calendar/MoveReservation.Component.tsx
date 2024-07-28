@@ -26,6 +26,10 @@ import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Componen
 import { getSchedules } from '../../../../../../../service/schedule.service';
 import { getProfileSchedules } from '../../../../../../../service/profile.service';
 import Schedule from '../../../../../../../models/Schedule.Model';
+import {
+	reservationBedConflict,
+	reservationEmployeeConflict,
+} from '../../../../../../../utils/reservation.utils';
 
 interface MoveReservationProp {
 	setOpen(open: boolean): void;
@@ -58,9 +62,12 @@ const MoveReservation: FC<MoveReservationProp> = ({
 		useState<boolean>(false);
 	const [openConflictWarningModal, setOpenConflictWarningModal] =
 		useState<boolean>(false);
+	const [openGenderMismatchWarningModel, setOpenGenderMismatchWarningModal] =
+		useState<boolean>(false);
 
 	const [noBeds, setNoBeds] = useState<boolean>(false);
 	const [conflict, setConflict] = useState<boolean>(false);
+	const [genderMismatch, setGenderMismatch] = useState<boolean>(false);
 
 	const { user } = useUserContext();
 	const { date } = useScheduleDateContext();
@@ -108,37 +115,24 @@ const MoveReservation: FC<MoveReservationProp> = ({
 	)?.username;
 
 	useEffect(() => {
-		const service = reservation.service;
-
 		const startDate = newTime
 			? new Date(newTime)
 			: new Date(reservation.reserved_date);
-		const endDate = new Date(startDate.getTime() + service.time * 60000);
 
-		const reservationsAtSameTime = schedules
-			.flatMap((schedule) => schedule.reservations)
-			.filter(
-				(res) =>
-					res.reservation_id !== reservation.reservation_id &&
-					doesDateOverlap(
-						res.reserved_date,
-						startDate,
-						endDate,
-						res.service.time
-					)
-			);
+		const service = reservation.service;
 
-		const bedsUsedAtSameTime = reservationsAtSameTime
-			.filter((reservation) => reservation.service.beds_required > 0)
-			.reduce(
-				(total, reservation) =>
-					total + reservation.service.beds_required,
-				0
-			);
-		if (
-			service.beds_required > 0 &&
-			bedsUsedAtSameTime + service.beds_required > STORES.beds
-		) {
+		const reservationId = reservation.reservation_id;
+
+		const reservations = schedules.flatMap((schedule) => schedule.reservations);
+
+		const bedsConflict = reservationBedConflict(
+			startDate,
+			service,
+			reservations,
+			reservationId
+		);
+
+		if (bedsConflict) {
 			setNoBeds(true);
 			setOpenBedWarningModal(true);
 		} else {
@@ -146,13 +140,17 @@ const MoveReservation: FC<MoveReservationProp> = ({
 		}
 
 		const employeeId =
-			newEmployeeId === undefined
-				? reservation.employee_id
-				: newEmployeeId;
-		const conflictingReservations = reservationsAtSameTime.filter(
-			(reservation) => reservation.employee_id === employeeId
+			newEmployeeId === undefined ? reservation.employee_id : newEmployeeId;
+
+		const reservationConflict = reservationEmployeeConflict(
+			startDate,
+			employeeId,
+			service,
+			reservations,
+			reservationId
 		);
-		if (conflictingReservations.length > 0) {
+
+		if (reservationConflict) {
 			setConflict(true);
 			setOpenConflictWarningModal(true);
 		} else {
@@ -160,74 +158,85 @@ const MoveReservation: FC<MoveReservationProp> = ({
 		}
 	}, []);
 
+	useEffect(() => {
+		if (newEmployeeId && reservation.requested_gender) {
+			const employee = employees.find(
+				(employee) => employee.employee_id === newEmployeeId
+			);
+
+			if (employee) {
+				const sameGender = employee.gender === reservation.requested_gender;
+
+				if (!sameGender) {
+					setGenderMismatch(true);
+					setOpenGenderMismatchWarningModal(true);
+				} else {
+					setGenderMismatch(false);
+				}
+			} else {
+				setGenderMismatch(false);
+			}
+		} else {
+			setGenderMismatch(false);
+		}
+	}, []);
+
 	const onEdit = () => {
 		if (
 			newTime ||
-			(newEmployeeId !== undefined &&
-				newEmployeeId !== reservation.employee_id)
+			(newEmployeeId !== undefined && newEmployeeId !== reservation.employee_id)
 		) {
 			const updateReservationRequest: UpdateReservationRequest = {
 				reserved_date: newTime,
 				employee_id: newEmployeeId,
 				updated_by: updatedBy,
 			};
-			onEditReservation(
-				reservation.reservation_id,
-				updateReservationRequest
-			);
+			onEditReservation(reservation.reservation_id, updateReservationRequest);
 			setOpen(false);
 		}
 	};
 
 	return (
 		<>
-			<div className='bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4'>
-				<div className='sm:flex sm:items-start'>
-					<div className='mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10'>
+			<div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+				<div className="sm:flex sm:items-start">
+					<div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
 						<PencilSquareIcon
-							className='h-6 w-6 text-blue-600'
-							aria-hidden='true'
+							className="h-6 w-6 text-blue-600"
+							aria-hidden="true"
 						/>
 					</div>
-					<div className='mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full'>
+					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
-							as='h3'
-							className='text-base font-semibold leading-6 text-gray-900'
-						>
+							as="h3"
+							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Edit Reservation')}
 						</Dialog.Title>
-						<div className='mt-2'>
+						<div className="mt-2">
 							{t(
 								'Would you like to make the following changes to the reservation?'
 							)}
-							<div className='flex flex-col text-m text-black font-bold mt-3'>
+							<div className="flex flex-col text-m text-black font-bold mt-3">
 								{prevEmployeeUsername &&
 									newEmployeeUsername &&
-									prevEmployeeUsername !==
-										newEmployeeUsername && (
-										<span className='flex flex-row'>
-											<span className='me-3 font-medium'>
-												{t('Employee')}:
-											</span>
+									prevEmployeeUsername !== newEmployeeUsername && (
+										<span className="flex flex-row">
+											<span className="me-3 font-medium">{t('Employee')}:</span>
 											{prevEmployeeUsername}
 											<ArrowLongRightIcon
-												className='h-6 w-6 mx-3 text-black'
-												aria-hidden='true'
+												className="h-6 w-6 mx-3 text-black"
+												aria-hidden="true"
 											/>
 											{newEmployeeUsername}
 										</span>
 									)}
 								{newTime && (
-									<span className='flex flex-row'>
-										<span className='me-3 font-medium'>
-											{t('Time')}:
-										</span>
-										{formatTimeFromDate(
-											reservation.reserved_date
-										)}
+									<span className="flex flex-row">
+										<span className="me-3 font-medium">{t('Time')}:</span>
+										{formatTimeFromDate(reservation.reserved_date)}
 										<ArrowLongRightIcon
-											className='h-6 w-6 mx-3 text-black'
-											aria-hidden='true'
+											className="h-6 w-6 mx-3 text-black"
+											aria-hidden="true"
 										/>
 										{newTime && formatTimeFromDate(newTime)}
 									</span>
@@ -242,17 +251,25 @@ const MoveReservation: FC<MoveReservationProp> = ({
 					onCancel();
 					setOpen(false);
 				}}
-				disabledEdit={!editable || noBeds || conflict}
+				disabledEdit={!editable || conflict || noBeds || genderMismatch}
 				editMissingPermissionMessage={
 					!editable
 						? ERRORS.reservation.permissions.edit
-						: noBeds
-						? ERRORS.warnings.no_beds.title
 						: conflict
 						? ERRORS.warnings.conflicts.title
+						: noBeds
+						? ERRORS.warnings.no_beds.title
+						: genderMismatch
+						? ERRORS.warnings.gender_mismatch.title
 						: ''
 				}
 				onEdit={onEdit}
+			/>
+			<WarningModal
+				open={openGenderMismatchWarningModel}
+				setOpen={setOpenGenderMismatchWarningModal}
+				title={ERRORS.warnings.gender_mismatch.title}
+				message={ERRORS.warnings.gender_mismatch.message}
 			/>
 			<WarningModal
 				open={openBedWarningModal}
