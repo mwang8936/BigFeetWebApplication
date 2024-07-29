@@ -62,6 +62,7 @@ export const reservationBedConflict = (
 		.filter(
 			(res) =>
 				res.reservation_id !== reservationId &&
+				res.service.beds_required > 0 &&
 				doesDateOverlap(res.reserved_date, startDate, endDate, res.service.time)
 		)
 		.map((res) => {
@@ -107,7 +108,7 @@ export const reservationBedConflict = (
 
 	events.sort((a, b) => {
 		if (a.time === b.time) {
-			return a.type === eventType.start ? -1 : 1; // Prioritize 'start' over 'end'
+			return a.type === eventType.end ? -1 : 1; // Prioritize 'end' over 'start'
 		}
 		return a.time - b.time;
 	});
