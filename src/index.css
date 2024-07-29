@@ -80,15 +80,9 @@
     bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom-right
   }
 
-  .sidebar::-webkit-scrollbar {
-    display: none
-  }
-
   .sidebar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    @apply fixed top-0 left-0 flex z-20 landscape:flex-col landscape:h-screen landscape:w-1/12 landscape:min-w-max landscape:min-h-max landscape:overflow-y-auto landscape:overflow-x-hidden
-    portrait:flex-row portrait:h-[10%] portrait:w-screen portrait:min-h-max portrait:overflow-x-auto portrait:overflow-y-hidden bg-primary shadow-lg 
+    @apply fixed top-0 left-0 flex z-20 landscape:flex-col landscape:h-screen landscape:w-1/12 landscape:min-w-max landscape:min-h-max 
+    portrait:flex-row portrait:h-[10%] portrait:w-screen portrait:min-h-max  bg-primary shadow-lg 
   }
 
   .sidebar-icon {
