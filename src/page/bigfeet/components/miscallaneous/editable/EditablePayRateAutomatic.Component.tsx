@@ -45,10 +45,10 @@ const EditablePayRateAutomatic: FC<EditablePayRateAutomaticProp> = ({
 }) => {
 	const { t } = useTranslation();
 
-	const [disabled, setDisabled] = useState(true);
+	const [disabled, setDisabled] = useState(originalAmount !== null);
 
 	useEffect(() => {
-		setDisabled(true);
+		setDisabled(originalAmount !== null);
 	}, [originalAmount]);
 
 	const fillBtnClick = () => {

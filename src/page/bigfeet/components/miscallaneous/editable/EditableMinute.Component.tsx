@@ -41,10 +41,10 @@ const EditableMinute: FC<EditableMinuteProp> = ({
 }) => {
 	const { t } = useTranslation();
 
-	const [disabled, setDisabled] = useState(true);
+	const [disabled, setDisabled] = useState(originalMinutes !== null);
 
 	useEffect(() => {
-		setDisabled(true);
+		setDisabled(originalMinutes !== null);
 	}, [originalMinutes]);
 
 	const handleDisableBtnClick = () => {

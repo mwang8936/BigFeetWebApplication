@@ -41,10 +41,10 @@ const EditableDate: FC<EditableDateProp> = ({
 }) => {
 	const { t } = useTranslation();
 
-	const [disabled, setDisabled] = useState(true);
+	const [disabled, setDisabled] = useState(originalDate !== null);
 
 	useEffect(() => {
-		setDisabled(true);
+		setDisabled(originalDate !== null);
 	}, [originalDate]);
 
 	useEffect(() => {

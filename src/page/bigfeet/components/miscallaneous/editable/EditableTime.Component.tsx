@@ -41,10 +41,10 @@ const EditableTime: FC<EditableTimeProp> = ({
 }) => {
 	const { t } = useTranslation();
 
-	const [disabled, setDisabled] = useState(true);
+	const [disabled, setDisabled] = useState(originalTime !== null);
 
 	useEffect(() => {
-		setDisabled(true);
+		setDisabled(originalTime !== null);
 	}, [originalTime]);
 
 	useEffect(() => {

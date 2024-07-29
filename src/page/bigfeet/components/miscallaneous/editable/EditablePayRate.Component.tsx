@@ -41,10 +41,10 @@ const EditablePayRate: FC<EditablePayRateProp> = ({
 }) => {
 	const { t } = useTranslation();
 
-	const [disabled, setDisabled] = useState(true);
+	const [disabled, setDisabled] = useState(originalAmount !== null);
 
 	useEffect(() => {
-		setDisabled(true);
+		setDisabled(originalAmount !== null);
 	}, [originalAmount]);
 
 	const handleDisableBtnClick = () => {

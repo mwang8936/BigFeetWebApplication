@@ -41,10 +41,10 @@ const EditableNumber: FC<EditableNumberProp> = ({
 }) => {
 	const { t } = useTranslation();
 
-	const [disabled, setDisabled] = useState(true);
+	const [disabled, setDisabled] = useState(originalInput !== null);
 
 	useEffect(() => {
-		setDisabled(true);
+		setDisabled(originalInput !== null);
 	}, [originalInput]);
 
 	const handleDisableBtnClick = () => {

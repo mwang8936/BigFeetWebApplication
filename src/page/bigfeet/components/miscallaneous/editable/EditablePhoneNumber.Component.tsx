@@ -41,10 +41,10 @@ const EditablePhoneNumber: FC<EditablePhoneNumberProp> = ({
 }) => {
 	const { t } = useTranslation();
 
-	const [disabled, setDisabled] = useState(true);
+	const [disabled, setDisabled] = useState(originalPhoneNumber !== null);
 
 	useEffect(() => {
-		setDisabled(true);
+		setDisabled(originalPhoneNumber !== null);
 	}, [originalPhoneNumber]);
 
 	const handleDisableBtnClick = () => {

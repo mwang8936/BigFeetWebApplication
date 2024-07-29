@@ -42,10 +42,10 @@ const EditableDropDown: FC<EditableDropDownProp> = ({
 }) => {
 	const { t } = useTranslation();
 
-	const [disabled, setDisabled] = useState(true);
+	const [disabled, setDisabled] = useState(originalOption.id !== null);
 
 	useEffect(() => {
-		setDisabled(true);
+		setDisabled(originalOption.id !== null);
 	}, [originalOption]);
 
 	const handleDisableBtnClick = () => {

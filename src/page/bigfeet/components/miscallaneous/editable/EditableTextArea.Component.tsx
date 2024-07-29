@@ -32,10 +32,10 @@ const EditableTextArea: FC<EditableTextAreaProp> = ({
 }) => {
 	const { t } = useTranslation();
 
-	const [disabled, setDisabled] = useState(true);
+	const [disabled, setDisabled] = useState(originalText !== null);
 
 	useEffect(() => {
-		setDisabled(true);
+		setDisabled(originalText !== null);
 	}, [originalText]);
 
 	const handleDisableBtnClick = () => {
