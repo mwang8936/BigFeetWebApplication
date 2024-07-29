@@ -7,26 +7,24 @@ import {
 	ServiceColor,
 	TipMethod,
 } from '../../../../../../models/enums';
-import {
-	formatDateToQueryKey,
-	formatPhoneNumber,
-} from '../../../../../../utils/string.utils';
+import { formatPhoneNumber } from '../../../../../../utils/string.utils';
 import { UpdateReservationRequest } from '../../../../../../models/requests/Reservation.Request.Model';
 import EditReservationModal from '../../../miscallaneous/modals/scheduler/calendar/EditReservationModal.Component';
 import Employee from '../../../../../../models/Employee.Model';
 import Draggable from 'react-draggable';
 import MoveReservationModal from '../../../miscallaneous/modals/scheduler/calendar/MoveReservationModal.Component';
 import STORES from '../../../../../../constants/store.constants';
-import { useUserContext } from '../../../../BigFeet.Page';
 import { sortEmployees } from '../../../../../../utils/employee.utils';
 import { useScheduleDateContext } from '../../Scheduler.Component';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
-import { getEmployees } from '../../../../../../service/employee.service';
 import { useNavigate } from 'react-router-dom';
-import { getSchedules } from '../../../../../../service/schedule.service';
-import { getProfileSchedules } from '../../../../../../service/profile.service';
 import Schedule from '../../../../../../models/Schedule.Model';
+import {
+	useEmployeesQuery,
+	useSchedulesQuery,
+	useUserQuery,
+} from '../../../../../../service/query/get-items.query';
+import User from '../../../../../../models/User.Model';
 
 interface ReservationTagProp {
 	reservation: Reservation;
@@ -59,7 +57,9 @@ const ReservationTag: FC<ReservationTagProp> = ({
 		y: 0,
 	});
 
-	const { user } = useUserContext();
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
 	const { date } = useScheduleDateContext();
 
 	let employeeList: Employee[] = [];
@@ -71,29 +71,19 @@ const ReservationTag: FC<ReservationTagProp> = ({
 		Permissions.PERMISSION_GET_SCHEDULE
 	);
 
-	const scheduleQuery = useQuery({
-		queryKey: ['schedules', formatDateToQueryKey(date)],
-		queryFn: () => {
-			if (scheduleGettable) {
-				return getSchedules(navigate, {
-					start: date,
-					end: date,
-				});
-			} else {
-				return getProfileSchedules(navigate);
-			}
-		},
-		staleTime: 0,
+	const scheduleQuery = useSchedulesQuery({
+		date,
+		gettable: scheduleGettable,
+		staleTime: Infinity,
 	});
 	const schedules: Schedule[] = (
 		(scheduleQuery.data as Schedule[]) || []
 	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
 	try {
-		const employeeQuery = useQuery({
-			queryKey: ['employees'],
-			queryFn: () => getEmployees(navigate),
-			enabled: employeeGettable,
+		const employeeQuery = useEmployeesQuery({
+			gettable: employeeGettable,
+			staleTime: Infinity,
 		});
 		const employees: Employee[] = (
 			(employeeQuery.data as Employee[]) || []

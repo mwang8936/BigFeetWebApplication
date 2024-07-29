@@ -1,10 +1,8 @@
 import { FC, useState } from 'react';
-import { useUserContext } from '../../BigFeet.Page';
 import { Permissions } from '../../../../models/enums';
 import {
 	addCustomer,
 	deleteCustomer,
-	getCustomers,
 	updateCustomer,
 } from '../../../../service/customer.service';
 import { useNavigate } from 'react-router-dom';
@@ -32,6 +30,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Loading from '../Loading.Component';
 import Customer from '../../../../models/Customer.Model';
 import Retry from '../Retry.Component';
+import {
+	useCustomersQuery,
+	useUserQuery,
+} from '../../../../service/query/get-items.query';
+import User from '../../../../models/User.Model';
 
 const Customers: FC = () => {
 	const { t } = useTranslation();
@@ -45,7 +48,8 @@ const Customers: FC = () => {
 	const [retryingCustomerQuery, setRetryingCustomerQuery] =
 		useState<boolean>(false);
 
-	const { user } = useUserContext();
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
 
 	const gettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_CUSTOMER
@@ -60,11 +64,7 @@ const Customers: FC = () => {
 		Permissions.PERMISSION_DELETE_CUSTOMER
 	);
 
-	const customerQuery = useQuery({
-		queryKey: ['customers'],
-		queryFn: () => getCustomers(navigate),
-		enabled: gettable,
-	});
+	const customerQuery = useCustomersQuery({ gettable });
 
 	const customers: Customer[] = customerQuery.data || [];
 

@@ -1,6 +1,5 @@
 import { FC, useEffect, useState } from 'react';
 import { Role, Permissions, Gender } from '../../../../../models/enums';
-import { useUserContext } from '../../../BigFeet.Page';
 import {
 	deleteEmployee,
 	updateEmployee,
@@ -31,13 +30,14 @@ import NAMES from '../../../../../constants/name.constants';
 import NUMBERS from '../../../../../constants/numbers.constants';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 import { useTranslation } from 'react-i18next';
-import { userKey } from '../../../../../constants/api.constants';
 import {
 	createLoadingToast,
 	errorToast,
 	successToast,
 } from '../../../../../utils/toast.utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useUserQuery } from '../../../../../service/query/get-items.query';
+import User from '../../../../../models/User.Model';
 
 interface EditEmployeeProp {
 	editable: boolean;
@@ -215,7 +215,9 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 		invalidPerHour,
 	]);
 
-	const { user, setUser } = useUserContext();
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
 	const { setAuthentication } = useAuthenticationContext();
 
 	const editEmployeeMutation = useMutation({
@@ -227,16 +229,9 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 			const toastId = createLoadingToast(t('Updating Employee...'));
 			return { toastId };
 		},
-		onSuccess: (_data, variables, context) => {
+		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: ['employees'] });
-			if (variables.employeeId == user.employee_id) {
-				const updatedUser = {
-					...user,
-					...variables.request,
-				};
-				sessionStorage.setItem(userKey, JSON.stringify(updatedUser));
-				setUser(updatedUser);
-			}
+			queryClient.invalidateQueries({ queryKey: ['user'] });
 
 			successToast(context.toastId, t('Employee Updated Successfully'));
 		},
@@ -315,6 +310,7 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: ['employees'] });
 			if (employee.employee_id === user.employee_id) {
+				queryClient.clear();
 				logout(setAuthentication);
 			}
 			successToast(context.toastId, t('Employee Deleted Successfully'));

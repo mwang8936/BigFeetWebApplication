@@ -17,7 +17,6 @@ import {
 } from '../../../../../../models/requests/Schedule.Request.Model';
 import ScheduleGrid from './ScheduleGrid.Component';
 import SignatureGrid from './SignatureGrid.Component';
-import { useUserContext } from '../../../../BigFeet.Page';
 import TotalGrid from './TotalGrid.Component';
 import TipGrid from './TipGrid.Component';
 import VipGrid from './VipGrid.Component';
@@ -27,6 +26,8 @@ import {
 } from '../../../../../../models/requests/Vip-Package.Request.Model';
 import { doesDateOverlap } from '../../../../../../utils/date.utils';
 import PayoutGrid from './PayoutGrid.Component';
+import { useUserQuery } from '../../../../../../service/query/get-items.query';
+import User from '../../../../../../models/User.Model';
 
 interface CalendarEmployeeColumnProp {
 	date: Date;
@@ -77,7 +78,8 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 	onDeleteVipPackage,
 	onScheduleSigned,
 }) => {
-	const { user } = useUserContext();
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
 
 	const renderGrids = () => {
 		const grids = [];

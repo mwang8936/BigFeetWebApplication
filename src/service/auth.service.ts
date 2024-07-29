@@ -7,7 +7,6 @@ import BASE_API_URL, {
 	authenticatePath,
 	loginPath,
 	tokenKey,
-	userKey,
 } from '../constants/api.constants';
 
 export function login(request: LoginRequest) {
@@ -17,7 +16,18 @@ export function login(request: LoginRequest) {
 		url: loginPath,
 		data: request,
 	};
-	return axios(config);
+
+	return axios(config)
+		.then((response) => {
+			console.log('Login Response:', response);
+			return parseData(response.data);
+		})
+		.catch((error: AxiosError) => {
+			console.error('Error logging in:', error);
+
+			const message = onError(error);
+			if (typeof message === 'string') throw new Error(message);
+		});
 }
 
 export async function authenticate(
@@ -52,6 +62,40 @@ export async function authenticate(
 	}
 }
 
+function parseData(data: any) {
+	if (data) {
+		if (Array.isArray(data)) {
+			data.map((object) => parseData(object));
+		} else {
+			Object.keys(data).forEach((key) => {
+				const property = data[key];
+				if (typeof property === 'string') {
+					if (/^\d{4}-\d{2}-\d{2}$/.test(property)) {
+						const [year, month, day] = property.split('-').map(Number);
+						const date = new Date(year, month - 1, day);
+						data[key] = date;
+					} else if (
+						/(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/.exec(
+							property
+						)
+					)
+						data[key] = new Date(property);
+					else if (
+						/((?:2[0-3]|[01]?[0-9]):[0-5][0-9]:[0-5][0-9])/.exec(property)
+					) {
+						const hours = parseInt(property.split(':')[0]);
+						const minutes = parseInt(property.split(':')[1]);
+						data[key] = new Date(1970, 1, 1, hours, minutes);
+					}
+				} else if (typeof property === 'object') {
+					data[key] = parseData(property);
+				}
+			});
+		}
+	}
+	return data;
+}
+
 function onError(error: AxiosError) {
 	if (error.response) {
 		const responseData: any = error.response.data;
@@ -66,9 +110,8 @@ function onError(error: AxiosError) {
 }
 
 export function logout(setAuthentication: (authenticated: boolean) => void) {
-	console.log('User logged out.');
-
-	sessionStorage.removeItem(userKey);
 	Cookies.remove(tokenKey);
 	setAuthentication(false);
+
+	console.log('User logged out.');
 }

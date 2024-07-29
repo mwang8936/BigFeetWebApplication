@@ -3,21 +3,42 @@ import { NavigateFunction } from 'react-router-dom';
 import authorizedRequest from './base.service';
 
 import {
+	GetServiceParam,
+	GetServicesParam,
+} from '../models/params/Service.Param';
+
+import {
 	AddServiceRequest,
 	UpdateServiceRequest,
 } from '../models/requests/Service.Request.Model';
 
 import { servicePath } from '../constants/api.constants';
 
-export async function getServices(navigate: NavigateFunction) {
-	return authorizedRequest(navigate, `${servicePath}`, 'get');
+export async function getServices(
+	navigate: NavigateFunction,
+	params?: GetServicesParam
+) {
+	return authorizedRequest(
+		navigate,
+		`${servicePath}`,
+		'get',
+		undefined,
+		params
+	);
 }
 
 export async function getService(
 	navigate: NavigateFunction,
-	service_id: number
+	service_id: number,
+	params?: GetServiceParam
 ) {
-	return authorizedRequest(navigate, `${servicePath}/${service_id}`, 'get');
+	return authorizedRequest(
+		navigate,
+		`${servicePath}/${service_id}`,
+		'get',
+		undefined,
+		params
+	);
 }
 
 export async function updateService(
@@ -45,4 +66,15 @@ export async function deleteService(
 	service_id: number
 ) {
 	return authorizedRequest(navigate, `${servicePath}/${service_id}`, 'delete');
+}
+
+export async function recoverService(
+	navigate: NavigateFunction,
+	service_id: number
+) {
+	return authorizedRequest(
+		navigate,
+		`${servicePath}/${service_id}/recover`,
+		'delete'
+	);
 }

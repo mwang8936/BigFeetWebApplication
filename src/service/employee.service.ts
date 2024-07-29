@@ -3,21 +3,42 @@ import { NavigateFunction } from 'react-router-dom';
 import authorizedRequest from './base.service';
 
 import {
+	GetEmployeeParam,
+	GetEmployeesParam,
+} from '../models/params/Employee.Param';
+
+import {
 	AddEmployeeRequest,
 	UpdateEmployeeRequest,
 } from '../models/requests/Employee.Request.Model';
 
 import { employeePath } from '../constants/api.constants';
 
-export async function getEmployees(navigate: NavigateFunction) {
-	return authorizedRequest(navigate, `${employeePath}`, 'get');
+export async function getEmployees(
+	navigate: NavigateFunction,
+	params?: GetEmployeesParam
+) {
+	return authorizedRequest(
+		navigate,
+		`${employeePath}`,
+		'get',
+		undefined,
+		params
+	);
 }
 
 export async function getEmployee(
 	navigate: NavigateFunction,
-	employee_id: number
+	employee_id: number,
+	params?: GetEmployeeParam
 ) {
-	return authorizedRequest(navigate, `${employeePath}/${employee_id}`, 'get');
+	return authorizedRequest(
+		navigate,
+		`${employeePath}/${employee_id}`,
+		'get',
+		undefined,
+		params
+	);
 }
 
 export async function updateEmployee(
@@ -47,6 +68,17 @@ export async function deleteEmployee(
 	return authorizedRequest(
 		navigate,
 		`${employeePath}/${employee_id}`,
+		'delete'
+	);
+}
+
+export async function recoverEmployee(
+	navigate: NavigateFunction,
+	employee_id: number
+) {
+	return authorizedRequest(
+		navigate,
+		`${employeePath}/${employee_id}/recover`,
 		'delete'
 	);
 }

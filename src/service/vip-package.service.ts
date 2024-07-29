@@ -8,9 +8,19 @@ import {
 } from '../models/requests/Vip-Package.Request.Model';
 
 import { vipPackagePath } from '../constants/api.constants';
+import { GetVipPackagesParam } from '../models/params/Vip-Package.Param';
 
-export async function getVipPackages(navigate: NavigateFunction) {
-	return authorizedRequest(navigate, `${vipPackagePath}`, 'get');
+export async function getVipPackages(
+	navigate: NavigateFunction,
+	params?: GetVipPackagesParam
+) {
+	return authorizedRequest(
+		navigate,
+		`${vipPackagePath}`,
+		'get',
+		undefined,
+		params
+	);
 }
 
 export async function getVipPackage(

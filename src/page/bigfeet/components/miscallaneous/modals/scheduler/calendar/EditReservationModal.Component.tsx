@@ -1,9 +1,10 @@
 import { FC } from 'react';
 import BaseModal from '../../BaseModal.Component';
-import { useUserContext } from '../../../../../BigFeet.Page';
 import EditReservation from './EditReservation.Component';
 import Reservation from '../../../../../../../models/Reservation.Model';
 import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
+import { useUserQuery } from '../../../../../../../service/query/get-items.query';
+import User from '../../../../../../../models/User.Model';
 
 interface EditReservationModalProp {
 	open: boolean;
@@ -29,7 +30,8 @@ const EditReservationModal: FC<EditReservationModalProp> = ({
 	deletable,
 	onDeleteReservation,
 }) => {
-	const { user } = useUserContext();
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
 
 	return (
 		<BaseModal

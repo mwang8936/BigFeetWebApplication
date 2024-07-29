@@ -13,12 +13,15 @@ import { login } from '../../../service/auth.service';
 import {
 	passwordKey,
 	tokenKey,
-	userKey,
 	usernameKey,
 } from '../../../constants/api.constants';
 import STORES from '../../../constants/store.constants';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { LoginRequest } from '../../../models/requests/Login.Request.Model';
 
 export default function LoginForm() {
+	const queryClient = useQueryClient();
+
 	//Obtain last used username and password from secure storage.
 	const savedUsername = secureLocalStorage.getItem(usernameKey);
 	const savedPassword = secureLocalStorage.getItem(passwordKey);
@@ -46,46 +49,47 @@ export default function LoginForm() {
 
 	const { setAuthentication } = useAuthenticationContext();
 
+	const loginMutation = useMutation({
+		mutationFn: (data: { request: LoginRequest; rememberMe: boolean }) =>
+			login(data.request),
+		onMutate: async () => setLoading(true),
+		onSuccess: (data, variables) => {
+			const { user, accessToken } = data;
+
+			setAuthentication(true);
+			Cookies.set(tokenKey, accessToken);
+
+			//If remember me is checked, securely store username and password in local storage.
+			const rememberMe = variables.rememberMe;
+			if (rememberMe) {
+				secureLocalStorage.setItem(usernameKey, username);
+				secureLocalStorage.setItem(passwordKey, password);
+			} else {
+				secureLocalStorage.removeItem(usernameKey);
+				secureLocalStorage.removeItem(passwordKey);
+			}
+
+			queryClient.setQueryData(['user'], user);
+		},
+		onError: (error) => setError(error.message),
+		onSettled: () => setLoading(false),
+	});
+
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
 		if (!username) setError(ERRORS.employee.username.required);
 		else if (!password) setError(ERRORS.employee.password.required);
 		else {
-			const rememberMe: boolean | undefined =
-				event.currentTarget.remember_me?.checked;
-			setLoading(true);
-			//Login API request.
-			login({ username, password })
-				.then((response) => {
-					const { user, accessToken } = response.data;
-					//Set authentication to true, store access token for future protected requests, and store user item.
-					setAuthentication(true);
-					Cookies.set(tokenKey, accessToken);
-					sessionStorage.setItem(userKey, JSON.stringify(user));
-					//If remember me is checked, securely store username and password in local storage.
-					if (rememberMe) {
-						secureLocalStorage.setItem(usernameKey, username);
-						secureLocalStorage.setItem(passwordKey, password);
-					} else {
-						secureLocalStorage.removeItem(usernameKey);
-						secureLocalStorage.removeItem(passwordKey);
-					}
-				})
-				.catch((error) => {
-					console.log(error);
-					if (error.response) {
-						const responseData: any = error.response.data;
-						if (responseData) {
-							setError(`${responseData.error}: ${responseData.messages}`);
-						} else {
-							setError(error.response.statusText);
-						}
-					} else {
-						setError(error.message || 'An unidentified error occurred.');
-					}
-				})
-				.finally(() => setLoading(false));
+			const rememberMe: boolean =
+				event.currentTarget.remember_me?.checked ?? false;
+
+			const request: LoginRequest = {
+				username,
+				password,
+			};
+
+			loginMutation.mutate({ request, rememberMe });
 		}
 	};
 

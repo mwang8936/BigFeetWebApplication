@@ -2,7 +2,6 @@ import { FC, useState, useEffect } from 'react';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
 import { Gender, Permissions, Role } from '../../../../../../../models/enums';
-import { useUserContext } from '../../../../../BigFeet.Page';
 import Employee from '../../../../../../../models/Employee.Model';
 import Service from '../../../../../../../models/Service.Model';
 import {
@@ -28,23 +27,23 @@ import LENGTHS from '../../../../../../../constants/lengths.constants';
 import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
 import STORES from '../../../../../../../constants/store.constants';
 import AddBottom from '../../AddBottom.Component';
-import { doesDateOverlap } from '../../../../../../../utils/date.utils';
 import WarningModal from './WarningModal.Component';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { getCustomers } from '../../../../../../../service/customer.service';
-import { getServices } from '../../../../../../../service/service.service';
-import { getEmployees } from '../../../../../../../service/employee.service';
-import { getSchedules } from '../../../../../../../service/schedule.service';
-import { getProfileSchedules } from '../../../../../../../service/profile.service';
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
 import Schedule from '../../../../../../../models/Schedule.Model';
-import { formatDateToQueryKey } from '../../../../../../../utils/string.utils';
 import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
 } from '../../../../../../../utils/reservation.utils';
+import {
+	useCustomersQuery,
+	useEmployeesQuery,
+	useSchedulesQuery,
+	useServicesQuery,
+	useUserQuery,
+} from '../../../../../../../service/query/get-items.query';
+import User from '../../../../../../../models/User.Model';
 
 interface AddReservationProp {
 	setOpen(open: boolean): void;
@@ -107,7 +106,9 @@ const AddReservation: FC<AddReservationProp> = ({
 	const [conflict, setConflict] = useState<boolean>(false);
 	const [genderMismatch, setGenderMismatch] = useState<boolean>(false);
 
-	const { user } = useUserContext();
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
 	const { date } = useScheduleDateContext();
 
 	const customerGettable = user.permissions.includes(
@@ -123,50 +124,37 @@ const AddReservation: FC<AddReservationProp> = ({
 		Permissions.PERMISSION_GET_SCHEDULE
 	);
 
-	const customerQuery = useQuery({
-		queryKey: ['customers'],
-		queryFn: () => getCustomers(navigate),
-		enabled: customerGettable,
+	const customerQuery = useCustomersQuery({
+		gettable: customerGettable,
+		staleTime: Infinity,
 	});
 	const customers: Customer[] = customerQuery.data || [];
 
-	const employeeQuery = useQuery({
-		queryKey: ['employees'],
-		queryFn: () => getEmployees(navigate),
-		enabled: employeeGettable,
+	const employeeQuery = useEmployeesQuery({
+		gettable: employeeGettable,
+		staleTime: Infinity,
 	});
 	const employees: Employee[] = (
 		(employeeQuery.data as Employee[]) || []
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
-	const serviceQuery = useQuery({
-		queryKey: ['services'],
-		queryFn: () => getServices(navigate),
-		enabled: serviceGettable,
+	const serviceQuery = useServicesQuery({
+		gettable: serviceGettable,
+		staleTime: Infinity,
 	});
 	const services: Service[] = serviceQuery.data || [];
 
-	const scheduleQuery = useQuery({
-		queryKey: ['schedules', formatDateToQueryKey(date)],
-		queryFn: () => {
-			if (scheduleGettable) {
-				return getSchedules(navigate, {
-					start: date,
-					end: date,
-				});
-			} else {
-				return getProfileSchedules(navigate);
-			}
-		},
-		staleTime: 0,
+	const scheduleQuery = useSchedulesQuery({
+		date,
+		gettable: scheduleGettable,
+		staleTime: Infinity,
 	});
-
-	const employeeDropDownItems = getEmployeeDropDownItems(employees);
-	const serviceDropDownItems = getServiceDropDownItems(services);
-
 	const schedules: Schedule[] = (
 		(scheduleQuery.data as Schedule[]) || []
 	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
+
+	const employeeDropDownItems = getEmployeeDropDownItems(employees);
+	const serviceDropDownItems = getServiceDropDownItems(services);
 
 	useEffect(() => {
 		const missingRequiredInput =

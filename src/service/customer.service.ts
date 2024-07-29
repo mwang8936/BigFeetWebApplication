@@ -3,21 +3,42 @@ import { NavigateFunction } from 'react-router-dom';
 import authorizedRequest from './base.service';
 
 import {
+	GetCustomerParam,
+	GetCustomersParam,
+} from '../models/params/Customer.Param';
+
+import {
 	AddCustomerRequest,
 	UpdateCustomerRequest,
 } from '../models/requests/Customer.Request.Model';
 
 import { customerPath } from '../constants/api.constants';
 
-export async function getCustomers(navigate: NavigateFunction) {
-	return authorizedRequest(navigate, `${customerPath}`, 'get');
+export async function getCustomers(
+	navigate: NavigateFunction,
+	params?: GetCustomersParam
+) {
+	return authorizedRequest(
+		navigate,
+		`${customerPath}`,
+		'get',
+		undefined,
+		params
+	);
 }
 
 export async function getCustomer(
 	navigate: NavigateFunction,
-	phone_number: string
+	phone_number: string,
+	params?: GetCustomerParam
 ) {
-	return authorizedRequest(navigate, `${customerPath}/${phone_number}`, 'get');
+	return authorizedRequest(
+		navigate,
+		`${customerPath}/${phone_number}`,
+		'get',
+		undefined,
+		params
+	);
 }
 
 export async function updateCustomer(
@@ -47,6 +68,17 @@ export async function deleteCustomer(
 	return authorizedRequest(
 		navigate,
 		`${customerPath}/${phone_number}`,
+		'delete'
+	);
+}
+
+export async function recoverCustomer(
+	navigate: NavigateFunction,
+	phone_number: string
+) {
+	return authorizedRequest(
+		navigate,
+		`${customerPath}/${phone_number}/recover`,
 		'delete'
 	);
 }

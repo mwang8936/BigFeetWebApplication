@@ -14,17 +14,16 @@ import EditableTime from '../../../editable/EditableTime.Component';
 import EditableToggleSwitch from '../../../editable/EditableToggleSwitch.Component';
 import { useTranslation } from 'react-i18next';
 import Employee from '../../../../../../../models/Employee.Model';
-import { useUserContext } from '../../../../../BigFeet.Page';
 import { Permissions, Role } from '../../../../../../../models/enums';
-import { getEmployees } from '../../../../../../../service/employee.service';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { formatDateToQueryKey } from '../../../../../../../utils/string.utils';
-import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
-import { getSchedules } from '../../../../../../../service/schedule.service';
-import { getProfileSchedules } from '../../../../../../../service/profile.service';
 import { getPriorityDropDownItems } from '../../../../../../../constants/drop-down.constants';
 import EditableDropDown from '../../../editable/EditableDropDown.Component';
+import {
+	useEmployeesQuery,
+	useSchedulesQuery,
+	useUserQuery,
+} from '../../../../../../../service/query/get-items.query';
+import User from '../../../../../../../models/User.Model';
 
 interface EditScheduleProp {
 	setOpen(open: boolean): void;
@@ -61,7 +60,8 @@ const EditSchedule: FC<EditScheduleProp> = ({
 	const [changesMade, setChangesMade] = useState<boolean>(false);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
-	const { user } = useUserContext();
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -70,28 +70,17 @@ const EditSchedule: FC<EditScheduleProp> = ({
 		Permissions.PERMISSION_GET_SCHEDULE
 	);
 
-	const employeeQuery = useQuery({
-		queryKey: ['employees'],
-		queryFn: () => getEmployees(navigate),
-		enabled: employeeGettable,
+	const employeeQuery = useEmployeesQuery({
+		gettable: employeeGettable,
 		staleTime: Infinity,
 	});
 	const employees: Employee[] = (
 		(employeeQuery.data as Employee[]) || []
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
-	const scheduleQuery = useQuery({
-		queryKey: ['schedules', formatDateToQueryKey(schedule.date)],
-		queryFn: () => {
-			if (scheduleGettable) {
-				return getSchedules(navigate, {
-					start: schedule.date,
-					end: schedule.date,
-				});
-			} else {
-				return getProfileSchedules(navigate);
-			}
-		},
+	const scheduleQuery = useSchedulesQuery({
+		date: schedule.date,
+		gettable: scheduleGettable,
 		staleTime: Infinity,
 	});
 	const schedules: Schedule[] = (

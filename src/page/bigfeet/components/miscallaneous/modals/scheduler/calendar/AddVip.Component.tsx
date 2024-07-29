@@ -1,7 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
-import { useUserContext } from '../../../../../BigFeet.Page';
 import Employee from '../../../../../../../models/Employee.Model';
 import AddInput from '../../../add/AddInput.Component';
 import ERRORS from '../../../../../../../constants/error.constants';
@@ -18,9 +17,12 @@ import AddPayRate from '../../../add/AddPayRate.Component';
 import NUMBERS from '../../../../../../../constants/numbers.constants';
 import PATTERNS from '../../../../../../../constants/patterns.constants';
 import { Permissions, Role } from '../../../../../../../models/enums';
-import { useQuery } from '@tanstack/react-query';
-import { getEmployees } from '../../../../../../../service/employee.service';
 import { useNavigate } from 'react-router-dom';
+import {
+	useEmployeesQuery,
+	useUserQuery,
+} from '../../../../../../../service/query/get-items.query';
+import User from '../../../../../../../models/User.Model';
 
 interface AddVipProp {
 	setOpen(open: boolean): void;
@@ -48,17 +50,18 @@ const AddVip: FC<AddVipProp> = ({ setOpen, creatable, onAddVipPackage }) => {
 		useState<boolean>(true);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
-	const { user } = useUserContext();
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
 	const { date } = useScheduleDateContext();
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
 	);
 
-	const employeeQuery = useQuery({
-		queryKey: ['employees'],
-		queryFn: () => getEmployees(navigate),
-		enabled: employeeGettable,
+	const employeeQuery = useEmployeesQuery({
+		gettable: employeeGettable,
+		staleTime: Infinity,
 	});
 	const employees: Employee[] = (
 		(employeeQuery.data as Employee[]) || []

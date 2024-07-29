@@ -12,7 +12,7 @@ import { reservationPath } from '../constants/api.constants';
 
 export async function getReservations(
 	navigate: NavigateFunction,
-	params: GetReservationsParam
+	params?: GetReservationsParam
 ) {
 	return authorizedRequest(
 		navigate,

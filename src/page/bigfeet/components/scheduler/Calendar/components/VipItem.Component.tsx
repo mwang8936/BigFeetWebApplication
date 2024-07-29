@@ -4,12 +4,13 @@ import VipPackage from '../../../../../../models/Vip-Package.Model';
 import { UpdateVipPackageRequest } from '../../../../../../models/requests/Vip-Package.Request.Model';
 import EditVipModal from '../../../miscallaneous/modals/scheduler/calendar/EditVipModal.Component';
 import { moneyToString } from '../../../../../../utils/number.utils';
-import { useNavigate } from 'react-router-dom';
-import { useUserContext } from '../../../../BigFeet.Page';
 import { Permissions, Role } from '../../../../../../models/enums';
-import { useQuery } from '@tanstack/react-query';
-import { getEmployees } from '../../../../../../service/employee.service';
 import Employee from '../../../../../../models/Employee.Model';
+import {
+	useEmployeesQuery,
+	useUserQuery,
+} from '../../../../../../service/query/get-items.query';
+import User from '../../../../../../models/User.Model';
 
 interface VipItemProp {
 	vipPackage: VipPackage;
@@ -30,20 +31,19 @@ const VipItem: FC<VipItemProp> = ({
 	onDeleteVipPackage,
 }) => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
 
 	const [open, setOpen] = useState(false);
 
-	const { user } = useUserContext();
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
 	);
 
-	const employeeQuery = useQuery({
-		queryKey: ['employees'],
-		queryFn: () => getEmployees(navigate),
-		enabled: employeeGettable,
+	const employeeQuery = useEmployeesQuery({
+		gettable: employeeGettable,
+		staleTime: Infinity,
 	});
 	const employees: Employee[] = (
 		(employeeQuery.data as Employee[]) || []

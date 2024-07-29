@@ -158,6 +158,7 @@ export default function SideBar(prop: SideBarProp) {
 			<div
 				className="sidebar-icon landscape:mt-auto landscape:py-5 portrait:ml-auto portrait:px-5 text-center"
 				onClick={() => {
+					queryClient.clear();
 					logout(setAuthentication);
 				}}>
 				{t('Log Out')}

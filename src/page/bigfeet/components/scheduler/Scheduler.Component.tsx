@@ -1,7 +1,6 @@
 import { useState, createContext, useContext } from 'react';
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import Calendar from './Calendar/Calendar.Component';
-import { useUserContext } from '../../BigFeet.Page';
 import { Permissions, Role } from '../../../../models/enums';
 import Schedule from '../../../../models/Schedule.Model';
 import { sameDate } from '../../../../utils/date.utils';
@@ -27,14 +26,9 @@ import PermissionsButton, {
 import ZoomOverlay from './components/ZoomOverlay.Component';
 import {
 	addSchedule,
-	getSchedules,
 	updateSchedule,
 } from '../../../../service/schedule.service';
-import {
-	getProfileSchedules,
-	signProfileSchedule,
-} from '../../../../service/profile.service';
-import { GetSchedulesParam } from '../../../../models/params/Schedule.Param';
+import { signProfileSchedule } from '../../../../service/profile.service';
 import {
 	AddVipPackageRequest,
 	UpdateVipPackageRequest,
@@ -54,12 +48,17 @@ import {
 	errorToast,
 	successToast,
 } from '../../../../utils/toast.utils';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getCustomers } from '../../../../service/customer.service';
-import { getServices } from '../../../../service/service.service';
-import { getEmployees } from '../../../../service/employee.service';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { formatDateToQueryKey } from '../../../../utils/string.utils';
 import { moneyToString } from '../../../../utils/number.utils';
+import {
+	useCustomersQuery,
+	useEmployeesQuery,
+	useSchedulesQuery,
+	useServicesQuery,
+	useUserQuery,
+} from '../../../../service/query/get-items.query';
+import User from '../../../../models/User.Model';
 
 const ScheduleDateContext = createContext<
 	{ date: Date; setDate(date: Date): void } | undefined
@@ -100,7 +99,8 @@ export default function Scheduler() {
 		setScale(1);
 	};
 
-	const { user } = useUserContext();
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
 
 	const customerGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_CUSTOMER
@@ -115,36 +115,21 @@ export default function Scheduler() {
 		Permissions.PERMISSION_GET_SCHEDULE
 	);
 
-	useQuery({
-		queryKey: ['customers'],
-		queryFn: () => getCustomers(navigate),
-		enabled: customerGettable,
+	useCustomersQuery({
+		gettable: customerGettable,
 		refetchInterval: 1000 * 60 * 5,
 	});
-	const employeeQuery = useQuery({
-		queryKey: ['employees'],
-		queryFn: () => getEmployees(navigate),
-		enabled: employeeGettable,
+	const employeeQuery = useEmployeesQuery({
+		gettable: employeeGettable,
 		refetchInterval: 1000 * 60 * 5,
 	});
-	useQuery({
-		queryKey: ['services'],
-		queryFn: () => getServices(navigate),
-		enabled: serviceGettable,
+	useServicesQuery({
+		gettable: serviceGettable,
 		refetchInterval: 1000 * 60 * 5,
 	});
-	const scheduleQuery = useQuery({
-		queryKey: ['schedules', formatDateToQueryKey(date)],
-		queryFn: () => {
-			if (scheduleGettable) {
-				return getSchedules(navigate, {
-					start: date,
-					end: date,
-				});
-			} else {
-				return getProfileSchedules(navigate);
-			}
-		},
+	const scheduleQuery = useSchedulesQuery({
+		date,
+		gettable: scheduleGettable,
 		staleTime: 0,
 	});
 	const schedules: Schedule[] = (

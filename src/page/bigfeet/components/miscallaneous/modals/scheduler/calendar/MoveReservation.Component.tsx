@@ -4,32 +4,28 @@ import {
 	PencilSquareIcon,
 } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
-import { useUserContext } from '../../../../../BigFeet.Page';
 import Employee from '../../../../../../../models/Employee.Model';
 import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
 import Reservation from '../../../../../../../models/Reservation.Model';
-import {
-	formatDateToQueryKey,
-	formatTimeFromDate,
-} from '../../../../../../../utils/string.utils';
+import { formatTimeFromDate } from '../../../../../../../utils/string.utils';
 import EditBottom from '../../EditBottom.Component';
 import ERRORS from '../../../../../../../constants/error.constants';
 import WarningModal from './WarningModal.Component';
-import { doesDateOverlap } from '../../../../../../../utils/date.utils';
-import STORES from '../../../../../../../constants/store.constants';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
-import { getEmployees } from '../../../../../../../service/employee.service';
 import { Permissions, Role } from '../../../../../../../models/enums';
 import { useNavigate } from 'react-router-dom';
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
-import { getSchedules } from '../../../../../../../service/schedule.service';
-import { getProfileSchedules } from '../../../../../../../service/profile.service';
 import Schedule from '../../../../../../../models/Schedule.Model';
 import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
 } from '../../../../../../../utils/reservation.utils';
+import {
+	useEmployeesQuery,
+	useSchedulesQuery,
+	useUserQuery,
+} from '../../../../../../../service/query/get-items.query';
+import User from '../../../../../../../models/User.Model';
 
 interface MoveReservationProp {
 	setOpen(open: boolean): void;
@@ -69,7 +65,9 @@ const MoveReservation: FC<MoveReservationProp> = ({
 	const [conflict, setConflict] = useState<boolean>(false);
 	const [genderMismatch, setGenderMismatch] = useState<boolean>(false);
 
-	const { user } = useUserContext();
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
 	const { date } = useScheduleDateContext();
 
 	const employeeGettable = user.permissions.includes(
@@ -79,28 +77,17 @@ const MoveReservation: FC<MoveReservationProp> = ({
 		Permissions.PERMISSION_GET_SCHEDULE
 	);
 
-	const employeeQuery = useQuery({
-		queryKey: ['employees'],
-		queryFn: () => getEmployees(navigate),
-		enabled: employeeGettable,
+	const employeeQuery = useEmployeesQuery({
+		gettable: employeeGettable,
+		staleTime: Infinity,
 	});
 	const employees: Employee[] = (
 		(employeeQuery.data as Employee[]) || []
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
-	const scheduleQuery = useQuery({
-		queryKey: ['schedules', formatDateToQueryKey(date)],
-		queryFn: () => {
-			if (scheduleGettable) {
-				return getSchedules(navigate, {
-					start: date,
-					end: date,
-				});
-			} else {
-				return getProfileSchedules(navigate);
-			}
-		},
-		enabled: scheduleGettable,
+	const scheduleQuery = useSchedulesQuery({
+		date,
+		gettable: scheduleGettable,
 		staleTime: Infinity,
 	});
 	const schedules: Schedule[] = (

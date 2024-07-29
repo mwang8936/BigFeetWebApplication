@@ -12,7 +12,7 @@ import { schedulePath } from '../constants/api.constants';
 
 export async function getSchedules(
 	navigate: NavigateFunction,
-	params: GetSchedulesParam
+	params?: GetSchedulesParam
 ) {
 	return authorizedRequest(
 		navigate,

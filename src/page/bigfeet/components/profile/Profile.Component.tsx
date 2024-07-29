@@ -4,7 +4,6 @@ import Personal from './personal/Personal.Component.tsx';
 import Professional from './professional/Professional.Component.tsx';
 import Settings from './settings/Settings.Component.tsx';
 import DatesDisplay from '../miscallaneous/DatesDisplay.Component.tsx';
-import { useUserContext } from '../../BigFeet.Page';
 import { Permissions } from '../../../../models/enums.ts';
 import { deleteEmployee } from '../../../../service/employee.service.ts';
 import { useNavigate } from 'react-router-dom';
@@ -21,9 +20,13 @@ import {
 	errorToast,
 	successToast,
 } from '../../../../utils/toast.utils.tsx';
+import { useUserQuery } from '../../../../service/query/get-items.query.ts';
+import User from '../../../../models/User.Model.ts';
+import { useQueryClient } from '@tanstack/react-query';
 
 const Profile: FC = () => {
 	const { t } = useTranslation();
+	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 
 	const [selectedTab, setSelectedTab] = useState(0);
@@ -31,7 +34,9 @@ const Profile: FC = () => {
 
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-	const { user } = useUserContext();
+	const userQuery = useUserQuery({ gettable: true });
+	const user: User = userQuery.data;
+
 	const { setAuthentication } = useAuthenticationContext();
 
 	const editable = user.permissions.includes(
@@ -47,6 +52,7 @@ const Profile: FC = () => {
 		deleteEmployee(navigate, userId)
 			.then(() => {
 				successToast(toastId, t('Profile Deleted Successfully'));
+				queryClient.clear();
 				logout(setAuthentication);
 			})
 			.catch((error) => {

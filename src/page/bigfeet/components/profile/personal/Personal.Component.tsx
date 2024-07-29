@@ -3,7 +3,6 @@ import LENGTHS from '../../../../../constants/lengths.constants';
 import { FC, useEffect, useState } from 'react';
 import { updateEmployee } from '../../../../../service/employee.service';
 import { useNavigate } from 'react-router-dom';
-import { useUserContext } from '../../../BigFeet.Page';
 import { Gender, Permissions } from '../../../../../models/enums';
 import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
 import { genderDropDownItems } from '../../../../../constants/drop-down.constants';
@@ -15,13 +14,14 @@ import NAMES from '../../../../../constants/name.constants';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
 import { useTranslation } from 'react-i18next';
-import { userKey } from '../../../../../constants/api.constants';
 import {
 	createLoadingToast,
 	errorToast,
 	successToast,
 } from '../../../../../utils/toast.utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useUserQuery } from '../../../../../service/query/get-items.query';
+import User from '../../../../../models/User.Model';
 
 interface PersonalProp {
 	editable: boolean;
@@ -112,7 +112,8 @@ const Personal: FC<PersonalProp> = ({
 		setInvalidInput(invalidInput);
 	}, [invalidUsername, invalidFirstName, invalidLastName]);
 
-	const { user, setUser } = useUserContext();
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
 
 	const editProfileMutation = useMutation({
 		mutationFn: (data: {
@@ -123,14 +124,10 @@ const Personal: FC<PersonalProp> = ({
 			const toastId = createLoadingToast(t('Updating Profile...'));
 			return { toastId };
 		},
-		onSuccess: (_data, variables, context) => {
+		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: ['employees'] });
-			const updatedUser = {
-				...user,
-				...variables.request,
-			};
-			sessionStorage.setItem(userKey, JSON.stringify(updatedUser));
-			setUser(updatedUser);
+			queryClient.invalidateQueries({ queryKey: ['user'] });
+
 			successToast(context.toastId, t('Profile Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {

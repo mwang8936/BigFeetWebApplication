@@ -1,10 +1,6 @@
 import { FC, useState } from 'react';
-import { useUserContext } from '../../BigFeet.Page';
 import { Permissions } from '../../../../models/enums';
-import {
-	addEmployee,
-	getEmployees,
-} from '../../../../service/employee.service';
+import { addEmployee } from '../../../../service/employee.service';
 import Tabs from '../miscallaneous/Tabs.Component';
 import EditEmployee from './components/EditEmployee.Component';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +20,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Loading from '../Loading.Component';
 import Retry from '../Retry.Component';
 import Employee from '../../../../models/Employee.Model';
+import {
+	useEmployeesQuery,
+	useUserQuery,
+} from '../../../../service/query/get-items.query';
+import User from '../../../../models/User.Model';
 
 const Employees: FC = () => {
 	const { t } = useTranslation();
@@ -37,7 +38,8 @@ const Employees: FC = () => {
 	const [retryingEmployeeQuery, setRetryingEmployeeQuery] =
 		useState<boolean>(false);
 
-	const { user } = useUserContext();
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
 
 	const gettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -52,11 +54,7 @@ const Employees: FC = () => {
 		Permissions.PERMISSION_DELETE_EMPLOYEE
 	);
 
-	const employeeQuery = useQuery({
-		queryKey: ['employees'],
-		queryFn: () => getEmployees(navigate),
-		enabled: gettable,
-	});
+	const employeeQuery = useEmployeesQuery({ gettable });
 
 	const employees: Employee[] = employeeQuery.data || [];
 
