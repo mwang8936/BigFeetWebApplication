@@ -55,6 +55,7 @@ const LABELS = {
 		feet: 'Feet',
 		acupuncture: 'Acupuncture',
 		beds_required: 'Beds Required',
+		can_overlap: 'Can Overlap',
 		color: 'Color',
 	},
 	vip_package: {

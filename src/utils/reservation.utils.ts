@@ -10,11 +10,14 @@ export const reservationEmployeeConflict = (
 	reservations: Reservation[],
 	reservationId?: number
 ): boolean => {
+	if (service.can_overlap) return false;
+
 	const endDate = new Date(startDate.getTime() + service.time * 60000);
 
 	const reservationsAtSameTime = reservations.filter(
 		(res) =>
 			res.reservation_id !== reservationId &&
+			!res.service.can_overlap &&
 			doesDateOverlap(res.reserved_date, startDate, endDate, res.service.time)
 	);
 

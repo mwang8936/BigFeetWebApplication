@@ -21,6 +21,7 @@ import FemaleIcon from '../assets/Female_Icon.svg';
 
 import CanadaFlagIcon from '../assets/Canada_Flag.png';
 import ChinaFlagIcon from '../assets/China_Flag.png';
+
 import Service from '../models/Service.Model';
 import VipPackage from '../models/Vip-Package.Model';
 import Schedule from '../models/Schedule.Model';

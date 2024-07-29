@@ -152,6 +152,8 @@
     "B": "B",
     "F": "F",
     "A": "A",
+    "Can Overlap": "Can Overlap",
+    "Cannot Overlap": "Cannot Overlap",
     "Delete Service": "删除服务项目: {{service}}",
     "Are you sure you want to delete this service? This action cannot be reversed.": "请确认是否要删除？",
 

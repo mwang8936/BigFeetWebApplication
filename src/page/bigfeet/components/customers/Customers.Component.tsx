@@ -26,7 +26,7 @@ import {
 	errorToast,
 	successToast,
 } from '../../../../utils/toast.utils';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Loading from '../Loading.Component';
 import Customer from '../../../../models/Customer.Model';
 import Retry from '../Retry.Component';

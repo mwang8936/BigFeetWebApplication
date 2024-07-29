@@ -63,6 +63,9 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 	const [bedsRequiredInput, setBedsRequiredInput] = useState<number | null>(
 		service.beds_required
 	);
+	const [canOverlapInput, setCanOverlapInput] = useState<boolean>(
+		service.can_overlap
+	);
 	const [colorInput, setColorInput] = useState<ServiceColor | null>(
 		service.color
 	);
@@ -93,6 +96,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 		setFeetInput(service.feet);
 		setAcupunctureInput(service.acupuncture);
 		setBedsRequiredInput(service.beds_required);
+		setCanOverlapInput(service.can_overlap);
 		setColorInput(service.color);
 
 		setChangesMade(false);
@@ -132,6 +136,8 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			bedsRequiredInput === service.beds_required
 				? undefined
 				: bedsRequiredInput;
+		const can_overlap: boolean | undefined =
+			canOverlapInput === service.can_overlap ? undefined : canOverlapInput;
 		const color: ServiceColor | null | undefined =
 			colorInput === service.color ? undefined : colorInput;
 
@@ -144,6 +150,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			feet !== undefined ||
 			acupuncture !== undefined ||
 			beds_required !== undefined ||
+			can_overlap !== undefined ||
 			color !== undefined;
 
 		setChangesMade(changesMade);
@@ -169,6 +176,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 		feetInput,
 		acupunctureInput,
 		bedsRequiredInput,
+		canOverlapInput,
 		colorInput,
 	]);
 
@@ -241,6 +249,8 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			bedsRequiredInput === service.beds_required
 				? undefined
 				: (bedsRequiredInput as number);
+		const can_overlap: boolean | undefined =
+			canOverlapInput === service.can_overlap ? undefined : canOverlapInput;
 		const color: ServiceColor | undefined =
 			colorInput === service.color ? undefined : (colorInput as ServiceColor);
 
@@ -254,6 +264,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			...(feet !== undefined && { feet }),
 			...(acupuncture !== undefined && { acupuncture }),
 			...(beds_required !== undefined && { beds_required }),
+			...(can_overlap !== undefined && { can_overlap }),
 			...(color !== undefined && { color }),
 		};
 
@@ -416,6 +427,19 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 					requiredMessage: ERRORS.service.beds_required.required,
 				}}
 				placeholder={PLACEHOLDERS.service.beds_required}
+				editable={editable}
+				missingPermissionMessage={ERRORS.service.permissions.edit}
+			/>
+
+			<EditableToggleSwitch
+				originalChecked={service.can_overlap}
+				setChecked={setCanOverlapInput}
+				checked={canOverlapInput}
+				falseText={'Cannot Overlap'}
+				trueText={'Can Overlap'}
+				toggleColour={ToggleColor.BLUE}
+				label={LABELS.service.can_overlap}
+				name={NAMES.service.can_overlap}
 				editable={editable}
 				missingPermissionMessage={ERRORS.service.permissions.edit}
 			/>

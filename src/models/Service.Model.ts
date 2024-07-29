@@ -10,5 +10,6 @@ export default interface Service {
 	feet: number;
 	acupuncture: number;
 	beds_required: number;
+	can_overlap: boolean;
 	color: ServiceColor;
 }
