@@ -9,6 +9,10 @@ const LENGTHS = {
 		first_name: 30,
 		last_name: 30,
 	},
+	login: {
+		username: 30,
+		password: 30,
+	},
 	service: {
 		service_name: 30,
 		shorthand: 20,

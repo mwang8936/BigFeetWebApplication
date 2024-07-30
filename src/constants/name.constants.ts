@@ -17,6 +17,11 @@ const NAMES = {
 		acupuncture_rate: 'acupuncture_rate',
 		per_hour: 'per_hour',
 	},
+	login: {
+		username: 'username',
+		password: 'password',
+		remember_me: 'remember_me',
+	},
 	profile: {
 		dark_mode: 'dark_mode',
 	},

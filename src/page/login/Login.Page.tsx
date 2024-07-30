@@ -1,12 +1,17 @@
+import { FC } from 'react';
+
 import LoginForm from './components/LoginForm.Component';
 
 import Logo from '../../assets/Logo.png';
 
-export default function Login() {
+const Login: FC = () => {
 	return (
 		<div className="center-page">
 			<img src={Logo} />
+
 			<LoginForm />
 		</div>
 	);
-}
+};
+
+export default Login;

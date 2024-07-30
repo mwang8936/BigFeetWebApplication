@@ -111,6 +111,24 @@ const ERRORS = {
 			delete: 'You do not have permission to delete employees.',
 		},
 	},
+	login: {
+		username: {
+			required: 'Username cannot be empty.',
+			invalid: {
+				key: 'Username Invalid',
+				value: {
+					length: LENGTHS.login.username,
+				},
+			},
+		},
+		password: {
+			required: 'Password cannot be empty.',
+			invalid: {
+				key: 'Password Invalid',
+				value: { max: LENGTHS.login.password },
+			},
+		},
+	},
 	profile: {
 		language: {
 			required: 'Language cannot be empty.',

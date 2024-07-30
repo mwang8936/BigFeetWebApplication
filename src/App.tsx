@@ -1,12 +1,12 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import BigFeet from './page/bigfeet/BigFeet.Page';
 import Login from './page/login/Login.Page';
 
 import { authenticate } from './service/auth.service';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const AuthenticationContext = createContext<{
 	authenticated: boolean;

@@ -1,48 +1,56 @@
+import { FC, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import secureLocalStorage from 'react-secure-storage';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 import Cookies from 'js-cookie';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
-import { useState } from 'react';
-import secureLocalStorage from 'react-secure-storage';
-
-import ERRORS from '../../../constants/error.constants';
-import LENGTHS from '../../../constants/lengths.constants';
-import PATTERNS from '../../../constants/patterns.constants';
 
 import { useAuthenticationContext } from '../../../App';
 
-import { login } from '../../../service/auth.service';
 import {
 	passwordKey,
 	tokenKey,
 	usernameKey,
 } from '../../../constants/api.constants';
+import ERRORS from '../../../constants/error.constants';
+import LENGTHS from '../../../constants/lengths.constants';
+import NAMES from '../../../constants/name.constants';
+import PATTERNS from '../../../constants/patterns.constants';
+import PLACEHOLDERS from '../../../constants/placeholder.constants';
 import STORES from '../../../constants/store.constants';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { LoginRequest } from '../../../models/requests/Login.Request.Model';
 
-export default function LoginForm() {
+import { login } from '../../../service/auth.service';
+
+const LoginForm: FC = () => {
+	const { t } = useTranslation();
 	const queryClient = useQueryClient();
 
 	//Obtain last used username and password from secure storage.
 	const savedUsername = secureLocalStorage.getItem(usernameKey);
 	const savedPassword = secureLocalStorage.getItem(passwordKey);
 
-	const [username, setUsername] = useState(
+	const [username, setUsername] = useState<string>(
 		typeof savedUsername == 'string' ? savedUsername : ''
 	);
-	const [usernameInvalid, setUsernameInvalid] = useState(false);
+	const [usernameInvalid, setUsernameInvalid] = useState<boolean>(false);
 	//Highlight username input if we are using a saved username.
-	const [highlightUsername, setHighlightUsername] = useState(
+	const [highlightUsername, setHighlightUsername] = useState<boolean>(
 		typeof savedUsername == 'string'
 	);
 
-	const [password, setPassword] = useState(
+	const [password, setPassword] = useState<string>(
 		typeof savedPassword == 'string' ? savedPassword : ''
 	);
-	const [showPassword, setShowPassword] = useState(false);
+	const [showPassword, setShowPassword] = useState<boolean>(false);
 	//Hightlight password input if we are using a saved password.
-	const [highlightPassword, setHighlightPassword] = useState(
+	const [highlightPassword, setHighlightPassword] = useState<boolean>(
 		typeof savedPassword == 'string'
 	);
+
+	const [rememberMe, setRememberMe] = useState<boolean>(true);
 
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
@@ -54,8 +62,10 @@ export default function LoginForm() {
 			login(data.request),
 		onMutate: async () => setLoading(true),
 		onSuccess: (data, variables) => {
+			// Obtain user profile and access token from login response
 			const { user, accessToken } = data;
 
+			// Set user as authenticated and add access token to authorization cookie
 			setAuthentication(true);
 			Cookies.set(tokenKey, accessToken);
 
@@ -69,6 +79,7 @@ export default function LoginForm() {
 				secureLocalStorage.removeItem(passwordKey);
 			}
 
+			// Store the user
 			queryClient.setQueryData(['user'], user);
 		},
 		onError: (error) => setError(error.message),
@@ -78,35 +89,34 @@ export default function LoginForm() {
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		if (!username) setError(ERRORS.employee.username.required);
-		else if (!password) setError(ERRORS.employee.password.required);
+		// Check if fields are empty
+		if (!username) setError(ERRORS.login.username.required);
+		else if (!password) setError(ERRORS.login.password.required);
 		else {
-			const rememberMe: boolean =
-				event.currentTarget.remember_me?.checked ?? false;
-
 			const request: LoginRequest = {
 				username,
 				password,
 			};
 
+			// Login API
 			loginMutation.mutate({ request, rememberMe });
 		}
 	};
 
 	const usernameElement = (
 		<div className="mb-4">
-			<label className="label" htmlFor="username">
-				Username
+			<label className="label" htmlFor={NAMES.login.username}>
+				{t('Username')}
 			</label>
+
 			<input
 				className={highlightUsername ? 'input-form-highlighted' : 'input-form'}
 				value={username}
-				id="username"
-				name="username"
+				name={NAMES.login.username}
 				type="text"
 				pattern={PATTERNS.login.username}
-				maxLength={LENGTHS.employee.username}
-				placeholder="Username"
+				maxLength={LENGTHS.login.username}
+				placeholder={PLACEHOLDERS.login.username}
 				onChange={(event) => {
 					setUsername(event.target.value);
 					setUsernameInvalid(!event.target.validity.valid);
@@ -114,11 +124,17 @@ export default function LoginForm() {
 				}}
 				required
 			/>
+
 			{username.length === 0 ? (
 				<p className="error-label">{ERRORS.employee.username.required}</p>
 			) : (
 				usernameInvalid && (
-					<p className="error-label">{ERRORS.employee.username.invalid}</p>
+					<p className="error-label">
+						{t(
+							ERRORS.employee.username.invalid.key,
+							ERRORS.employee.username.invalid.value
+						)}
+					</p>
 				)
 			)}
 		</div>
@@ -126,9 +142,10 @@ export default function LoginForm() {
 
 	const passwordElement = (
 		<div className="mb-4">
-			<label className="label" htmlFor="password">
-				Password
+			<label className="label" htmlFor={NAMES.login.password}>
+				{t('Password')}
 			</label>
+
 			<div className="flex relative">
 				<input
 					className={
@@ -137,18 +154,18 @@ export default function LoginForm() {
 							: 'input-form pl-11'
 					}
 					value={password}
-					id="password"
-					name="password"
+					name={NAMES.login.password}
 					type={showPassword ? 'text' : 'password'}
-					maxLength={LENGTHS.employee.password}
-					placeholder="******************"
+					maxLength={LENGTHS.login.password}
+					placeholder={PLACEHOLDERS.login.password}
 					onChange={(event) => {
 						setPassword(event.target.value);
 						setHighlightPassword(false);
 					}}
 					required
 				/>
-				<div className="absolute mt-1 mb-3 inset-y-0 left-0 flex items-center pl-3 z-20">
+
+				<div className="absolute inset-y-0 left-0 flex items-center pl-3 mt-1 mb-3 z-20">
 					{showPassword ? (
 						<EyeIcon
 							className="pointer-icon"
@@ -162,26 +179,39 @@ export default function LoginForm() {
 					)}
 				</div>
 			</div>
+
 			{!password && (
 				<p className="error-label">{ERRORS.employee.password.required}</p>
 			)}
 		</div>
 	);
 
+	const rememberMeElement = (
+		<div className="flex flex-row mb-4">
+			<input
+				className="mr-2"
+				checked={rememberMe}
+				onChange={() => setRememberMe(!rememberMe)}
+				name={NAMES.login.remember_me}
+				type="checkbox"
+			/>
+
+			<p className="block text-gray-700 text-sm font-bold">
+				{t('Remember Me')}
+			</p>
+		</div>
+	);
+
 	return (
 		<form className="login-form" onSubmit={handleSubmit}>
 			<h1 className="login-title">{STORES.city}</h1>
+
 			{usernameElement}
+
 			{passwordElement}
-			<div className="mb-4 flex flex-row">
-				<input
-					className="mr-2"
-					defaultChecked={true}
-					name="remember_me"
-					type="checkbox"
-				/>
-				<p className="block text-gray-700 text-sm font-bold">Remember Me</p>
-			</div>
+
+			{rememberMeElement}
+
 			<div>
 				<button
 					className="button"
@@ -208,10 +238,13 @@ export default function LoginForm() {
 							/>
 						</svg>
 					)}
-					{loading ? 'Signing In' : 'Sign In'}
+					{loading ? t('Signing In') : t('Sign In')}
 				</button>
+
 				{error && <p className="error-label">{error}</p>}
 			</div>
 		</form>
 	);
-}
+};
+
+export default LoginForm;

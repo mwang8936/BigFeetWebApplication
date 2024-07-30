@@ -16,6 +16,10 @@ const PLACEHOLDERS = {
 		acupuncture_rate: '0.00',
 		per_hour: '0.00',
 	},
+	login: {
+		username: 'Add Username',
+		password: '******************',
+	},
 	reservation: {
 		cash: '0.00',
 		machine: '0.00',
