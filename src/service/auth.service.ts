@@ -1,13 +1,13 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
 
-import { LoginRequest } from '../models/requests/Login.Request.Model';
-
 import BASE_API_URL, {
 	authenticatePath,
 	loginPath,
 	tokenKey,
 } from '../constants/api.constants';
+
+import { LoginRequest } from '../models/requests/Login.Request.Model';
 
 export function login(request: LoginRequest) {
 	const config: AxiosRequestConfig = {

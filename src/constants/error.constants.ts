@@ -1,7 +1,8 @@
-import { formatTimeFromNumber } from '../utils/string.utils';
 import LENGTHS from './lengths.constants';
 import NUMBERS from './numbers.constants';
 import STORES from './store.constants';
+
+import { formatTimeFromNumber } from '../utils/string.utils';
 
 const ERRORS = {
 	customer: {

@@ -2,13 +2,14 @@ import { NavigateFunction } from 'react-router-dom';
 
 import authorizedRequest from './base.service';
 
+import { schedulePath } from '../constants/api.constants';
+
 import { GetSchedulesParam } from '../models/params/Schedule.Param';
+
 import {
 	AddScheduleRequest,
 	UpdateScheduleRequest,
 } from '../models/requests/Schedule.Request.Model';
-
-import { schedulePath } from '../constants/api.constants';
 
 export async function getSchedules(
 	navigate: NavigateFunction,

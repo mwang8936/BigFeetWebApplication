@@ -2,6 +2,8 @@ import { NavigateFunction } from 'react-router-dom';
 
 import authorizedRequest from './base.service';
 
+import { customerPath } from '../constants/api.constants';
+
 import {
 	GetCustomerParam,
 	GetCustomersParam,
@@ -11,8 +13,6 @@ import {
 	AddCustomerRequest,
 	UpdateCustomerRequest,
 } from '../models/requests/Customer.Request.Model';
-
-import { customerPath } from '../constants/api.constants';
 
 export async function getCustomers(
 	navigate: NavigateFunction,

@@ -2,13 +2,14 @@ import { NavigateFunction } from 'react-router-dom';
 
 import authorizedRequest from './base.service';
 
+import { vipPackagePath } from '../constants/api.constants';
+
+import { GetVipPackagesParam } from '../models/params/Vip-Package.Param';
+
 import {
 	AddVipPackageRequest,
 	UpdateVipPackageRequest,
 } from '../models/requests/Vip-Package.Request.Model';
-
-import { vipPackagePath } from '../constants/api.constants';
-import { GetVipPackagesParam } from '../models/params/Vip-Package.Param';
 
 export async function getVipPackages(
 	navigate: NavigateFunction,

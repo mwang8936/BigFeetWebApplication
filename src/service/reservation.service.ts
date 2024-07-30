@@ -2,13 +2,14 @@ import { NavigateFunction } from 'react-router-dom';
 
 import authorizedRequest from './base.service';
 
+import { reservationPath } from '../constants/api.constants';
+
 import { GetReservationsParam } from '../models/params/Reservation.Param';
+
 import {
 	AddReservationRequest,
 	UpdateReservationRequest,
 } from '../models/requests/Reservation.Request.Model';
-
-import { reservationPath } from '../constants/api.constants';
 
 export async function getReservations(
 	navigate: NavigateFunction,

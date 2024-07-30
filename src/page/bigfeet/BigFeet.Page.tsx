@@ -17,11 +17,11 @@ import Services from './components/services/Services.Component';
 import { Permissions } from '../../models/enums';
 import User from '../../models/User.Model';
 
-import getLanguageFile from '../../constants/language.constants';
 import {
 	useSchedulesQuery,
 	useUserQuery,
 } from '../../service/query/get-items.query';
+import { getLanguageFile } from '../../utils/i18n.utils';
 
 export const enum SideBarItems {
 	Profile = 0,

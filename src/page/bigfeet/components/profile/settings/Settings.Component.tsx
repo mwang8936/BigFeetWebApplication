@@ -12,13 +12,13 @@ import LABELS from '../../../../../constants/label.constants';
 import NAMES from '../../../../../constants/name.constants';
 import EditableToggleSwitch from '../../miscallaneous/editable/EditableToggleSwitch.Component';
 import { useTranslation } from 'react-i18next';
-import getLanguageFile from '../../../../../constants/language.constants';
 import {
 	createLoadingToast,
 	errorToast,
 	successToast,
 } from '../../../../../utils/toast.utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { getLanguageFile } from '../../../../../utils/i18n.utils';
 
 interface SettingsProp {
 	originalLanguage: Language;

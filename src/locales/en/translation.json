@@ -203,6 +203,8 @@
 
     "No Vip Package Selected": "No Vip Package Selected",
 
+    "No Priority Selected": "No Priority Selected",
+
     "Invalid search field.": "Invalid search field.",
     "Phone Number cannot be empty.": "Phone Number cannot be empty.",
     "Phone Number Invalid": "Phone Number can only contain numbers and must be {{length}} characters long.",
