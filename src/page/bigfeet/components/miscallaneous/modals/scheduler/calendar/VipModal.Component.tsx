@@ -1,11 +1,15 @@
 import { FC } from 'react';
+
+import Vip from './Vip.Component';
+
 import BaseModal from '../../BaseModal.Component';
+
 import VipPackage from '../../../../../../../models/Vip-Package.Model';
+
 import {
 	AddVipPackageRequest,
 	UpdateVipPackageRequest,
 } from '../../../../../../../models/requests/Vip-Package.Request.Model';
-import Vip from './Vip.Component';
 
 interface VipModalProp {
 	open: boolean;

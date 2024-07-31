@@ -42,12 +42,13 @@ const AddInput: FC<AddInputProp> = ({
 			<label className="label" htmlFor={name}>
 				{t(label)}
 			</label>
-			<div className="flex rounded-md shadow-sm">
+
+			<div className="input-div">
 				<input
 					className="add-input"
 					id={name}
 					type={type}
-					value={text || ''}
+					value={text ?? ''}
 					onChange={(event) => {
 						const text = event.target.value.trimStart();
 
@@ -60,6 +61,7 @@ const AddInput: FC<AddInputProp> = ({
 					placeholder={placeholder && t(placeholder)}
 				/>
 			</div>
+
 			{validationProp.required && (text === null || text.length === 0) ? (
 				<p className="error-label">
 					{validationProp.requiredMessage && t(validationProp.requiredMessage)}

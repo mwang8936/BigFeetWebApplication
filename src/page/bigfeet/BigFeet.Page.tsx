@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -32,7 +32,7 @@ export const enum SideBarItems {
 	Customers = 5,
 }
 
-export default function BigFeet() {
+const BigFeet: FC = () => {
 	const [retryingUserQuery, setRetryingUserQuery] = useState(false);
 
 	const [sideBarItems] = useState([SideBarItems.Profile]);
@@ -152,4 +152,6 @@ export default function BigFeet() {
 			}
 		</div>
 	);
-}
+};
+
+export default BigFeet;

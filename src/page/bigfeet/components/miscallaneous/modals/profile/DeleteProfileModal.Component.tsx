@@ -1,6 +1,8 @@
 import { FC } from 'react';
-import BaseModal from '../BaseModal.Component';
+
 import DeleteProfile from './DeleteProfile.Component';
+
+import BaseModal from '../BaseModal.Component';
 
 interface DeleteProfileModalProp {
 	open: boolean;

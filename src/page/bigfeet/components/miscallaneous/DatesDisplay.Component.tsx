@@ -10,7 +10,7 @@ const DatesDisplay: FC<DatesDisplayProp> = ({ updatedAt, createdAt }) => {
 	const { t } = useTranslation();
 
 	return (
-		<div className="flex flex-col text-sm font-medium text-gray-500 italic">
+		<div className="dates-bar">
 			<div>
 				{t('Last Updated')}
 				{updatedAt.toLocaleDateString()}

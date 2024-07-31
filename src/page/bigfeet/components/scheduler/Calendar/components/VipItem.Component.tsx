@@ -50,19 +50,17 @@ const VipItem: FC<VipItemProp> = ({
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	return (
-		<div
-			className="w-full h-fit p-2 border-2 border-black flex flex-col hover:bg-slate-300 cursor-pointer"
-			onClick={() => setOpen(true)}>
+		<div className="list-item-div" onClick={() => setOpen(true)}>
 			<span>
-				<span className="font-bold me-1">{t('Serial')}:</span>
+				<span className="list-item-field">{t('Serial')}:</span>
 				{vipPackage.serial}
 			</span>
 			<span>
-				<span className="font-bold me-1">{t('Sold Amount')}:</span>$
+				<span className="list-item-field">{t('Sold Amount')}:</span>$
 				{moneyToString(vipPackage.sold_amount)}
 			</span>
 			<span>
-				<span className="font-bold me-1">{t('Commission Amount')}:</span>$
+				<span className="list-item-field">{t('Commission Amount')}:</span>$
 				{moneyToString(vipPackage.commission_amount)}
 			</span>
 			<span className="grid grid-flow-col">

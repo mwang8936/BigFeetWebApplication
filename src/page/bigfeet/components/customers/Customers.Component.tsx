@@ -1,47 +1,59 @@
 import { FC, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import CustomerList from './components/CustomerList.Component';
+
+import Loading from '../Loading.Component';
+import Retry from '../Retry.Component';
+
+import PermissionsButton, {
+	ButtonType,
+} from '../miscallaneous/PermissionsButton.Component';
+
+import AddInput from '../miscallaneous/add/AddInput.Component';
+
+import AddCustomerModal from '../miscallaneous/modals/customer/AddCustomerModal.Component';
+
+import ERRORS from '../../../../constants/error.constants';
+import LABELS from '../../../../constants/label.constants';
+import NAMES from '../../../../constants/name.constants';
+import PLACEHOLDERS from '../../../../constants/placeholder.constants';
+
+import Customer from '../../../../models/Customer.Model';
 import { Permissions } from '../../../../models/enums';
+import User from '../../../../models/User.Model';
+
+import {
+	AddCustomerRequest,
+	UpdateCustomerRequest,
+} from '../../../../models/requests/Customer.Request.Model';
+
 import {
 	addCustomer,
 	deleteCustomer,
 	updateCustomer,
 } from '../../../../service/customer.service';
-import { useNavigate } from 'react-router-dom';
-import CustomerList from './components/CustomerList.Component';
+
 import {
-	AddCustomerRequest,
-	UpdateCustomerRequest,
-} from '../../../../models/requests/Customer.Request.Model';
-import PermissionsButton, {
-	ButtonType,
-} from '../miscallaneous/PermissionsButton.Component';
-import AddCustomerModal from '../miscallaneous/modals/customer/AddCustomerModal.Component';
-import AddInput from '../miscallaneous/add/AddInput.Component';
-import ERRORS from '../../../../constants/error.constants';
-import { useTranslation } from 'react-i18next';
-import LABELS from '../../../../constants/label.constants';
-import NAMES from '../../../../constants/name.constants';
-import PLACEHOLDERS from '../../../../constants/placeholder.constants';
+	useCustomersQuery,
+	useUserQuery,
+} from '../../../../service/query/get-items.query';
+
 import {
 	createLoadingToast,
 	errorToast,
 	successToast,
 } from '../../../../utils/toast.utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import Loading from '../Loading.Component';
-import Customer from '../../../../models/Customer.Model';
-import Retry from '../Retry.Component';
-import {
-	useCustomersQuery,
-	useUserQuery,
-} from '../../../../service/query/get-items.query';
-import User from '../../../../models/User.Model';
 
 const Customers: FC = () => {
 	const { t } = useTranslation();
-	const queryClient = useQueryClient();
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 
 	const [openAddCustomerModal, setOpenAddCustomerModal] = useState(false);
+
 	const [searchFilter, setSearchFilter] = useState<string | null>(null);
 	const [invalidSearch, setInvalidSearch] = useState<boolean>(false);
 
@@ -77,7 +89,12 @@ const Customers: FC = () => {
 	const isCustomerPaused = customerQuery.isPaused;
 
 	let filteredCustomers: Customer[] = [];
-	if (!isCustomerLoading && !isCustomerError && !isCustomerPaused) {
+	if (
+		!isCustomerLoading &&
+		!isCustomerError &&
+		!isCustomerPaused &&
+		customers
+	) {
 		filteredCustomers = searchFilter
 			? customers.filter(
 					(customer) =>
@@ -167,15 +184,18 @@ const Customers: FC = () => {
 		deleteCustomerMutation.mutate({ phoneNumber });
 	};
 
-	const customersElement = (
-		<CustomerList
-			customers={filteredCustomers}
-			editable={editable}
-			onEditCustomer={onEditCustomer}
-			deletable={deletable}
-			onDeleteCustomer={onDeleteCustomer}
-		/>
-	);
+	const customersElement =
+		customers.length !== 0 ? (
+			<CustomerList
+				customers={filteredCustomers}
+				editable={editable}
+				onEditCustomer={onEditCustomer}
+				deletable={deletable}
+				onDeleteCustomer={onDeleteCustomer}
+			/>
+		) : (
+			<h1 className="large-centered-text">{t('No Customers Created')}</h1>
+		);
 
 	const searchElement = (
 		<>
@@ -193,7 +213,8 @@ const Customers: FC = () => {
 				}}
 				placeholder={PLACEHOLDERS.customer.search_customer}
 			/>
-			<div className="mb-4 pr-4 overflow-auto">{customersElement}</div>
+
+			<div className="content-div">{customersElement}</div>
 		</>
 	);
 
@@ -211,7 +232,7 @@ const Customers: FC = () => {
 	const errorsElement = isCustomerError ? (
 		<Retry
 			retrying={retryingCustomerQuery}
-			error={customerError?.message as string}
+			error={customerError?.message ?? ''}
 			onRetry={() => {
 				setRetryingCustomerQuery(true);
 				retryCustomerQuery().finally(() => setRetryingCustomerQuery(false));
@@ -223,7 +244,7 @@ const Customers: FC = () => {
 	);
 
 	const permissionsElement = !gettable ? (
-		<h1 className="m-auto text-gray-600 text-3xl">
+		<h1 className="large-centered-text">
 			{t(ERRORS.customer.permissions.get)}
 		</h1>
 	) : (
@@ -235,9 +256,10 @@ const Customers: FC = () => {
 	return (
 		<>
 			<div className="non-sidebar">
-				<div className="py-4 h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
-					<h1 className="my-auto text-gray-600 text-3xl">{t('Customers')}</h1>
-					<div className="h-fit my-auto flex">
+				<div className="title-bar">
+					<h1 className="centered-title-text">{t('Customers')}</h1>
+
+					<div className="vertical-center">
 						<PermissionsButton
 							btnTitle={t('Add Customer')}
 							btnType={ButtonType.ADD}
@@ -250,8 +272,10 @@ const Customers: FC = () => {
 						/>
 					</div>
 				</div>
+
 				{isLoadingElement}
 			</div>
+
 			<AddCustomerModal
 				open={openAddCustomerModal}
 				setOpen={setOpenAddCustomerModal}

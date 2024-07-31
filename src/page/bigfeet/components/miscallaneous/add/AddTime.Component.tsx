@@ -1,8 +1,10 @@
 import { FC, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import dayjs from 'dayjs';
+
 import { LocalizationProvider, DesktopTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
-import { useTranslation } from 'react-i18next';
 
 interface InvalidMessage {
 	key: string;
@@ -57,7 +59,7 @@ const AddTime: FC<AddTimeProp> = ({ time, setTime, label, validationProp }) => {
 
 	return (
 		<div className="mb-4">
-			<div className="flex relative rounded-md shadow-sm">
+			<div className="div-input">
 				<LocalizationProvider dateAdapter={AdapterDayjs}>
 					<DesktopTimePicker
 						className="add-input"

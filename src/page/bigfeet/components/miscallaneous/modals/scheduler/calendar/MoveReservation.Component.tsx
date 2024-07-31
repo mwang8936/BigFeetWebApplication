@@ -1,31 +1,39 @@
 import { FC, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { Dialog } from '@headlessui/react';
 import {
 	ArrowLongRightIcon,
 	PencilSquareIcon,
 } from '@heroicons/react/24/outline';
-import { Dialog } from '@headlessui/react';
-import Employee from '../../../../../../../models/Employee.Model';
-import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
-import Reservation from '../../../../../../../models/Reservation.Model';
-import { formatTimeFromDate } from '../../../../../../../utils/string.utils';
-import EditBottom from '../../EditBottom.Component';
-import ERRORS from '../../../../../../../constants/error.constants';
+
 import WarningModal from './WarningModal.Component';
-import { useTranslation } from 'react-i18next';
-import { Permissions, Role } from '../../../../../../../models/enums';
-import { useNavigate } from 'react-router-dom';
+
+import EditBottom from '../../EditBottom.Component';
+
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
+
+import ERRORS from '../../../../../../../constants/error.constants';
+
+import Employee from '../../../../../../../models/Employee.Model';
+import { Permissions, Role } from '../../../../../../../models/enums';
+import Reservation from '../../../../../../../models/Reservation.Model';
 import Schedule from '../../../../../../../models/Schedule.Model';
-import {
-	reservationBedConflict,
-	reservationEmployeeConflict,
-} from '../../../../../../../utils/reservation.utils';
+import User from '../../../../../../../models/User.Model';
+
+import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
+
 import {
 	useEmployeesQuery,
 	useSchedulesQuery,
 	useUserQuery,
 } from '../../../../../../../service/query/get-items.query';
-import User from '../../../../../../../models/User.Model';
+
+import {
+	reservationBedConflict,
+	reservationEmployeeConflict,
+} from '../../../../../../../utils/reservation.utils';
+import { formatTimeFromDate } from '../../../../../../../utils/string.utils';
 
 interface MoveReservationProp {
 	setOpen(open: boolean): void;
@@ -52,7 +60,6 @@ const MoveReservation: FC<MoveReservationProp> = ({
 	onCancel,
 }) => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
 
 	const [openBedWarningModal, setOpenBedWarningModal] =
 		useState<boolean>(false);
@@ -65,10 +72,10 @@ const MoveReservation: FC<MoveReservationProp> = ({
 	const [conflict, setConflict] = useState<boolean>(false);
 	const [genderMismatch, setGenderMismatch] = useState<boolean>(false);
 
+	const { date } = useScheduleDateContext();
+
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
-
-	const { date } = useScheduleDateContext();
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -178,6 +185,7 @@ const MoveReservation: FC<MoveReservationProp> = ({
 				employee_id: newEmployeeId,
 				updated_by: updatedBy,
 			};
+
 			onEditReservation(reservation.reservation_id, updateReservationRequest);
 			setOpen(false);
 		}
@@ -193,12 +201,14 @@ const MoveReservation: FC<MoveReservationProp> = ({
 							aria-hidden="true"
 						/>
 					</div>
+
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Edit Reservation')}
 						</Dialog.Title>
+
 						<div className="mt-2">
 							{t(
 								'Would you like to make the following changes to the reservation?'
@@ -217,6 +227,7 @@ const MoveReservation: FC<MoveReservationProp> = ({
 											{newEmployeeUsername}
 										</span>
 									)}
+
 								{newTime && (
 									<span className="flex flex-row">
 										<span className="me-3 font-medium">{t('Time')}:</span>
@@ -233,6 +244,7 @@ const MoveReservation: FC<MoveReservationProp> = ({
 					</div>
 				</div>
 			</div>
+
 			<EditBottom
 				onCancel={() => {
 					onCancel();
@@ -252,12 +264,14 @@ const MoveReservation: FC<MoveReservationProp> = ({
 				}
 				onEdit={onEdit}
 			/>
+
 			<WarningModal
 				open={openGenderMismatchWarningModel}
 				setOpen={setOpenGenderMismatchWarningModal}
 				title={ERRORS.warnings.gender_mismatch.title}
 				message={ERRORS.warnings.gender_mismatch.message}
 			/>
+
 			<WarningModal
 				open={openBedWarningModal}
 				setOpen={setOpenBedWarningModal}
@@ -267,6 +281,7 @@ const MoveReservation: FC<MoveReservationProp> = ({
 					ERRORS.warnings.no_beds.message.value
 				)}
 			/>
+
 			<WarningModal
 				open={openConflictWarningModal}
 				setOpen={setOpenConflictWarningModal}

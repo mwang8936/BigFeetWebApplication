@@ -1,6 +1,8 @@
 import { FC } from 'react';
-import BaseModal from '../BaseModal.Component';
+
 import DeleteEmployee from './DeleteEmployee.Component';
+
+import BaseModal from '../BaseModal.Component';
 
 interface DeleteEmployeeModalProp {
 	open: boolean;

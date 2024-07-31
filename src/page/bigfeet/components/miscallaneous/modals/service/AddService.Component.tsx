@@ -1,28 +1,36 @@
 import { FC, useEffect, useState } from 'react';
-import { PlusCircleIcon } from '@heroicons/react/24/outline';
-import { Dialog } from '@headlessui/react';
-import AddInput from '../../add/AddInput.Component';
-import { AddServiceRequest } from '../../../../../../models/requests/Service.Request.Model';
-import { ServiceColor } from '../../../../../../models/enums';
-import LABELS from '../../../../../../constants/label.constants';
-import NAMES from '../../../../../../constants/name.constants';
-import LENGTHS from '../../../../../../constants/lengths.constants';
-import PATTERNS from '../../../../../../constants/patterns.constants';
-import ERRORS from '../../../../../../constants/error.constants';
-import PLACEHOLDERS from '../../../../../../constants/placeholder.constants';
-import AddMinute from '../../add/AddMinute.Component';
-import AddPayRate from '../../add/AddPayRate.Component';
-import AddDropDown from '../../add/AddDropDown.Component';
-import { colorDropDownItems } from '../../../../../../constants/drop-down.constants';
-import AddBodyFeetAcupunctureService from '../../../services/components/AddBodyFeetAcupunctureService.Component';
-import NUMBERS from '../../../../../../constants/numbers.constants';
-import AddBottom from '../AddBottom.Component';
 import { useTranslation } from 'react-i18next';
+
+import { Dialog } from '@headlessui/react';
+
+import { PlusCircleIcon } from '@heroicons/react/24/outline';
+
+import AddBottom from '../AddBottom.Component';
+
+import AddDropDown from '../../add/AddDropDown.Component';
+import AddInput from '../../add/AddInput.Component';
+import AddMinute from '../../add/AddMinute.Component';
+import AddNumber from '../../add/AddNumber.Component';
+import AddPayRate from '../../add/AddPayRate.Component';
 import AddToggleSwitch, {
 	ToggleColor,
 } from '../../add/AddToggleSwitch.Component';
+
+import AddBodyFeetAcupunctureService from '../../../services/components/AddBodyFeetAcupunctureService.Component';
+
+import { colorDropDownItems } from '../../../../../../constants/drop-down.constants';
+import ERRORS from '../../../../../../constants/error.constants';
+import LABELS from '../../../../../../constants/label.constants';
+import LENGTHS from '../../../../../../constants/lengths.constants';
+import NAMES from '../../../../../../constants/name.constants';
+import NUMBERS from '../../../../../../constants/numbers.constants';
+import PATTERNS from '../../../../../../constants/patterns.constants';
+import PLACEHOLDERS from '../../../../../../constants/placeholder.constants';
 import STORES from '../../../../../../constants/store.constants';
-import AddNumber from '../../add/AddNumber.Component';
+
+import { ServiceColor } from '../../../../../../models/enums';
+
+import { AddServiceRequest } from '../../../../../../models/requests/Service.Request.Model';
 
 interface AddServiceProp {
 	setOpen(open: boolean): void;
@@ -151,12 +159,14 @@ const AddService: FC<AddServiceProp> = ({
 							aria-hidden="true"
 						/>
 					</div>
+
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Add Service')}
 						</Dialog.Title>
+
 						<div className="mt-2">
 							<AddInput
 								text={serviceNameInput}
@@ -274,8 +284,8 @@ const AddService: FC<AddServiceProp> = ({
 							<AddToggleSwitch
 								setChecked={setCanOverlapInput}
 								checked={canOverlapInput}
-								falseText={'Cannot Overlap'}
-								trueText={'Can Overlap'}
+								falseText={t('Cannot Overlap')}
+								trueText={t('Can Overlap')}
 								toggleColour={ToggleColor.GREEN}
 								label={LABELS.service.can_overlap}
 								name={NAMES.service.can_overlap}
@@ -304,6 +314,7 @@ const AddService: FC<AddServiceProp> = ({
 					</div>
 				</div>
 			</div>
+
 			<AddBottom
 				onCancel={() => setOpen(false)}
 				disabledAdd={!creatable || missingRequiredInput || invalidInput}

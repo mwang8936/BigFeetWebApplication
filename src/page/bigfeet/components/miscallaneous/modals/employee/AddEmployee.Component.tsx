@@ -1,27 +1,36 @@
 import { FC, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { Dialog } from '@headlessui/react';
-import ERRORS from '../../../../../../constants/error.constants';
-import { AddEmployeeRequest } from '../../../../../../models/requests/Employee.Request.Model';
+
 import { PlusCircleIcon } from '@heroicons/react/20/solid';
-import { Gender, Permissions, Role } from '../../../../../../models/enums';
+
+import AddBottom from '../AddBottom.Component';
+
 import AddInput from '../../add/AddInput.Component';
-import LABELS from '../../../../../../constants/label.constants';
-import NAMES from '../../../../../../constants/name.constants';
-import LENGTHS from '../../../../../../constants/lengths.constants';
-import PATTERNS from '../../../../../../constants/patterns.constants';
-import PLACEHOLDERS from '../../../../../../constants/placeholder.constants';
-import AddPassword from '../../add/AddPassword.Component';
 import AddDropDown from '../../add/AddDropDown.Component';
+import AddMultiSelect from '../../add/AddMultiSelect.Component';
+import AddPassword from '../../add/AddPassword.Component';
+import AddPayRate from '../../add/AddPayRate.Component';
+
 import {
 	genderDropDownItems,
 	roleDropDownItems,
 } from '../../../../../../constants/drop-down.constants';
-import AddPayRate from '../../add/AddPayRate.Component';
+import ERRORS from '../../../../../../constants/error.constants';
+import LABELS from '../../../../../../constants/label.constants';
+import LENGTHS from '../../../../../../constants/lengths.constants';
+import NAMES from '../../../../../../constants/name.constants';
 import NUMBERS from '../../../../../../constants/numbers.constants';
-import AddMultiSelect from '../../add/AddMultiSelect.Component';
-import rolePermissions from '../../../../../../constants/role-permissions.constants';
-import AddBottom from '../AddBottom.Component';
-import { useTranslation } from 'react-i18next';
+import PATTERNS from '../../../../../../constants/patterns.constants';
+import PLACEHOLDERS from '../../../../../../constants/placeholder.constants';
+import rolePermissions, {
+	permissionValues,
+} from '../../../../../../constants/role-permissions.constants';
+
+import { Gender, Permissions, Role } from '../../../../../../models/enums';
+
+import { AddEmployeeRequest } from '../../../../../../models/requests/Employee.Request.Model';
 
 interface AddEmployeeProp {
 	setOpen(open: boolean): void;
@@ -152,9 +161,6 @@ const AddEmployee: FC<AddEmployeeProp> = ({
 		setOpen(false);
 	};
 
-	const permissionValues = Object.values(Permissions).map(
-		(permission: Permissions) => permission
-	);
 	return (
 		<>
 			<div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
@@ -165,12 +171,14 @@ const AddEmployee: FC<AddEmployeeProp> = ({
 							aria-hidden="true"
 						/>
 					</div>
+
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Add Employee')}
 						</Dialog.Title>
+
 						<div className="mt-2">
 							<AddInput
 								text={usernameInput}
@@ -363,6 +371,7 @@ const AddEmployee: FC<AddEmployeeProp> = ({
 					</div>
 				</div>
 			</div>
+
 			<AddBottom
 				onCancel={() => setOpen(false)}
 				disabledAdd={!creatable || missingRequiredInput || invalidInput}

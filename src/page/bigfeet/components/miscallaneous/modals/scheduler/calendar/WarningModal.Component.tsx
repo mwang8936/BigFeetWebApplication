@@ -1,6 +1,8 @@
 import { FC } from 'react';
-import BaseModal from '../../BaseModal.Component';
+
 import Warning from './Warning.Component';
+
+import BaseModal from '../../BaseModal.Component';
 
 interface WarningModalProp {
 	open: boolean;

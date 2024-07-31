@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
-import PermissionsButton from '../PermissionsButton.Component';
 import { useTranslation } from 'react-i18next';
+
+import PermissionsButton from '../PermissionsButton.Component';
 
 interface ValidationProp {
 	required: boolean;
@@ -50,11 +51,12 @@ const EditableTextArea: FC<EditableTextAreaProp> = ({
 			<label className="label" htmlFor={name}>
 				{t(label)}
 			</label>
-			<div className="flex rounded-md shadow-sm">
+
+			<div className="input-div">
 				<textarea
 					className="editable-input"
 					id={name}
-					value={text || ''}
+					value={text ?? ''}
 					onChange={(event) => {
 						const text = event.target.value.trimStart();
 
@@ -64,6 +66,7 @@ const EditableTextArea: FC<EditableTextAreaProp> = ({
 					disabled={disabled}
 					placeholder={placeholder && t(placeholder)}
 				/>
+
 				<div className="ms-3">
 					<PermissionsButton
 						btnTitle={disabled ? t('Change') : t('Cancel')}
@@ -73,6 +76,7 @@ const EditableTextArea: FC<EditableTextAreaProp> = ({
 					/>
 				</div>
 			</div>
+
 			{validationProp.required && (text === null || text.length === 0) && (
 				<p className="error-label">
 					{validationProp.requiredMessage && t(validationProp.requiredMessage)}

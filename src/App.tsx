@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { FC, createContext, useContext, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -25,7 +25,7 @@ const queryClient = new QueryClient({
 	},
 });
 
-export default function App() {
+const App: FC = () => {
 	const [authenticated, setAuthentication] = useState(false);
 
 	useEffect(() => {
@@ -67,4 +67,6 @@ export default function App() {
 			<ReactQueryDevtools initialIsOpen={false} />
 		</QueryClientProvider>
 	);
-}
+};
+
+export default App;

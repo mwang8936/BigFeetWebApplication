@@ -1,35 +1,45 @@
 import { FC, useState } from 'react';
-import EditService from './components/EditService.Component.tsx';
-import Tabs from '../miscallaneous/Tabs.Component.tsx';
-import { Permissions } from '../../../../models/enums.ts';
-import { addService } from '../../../../service/service.service.ts';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import EditService from './components/EditService.Component.tsx';
+
+import Loading from '../Loading.Component.tsx';
+import Retry from '../Retry.Component.tsx';
+
 import PermissionsButton, {
 	ButtonType,
 } from '../miscallaneous/PermissionsButton.Component.tsx';
-import ERRORS from '../../../../constants/error.constants.ts';
+import Tabs from '../miscallaneous/Tabs.Component.tsx';
+
 import AddServiceModal from '../miscallaneous/modals/service/AddServiceModal.Component.tsx';
+
+import ERRORS from '../../../../constants/error.constants.ts';
+
+import { Permissions } from '../../../../models/enums.ts';
+import Service from '../../../../models/Service.Model.ts';
+import User from '../../../../models/User.Model.ts';
+
 import { AddServiceRequest } from '../../../../models/requests/Service.Request.Model.ts';
-import { useTranslation } from 'react-i18next';
+
+import { addService } from '../../../../service/service.service.ts';
+
+import {
+	useServicesQuery,
+	useUserQuery,
+} from '../../../../service/query/get-items.query.ts';
+
 import {
 	createLoadingToast,
 	errorToast,
 	successToast,
 } from '../../../../utils/toast.utils.tsx';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import Service from '../../../../models/Service.Model.ts';
-import Loading from '../Loading.Component.tsx';
-import Retry from '../Retry.Component.tsx';
-import {
-	useServicesQuery,
-	useUserQuery,
-} from '../../../../service/query/get-items.query.ts';
-import User from '../../../../models/User.Model.ts';
 
 const Services: FC = () => {
 	const { t } = useTranslation();
-	const queryClient = useQueryClient();
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 
 	const [selectedTab, setSelectedTab] = useState(0);
 
@@ -67,7 +77,7 @@ const Services: FC = () => {
 	const isServicePaused = serviceQuery.isPaused;
 
 	let tabs: string[] = [];
-	if (!isServiceLoading && !isServiceError && !isServicePaused) {
+	if (!isServiceLoading && !isServiceError && !isServicePaused && services) {
 		tabs = services.map((service) => service.service_name);
 	}
 
@@ -104,9 +114,7 @@ const Services: FC = () => {
 				)}
 			</>
 		) : (
-			<h1 className="m-auto text-gray-600 text-3xl">
-				{t('No Services Created')}
-			</h1>
+			<h1 className="large-centered-text">{t('No Services Created')}</h1>
 		);
 
 	const tabsElement = (
@@ -116,7 +124,8 @@ const Services: FC = () => {
 				selectedTab={selectedTab}
 				onTabSelected={setSelectedTab}
 			/>
-			<div className="mt-8 mb-4 pr-4 overflow-auto">{servicesElement}</div>
+
+			<div className="content-div">{servicesElement}</div>
 		</>
 	);
 
@@ -146,9 +155,7 @@ const Services: FC = () => {
 	);
 
 	const permissionsElement = !gettable ? (
-		<h1 className="m-auto text-gray-600 text-3xl">
-			{t(ERRORS.service.permissions.get)}
-		</h1>
+		<h1 className="large-centered-text">{t(ERRORS.service.permissions.get)}</h1>
 	) : (
 		errorsElement
 	);
@@ -158,9 +165,10 @@ const Services: FC = () => {
 	return (
 		<>
 			<div className="non-sidebar">
-				<div className="py-4 h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
-					<h1 className="my-auto text-gray-600 text-3xl">{t('Services')}</h1>
-					<div className="h-fit my-auto flex">
+				<div className="title-bar">
+					<h1 className="centered-title-text">{t('Services')}</h1>
+
+					<div className="vertical-center">
 						<PermissionsButton
 							btnTitle={t('Add Service')}
 							btnType={ButtonType.ADD}
@@ -173,8 +181,10 @@ const Services: FC = () => {
 						/>
 					</div>
 				</div>
+
 				{isLoadingElement}
 			</div>
+
 			<AddServiceModal
 				open={openAddModal}
 				setOpen={setOpenAddModal}

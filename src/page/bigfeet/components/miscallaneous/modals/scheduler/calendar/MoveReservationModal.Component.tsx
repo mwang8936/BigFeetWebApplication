@@ -1,10 +1,15 @@
 import { FC } from 'react';
-import BaseModal from '../../BaseModal.Component';
-import Reservation from '../../../../../../../models/Reservation.Model';
-import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
+
 import MoveReservation from './MoveReservation.Component';
-import { useUserQuery } from '../../../../../../../service/query/get-items.query';
+
+import BaseModal from '../../BaseModal.Component';
+
+import Reservation from '../../../../../../../models/Reservation.Model';
 import User from '../../../../../../../models/User.Model';
+
+import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
+
+import { useUserQuery } from '../../../../../../../service/query/get-items.query';
 
 interface MoveReservationModalProp {
 	open: boolean;

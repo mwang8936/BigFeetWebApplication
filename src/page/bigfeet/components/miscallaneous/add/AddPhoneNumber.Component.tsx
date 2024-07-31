@@ -1,8 +1,9 @@
 import { FC } from 'react';
-import LENGTHS from '../../../../../constants/lengths.constants';
-import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
-import PATTERNS from '../../../../../constants/patterns.constants';
 import { useTranslation } from 'react-i18next';
+
+import LENGTHS from '../../../../../constants/lengths.constants';
+import PATTERNS from '../../../../../constants/patterns.constants';
+import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 
 interface InvalidMessage {
 	key: string;
@@ -51,7 +52,8 @@ const AddPhoneNumber: FC<AddPhoneNumberProp> = ({
 			<label className="label" htmlFor={name}>
 				{t(label)}
 			</label>
-			<div className="flex rounded-md shadow-sm">
+
+			<div className="input-div">
 				<input
 					className="add-input"
 					id={name}
@@ -69,6 +71,7 @@ const AddPhoneNumber: FC<AddPhoneNumberProp> = ({
 					placeholder={PLACEHOLDERS.customer.phone_number}
 				/>
 			</div>
+
 			{validationProp.required &&
 			(phoneNumber === null || phoneNumber.length === 0) ? (
 				<p className="error-label">

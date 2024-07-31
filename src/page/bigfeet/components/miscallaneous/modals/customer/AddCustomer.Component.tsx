@@ -1,17 +1,22 @@
 import { FC, useEffect, useState } from 'react';
-import { PlusCircleIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
+
 import { Dialog } from '@headlessui/react';
-import { AddCustomerRequest } from '../../../../../../models/requests/Customer.Request.Model';
+import { PlusCircleIcon } from '@heroicons/react/24/outline';
+
+import AddBottom from '../AddBottom.Component';
+
 import AddInput from '../../add/AddInput.Component';
-import AddTextArea from '../../add/AddTextArea.Component';
 import AddPhoneNumber from '../../add/AddPhoneNumber.Component';
+import AddTextArea from '../../add/AddTextArea.Component';
+
+import { AddCustomerRequest } from '../../../../../../models/requests/Customer.Request.Model';
+
 import ERRORS from '../../../../../../constants/error.constants';
 import LABELS from '../../../../../../constants/label.constants';
-import NAMES from '../../../../../../constants/name.constants';
 import LENGTHS from '../../../../../../constants/lengths.constants';
+import NAMES from '../../../../../../constants/name.constants';
 import PLACEHOLDERS from '../../../../../../constants/placeholder.constants';
-import AddBottom from '../AddBottom.Component';
-import { useTranslation } from 'react-i18next';
 
 interface AddCustomerProp {
 	setOpen(open: boolean): void;
@@ -73,12 +78,14 @@ const AddCustomer: FC<AddCustomerProp> = ({
 							aria-hidden="true"
 						/>
 					</div>
+
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Add Customer')}
 						</Dialog.Title>
+
 						<div className="mt-2">
 							<AddPhoneNumber
 								phoneNumber={phoneNumberInput}
@@ -124,6 +131,7 @@ const AddCustomer: FC<AddCustomerProp> = ({
 					</div>
 				</div>
 			</div>
+
 			<AddBottom
 				onCancel={() => setOpen(false)}
 				disabledAdd={!creatable || missingRequiredInput || invalidInput}

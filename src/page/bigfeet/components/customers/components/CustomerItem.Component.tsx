@@ -1,9 +1,12 @@
 import { FC, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import EditCustomerModal from '../../miscallaneous/modals/customer/EditCustomerModal.Component';
+
 import Customer from '../../../../../models/Customer.Model';
 import { UpdateCustomerRequest } from '../../../../../models/requests/Customer.Request.Model';
+
 import { formatPhoneNumber } from '../../../../../utils/string.utils';
-import EditCustomerModal from '../../miscallaneous/modals/customer/EditCustomerModal.Component';
-import { useTranslation } from 'react-i18next';
 
 interface CustomerItemProp {
 	customer: Customer;
@@ -26,26 +29,30 @@ const CustomerItem: FC<CustomerItemProp> = ({
 	const { t } = useTranslation();
 
 	const [open, setOpen] = useState(false);
+
 	return (
-		<div
-			className="w-full h-fit p-2 border-2 border-black flex flex-col hover:bg-slate-300 cursor-pointer"
-			onClick={() => setOpen(true)}>
-			<span>
-				<span className="font-bold me-1">{t('Phone Number')}:</span>
-				{formatPhoneNumber(customer.phone_number)}
-			</span>
-			{customer.customer_name && (
+		<>
+			<div className="list-item-div" onClick={() => setOpen(true)}>
 				<span>
-					<span className="font-bold me-1">{t('Name')}:</span>
-					{customer.customer_name}
+					<span className="list-item-field">{t('Phone Number')}:</span>
+					{formatPhoneNumber(customer.phone_number)}
 				</span>
-			)}
-			{customer.notes && (
-				<span>
-					<span className="font-bold me-1">{t('Notes')}:</span>
-					{customer.notes}
-				</span>
-			)}
+
+				{customer.customer_name && (
+					<span>
+						<span className="list-item-field">{t('Name')}:</span>
+						{customer.customer_name}
+					</span>
+				)}
+
+				{customer.notes && (
+					<span>
+						<span className="list-item-field">{t('Notes')}:</span>
+						{customer.notes}
+					</span>
+				)}
+			</div>
+
 			<EditCustomerModal
 				open={open}
 				setOpen={setOpen}
@@ -55,7 +62,7 @@ const CustomerItem: FC<CustomerItemProp> = ({
 				deletable={deletable}
 				onDeleteCustomer={onDeleteCustomer}
 			/>
-		</div>
+		</>
 	);
 };
 

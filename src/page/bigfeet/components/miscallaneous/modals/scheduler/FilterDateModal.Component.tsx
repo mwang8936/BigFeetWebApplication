@@ -1,6 +1,8 @@
 import { FC } from 'react';
-import BaseModal from '../BaseModal.Component';
+
 import FilterDate from './FilterDate.Component';
+
+import BaseModal from '../BaseModal.Component';
 
 interface FilterDateModalProp {
 	open: boolean;

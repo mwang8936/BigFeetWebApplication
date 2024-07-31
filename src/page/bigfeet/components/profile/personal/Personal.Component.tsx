@@ -1,27 +1,35 @@
-import PATTERNS from '../../../../../constants/patterns.constants';
-import LENGTHS from '../../../../../constants/lengths.constants';
 import { FC, useEffect, useState } from 'react';
-import { updateEmployee } from '../../../../../service/employee.service';
-import { useNavigate } from 'react-router-dom';
-import { Gender, Permissions } from '../../../../../models/enums';
-import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
-import { genderDropDownItems } from '../../../../../constants/drop-down.constants';
-import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
-import ERRORS from '../../../../../constants/error.constants';
-import EditableInput from '../../miscallaneous/editable/EditableInput.Component';
-import LABELS from '../../../../../constants/label.constants';
-import NAMES from '../../../../../constants/name.constants';
-import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
-import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
+
+import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
+import EditableInput from '../../miscallaneous/editable/EditableInput.Component';
+
+import { genderDropDownItems } from '../../../../../constants/drop-down.constants';
+import ERRORS from '../../../../../constants/error.constants';
+import LABELS from '../../../../../constants/label.constants';
+import LENGTHS from '../../../../../constants/lengths.constants';
+import NAMES from '../../../../../constants/name.constants';
+import PATTERNS from '../../../../../constants/patterns.constants';
+import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
+
+import { Gender } from '../../../../../models/enums';
+import User from '../../../../../models/User.Model';
+
+import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
+
+import { updateEmployee } from '../../../../../service/employee.service';
+
+import { useUserQuery } from '../../../../../service/query/get-items.query';
+
 import {
 	createLoadingToast,
 	errorToast,
 	successToast,
 } from '../../../../../utils/toast.utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useUserQuery } from '../../../../../service/query/get-items.query';
-import User from '../../../../../models/User.Model';
 
 interface PersonalProp {
 	editable: boolean;
@@ -39,8 +47,8 @@ const Personal: FC<PersonalProp> = ({
 	originalGender,
 }) => {
 	const { t } = useTranslation();
-	const queryClient = useQueryClient();
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 
 	const [usernameInput, setUsernameInput] = useState<string | null>(
 		originalUsername
@@ -69,7 +77,9 @@ const Personal: FC<PersonalProp> = ({
 		setGenderInput(originalGender);
 
 		setChangesMade(false);
+
 		setMissingRequiredInput(false);
+
 		setInvalidUsername(false);
 		setInvalidFirstName(false);
 		setInvalidLastName(false);
@@ -257,7 +267,7 @@ const Personal: FC<PersonalProp> = ({
 				missingPermissionMessage={ERRORS.employee.permissions.edit}
 			/>
 
-			<div className="flex border-t-2 border-gray-400 py-4">
+			<div className="bottom-bar">
 				<PermissionsButton
 					btnTitle={t('Save Changes')}
 					right={false}

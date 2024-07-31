@@ -1,9 +1,13 @@
 import { FC } from 'react';
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { Dialog } from '@headlessui/react';
-import DeleteBottom from '../DeleteBottom.Component';
-import ERRORS from '../../../../../../constants/error.constants';
 import { useTranslation } from 'react-i18next';
+
+import { Dialog } from '@headlessui/react';
+
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+
+import DeleteBottom from '../DeleteBottom.Component';
+
+import ERRORS from '../../../../../../constants/error.constants';
 
 interface DeleteServiceProp {
 	setOpen(open: boolean): void;
@@ -32,12 +36,14 @@ const DeleteService: FC<DeleteServiceProp> = ({
 							aria-hidden="true"
 						/>
 					</div>
+
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Delete Service', { service: serviceName })}
 						</Dialog.Title>
+
 						<div className="mt-2">
 							{t(
 								'Are you sure you want to delete this service? This action cannot be reversed.'
@@ -46,6 +52,7 @@ const DeleteService: FC<DeleteServiceProp> = ({
 					</div>
 				</div>
 			</div>
+
 			<DeleteBottom
 				onCancel={() => setOpen(false)}
 				disabledDelete={!deletable}

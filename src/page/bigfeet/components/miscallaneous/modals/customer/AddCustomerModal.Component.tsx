@@ -1,7 +1,10 @@
 import { FC } from 'react';
-import BaseModal from '../BaseModal.Component';
-import { AddCustomerRequest } from '../../../../../../models/requests/Customer.Request.Model';
+
 import AddCustomer from './AddCustomer.Component';
+
+import BaseModal from '../BaseModal.Component';
+
+import { AddCustomerRequest } from '../../../../../../models/requests/Customer.Request.Model';
 
 interface AddCustomerModalProp {
 	open: boolean;

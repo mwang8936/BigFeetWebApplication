@@ -1,43 +1,55 @@
 import { FC, useEffect, useState } from 'react';
-import { Role, Permissions, Gender } from '../../../../../models/enums';
-import {
-	deleteEmployee,
-	updateEmployee,
-} from '../../../../../service/employee.service';
-import PATTERNS from '../../../../../constants/patterns.constants';
-import LENGTHS from '../../../../../constants/lengths.constants';
-import EditablePayRate from '../../miscallaneous/editable/EditablePayRate.Component';
-import DatesDisplay from '../../miscallaneous/DatesDisplay.Component';
-import EditableMultiSelect from '../../miscallaneous/editable/EditableMultiSelect.Component';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import Employee from '../../../../../models/Employee.Model';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import DatesDisplay from '../../miscallaneous/DatesDisplay.Component';
+import PermissionsButton, {
+	ButtonType,
+} from '../../miscallaneous/PermissionsButton.Component';
+
 import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
+import EditableInput from '../../miscallaneous/editable/EditableInput.Component';
+import EditableMultiSelect from '../../miscallaneous/editable/EditableMultiSelect.Component';
+import EditablePayRate from '../../miscallaneous/editable/EditablePayRate.Component';
+
+import DeleteEmployeeModal from '../../miscallaneous/modals/employee/DeleteEmployeeModal.Component';
+
+import { useAuthenticationContext } from '../../../../../App';
+
 import {
 	genderDropDownItems,
 	roleDropDownItems,
 } from '../../../../../constants/drop-down.constants';
-import { useAuthenticationContext } from '../../../../../App';
-import { logout } from '../../../../../service/auth.service';
-import DeleteEmployeeModal from '../../miscallaneous/modals/employee/DeleteEmployeeModal.Component';
-import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
-import PermissionsButton, {
-	ButtonType,
-} from '../../miscallaneous/PermissionsButton.Component';
 import ERRORS from '../../../../../constants/error.constants';
-import EditableInput from '../../miscallaneous/editable/EditableInput.Component';
 import LABELS from '../../../../../constants/label.constants';
+import LENGTHS from '../../../../../constants/lengths.constants';
 import NAMES from '../../../../../constants/name.constants';
 import NUMBERS from '../../../../../constants/numbers.constants';
+import PATTERNS from '../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
-import { useTranslation } from 'react-i18next';
+import { permissionValues } from '../../../../../constants/role-permissions.constants';
+
+import Employee from '../../../../../models/Employee.Model';
+import { Role, Permissions, Gender } from '../../../../../models/enums';
+import User from '../../../../../models/User.Model';
+
+import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
+
+import { logout } from '../../../../../service/auth.service';
+import {
+	deleteEmployee,
+	updateEmployee,
+} from '../../../../../service/employee.service';
+
+import { useUserQuery } from '../../../../../service/query/get-items.query';
+
+import { arraysHaveSameContent } from '../../../../../utils/array.utils';
 import {
 	createLoadingToast,
 	errorToast,
 	successToast,
 } from '../../../../../utils/toast.utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useUserQuery } from '../../../../../service/query/get-items.query';
-import User from '../../../../../models/User.Model';
 
 interface EditEmployeeProp {
 	editable: boolean;
@@ -51,8 +63,8 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 	employee,
 }) => {
 	const { t } = useTranslation();
-	const queryClient = useQueryClient();
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 
 	const [usernameInput, setUsernameInput] = useState<string | null>(
 		employee.username
@@ -99,6 +111,8 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 
 	const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
 
+	const { setAuthentication } = useAuthenticationContext();
+
 	useEffect(() => {
 		setUsernameInput(employee.username);
 		setFirstNameInput(employee.first_name);
@@ -112,7 +126,9 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 		setPerHourInput(employee.per_hour);
 
 		setChangesMade(false);
+
 		setMissingRequiredInput(false);
+
 		setInvalidUsername(false);
 		setInvalidFirstName(false);
 		setInvalidLastName(false);
@@ -137,16 +153,12 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 			genderInput === employee.gender ? undefined : genderInput;
 		const role: Role | null | undefined =
 			roleInput === employee.role ? undefined : roleInput;
-		const permissions: Permissions[] | undefined =
-			permissionsInput.length === employee.permissions.length &&
-			permissionsInput.every((permission) =>
-				employee.permissions.includes(permission)
-			) &&
-			employee.permissions.every((permission) =>
-				permissionsInput.includes(permission)
-			)
-				? undefined
-				: (permissionsInput as Permissions[]);
+		const permissions: Permissions[] | undefined = arraysHaveSameContent(
+			permissionsInput,
+			employee.permissions
+		)
+			? undefined
+			: permissionsInput;
 		const body_rate: number | null | undefined =
 			bodyRateInput === employee.body_rate ? undefined : bodyRateInput;
 		const feet_rate: number | null | undefined =
@@ -218,8 +230,6 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
 
-	const { setAuthentication } = useAuthenticationContext();
-
 	const editEmployeeMutation = useMutation({
 		mutationFn: (data: {
 			employeeId: number;
@@ -229,9 +239,11 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 			const toastId = createLoadingToast(t('Updating Employee...'));
 			return { toastId };
 		},
-		onSuccess: (_data, _variables, context) => {
+		onSuccess: (_data, variables, context) => {
 			queryClient.invalidateQueries({ queryKey: ['employees'] });
-			queryClient.invalidateQueries({ queryKey: ['user'] });
+
+			if (variables.employeeId === user.employee_id)
+				queryClient.invalidateQueries({ queryKey: ['user'] });
 
 			successToast(context.toastId, t('Employee Updated Successfully'));
 		},
@@ -262,16 +274,12 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 			genderInput === employee.gender ? undefined : (genderInput as Gender);
 		const role: Role | undefined =
 			roleInput === employee.role ? undefined : (roleInput as Role);
-		const permissions: Permissions[] | undefined =
-			permissionsInput.length === employee.permissions.length &&
-			permissionsInput.every((permission) =>
-				employee.permissions.includes(permission)
-			) &&
-			employee.permissions.every((permission) =>
-				permissionsInput.includes(permission)
-			)
-				? undefined
-				: (permissionsInput as Permissions[]);
+		const permissions: Permissions[] | undefined = arraysHaveSameContent(
+			permissionsInput,
+			employee.permissions
+		)
+			? undefined
+			: permissionsInput;
 		const body_rate: number | null | undefined =
 			bodyRateInput === employee.body_rate ? undefined : bodyRateInput;
 		const feet_rate: number | null | undefined =
@@ -307,12 +315,14 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 			const toastId = createLoadingToast(t('Deleting Employee...'));
 			return { toastId };
 		},
-		onSuccess: (_data, _variables, context) => {
+		onSuccess: (_data, variables, context) => {
 			queryClient.invalidateQueries({ queryKey: ['employees'] });
-			if (employee.employee_id === user.employee_id) {
+
+			if (variables.employeeId === user.employee_id) {
 				queryClient.clear();
 				logout(setAuthentication);
 			}
+
 			successToast(context.toastId, t('Employee Deleted Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -328,10 +338,6 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 	const onDelete = async (employeeId: number) => {
 		deleteEmployeeMutation.mutate({ employeeId });
 	};
-
-	const permissionValues = Object.values(Permissions).map(
-		(permission: Permissions) => permission
-	);
 
 	return (
 		<>
@@ -546,7 +552,7 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 				missingPermissionMessage={ERRORS.employee.permissions.edit}
 			/>
 
-			<div className="flex border-t-2 border-gray-400 py-4 justify-between">
+			<div className="bottom-bar">
 				<PermissionsButton
 					btnTitle={t('Save Changes')}
 					right={false}
@@ -576,20 +582,20 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 						setOpenDeleteModal(true);
 					}}
 				/>
-
-				<DeleteEmployeeModal
-					open={openDeleteModal}
-					setOpen={setOpenDeleteModal}
-					employeeId={employee.employee_id}
-					employeeName={employee.username}
-					deletable={deletable}
-					onDeleteEmployee={onDelete}
-				/>
 			</div>
 
 			<DatesDisplay
 				updatedAt={employee.updated_at}
 				createdAt={employee.created_at}
+			/>
+
+			<DeleteEmployeeModal
+				open={openDeleteModal}
+				setOpen={setOpenDeleteModal}
+				employeeId={employee.employee_id}
+				employeeName={employee.username}
+				deletable={deletable}
+				onDeleteEmployee={onDelete}
 			/>
 		</>
 	);

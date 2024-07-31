@@ -1,7 +1,9 @@
 import { FC, useEffect, useState } from 'react';
-import Multiselect from 'multiselect-react-dropdown';
-import PermissionsButton from '../PermissionsButton.Component';
 import { useTranslation } from 'react-i18next';
+
+import Multiselect from 'multiselect-react-dropdown';
+
+import PermissionsButton from '../PermissionsButton.Component';
 
 interface EditableMultiSelectProp {
 	originalValues: { value: string | number; label: string }[];
@@ -46,7 +48,8 @@ const EditableMultiSelect: FC<EditableMultiSelectProp> = ({
 			<label className="label" htmlFor={name}>
 				{t(label)}
 			</label>
-			<div className="flex rounded-md shadow-sm">
+
+			<div className="input-div">
 				<div className="editable-input" id={name}>
 					<Multiselect
 						options={options}
@@ -60,6 +63,7 @@ const EditableMultiSelect: FC<EditableMultiSelectProp> = ({
 						disable={disabled}
 					/>
 				</div>
+
 				<div className="ms-3">
 					<PermissionsButton
 						btnTitle={disabled ? t('Change') : t('Cancel')}

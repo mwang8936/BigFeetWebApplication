@@ -4,4 +4,6 @@ export default interface VipPackage {
 	sold_amount: number;
 	commission_amount: number;
 	employee_ids: number[];
+	created_at: Date;
+	updated_at: Date;
 }

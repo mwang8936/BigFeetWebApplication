@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
-import PermissionsButton, { ButtonType } from '../PermissionsButton.Component';
 import { useTranslation } from 'react-i18next';
+
+import PermissionsButton, { ButtonType } from '../PermissionsButton.Component';
 
 interface InvalidMessage {
 	key: string;
@@ -70,7 +71,8 @@ const EditablePayRateAutomatic: FC<EditablePayRateAutomaticProp> = ({
 			<label className="label" htmlFor={name}>
 				{t(label)}
 			</label>
-			<div className="flex relative rounded-md shadow-sm">
+
+			<div className="div-input">
 				<input
 					className="editable-input pl-9"
 					id={name}
@@ -89,9 +91,11 @@ const EditablePayRateAutomatic: FC<EditablePayRateAutomaticProp> = ({
 					disabled={disabled}
 					placeholder={placeholder}
 				/>
-				<div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4">
+
+				<div className="input-icon-div">
 					<span className="text-gray-500">$</span>
 				</div>
+
 				<div className="ms-3">
 					<PermissionsButton
 						btnTitle={t('Fill')}
@@ -105,6 +109,7 @@ const EditablePayRateAutomatic: FC<EditablePayRateAutomaticProp> = ({
 						onClick={fillBtnClick}
 					/>
 				</div>
+
 				<div className="ms-3">
 					<PermissionsButton
 						btnTitle={disabled ? t('Change') : t('Cancel')}
@@ -114,6 +119,7 @@ const EditablePayRateAutomatic: FC<EditablePayRateAutomaticProp> = ({
 					/>
 				</div>
 			</div>
+
 			{validationProp.required && amount === null ? (
 				<p className="error-label">
 					{validationProp.requiredMessage && t(validationProp.requiredMessage)}

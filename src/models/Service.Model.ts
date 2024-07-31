@@ -12,4 +12,7 @@ export default interface Service {
 	beds_required: number;
 	can_overlap: boolean;
 	color: ServiceColor;
+	created_at: Date;
+	updated_at: Date;
+	deleted_at?: Date;
 }

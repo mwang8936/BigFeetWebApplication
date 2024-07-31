@@ -1,3 +1,5 @@
+import { FC } from 'react';
+
 import RetryButton from './RetryButton.Component';
 
 interface RetryProp {
@@ -7,14 +9,9 @@ interface RetryProp {
 	enabled?: boolean;
 }
 
-const Retry: React.FC<RetryProp> = ({
-	retrying,
-	error,
-	onRetry,
-	enabled = true,
-}) => {
+const Retry: FC<RetryProp> = ({ retrying, error, onRetry, enabled = true }) => {
 	return (
-		<div className="m-auto text-gray-700 text-xl font-bold flex flex-col items-center justify-center">
+		<div className="retry-div">
 			<h1>{error}</h1>
 			<RetryButton loading={retrying} onRetry={onRetry} enabled={enabled} />
 		</div>

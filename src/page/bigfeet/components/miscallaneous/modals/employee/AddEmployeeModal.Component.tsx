@@ -1,7 +1,10 @@
 import { FC } from 'react';
-import BaseModal from '../BaseModal.Component';
-import { AddEmployeeRequest } from '../../../../../../models/requests/Employee.Request.Model';
+
 import AddEmployee from './AddEmployee.Component';
+
+import BaseModal from '../BaseModal.Component';
+
+import { AddEmployeeRequest } from '../../../../../../models/requests/Employee.Request.Model';
 
 interface AddEmployeeModalProp {
 	open: boolean;

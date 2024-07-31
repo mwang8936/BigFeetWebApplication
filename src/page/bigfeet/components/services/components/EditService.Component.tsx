@@ -1,40 +1,51 @@
 import { FC, useEffect, useState } from 'react';
-import LENGTHS from '../../../../../constants/lengths.constants.ts';
-import PATTERNS from '../../../../../constants/patterns.constants.ts';
-import Service from '../../../../../models/Service.Model.ts';
-import { ServiceColor } from '../../../../../models/enums.ts';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import EditableBodyFeetAcupunctureService from './EditableBodyFeetAcupunctureService.Component.tsx';
+
+import DatesDisplay from '../../miscallaneous/DatesDisplay.Component.tsx';
+import PermissionsButton, {
+	ButtonType,
+} from '../../miscallaneous/PermissionsButton.Component.tsx';
+
+import { ToggleColor } from '../../miscallaneous/add/AddToggleSwitch.Component.tsx';
+
+import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component.tsx';
+import EditableInput from '../../miscallaneous/editable/EditableInput.Component.tsx';
 import EditableMinute from '../../miscallaneous/editable/EditableMinute.Component.tsx';
+import EditableNumber from '../../miscallaneous/editable/EditableNumber.Component.tsx';
 import EditablePayRate from '../../miscallaneous/editable/EditablePayRate.Component.tsx';
+import EditableToggleSwitch from '../../miscallaneous/editable/EditableToggleSwitch.Component.tsx';
+
+import DeleteServiceModal from '../../miscallaneous/modals/service/DeleteServiceModal.Component.tsx';
+
+import { colorDropDownItems } from '../../../../../constants/drop-down.constants.ts';
+import ERRORS from '../../../../../constants/error.constants.ts';
+import LABELS from '../../../../../constants/label.constants.ts';
+import LENGTHS from '../../../../../constants/lengths.constants.ts';
+import NAMES from '../../../../../constants/name.constants.ts';
+import NUMBERS from '../../../../../constants/numbers.constants.ts';
+import PATTERNS from '../../../../../constants/patterns.constants.ts';
+import PLACEHOLDERS from '../../../../../constants/placeholder.constants.ts';
+import STORES from '../../../../../constants/store.constants.ts';
+
+import { ServiceColor } from '../../../../../models/enums.ts';
+import Service from '../../../../../models/Service.Model.ts';
+
+import { UpdateServiceRequest } from '../../../../../models/requests/Service.Request.Model.ts';
+
 import {
 	deleteService,
 	updateService,
 } from '../../../../../service/service.service.ts';
-import { useNavigate } from 'react-router-dom';
-import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component.tsx';
-import { colorDropDownItems } from '../../../../../constants/drop-down.constants.ts';
-import EditableInput from '../../miscallaneous/editable/EditableInput.Component.tsx';
-import LABELS from '../../../../../constants/label.constants.ts';
-import NAMES from '../../../../../constants/name.constants.ts';
-import PLACEHOLDERS from '../../../../../constants/placeholder.constants.ts';
-import ERRORS from '../../../../../constants/error.constants.ts';
-import EditableBodyFeetAcupunctureService from './EditableBodyFeetAcupunctureService.Component.tsx';
-import { UpdateServiceRequest } from '../../../../../models/requests/Service.Request.Model.ts';
-import PermissionsButton, {
-	ButtonType,
-} from '../../miscallaneous/PermissionsButton.Component.tsx';
-import DeleteServiceModal from '../../miscallaneous/modals/service/DeleteServiceModal.Component.tsx';
-import NUMBERS from '../../../../../constants/numbers.constants.ts';
-import { useTranslation } from 'react-i18next';
-import EditableToggleSwitch from '../../miscallaneous/editable/EditableToggleSwitch.Component.tsx';
-import { ToggleColor } from '../../miscallaneous/add/AddToggleSwitch.Component.tsx';
+
 import {
 	createLoadingToast,
 	errorToast,
 	successToast,
 } from '../../../../../utils/toast.utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import EditableNumber from '../../miscallaneous/editable/EditableNumber.Component.tsx';
-import STORES from '../../../../../constants/store.constants.ts';
 
 interface EditServiceProp {
 	editable: boolean;
@@ -44,8 +55,8 @@ interface EditServiceProp {
 
 const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 	const { t } = useTranslation();
-	const queryClient = useQueryClient();
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 
 	const [serviceNameInput, setServiceNameInput] = useState<string | null>(
 		service.service_name
@@ -100,7 +111,9 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 		setColorInput(service.color);
 
 		setChangesMade(false);
+
 		setMissingRequiredInput(false);
+
 		setInvalidServiceName(false);
 		setInvalidTime(false);
 		setInvalidMoney(false);
@@ -435,8 +448,8 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 				originalChecked={service.can_overlap}
 				setChecked={setCanOverlapInput}
 				checked={canOverlapInput}
-				falseText={'Cannot Overlap'}
-				trueText={'Can Overlap'}
+				falseText={t('Cannot Overlap')}
+				trueText={t('Can Overlap')}
 				toggleColour={ToggleColor.BLUE}
 				label={LABELS.service.can_overlap}
 				name={NAMES.service.can_overlap}
@@ -472,7 +485,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 				missingPermissionMessage={ERRORS.service.permissions.edit}
 			/>
 
-			<div className="flex border-t-2 border-gray-400 py-4 justify-between">
+			<div className="bottom-bar">
 				<PermissionsButton
 					btnTitle={t('Save Changes')}
 					right={false}
@@ -502,16 +515,21 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 						setOpenDeleteModal(true);
 					}}
 				/>
-
-				<DeleteServiceModal
-					open={openDeleteModal}
-					setOpen={setOpenDeleteModal}
-					serviceId={service.service_id}
-					serviceName={service.service_name}
-					deletable={deletable}
-					onDeleteService={onDelete}
-				/>
 			</div>
+
+			<DatesDisplay
+				updatedAt={service.updated_at}
+				createdAt={service.created_at}
+			/>
+
+			<DeleteServiceModal
+				open={openDeleteModal}
+				setOpen={setOpenDeleteModal}
+				serviceId={service.service_id}
+				serviceName={service.service_name}
+				deletable={deletable}
+				onDeleteService={onDelete}
+			/>
 		</>
 	);
 };

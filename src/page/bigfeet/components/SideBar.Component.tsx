@@ -13,6 +13,7 @@ import { getCustomers } from '../../../service/customer.service';
 import { useNavigate } from 'react-router-dom';
 import { getServices } from '../../../service/service.service';
 import { getEmployees } from '../../../service/employee.service';
+import { FC } from 'react';
 
 interface SideBarProp {
 	selectedIndex: number;
@@ -20,7 +21,11 @@ interface SideBarProp {
 	sideBarItems: SideBarItems[];
 }
 
-export default function SideBar(prop: SideBarProp) {
+const SideBar: FC<SideBarProp> = ({
+	selectedIndex,
+	onIndexSelected,
+	sideBarItems,
+}) => {
 	const navigate = useNavigate();
 	const { t } = useTranslation();
 	const { setAuthentication } = useAuthenticationContext();
@@ -50,15 +55,15 @@ export default function SideBar(prop: SideBarProp) {
 
 	return (
 		<div className="sidebar">
-			{prop.sideBarItems.includes(SideBarItems.Profile) && (
+			{sideBarItems.includes(SideBarItems.Profile) && (
 				<div
 					className={
-						prop.selectedIndex === SideBarItems.Profile
+						selectedIndex === SideBarItems.Profile
 							? 'sidebar-icon-selected group'
 							: 'sidebar-icon group'
 					}
 					onClick={() => {
-						prop.onIndexSelected(SideBarItems.Profile);
+						onIndexSelected(SideBarItems.Profile);
 					}}>
 					<img src={ProfileIcon} className="h-16 w-16" />
 					<span className="sidebar-tip group-hover:scale-100">
@@ -67,15 +72,15 @@ export default function SideBar(prop: SideBarProp) {
 				</div>
 			)}
 
-			{prop.sideBarItems.includes(SideBarItems.Scheduler) && (
+			{sideBarItems.includes(SideBarItems.Scheduler) && (
 				<div
 					className={
-						prop.selectedIndex === SideBarItems.Scheduler
+						selectedIndex === SideBarItems.Scheduler
 							? 'sidebar-icon-selected group'
 							: 'sidebar-icon group'
 					}
 					onClick={() => {
-						prop.onIndexSelected(SideBarItems.Scheduler);
+						onIndexSelected(SideBarItems.Scheduler);
 					}}>
 					<img src={SchedulerIcon} className="h-16 w-16" />
 					<span className="sidebar-tip group-hover:scale-100">
@@ -84,15 +89,15 @@ export default function SideBar(prop: SideBarProp) {
 				</div>
 			)}
 
-			{prop.sideBarItems.includes(SideBarItems.PayRoll) && (
+			{sideBarItems.includes(SideBarItems.PayRoll) && (
 				<div
 					className={
-						prop.selectedIndex === SideBarItems.PayRoll
+						selectedIndex === SideBarItems.PayRoll
 							? 'sidebar-icon-selected group'
 							: 'sidebar-icon group'
 					}
 					onClick={() => {
-						prop.onIndexSelected(SideBarItems.PayRoll);
+						onIndexSelected(SideBarItems.PayRoll);
 					}}>
 					<img src={PayRollIcon} className="h-16 w-16" />
 					<span className="sidebar-tip group-hover:scale-100">
@@ -101,16 +106,16 @@ export default function SideBar(prop: SideBarProp) {
 				</div>
 			)}
 
-			{prop.sideBarItems.includes(SideBarItems.Employees) && (
+			{sideBarItems.includes(SideBarItems.Employees) && (
 				<div
 					className={
-						prop.selectedIndex === SideBarItems.Employees
+						selectedIndex === SideBarItems.Employees
 							? 'sidebar-icon-selected group'
 							: 'sidebar-icon group'
 					}
 					onMouseEnter={prefetchEmployees}
 					onClick={() => {
-						prop.onIndexSelected(SideBarItems.Employees);
+						onIndexSelected(SideBarItems.Employees);
 					}}>
 					<img src={EmployeesIcon} className="h-16 w-16" />
 					<span className="sidebar-tip group-hover:scale-100">
@@ -119,16 +124,16 @@ export default function SideBar(prop: SideBarProp) {
 				</div>
 			)}
 
-			{prop.sideBarItems.includes(SideBarItems.Services) && (
+			{sideBarItems.includes(SideBarItems.Services) && (
 				<div
 					className={
-						prop.selectedIndex === SideBarItems.Services
+						selectedIndex === SideBarItems.Services
 							? 'sidebar-icon-selected group'
 							: 'sidebar-icon group'
 					}
 					onMouseEnter={prefetchServices}
 					onClick={() => {
-						prop.onIndexSelected(SideBarItems.Services);
+						onIndexSelected(SideBarItems.Services);
 					}}>
 					<img src={ServicesIcon} className="h-16 w-16" />
 					<span className="sidebar-tip group-hover:scale-100">
@@ -137,16 +142,16 @@ export default function SideBar(prop: SideBarProp) {
 				</div>
 			)}
 
-			{prop.sideBarItems.includes(SideBarItems.Customers) && (
+			{sideBarItems.includes(SideBarItems.Customers) && (
 				<div
 					className={
-						prop.selectedIndex === SideBarItems.Customers
+						selectedIndex === SideBarItems.Customers
 							? 'sidebar-icon-selected group'
 							: 'sidebar-icon group'
 					}
 					onMouseEnter={prefetchCustomers}
 					onClick={() => {
-						prop.onIndexSelected(SideBarItems.Customers);
+						onIndexSelected(SideBarItems.Customers);
 					}}>
 					<img src={CustomersIcon} className="h-16 w-16" />
 					<span className="sidebar-tip group-hover:scale-100">
@@ -165,4 +170,6 @@ export default function SideBar(prop: SideBarProp) {
 			</div>
 		</div>
 	);
-}
+};
+
+export default SideBar;

@@ -30,11 +30,12 @@ const AddTextArea: FC<AddTextAreaProp> = ({
 			<label className="label" htmlFor={name}>
 				{t(label)}
 			</label>
-			<div className="flex rounded-md shadow-sm">
+
+			<div className="input-div">
 				<textarea
 					className="add-input"
 					id={name}
-					value={text || ''}
+					value={text ?? ''}
 					onChange={(event) => {
 						const text = event.target.value.trimStart();
 
@@ -44,6 +45,7 @@ const AddTextArea: FC<AddTextAreaProp> = ({
 					placeholder={placeholder && t(placeholder)}
 				/>
 			</div>
+
 			{validationProp.required && (text === null || text.length === 0) && (
 				<p className="error-label">
 					{validationProp.requiredMessage && t(validationProp.requiredMessage)}

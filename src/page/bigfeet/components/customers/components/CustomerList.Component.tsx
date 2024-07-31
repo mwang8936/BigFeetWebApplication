@@ -1,7 +1,10 @@
 import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import CustomerItem from './CustomerItem.Component';
+
 import Customer from '../../../../../models/Customer.Model';
 import { UpdateCustomerRequest } from '../../../../../models/requests/Customer.Request.Model';
-import CustomerItem from './CustomerItem.Component';
 
 interface CustomerListProp {
 	customers: Customer[];
@@ -21,6 +24,8 @@ const CustomerList: FC<CustomerListProp> = ({
 	deletable,
 	onDeleteCustomer,
 }) => {
+	const { t } = useTranslation();
+
 	const customersElement =
 		customers.length !== 0 ? (
 			customers.map((customer) => (
@@ -34,14 +39,10 @@ const CustomerList: FC<CustomerListProp> = ({
 				/>
 			))
 		) : (
-			<h1 className="text-3xl mx-auto">No Customers</h1>
+			<h1 className="large-centered-text">{t('No Customers Found')}</h1>
 		);
 
-	return (
-		<div className="flex flex-col flex-1 h-full w-full mx-auto border-black border-2">
-			{customersElement}
-		</div>
-	);
+	return <div className="list-div">{customersElement}</div>;
 };
 
 export default CustomerList;

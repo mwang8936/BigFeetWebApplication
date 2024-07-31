@@ -1,26 +1,34 @@
-import { Role } from '../../../../../models/enums';
-import EditablePayRate from '../../miscallaneous/editable/EditablePayRate.Component';
-import { useNavigate } from 'react-router-dom';
 import { FC, useEffect, useState } from 'react';
-import { updateEmployee } from '../../../../../service/employee.service';
-import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
-import { roleDropDownItems } from '../../../../../constants/drop-down.constants';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
+
+import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
+import EditablePayRate from '../../miscallaneous/editable/EditablePayRate.Component';
+
+import { roleDropDownItems } from '../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../constants/error.constants';
 import LABELS from '../../../../../constants/label.constants';
 import NAMES from '../../../../../constants/name.constants';
 import NUMBERS from '../../../../../constants/numbers.constants';
-import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
-import { useTranslation } from 'react-i18next';
+
+import { Role } from '../../../../../models/enums';
+import User from '../../../../../models/User.Model';
+
+import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
+
+import { updateEmployee } from '../../../../../service/employee.service';
+
+import { useUserQuery } from '../../../../../service/query/get-items.query';
+
 import {
 	createLoadingToast,
 	errorToast,
 	successToast,
 } from '../../../../../utils/toast.utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useUserQuery } from '../../../../../service/query/get-items.query';
-import User from '../../../../../models/User.Model';
 
 interface ProfessionalProp {
 	editable: boolean;
@@ -40,8 +48,8 @@ const Professional: FC<ProfessionalProp> = ({
 	originalPerHour,
 }) => {
 	const { t } = useTranslation();
-	const queryClient = useQueryClient();
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 
 	const [roleInput, setRoleInput] = useState<Role | null>(originalRole);
 	const [bodyRateInput, setBodyRateInput] = useState<number | null>(
@@ -76,7 +84,9 @@ const Professional: FC<ProfessionalProp> = ({
 		setPerHourInput(originalPerHour);
 
 		setChangesMade(false);
+
 		setMissingRequiredInput(false);
+
 		setInvalidBodyRate(false);
 		setInvalidFeetRate(false);
 		setInvalidAcupunctureRate(false);
@@ -183,11 +193,11 @@ const Professional: FC<ProfessionalProp> = ({
 
 		const employeeId = user.employee_id;
 		const request: UpdateEmployeeRequest = {
-			...(role && { role }),
-			...(body_rate && { body_rate }),
-			...(feet_rate && { feet_rate }),
-			...(acupuncture_rate && { acupuncture_rate }),
-			...(per_hour && { per_hour }),
+			...(role !== undefined && { role }),
+			...(body_rate !== undefined && { body_rate }),
+			...(feet_rate !== undefined && { feet_rate }),
+			...(acupuncture_rate !== undefined && { acupuncture_rate }),
+			...(per_hour !== undefined && { per_hour }),
 		};
 
 		editProfileMutation.mutate({ employeeId, request });
@@ -292,7 +302,7 @@ const Professional: FC<ProfessionalProp> = ({
 				missingPermissionMessage={ERRORS.employee.permissions.edit}
 			/>
 
-			<div className="flex border-t-2 border-gray-400 py-4">
+			<div className="bottom-bar">
 				<PermissionsButton
 					btnTitle={t('Save Changes')}
 					right={false}

@@ -165,7 +165,7 @@ const LoginForm: FC = () => {
 					required
 				/>
 
-				<div className="absolute inset-y-0 left-0 flex items-center pl-3 mt-1 mb-3 z-20">
+				<div className="show-password-login-div">
 					{showPassword ? (
 						<EyeIcon
 							className="pointer-icon"
@@ -196,9 +196,7 @@ const LoginForm: FC = () => {
 				type="checkbox"
 			/>
 
-			<p className="block text-gray-700 text-sm font-bold">
-				{t('Remember Me')}
-			</p>
+			<p className="remember-me-label">{t('Remember Me')}</p>
 		</div>
 	);
 

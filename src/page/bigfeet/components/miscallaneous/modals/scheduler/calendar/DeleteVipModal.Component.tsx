@@ -1,7 +1,9 @@
 import { FC } from 'react';
-import BaseModal from '../../BaseModal.Component';
-import DeleteReservation from './DeleteReservation.Component';
+
 import DeleteVip from './DeleteVip.Component';
+
+import BaseModal from '../../BaseModal.Component';
+
 import VipPackage from '../../../../../../../models/Vip-Package.Model';
 
 interface DeleteVipModalProp {

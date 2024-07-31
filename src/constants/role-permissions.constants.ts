@@ -2,7 +2,7 @@ import { Permissions, Role } from '../models/enums';
 
 const rolePermissions: Map<Role, Permissions[]> = new Map();
 
-const permissionValues = Object.values(Permissions).map(
+export const permissionValues = Object.values(Permissions).map(
 	(permission: Permissions) => permission
 );
 

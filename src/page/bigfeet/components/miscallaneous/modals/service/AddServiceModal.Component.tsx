@@ -1,7 +1,10 @@
 import { FC } from 'react';
+
+import AddService from './AddService.Component';
+
 import BaseModal from '../BaseModal.Component';
+
 import { AddServiceRequest } from '../../../../../../models/requests/Service.Request.Model';
-import AddService1 from './AddService.Component';
 
 interface AddServiceModalProp {
 	open: boolean;
@@ -21,7 +24,7 @@ const AddServiceModal: FC<AddServiceModalProp> = ({
 			open={open}
 			setOpen={setOpen}
 			contentElement={
-				<AddService1
+				<AddService
 					setOpen={setOpen}
 					creatable={creatable}
 					onAddService={onAddService}

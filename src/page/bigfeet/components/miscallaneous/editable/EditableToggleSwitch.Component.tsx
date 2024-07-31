@@ -1,7 +1,9 @@
 import { FC, useEffect, useState } from 'react';
-import { ToggleColor } from '../add/AddToggleSwitch.Component';
-import PermissionsButton from '../PermissionsButton.Component';
 import { useTranslation } from 'react-i18next';
+
+import PermissionsButton from '../PermissionsButton.Component';
+
+import { ToggleColor } from '../add/AddToggleSwitch.Component';
 
 interface EditableToggleSwitchProp {
 	originalChecked: boolean;
@@ -57,12 +59,14 @@ const EditableToggleSwitch: FC<EditableToggleSwitchProp> = ({
 			: toggleColour === ToggleColor.RED
 			? redColour
 			: blackColour;
+
 	return (
 		<div className="mb-4">
 			<label className="label" htmlFor={name}>
 				{t(label)}
 			</label>
-			<div className="flex rounded-md shadow-sm">
+
+			<div className="input-div">
 				<label
 					id={name}
 					style={{ cursor: disabled ? 'default' : 'pointer' }}
@@ -74,10 +78,12 @@ const EditableToggleSwitch: FC<EditableToggleSwitchProp> = ({
 						disabled={disabled}
 						className="sr-only"
 					/>
+
 					<span
 						className={`label flex items-center text-sm font-medium ${textColour}`}>
 						{t(falseText)}
 					</span>
+
 					<span
 						className={`slider mx-4 flex h-8 w-[60px] items-center rounded-full p-1 duration-200 ${
 							checked ? colourCss : 'bg-gray-300'
@@ -88,11 +94,13 @@ const EditableToggleSwitch: FC<EditableToggleSwitchProp> = ({
 							}`}
 						/>
 					</span>
+
 					<span
 						className={`label flex items-center text-sm font-medium ${textColour}`}>
 						{t(trueText)}
 					</span>
 				</label>
+
 				<div className="ms-auto">
 					<PermissionsButton
 						btnTitle={disabled ? t('Change') : t('Cancel')}

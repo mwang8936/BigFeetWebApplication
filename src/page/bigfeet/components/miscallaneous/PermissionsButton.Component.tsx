@@ -28,12 +28,12 @@ const PermissionsButton: FC<PermissionsButtonProp> = ({
 }) => {
 	const btnColorCss =
 		btnType === ButtonType.ADD
-			? 'bg-green-500 hover:bg-green-700 disabled:bg-green-300'
+			? 'green-button-color'
 			: btnType === ButtonType.CANCEL
-			? 'bg-gray-500 hover:bg-gray-700 disabled:bg-gray-300'
+			? 'gray-button-color'
 			: btnType === ButtonType.DELETE
-			? 'bg-red-500 hover:bg-red-700 disabled:bg-red-300'
-			: 'bg-blue-500 hover:bg-blue-700 disabled:bg-blue-300';
+			? 'red-button-color'
+			: 'blue-button-olor';
 
 	const tipOriginCss =
 		'origin' + (top ? '-bottom' : '-top') + (right ? '-right' : '-left');

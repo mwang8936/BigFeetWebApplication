@@ -1,6 +1,7 @@
 import { FC } from 'react';
-import Multiselect from 'multiselect-react-dropdown';
 import { useTranslation } from 'react-i18next';
+
+import Multiselect from 'multiselect-react-dropdown';
 
 interface AddMultiSelectProp {
 	options: { value: string | number; label: string }[];
@@ -26,7 +27,8 @@ const AddMultiSelect: FC<AddMultiSelectProp> = ({
 			<label className="label" htmlFor={name}>
 				{t(label)}
 			</label>
-			<div className="flex rounded-md shadow-sm">
+
+			<div className="input-div">
 				<div className="editable-input" id={name}>
 					<Multiselect
 						options={options}

@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
-import PermissionsButton from '../PermissionsButton.Component';
 import { useTranslation } from 'react-i18next';
+
+import PermissionsButton from '../PermissionsButton.Component';
 
 interface InvalidMessage {
 	key: string;
@@ -63,12 +64,13 @@ const EditableInput: FC<EditableInputProp> = ({
 			<label className="label" htmlFor={name}>
 				{t(label)}
 			</label>
-			<div className="flex rounded-md shadow-sm">
+
+			<div className="input-div">
 				<input
 					className="editable-input"
 					id={name}
 					type={type}
-					value={text || ''}
+					value={text ?? ''}
 					onChange={(event) => {
 						const text = event.target.value.trimStart();
 
@@ -81,6 +83,7 @@ const EditableInput: FC<EditableInputProp> = ({
 					disabled={disabled}
 					placeholder={placeholder && t(placeholder)}
 				/>
+
 				<div className="ms-3">
 					<PermissionsButton
 						btnTitle={disabled ? t('Change') : t('Cancel')}
@@ -90,6 +93,7 @@ const EditableInput: FC<EditableInputProp> = ({
 					/>
 				</div>
 			</div>
+
 			{validationProp.required && (text === null || text.length === 0) ? (
 				<p className="error-label">
 					{validationProp.requiredMessage && t(validationProp.requiredMessage)}

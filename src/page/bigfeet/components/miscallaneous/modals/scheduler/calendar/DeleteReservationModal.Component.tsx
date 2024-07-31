@@ -1,6 +1,8 @@
 import { FC } from 'react';
-import BaseModal from '../../BaseModal.Component';
+
 import DeleteReservation from './DeleteReservation.Component';
+
+import BaseModal from '../../BaseModal.Component';
 
 interface DeleteReservationModalProp {
 	open: boolean;

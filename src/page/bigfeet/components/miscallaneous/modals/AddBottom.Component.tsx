@@ -1,7 +1,9 @@
 import { FC } from 'react';
-import ModalPermissionsButton from './ModalPermissionsButton.Component';
-import { ButtonType } from '../PermissionsButton.Component';
 import { useTranslation } from 'react-i18next';
+
+import ModalPermissionsButton from './ModalPermissionsButton.Component';
+
+import { ButtonType } from '../PermissionsButton.Component';
 
 interface AddBottomProp {
 	cancelText?: string;
@@ -35,7 +37,7 @@ const AddBottom: FC<AddBottomProp> = ({
 	const { t } = useTranslation();
 
 	return (
-		<div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+		<div className="modal-bottom">
 			<ModalPermissionsButton
 				btnTitle={addText || t('Add')}
 				btnType={ButtonType.ADD}
@@ -43,6 +45,7 @@ const AddBottom: FC<AddBottomProp> = ({
 				missingPermissionMessage={addMissingPermissionMessage}
 				onClick={onAdd}
 			/>
+
 			<ModalPermissionsButton
 				btnTitle={cancelText || t('Cancel')}
 				btnType={ButtonType.CANCEL}

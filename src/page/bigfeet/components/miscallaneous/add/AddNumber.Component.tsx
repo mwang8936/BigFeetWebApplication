@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 import { useTranslation } from 'react-i18next';
 
 interface InvalidMessage {
@@ -40,7 +39,8 @@ const AddNumber: FC<AddNumberProp> = ({
 			<label className="label" htmlFor={name}>
 				{t(label)}
 			</label>
-			<div className="flex relative rounded-md shadow-sm">
+
+			<div className="div-input">
 				<input
 					className="add-input"
 					id={name}
@@ -59,6 +59,7 @@ const AddNumber: FC<AddNumberProp> = ({
 					placeholder={placeholder}
 				/>
 			</div>
+
 			{validationProp.required && input === null ? (
 				<p className="error-label">
 					{validationProp.requiredMessage && t(validationProp.requiredMessage)}

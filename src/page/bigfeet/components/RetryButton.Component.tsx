@@ -1,3 +1,4 @@
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface RetryButtonProp {
@@ -6,7 +7,7 @@ interface RetryButtonProp {
 	enabled?: boolean;
 }
 
-const RetryButton: React.FC<RetryButtonProp> = ({
+const RetryButton: FC<RetryButtonProp> = ({
 	loading,
 	onRetry,
 	enabled = true,
@@ -22,7 +23,7 @@ const RetryButton: React.FC<RetryButtonProp> = ({
 				disabled={!enabled}>
 				{loading && (
 					<svg
-						className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+						className="white-spin"
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"
 						viewBox="0 0 24 24">

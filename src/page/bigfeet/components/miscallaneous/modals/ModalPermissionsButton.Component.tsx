@@ -1,4 +1,5 @@
 import { FC } from 'react';
+
 import { ButtonType } from '../PermissionsButton.Component';
 
 interface ModalPermissionsButtonProp {
@@ -46,6 +47,7 @@ const ModalPermissionsButton: FC<ModalPermissionsButtonProp> = ({
 				className={`button-tip ${tipLocationCss} ${tipOriginCss} group-hover:group-disabled:scale-100`}>
 				{missingPermissionMessage}
 			</span>
+
 			{btnTitle}
 		</button>
 	);

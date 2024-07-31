@@ -1,7 +1,11 @@
 import { FC } from 'react';
-import BaseModal from '../BaseModal.Component';
-import Customer from '../../../../../../models/Customer.Model';
+
 import EditCustomer from './EditCustomer.Component';
+
+import BaseModal from '../BaseModal.Component';
+
+import Customer from '../../../../../../models/Customer.Model';
+
 import { UpdateCustomerRequest } from '../../../../../../models/requests/Customer.Request.Model';
 
 interface EditCustomerModalProp {

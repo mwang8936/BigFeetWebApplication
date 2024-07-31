@@ -1,7 +1,11 @@
 import { FC } from 'react';
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+
 import { Dialog } from '@headlessui/react';
+
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+
 import ModalPermissionsButton from '../../ModalPermissionsButton.Component';
+
 import { ButtonType } from '../../../PermissionsButton.Component';
 
 interface WarningProp {
@@ -21,16 +25,19 @@ const Warning: FC<WarningProp> = ({ setOpen, title, message }) => {
 							aria-hidden="true"
 						/>
 					</div>
+
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{title}
 						</Dialog.Title>
+
 						<div className="mt-2">{message}</div>
 					</div>
 				</div>
 			</div>
+
 			<div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
 				<ModalPermissionsButton
 					btnTitle="Okay"

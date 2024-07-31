@@ -1,19 +1,28 @@
 import { FC, useState, useEffect } from 'react';
-import { PencilSquareIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
+
 import { Dialog } from '@headlessui/react';
-import Customer from '../../../../../../models/Customer.Model';
-import { UpdateCustomerRequest } from '../../../../../../models/requests/Customer.Request.Model';
+
+import { PencilSquareIcon } from '@heroicons/react/24/outline';
+
 import DeleteCustomerModal from './DeleteCustomerModal.Component';
-import { formatPhoneNumber } from '../../../../../../utils/string.utils';
+
+import EditBottom from '../EditBottom.Component';
+
 import EditableInput from '../../editable/EditableInput.Component';
 import EditableTextArea from '../../editable/EditableTextArea.Component';
-import LABELS from '../../../../../../constants/label.constants';
-import NAMES from '../../../../../../constants/name.constants';
-import LENGTHS from '../../../../../../constants/lengths.constants';
+
 import ERRORS from '../../../../../../constants/error.constants';
+import LABELS from '../../../../../../constants/label.constants';
+import LENGTHS from '../../../../../../constants/lengths.constants';
+import NAMES from '../../../../../../constants/name.constants';
 import PLACEHOLDERS from '../../../../../../constants/placeholder.constants';
-import EditBottom from '../EditBottom.Component';
-import { useTranslation } from 'react-i18next';
+
+import Customer from '../../../../../../models/Customer.Model';
+
+import { UpdateCustomerRequest } from '../../../../../../models/requests/Customer.Request.Model';
+
+import { formatPhoneNumber } from '../../../../../../utils/string.utils';
 
 interface EditCustomerProp {
 	setOpen(open: boolean): void;
@@ -80,6 +89,7 @@ const EditCustomer: FC<EditCustomerProp> = ({
 			...(customer_name !== undefined && { customer_name }),
 			...(notes !== undefined && { notes }),
 		};
+
 		onEditCustomer(customer.phone_number, updateCustomerRequest);
 		setOpen(false);
 	};
@@ -99,6 +109,7 @@ const EditCustomer: FC<EditCustomerProp> = ({
 							aria-hidden="true"
 						/>
 					</div>
+
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
@@ -107,6 +118,7 @@ const EditCustomer: FC<EditCustomerProp> = ({
 								phone_number: formatPhoneNumber(customer.phone_number),
 							})}
 						</Dialog.Title>
+
 						<div className="mt-2">
 							<EditableInput
 								originalText={customer.customer_name}
@@ -144,6 +156,7 @@ const EditCustomer: FC<EditCustomerProp> = ({
 					</div>
 				</div>
 			</div>
+
 			<EditBottom
 				onCancel={() => setOpen(false)}
 				disabledEdit={!editable || !changesMade || invalidInput}
@@ -161,6 +174,7 @@ const EditCustomer: FC<EditCustomerProp> = ({
 				deleteMissingPermissionMessage={ERRORS.customer.permissions.delete}
 				onDelete={() => setOpenDeleteModal(true)}
 			/>
+
 			<DeleteCustomerModal
 				open={openDeleteModal}
 				setOpen={setOpenDeleteModal}

@@ -1,4 +1,5 @@
 import { FC, Fragment } from 'react';
+
 import { Dialog, Transition } from '@headlessui/react';
 
 interface BaseModalProp {
@@ -8,6 +9,7 @@ interface BaseModalProp {
 	contentElement: React.ReactNode;
 	defaultButtonRef?: React.RefObject<null>;
 }
+
 const BaseModal: FC<BaseModalProp> = ({
 	open,
 	setOpen,
@@ -40,6 +42,7 @@ const BaseModal: FC<BaseModalProp> = ({
 
 				<div className="fixed inset-0 z-10 overflow-y-auto">
 					<Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+
 					<div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
 						<Transition.Child
 							as={Fragment}

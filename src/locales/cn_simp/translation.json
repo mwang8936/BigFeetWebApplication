@@ -20,6 +20,8 @@
     "Customer Deleted Successfully": "客户删除成功",
     "Failed to Delete Customer": "客户删除失败",
     "Add Customer": "添加顾客",
+    "No Customers Found": "No Customers Found",
+    "No Customers Created": "No Customers Created",
     "Name": "名字",
     "Notes": "备注",
     "Delete Customer": "删除客户: {{phone_number}}",

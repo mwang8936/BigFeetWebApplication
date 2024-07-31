@@ -1,6 +1,8 @@
 import { FC } from 'react';
-import BaseModal from '../../BaseModal.Component';
+
 import SignSchedule from './SignSchedule.Component';
+
+import BaseModal from '../../BaseModal.Component';
 
 interface SignScheduleModalProp {
 	open: boolean;

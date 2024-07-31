@@ -1,16 +1,24 @@
 import { FC, useState } from 'react';
-import { PencilSquareIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
+
 import { Dialog } from '@headlessui/react';
+
+import { PencilSquareIcon } from '@heroicons/react/24/outline';
+
+import AddVipModal from './AddVipModal.Component';
+
+import AddBottom from '../../AddBottom.Component';
+
+import VipItem from '../../../../scheduler/Calendar/components/VipItem.Component';
+
+import ERRORS from '../../../../../../../constants/error.constants';
+
 import VipPackage from '../../../../../../../models/Vip-Package.Model';
+
 import {
 	AddVipPackageRequest,
 	UpdateVipPackageRequest,
 } from '../../../../../../../models/requests/Vip-Package.Request.Model';
-import AddBottom from '../../AddBottom.Component';
-import ERRORS from '../../../../../../../constants/error.constants';
-import { useTranslation } from 'react-i18next';
-import AddVipModal from './AddVipModal.Component';
-import VipItem from '../../../../scheduler/Calendar/components/VipItem.Component';
 
 interface VipProp {
 	setOpen(open: boolean): void;
@@ -51,33 +59,43 @@ const Vip: FC<VipProp> = ({
 							aria-hidden="true"
 						/>
 					</div>
+
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Vip Packages')}
 						</Dialog.Title>
-						<div className="mt-2">
-							{vipPackages.map((vipPackage) => (
-								<VipItem
-									key={vipPackage.serial}
-									vipPackage={vipPackage}
-									editable={editable}
-									onEditVipPackage={onEditVipPackage}
-									deletable={deletable}
-									onDeleteVipPackage={onDeleteVipPackage}
-								/>
-							))}
+
+						<div className="list-div">
+							{vipPackages.length !== 0 ? (
+								vipPackages.map((vipPackage) => (
+									<VipItem
+										key={vipPackage.serial}
+										vipPackage={vipPackage}
+										editable={editable}
+										onEditVipPackage={onEditVipPackage}
+										deletable={deletable}
+										onDeleteVipPackage={onDeleteVipPackage}
+									/>
+								))
+							) : (
+								<h1 className="large-centered-text">
+									{t('No Vip Packages Created')}
+								</h1>
+							)}
 						</div>
 					</div>
 				</div>
 			</div>
+
 			<AddBottom
 				onCancel={() => setOpen(false)}
 				disabledAdd={!creatable}
 				addMissingPermissionMessage={ERRORS.vip_package.permissions.add}
 				onAdd={() => setOpenAddVipPackageModal(true)}
 			/>
+
 			<AddVipModal
 				open={openAddVipPackageModal}
 				setOpen={setOpenAddVipPackageModal}

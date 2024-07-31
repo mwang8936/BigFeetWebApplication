@@ -1,11 +1,12 @@
 import { FC, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
+
+import LABELS from '../../../../../constants/label.constants';
+import NAMES from '../../../../../constants/name.constants';
 import NUMBERS from '../../../../../constants/numbers.constants';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
-import NAMES from '../../../../../constants/name.constants';
-import LABELS from '../../../../../constants/label.constants';
-import { useTranslation } from 'react-i18next';
 
 interface InvalidMessage {
 	key: string;
@@ -163,7 +164,8 @@ const EditableBodyFeetAcupunctureService: FC<
 				<label className="label" htmlFor={NAMES.service.body}>
 					{t(LABELS.service.body)}
 				</label>
-				<div className="flex relative rounded-md shadow-sm">
+
+				<div className="div-input">
 					<input
 						className="editable-input pl-9"
 						id={NAMES.service.body}
@@ -182,9 +184,11 @@ const EditableBodyFeetAcupunctureService: FC<
 						disabled={disabledBody}
 						placeholder={PLACEHOLDERS.service.body}
 					/>
-					<div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4">
+
+					<div className="input-icon-div">
 						<span className="text-gray-500">{t('B')}</span>
 					</div>
+
 					<div className="ms-3">
 						<PermissionsButton
 							btnTitle={disabledBody ? t('Change') : t('Cancel')}
@@ -194,6 +198,7 @@ const EditableBodyFeetAcupunctureService: FC<
 						/>
 					</div>
 				</div>
+
 				{bodyValidationProp.required && body === null ? (
 					<p className="error-label">{bodyValidationProp.requiredMessage}</p>
 				) : (
@@ -212,7 +217,8 @@ const EditableBodyFeetAcupunctureService: FC<
 				<label className="label" htmlFor={NAMES.service.feet}>
 					{t(LABELS.service.feet)}
 				</label>
-				<div className="flex relative rounded-md shadow-sm">
+
+				<div className="div-input">
 					<input
 						className="editable-input pl-9"
 						id={NAMES.service.feet}
@@ -231,9 +237,11 @@ const EditableBodyFeetAcupunctureService: FC<
 						disabled={disabledFeet}
 						placeholder={PLACEHOLDERS.service.feet}
 					/>
-					<div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4">
+
+					<div className="input-icon-div">
 						<span className="text-gray-500">{t('F')}</span>
 					</div>
+
 					<div className="ms-3">
 						<PermissionsButton
 							btnTitle={disabledFeet ? t('Change') : t('Cancel')}
@@ -243,6 +251,7 @@ const EditableBodyFeetAcupunctureService: FC<
 						/>
 					</div>
 				</div>
+
 				{feetValidationProp.required && feet === null ? (
 					<p className="error-label">{feetValidationProp.requiredMessage}</p>
 				) : (
@@ -261,7 +270,8 @@ const EditableBodyFeetAcupunctureService: FC<
 				<label className="label" htmlFor={NAMES.service.acupuncture}>
 					{t(LABELS.service.acupuncture)}
 				</label>
-				<div className="flex relative rounded-md shadow-sm">
+
+				<div className="div-input">
 					<input
 						className="editable-input pl-9"
 						id={NAMES.service.acupuncture}
@@ -284,9 +294,11 @@ const EditableBodyFeetAcupunctureService: FC<
 						disabled={disabledAcupuncture}
 						placeholder={PLACEHOLDERS.service.acupuncture}
 					/>
-					<div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4">
+
+					<div className="input-icon-div">
 						<span className="text-gray-500">{t('A')}</span>
 					</div>
+
 					<div className="ms-3">
 						<PermissionsButton
 							btnTitle={disabledAcupuncture ? t('Change') : t('Cancel')}
@@ -296,6 +308,7 @@ const EditableBodyFeetAcupunctureService: FC<
 						/>
 					</div>
 				</div>
+
 				{acupunctureValidationProp.required && acupuncture === null ? (
 					<p className="error-label">
 						{acupunctureValidationProp.requiredMessage}

@@ -1,4 +1,4 @@
-import { useState, createContext, useContext } from 'react';
+import { useState, createContext, useContext, FC } from 'react';
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import Calendar from './Calendar/Calendar.Component';
 import { Permissions, Role } from '../../../../models/enums';
@@ -75,7 +75,7 @@ export function useScheduleDateContext() {
 	return context;
 }
 
-export default function Scheduler() {
+const Scheduler: FC = () => {
 	const { t } = useTranslation();
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
@@ -432,9 +432,17 @@ export default function Scheduler() {
 			: date.toDateString();
 	};
 
-	const totalReservations = schedules
-		.filter((schedule) => sameDate(date, schedule.date))
-		.flatMap((schedule) => schedule.reservations);
+	const totalReservations = schedules.flatMap(
+		(schedule) => schedule.reservations
+	);
+
+	const totalSessions = totalReservations
+		.flatMap((reservation) => [
+			reservation.service.acupuncture,
+			reservation.service.feet,
+			reservation.service.body,
+		])
+		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
 	const totalCash = totalReservations
 		.map((reservation) => reservation.cash || 0)
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
@@ -458,7 +466,7 @@ export default function Scheduler() {
 	return (
 		<ScheduleDateContext.Provider value={{ date, setDate }}>
 			<div className="h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
-				<div className="h-fit my-auto flex ms-10">
+				<div className="vertical-center ms-10">
 					<PermissionsButton
 						btnTitle={t('Add Reservation')}
 						btnType={ButtonType.ADD}
@@ -469,19 +477,19 @@ export default function Scheduler() {
 						onClick={() => setOpenAddReservationModal(true)}
 					/>
 				</div>
-				<div className="h-fit my-auto flex text-gray-600 text-xl">
+				<div className="vertical-center flex text-gray-600 text-xl">
 					{t('Total Cash')}:
 					<span className="font-bold ms-2">{moneyToString(totalCash)}</span>
 				</div>
-				<div className="h-fit my-auto flex flex-col">
+				<div className="vertical-center flex flex-col">
 					<h1 className="my-auto mx-auto text-gray-600 text-3xl">
 						{t('Scheduler')}
 					</h1>
 					<h1 className="mx-auto text-gray-600 text-xl">{displayDate()}</h1>
 				</div>
-				<div className="h-fit my-auto flex text-gray-600 text-xl">
+				<div className="vertical-center flex text-gray-600 text-xl">
 					{t('Total Reservations')}:
-					<span className="font-bold ms-2">{totalReservations.length}</span>
+					<span className="font-bold ms-2">{totalSessions}</span>
 				</div>
 				<AdjustmentsHorizontalIcon
 					className={`h-16 w-16 ${
@@ -541,4 +549,6 @@ export default function Scheduler() {
 			/>
 		</ScheduleDateContext.Provider>
 	);
-}
+};
+
+export default Scheduler;

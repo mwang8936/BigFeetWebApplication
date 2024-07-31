@@ -20,6 +20,8 @@
     "Customer Deleted Successfully": "Customer Deleted Successfully",
     "Failed to Delete Customer": "Failed to Delete Customer",
     "Add Customer": "Add Customer",
+    "No Customers Found": "No Customers Found",
+    "No Customers Created": "No Customers Created",
     "Name": "Name",
     "Notes": "Notes",
     "Delete Customer": "Delete Customer: {{phone_number}}",

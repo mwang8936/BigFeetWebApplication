@@ -1,8 +1,11 @@
 import { FC, useEffect, useState } from 'react';
-import { ClockIcon } from '@heroicons/react/24/outline';
-import PermissionsButton from '../PermissionsButton.Component';
-import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 import { useTranslation } from 'react-i18next';
+
+import { ClockIcon } from '@heroicons/react/24/outline';
+
+import PermissionsButton from '../PermissionsButton.Component';
+
+import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 
 interface InvalidMessage {
 	key: string;
@@ -60,12 +63,13 @@ const EditableMinute: FC<EditableMinuteProp> = ({
 			<label className="label" htmlFor={name}>
 				{t(label)}
 			</label>
-			<div className="flex relative rounded-md shadow-sm">
+
+			<div className="div-input">
 				<input
 					className="editable-input pl-11"
 					id={name}
 					type="number"
-					value={minutes || ''}
+					value={minutes ?? ''}
 					onChange={(event) => {
 						const text = event.target.value.trimStart();
 
@@ -79,9 +83,11 @@ const EditableMinute: FC<EditableMinuteProp> = ({
 					disabled={disabled}
 					placeholder={PLACEHOLDERS.service.time}
 				/>
-				<div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-3">
+
+				<div className="input-icon-div pl-3">
 					<ClockIcon className="h-6 w-6 text-gray-500" aria-hidden="true" />
 				</div>
+
 				<div className="ms-3">
 					<PermissionsButton
 						btnTitle={disabled ? t('Change') : t('Cancel')}
@@ -91,6 +97,7 @@ const EditableMinute: FC<EditableMinuteProp> = ({
 					/>
 				</div>
 			</div>
+
 			{validationProp.required && minutes === null ? (
 				<p className="error-label">
 					{validationProp.requiredMessage && t(validationProp.requiredMessage)}

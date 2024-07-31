@@ -37,6 +37,7 @@ const AddToggleSwitch: FC<AddToggleSwitchProp> = ({
 	const blueColour = disabled ? 'bg-blue-300' : 'bg-blue-500';
 	const redColour = disabled ? 'bg-red-300' : 'bg-red-500';
 	const blackColour = disabled ? 'bg-gray-500' : 'bg-black';
+
 	const colourCss =
 		toggleColour === ToggleColor.GREEN
 			? greenColour
@@ -45,12 +46,14 @@ const AddToggleSwitch: FC<AddToggleSwitchProp> = ({
 			: toggleColour === ToggleColor.RED
 			? redColour
 			: blackColour;
+
 	return (
 		<div className="mb-4">
 			<label className="label" htmlFor={name}>
 				{t(label)}
 			</label>
-			<div className="flex rounded-md shadow-sm">
+
+			<div className="input-div">
 				<label
 					id={name}
 					style={{ cursor: disabled ? 'default' : 'pointer' }}
@@ -62,10 +65,12 @@ const AddToggleSwitch: FC<AddToggleSwitchProp> = ({
 						disabled={disabled}
 						className="sr-only"
 					/>
+
 					<span
 						className={`label flex items-center text-sm font-medium ${textColour}`}>
 						{t(falseText)}
 					</span>
+
 					<span
 						className={`slider mx-4 flex h-8 w-[60px] items-center rounded-full p-1 duration-200 ${
 							checked ? colourCss : 'bg-gray-300'
@@ -76,6 +81,7 @@ const AddToggleSwitch: FC<AddToggleSwitchProp> = ({
 							}`}
 						/>
 					</span>
+
 					<span
 						className={`label flex items-center text-sm font-medium ${textColour}`}>
 						{t(trueText)}

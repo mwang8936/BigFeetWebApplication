@@ -14,4 +14,5 @@ export default interface Employee {
 	per_hour: number | null;
 	created_at: Date;
 	updated_at: Date;
+	deleted_at?: Date;
 }

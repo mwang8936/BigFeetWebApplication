@@ -1,35 +1,45 @@
 import { FC, useState } from 'react';
-import { Permissions } from '../../../../models/enums';
-import { addEmployee } from '../../../../service/employee.service';
-import Tabs from '../miscallaneous/Tabs.Component';
-import EditEmployee from './components/EditEmployee.Component';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import EditEmployee from './components/EditEmployee.Component';
+
+import Loading from '../Loading.Component';
+import Retry from '../Retry.Component';
+
 import PermissionsButton, {
 	ButtonType,
 } from '../miscallaneous/PermissionsButton.Component';
-import ERRORS from '../../../../constants/error.constants';
+import Tabs from '../miscallaneous/Tabs.Component';
+
 import AddEmployeeModal from '../miscallaneous/modals/employee/AddEmployeeModal.Component';
+
+import ERRORS from '../../../../constants/error.constants';
+
+import Employee from '../../../../models/Employee.Model';
+import { Permissions } from '../../../../models/enums';
+import User from '../../../../models/User.Model';
+
 import { AddEmployeeRequest } from '../../../../models/requests/Employee.Request.Model';
-import { useTranslation } from 'react-i18next';
+
+import { addEmployee } from '../../../../service/employee.service';
+
+import {
+	useEmployeesQuery,
+	useUserQuery,
+} from '../../../../service/query/get-items.query';
+
 import {
 	createLoadingToast,
 	errorToast,
 	successToast,
 } from '../../../../utils/toast.utils';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import Loading from '../Loading.Component';
-import Retry from '../Retry.Component';
-import Employee from '../../../../models/Employee.Model';
-import {
-	useEmployeesQuery,
-	useUserQuery,
-} from '../../../../service/query/get-items.query';
-import User from '../../../../models/User.Model';
 
 const Employees: FC = () => {
 	const { t } = useTranslation();
-	const queryClient = useQueryClient();
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 
 	const [selectedTab, setSelectedTab] = useState(0);
 
@@ -67,7 +77,12 @@ const Employees: FC = () => {
 	const isEmployeePaused = employeeQuery.isPaused;
 
 	let tabs: string[] = [];
-	if (!isEmployeeLoading && !isEmployeeError && !isEmployeePaused) {
+	if (
+		!isEmployeeLoading &&
+		!isEmployeeError &&
+		!isEmployeePaused &&
+		employees
+	) {
 		tabs = employees.map((employee) => employee.username);
 	}
 
@@ -104,9 +119,7 @@ const Employees: FC = () => {
 				)}
 			</>
 		) : (
-			<h1 className="m-auto text-gray-600 text-3xl">
-				{t('No Employees Created')}
-			</h1>
+			<h1 className="large-centered-text">{t('No Employees Created')}</h1>
 		);
 
 	const tabsElement = (
@@ -116,7 +129,8 @@ const Employees: FC = () => {
 				selectedTab={selectedTab}
 				onTabSelected={setSelectedTab}
 			/>
-			<div className="mt-8 mb-4 pr-4 overflow-auto">{employeesElement}</div>
+
+			<div className="content-div">{employeesElement}</div>
 		</>
 	);
 
@@ -134,7 +148,7 @@ const Employees: FC = () => {
 	const errorsElement = isEmployeeError ? (
 		<Retry
 			retrying={retryingEmployeeQuery}
-			error={employeeError?.message as string}
+			error={employeeError?.message ?? ''}
 			onRetry={() => {
 				setRetryingEmployeeQuery(true);
 				retryEmployeeQuery().finally(() => setRetryingEmployeeQuery(false));
@@ -146,7 +160,7 @@ const Employees: FC = () => {
 	);
 
 	const permissionsElement = !gettable ? (
-		<h1 className="m-auto text-gray-600 text-3xl">
+		<h1 className="large-centered-text">
 			{t(ERRORS.employee.permissions.get)}
 		</h1>
 	) : (
@@ -158,9 +172,10 @@ const Employees: FC = () => {
 	return (
 		<>
 			<div className="non-sidebar">
-				<div className="py-4 h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
-					<h1 className="my-auto text-gray-600 text-3xl">{t('Employees')}</h1>
-					<div className="h-fit my-auto flex">
+				<div className="title-bar">
+					<h1 className="centered-title-text">{t('Employees')}</h1>
+
+					<div className="vertical-center">
 						<PermissionsButton
 							btnTitle={t('Add Employee')}
 							btnType={ButtonType.ADD}
@@ -173,8 +188,10 @@ const Employees: FC = () => {
 						/>
 					</div>
 				</div>
+
 				{isLoadingElement}
 			</div>
+
 			<AddEmployeeModal
 				open={openAddModal}
 				setOpen={setOpenAddModal}

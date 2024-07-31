@@ -1,11 +1,13 @@
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { FC, useState } from 'react';
-import LENGTHS from '../../../../../constants/lengths.constants';
-import LABELS from '../../../../../constants/label.constants';
-import NAMES from '../../../../../constants/name.constants';
-import ERRORS from '../../../../../constants/error.constants';
-import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 import { useTranslation } from 'react-i18next';
+
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+
+import ERRORS from '../../../../../constants/error.constants';
+import LABELS from '../../../../../constants/label.constants';
+import LENGTHS from '../../../../../constants/lengths.constants';
+import NAMES from '../../../../../constants/name.constants';
+import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 
 interface InvalidMessage {
 	key: string;
@@ -46,12 +48,13 @@ const AddPassword: FC<AddPasswordProp> = ({
 				<label className="label" htmlFor={NAMES.employee.password}>
 					{t(LABELS.employee.password)}
 				</label>
-				<div className="flex relative rounded-md shadow-sm">
+
+				<div className="div-input">
 					<input
 						className="add-input pl-12"
 						id={NAMES.employee.password}
 						type={showPassword ? 'text' : 'password'}
-						value={password || ''}
+						value={password ?? ''}
 						onChange={(event) => {
 							const text = event.target.value;
 							const textOrNull = text.length !== 0 ? text : null;
@@ -64,20 +67,22 @@ const AddPassword: FC<AddPasswordProp> = ({
 						required={validationProp.required}
 						placeholder={PLACEHOLDERS.employee.password}
 					/>
-					<div className="absolute mt-3 mb-3 inset-y-0 left-0 flex items-center pl-3 z-20">
+
+					<div className="show-password-div">
 						{showPassword ? (
 							<EyeIcon
-								className="h-6 w-6 text-gray-500 cursor-pointer"
+								className="pointer-icon"
 								onClick={() => setShowPassword(!showPassword)}
 							/>
 						) : (
 							<EyeSlashIcon
-								className="h-6 w-6 text-gray-500 cursor-pointer"
+								className="pointer-icon"
 								onClick={() => setShowPassword(!showPassword)}
 							/>
 						)}
 					</div>
 				</div>
+
 				{validationProp.required &&
 				(password === null || password.length === 0) ? (
 					<p className="error-label">
@@ -97,16 +102,18 @@ const AddPassword: FC<AddPasswordProp> = ({
 					)
 				)}
 			</div>
+
 			<div className="mb-4">
 				<label className="label" htmlFor={NAMES.employee.retype_password}>
 					{t(LABELS.employee.retype_password)}
 				</label>
-				<div className="flex relative rounded-md shadow-sm">
+
+				<div className="div-input">
 					<input
 						className="add-input pl-12"
 						id={NAMES.employee.retype_password}
 						type={showRetypePassword ? 'text' : 'password'}
-						value={retypePassword || ''}
+						value={retypePassword ?? ''}
 						onChange={(event) => {
 							const text = event.target.value;
 							const textOrNull = text.length !== 0 ? text : null;
@@ -122,20 +129,22 @@ const AddPassword: FC<AddPasswordProp> = ({
 						}
 						placeholder={PLACEHOLDERS.employee.password}
 					/>
-					<div className="absolute mt-3 mb-3 inset-y-0 left-0 flex items-center pl-3 z-20">
+
+					<div className="show-password-div">
 						{showRetypePassword ? (
 							<EyeIcon
-								className="h-6 w-6 text-gray-500 cursor-pointer"
+								className="pointer-icon"
 								onClick={() => setShowRetypePassword(!showRetypePassword)}
 							/>
 						) : (
 							<EyeSlashIcon
-								className="h-6 w-6 text-gray-500 cursor-pointer"
+								className="pointer-icon"
 								onClick={() => setShowRetypePassword(!showRetypePassword)}
 							/>
 						)}
 					</div>
 				</div>
+
 				{(retypePassword === null || retypePassword.length === 0) && (
 					<p className="error-label">
 						{validationProp.requiredMessage &&

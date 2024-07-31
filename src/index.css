@@ -17,18 +17,6 @@
     @apply block mb-3 text-gray-700 font-bold text-xl text-center 
   }
 
-  .label {
-    @apply block text-gray-700 text-sm font-bold mb-2
-  }
-
-  .error-label {
-    @apply my-auto text-red-500 text-sm
-  }
-
-  .success-label {
-    @apply my-auto text-green-600 text-sm
-  }
-
   .input-form {
     @apply mt-1 mb-3 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
     focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
@@ -45,41 +33,24 @@
     focus:invalid:border-pink-500 focus:invalid:ring-pink-500
   }
 
-  .pointer-icon {
-    @apply h-6 w-6 text-gray-500 cursor-pointer
+  .show-password-login-div {
+    @apply absolute inset-y-0 left-0 flex items-center pl-3 mt-1 mb-3 z-20
   }
 
-  .white-spin {
-    @apply animate-spin -ml-1 mr-3 h-5 w-5 text-white
+  .remember-me-label {
+    @apply block text-gray-700 text-sm font-bold
   }
 
   /* BigFeet Page */
+  .retry-div {
+    @apply m-auto text-gray-700 text-xl font-bold flex flex-col items-center justify-center
+  }
+
+  .centered-big-green-spin {
+    @apply animate-spin h-40 w-40 m-auto text-green-500
+  }
 
   /* SideBar */
-
-  /* Non-SideBar */
-  .non-sidebar {
-    @apply w-11/12 mx-auto h-screen flex flex-col
-  }
-
-  /* Customers */
-
-
-  .button {
-    @apply relative inline-flex w-fit justify-center text-white font-bold py-2 px-4 my-2 rounded-md
-    bg-blue-500 hover:bg-blue-700 disabled:bg-blue-300 transition ease-in-out duration-150 disabled:cursor-not-allowed
-  } 
-
-  .modal-button {
-    @apply relative inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm 
-    bg-blue-600 hover:bg-blue-500 disabled:bg-blue-300 sm:ml-3 sm:w-auto disabled:cursor-not-allowed
-  }
-
-  .button-tip {
-    @apply absolute w-[200px] p-2 rounded-md shadow-md text-white bottom-[100%] right-[0%]
-    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom-right
-  }
-
   .sidebar {
     @apply fixed top-0 left-0 flex z-20 landscape:flex-col landscape:h-screen landscape:w-1/12 landscape:min-w-max landscape:min-h-max 
     portrait:flex-row portrait:h-[10%] portrait:w-screen portrait:min-h-max  bg-primary shadow-lg 
@@ -102,6 +73,98 @@
     bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-left
   }
 
+  /* Non-SideBar */
+  .non-sidebar {
+    @apply flex flex-col w-11/12 h-screen mx-auto
+  }
+
+  .dates-bar {
+    @apply flex flex-col text-sm font-medium text-gray-500 italic
+  }
+
+  .title-bar {
+    @apply flex flex-row py-4 justify-between border-b-2 border-gray-400
+  }
+
+  .centered-title-text {
+    @apply my-auto text-gray-600 text-3xl
+  }
+
+  .vertical-center {
+    @apply h-fit my-auto
+  }
+
+  .large-centered-text {
+    @apply m-auto p-2 text-gray-600 text-3xl
+  }
+
+  .content-div {
+    @apply mt-8 mb-4 pr-4 overflow-auto
+  }
+
+  .list-div {
+    @apply flex flex-col flex-1 h-full w-full mx-auto border-black border-2
+  }
+
+  .list-item-div {
+    @apply w-full h-fit p-2 border-2 border-black flex flex-col hover:bg-slate-300 cursor-pointer
+  }
+
+  .list-item-field {
+    @apply font-bold me-1
+  }
+
+  .bottom-bar {
+    @apply flex border-t-2 border-gray-400 py-4 justify-between
+  }
+
+  .div-input {
+    @apply flex relative rounded-md shadow-sm
+  }
+
+  .input-icon-div {
+    @apply absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4
+  }
+  
+  .button {
+    @apply relative inline-flex w-fit justify-center text-white font-bold py-2 px-4 my-2 rounded-md
+    bg-blue-500 hover:bg-blue-700 disabled:bg-blue-300 transition ease-in-out duration-150 disabled:cursor-not-allowed
+  } 
+
+  .modal-button {
+    @apply relative inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm 
+    bg-blue-600 hover:bg-blue-500 disabled:bg-blue-300 sm:ml-3 sm:w-auto disabled:cursor-not-allowed
+  }
+
+  .modal-bottom {
+    @apply bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6
+  }
+
+  .button-tip {
+    @apply absolute w-[200px] p-2 rounded-md shadow-md text-white bottom-[100%] right-[0%]
+    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom-right
+  }
+
+  .green-button-color {
+    @apply bg-green-500 hover:bg-green-700 disabled:bg-green-300
+  }
+
+  .gray-button-color {
+    @apply bg-gray-500 hover:bg-gray-700 disabled:bg-gray-300
+  }
+
+  .red-button-color {
+    @apply bg-red-500 hover:bg-red-700 disabled:bg-red-300
+  }
+
+  .blue-button-color {
+    @apply bg-blue-500 hover:bg-blue-700 disabled:bg-blue-300
+  }
+
+  .tab-ul {
+    @apply flex flex-wrap text-sm font-medium text-center border-b border-gray-200 mt-3
+  }
+
   .selected-tab {
     @apply mr-2 inline-block p-4 text-blue-600 bg-gray-200 rounded-t-lg 
     hover:bg-gray-300 hover:text-blue-700 cursor-pointer
@@ -109,6 +172,10 @@
 
   .tab {
     @apply mr-2 inline-block p-4 text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-100 cursor-pointer
+  }
+
+  .input-div {
+    @apply flex rounded-md shadow-sm
   }
 
   .editable-input {
@@ -126,6 +193,30 @@
     focus:invalid:border-pink-500 focus:invalid:ring-pink-500
   }
 
+  .list-box {
+    @apply absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm
+  }
+
+  .list-box-active {
+    @apply relative cursor-default select-none py-2 pl-3 pr-9
+  }
+
+  .list-box-selected {
+    @apply absolute inset-y-0 right-0 flex items-center pr-4
+  }
+
+  .drop-down-chevron {
+    @apply pointer-events-none absolute inset-y-0 right-[5px] ml-3 flex items-center pr-2
+  }
+
+  .drop-down-icon {
+    @apply h-5 w-5 flex-shrink-0 rounded-full
+  }
+
+  .drop-down-span {
+    @apply ml-3 block truncate
+  }
+
   .reservation-tip-above {
     @apply absolute w-[178px] h-auto p-2 mx-auto bottom-[100%] rounded-md shadow-md text-white flex flex-col
     bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom
@@ -139,5 +230,26 @@
   .grid-tip {
     @apply absolute w-[178px] h-auto p-2 mx-auto bottom-[100%] rounded-md shadow-md text-white flex flex-col
     bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom
+  }
+
+  /* Miscallaneous */
+  .white-spin {
+    @apply animate-spin -ml-1 mr-3 h-5 w-5 text-white
+  }
+
+  .label {
+    @apply block text-gray-700 text-sm font-bold mb-2
+  }
+
+  .error-label {
+    @apply my-auto text-red-500 text-sm
+  }
+
+  .pointer-icon {
+    @apply h-6 w-6 text-gray-500 cursor-pointer
+  }
+
+  .show-password-div {
+    @apply absolute mt-3 mb-3 inset-y-0 left-0 flex items-center pl-3 z-20
   }
 }

@@ -1,24 +1,32 @@
 import { FC, useEffect, useState } from 'react';
-import { Language } from '../../../../../models/enums';
-import { ToggleColor } from '../../miscallaneous/add/AddToggleSwitch.Component';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { updateProfile } from '../../../../../service/profile.service';
-import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
-import { languageDropDownItems } from '../../../../../constants/drop-down.constants';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
+
+import { ToggleColor } from '../../miscallaneous/add/AddToggleSwitch.Component';
+
+import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
+import EditableToggleSwitch from '../../miscallaneous/editable/EditableToggleSwitch.Component';
+
+import { languageDropDownItems } from '../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../constants/error.constants';
-import { UpdateProfileRequest } from '../../../../../models/requests/Profile.Request.Model';
 import LABELS from '../../../../../constants/label.constants';
 import NAMES from '../../../../../constants/name.constants';
-import EditableToggleSwitch from '../../miscallaneous/editable/EditableToggleSwitch.Component';
-import { useTranslation } from 'react-i18next';
+
+import { Language } from '../../../../../models/enums';
+
+import { UpdateProfileRequest } from '../../../../../models/requests/Profile.Request.Model';
+
+import { updateProfile } from '../../../../../service/profile.service';
+
+import { getLanguageFile } from '../../../../../utils/i18n.utils';
 import {
 	createLoadingToast,
 	errorToast,
 	successToast,
 } from '../../../../../utils/toast.utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { getLanguageFile } from '../../../../../utils/i18n.utils';
 
 interface SettingsProp {
 	originalLanguage: Language;
@@ -27,8 +35,8 @@ interface SettingsProp {
 
 const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 	const { t, i18n } = useTranslation();
-	const queryClient = useQueryClient();
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 
 	const [languageInput, setLanguageInput] = useState<Language | null>(
 		originalLanguage
@@ -44,6 +52,7 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 		setDarkModeInput(originalDarkMode);
 
 		setChangesMade(false);
+
 		setMissingRequiredInput(false);
 	}, [originalLanguage, originalDarkMode]);
 
@@ -75,9 +84,8 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 
 			const updatedLanguage = variables.request.language;
 
-			if (updatedLanguage) {
+			if (updatedLanguage)
 				i18n.changeLanguage(getLanguageFile(updatedLanguage));
-			}
 
 			successToast(context.toastId, t('Profile Updated Successfully'));
 		},
@@ -100,8 +108,8 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 			darkModeInput === originalDarkMode ? undefined : darkModeInput;
 
 		const request: UpdateProfileRequest = {
-			...(language && { language }),
-			...(dark_mode && { dark_mode }),
+			...(language !== undefined && { language }),
+			...(dark_mode !== undefined && { dark_mode }),
 		};
 
 		editProfileMutation.mutate({ request });
@@ -139,8 +147,8 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 				originalChecked={originalDarkMode}
 				checked={darkModeInput}
 				setChecked={setDarkModeInput}
-				falseText={'Light'}
-				trueText={'Dark'}
+				falseText={t('Light')}
+				trueText={t('Dark')}
 				toggleColour={ToggleColor.BLACK}
 				label={LABELS.profile.dark_mode}
 				name={NAMES.profile.dark_mode}
@@ -148,7 +156,7 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 				missingPermissionMessage=""
 			/>
 
-			<div className="flex border-t-2 border-gray-400 py-4">
+			<div className="bottom-bar">
 				<PermissionsButton
 					btnTitle={t('Save Changes')}
 					right={false}

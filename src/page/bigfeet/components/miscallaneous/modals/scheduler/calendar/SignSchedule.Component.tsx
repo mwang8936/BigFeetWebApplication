@@ -1,9 +1,13 @@
 import { FC } from 'react';
-import { PencilSquareIcon } from '@heroicons/react/24/outline';
-import { Dialog } from '@headlessui/react';
-import EditBottom from '../../EditBottom.Component';
-import ERRORS from '../../../../../../../constants/error.constants';
 import { useTranslation } from 'react-i18next';
+
+import { Dialog } from '@headlessui/react';
+
+import { PencilSquareIcon } from '@heroicons/react/24/outline';
+
+import EditBottom from '../../EditBottom.Component';
+
+import ERRORS from '../../../../../../../constants/error.constants';
 
 interface SignScheduleProp {
 	setOpen(open: boolean): void;
@@ -35,12 +39,14 @@ const SignSchedule: FC<SignScheduleProp> = ({
 							aria-hidden="true"
 						/>
 					</div>
+
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Sign Schedule')}
 						</Dialog.Title>
+
 						<div className="mt-2">
 							{signable
 								? t('Sign Off Message', { date: date.toDateString() })
@@ -49,6 +55,7 @@ const SignSchedule: FC<SignScheduleProp> = ({
 					</div>
 				</div>
 			</div>
+
 			<EditBottom
 				onCancel={() => setOpen(false)}
 				editText={t('Sign')}
