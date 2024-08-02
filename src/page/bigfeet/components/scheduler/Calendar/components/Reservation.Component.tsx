@@ -19,9 +19,9 @@ import { useScheduleDateContext } from '../../Scheduler.Component';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Schedule from '../../../../../../models/Schedule.Model';
-import { useSchedulesQuery } from '../../../../../../service/query/get-items.query';
 import User from '../../../../../../models/User.Model';
 import { useEmployeesQuery } from '../../../../../hooks/employee.hooks';
+import { useSchedulesQuery } from '../../../../../hooks/schedule.hooks';
 import { useUserQuery } from '../../../../../hooks/profile.hooks';
 
 interface ReservationTagProp {

@@ -122,6 +122,7 @@ export const useDeleteCustomerMutation = ({ setLoading }: MutationProp) => {
 		},
 		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: [customersQueryKey] });
+
 			successToast(context.toastId, t('Customer Deleted Successfully'));
 		},
 		onError: (error, _variables, context) => {

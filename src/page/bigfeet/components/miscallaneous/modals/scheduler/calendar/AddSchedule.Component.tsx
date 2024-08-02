@@ -18,9 +18,9 @@ import { Permissions, Role } from '../../../../../../../models/enums';
 import Employee from '../../../../../../../models/Employee.Model';
 import Schedule from '../../../../../../../models/Schedule.Model';
 import { getPriorityDropDownItems } from '../../../../../../../constants/drop-down.constants';
-import { useSchedulesQuery } from '../../../../../../../service/query/get-items.query';
 import User from '../../../../../../../models/User.Model';
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
+import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 interface AddScheduleProp {

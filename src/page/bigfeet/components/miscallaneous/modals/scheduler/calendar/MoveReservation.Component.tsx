@@ -14,6 +14,7 @@ import EditBottom from '../../EditBottom.Component';
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
 
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
+import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 import ERRORS from '../../../../../../../constants/error.constants';
@@ -25,8 +26,6 @@ import Schedule from '../../../../../../../models/Schedule.Model';
 import User from '../../../../../../../models/User.Model';
 
 import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
-
-import { useSchedulesQuery } from '../../../../../../../service/query/get-items.query';
 
 import {
 	reservationBedConflict,

@@ -13,11 +13,6 @@ import {
 	AddScheduleRequest,
 	UpdateScheduleRequest,
 } from '../../../../models/requests/Schedule.Request.Model';
-import {
-	addReservation,
-	deleteReservation,
-	updateReservation,
-} from '../../../../service/reservation.service';
 import { useNavigate } from 'react-router-dom';
 import AddReservationModal from '../miscallaneous/modals/scheduler/calendar/AddReservationModal.Component';
 import PermissionsButton, {
@@ -25,38 +20,38 @@ import PermissionsButton, {
 } from '../miscallaneous/PermissionsButton.Component';
 import ZoomOverlay from './components/ZoomOverlay.Component';
 import {
-	addSchedule,
-	updateSchedule,
-} from '../../../../service/schedule.service';
-import { signProfileSchedule } from '../../../../service/profile.service';
-import {
 	AddVipPackageRequest,
 	UpdateVipPackageRequest,
 } from '../../../../models/requests/Vip-Package.Request.Model';
-import {
-	addVipPackage,
-	deleteVipPackage,
-	updateVipPackage,
-} from '../../../../service/vip-package.service';
 import FilterDateModal from '../miscallaneous/modals/scheduler/FilterDateModal.Component';
 import STORES from '../../../../constants/store.constants';
 import { sortEmployees } from '../../../../utils/employee.utils';
 import ERRORS from '../../../../constants/error.constants';
 import { useTranslation } from 'react-i18next';
-import {
-	createLoadingToast,
-	errorToast,
-	successToast,
-} from '../../../../utils/toast.utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { formatDateToQueryKey } from '../../../../utils/string.utils';
 import { moneyToString } from '../../../../utils/number.utils';
-import { useSchedulesQuery } from '../../../../service/query/get-items.query';
 import User from '../../../../models/User.Model';
 import { useCustomersQuery } from '../../../hooks/customer.hooks';
 import { useEmployeesQuery } from '../../../hooks/employee.hooks';
+import { useSchedulesQuery } from '../../../hooks/schedule.hooks';
 import { useServicesQuery } from '../../../hooks/service.hooks';
 import { useUserQuery } from '../../../hooks/profile.hooks';
+import {
+	useAddScheduleMutation,
+	useSignProfileScheduleMutation,
+	useUpdateScheduleMutation,
+} from '../../../hooks/schedule.hooks';
+import {
+	useAddReservationMutation,
+	useDeleteReservationMutation,
+	useUpdateReservationMutation,
+} from '../../../hooks/reservation.hooks';
+import {
+	useAddVipPackageMutation,
+	useDeleteVipPackageMutation,
+	useUpdateVipPackageMutation,
+} from '../../../hooks/vip-package.hooks';
 
 const ScheduleDateContext = createContext<
 	{ date: Date; setDate(date: Date): void } | undefined
@@ -151,82 +146,19 @@ const Scheduler: FC = () => {
 		Permissions.PERMISSION_ADD_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
 
-	const addReservationMutation = useMutation({
-		mutationFn: (data: { request: AddReservationRequest }) =>
-			addReservation(navigate, data.request),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Adding Reservation...'));
-			return { toastId };
-		},
-		onSuccess: (_data, variables, context) => {
-			queryClient.invalidateQueries({
-				queryKey: [
-					'schedules',
-					formatDateToQueryKey(variables.request.reserved_date),
-				],
-			});
-			queryClient.invalidateQueries({ queryKey: ['customers'] });
-			successToast(context.toastId, t('Reservation Added Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Add Reservation'),
-					error.message
-				);
-		},
-	});
+	const addReservationMutation = useAddReservationMutation({});
 
 	const onAddReservation = async (request: AddReservationRequest) => {
 		addReservationMutation.mutate({ request });
 	};
 
-	const addScheduleMutation = useMutation({
-		mutationFn: (data: { request: AddScheduleRequest }) =>
-			addSchedule(navigate, data.request),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Adding Schedule...'));
-			return { toastId };
-		},
-		onSuccess: (_data, variables, context) => {
-			queryClient.invalidateQueries({
-				queryKey: ['schedules', formatDateToQueryKey(variables.request.date)],
-			});
-			successToast(context.toastId, t('Schedule Added Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(context.toastId, t('Failed to Add Schedule'), error.message);
-		},
-	});
+	const addScheduleMutation = useAddScheduleMutation({});
 
 	const onAddSchedule = async (request: AddScheduleRequest) => {
 		addScheduleMutation.mutate({ request });
 	};
 
-	const addVipPackageMutation = useMutation({
-		mutationFn: (data: { request: AddVipPackageRequest }) =>
-			addVipPackage(navigate, data.request),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Adding Vip Package...'));
-			return { toastId };
-		},
-		onSuccess: (_data, variables, context) => {
-			queryClient.invalidateQueries({
-				queryKey: ['schedules', formatDateToQueryKey(variables.request.date)],
-			});
-			successToast(context.toastId, t('Vip Package Added Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Add Vip Package'),
-					error.message
-				);
-		},
-	});
+	const addVipPackageMutation = useAddVipPackageMutation({});
 
 	const onAddVipPackage = async (request: AddVipPackageRequest) => {
 		addVipPackageMutation.mutate({ request });
@@ -237,101 +169,43 @@ const Scheduler: FC = () => {
 		Permissions.PERMISSION_UPDATE_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
 
-	const editReservationMutation = useMutation({
-		mutationFn: (data: {
-			reservationId: number;
-			request: UpdateReservationRequest;
-		}) => updateReservation(navigate, data.reservationId, data.request),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Updating Reservation...'));
-			return { toastId };
-		},
-		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({
-				queryKey: ['schedules', formatDateToQueryKey(date)],
-			});
-			queryClient.invalidateQueries({ queryKey: ['customers'] });
-			successToast(context.toastId, t('Reservation Updated Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Update Reservation'),
-					error.message
-				);
-		},
-	});
+	const updateReservationMutation = useUpdateReservationMutation({});
 
 	const onEditReservation = async (
 		reservationId: number,
 		request: UpdateReservationRequest
 	) => {
-		editReservationMutation.mutate({ reservationId, request });
+		const originalDate = date;
+		const newDate = request.reserved_date;
+
+		updateReservationMutation.mutate({
+			reservationId,
+			request,
+			originalDate,
+			newDate,
+		});
 	};
 
-	const editScheduleMutation = useMutation({
-		mutationFn: (data: {
-			date: Date;
-			employeeId: number;
-			request: UpdateScheduleRequest;
-		}) => updateSchedule(navigate, data.date, data.employeeId, data.request),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Updating Schedule...'));
-			return { toastId };
-		},
-		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({
-				queryKey: ['schedules', formatDateToQueryKey(date)],
-			});
-			successToast(context.toastId, t('Schedule Updated Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Update Schedule'),
-					error.message
-				);
-		},
-	});
+	const updateScheduleMutation = useUpdateScheduleMutation({});
 
 	const onEditSchedule = async (
 		date: Date,
 		employeeId: number,
 		request: UpdateScheduleRequest
 	) => {
-		editScheduleMutation.mutate({ date, employeeId, request });
+		updateScheduleMutation.mutate({ date, employeeId, request });
 	};
 
-	const editVipPackageMutation = useMutation({
-		mutationFn: (data: { serial: string; request: UpdateVipPackageRequest }) =>
-			updateVipPackage(navigate, data.serial, data.request),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Updating Vip Package...'));
-			return { toastId };
-		},
-		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({
-				queryKey: ['schedules', formatDateToQueryKey(date)],
-			});
-			successToast(context.toastId, t('Vip Package Updated Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Update Vip Package'),
-					error.message
-				);
-		},
-	});
+	const updateVipPackageMutation = useUpdateVipPackageMutation({});
 
 	const onEditVipPackage = async (
 		serial: string,
 		request: UpdateVipPackageRequest
 	) => {
-		editVipPackageMutation.mutate({ serial, request });
+		const originalDate = date;
+		const newDate = request.date;
+
+		updateVipPackageMutation.mutate({ serial, request, originalDate, newDate });
 	};
 
 	const deletable = [
@@ -339,82 +213,19 @@ const Scheduler: FC = () => {
 		Permissions.PERMISSION_DELETE_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
 
-	const deleteReservationMutation = useMutation({
-		mutationFn: (data: { reservationId: number }) =>
-			deleteReservation(navigate, data.reservationId),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Deleting Reservation...'));
-			return { toastId };
-		},
-		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({
-				queryKey: ['schedules', formatDateToQueryKey(date)],
-			});
-			successToast(context.toastId, t('Reservation Deleted Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Delete Reservation'),
-					error.message
-				);
-		},
-	});
+	const deleteReservationMutation = useDeleteReservationMutation({});
 
 	const onDeleteReservation = async (reservationId: number) => {
-		deleteReservationMutation.mutate({ reservationId });
+		deleteReservationMutation.mutate({ reservationId, date });
 	};
 
-	const deleteVipPackageMutation = useMutation({
-		mutationFn: (data: { serial: string }) =>
-			deleteVipPackage(navigate, data.serial),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Deleting Vip Package...'));
-			return { toastId };
-		},
-		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({
-				queryKey: ['schedules', formatDateToQueryKey(date)],
-			});
-			successToast(context.toastId, t('Vip Package Deleted Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Delete Vip Package'),
-					error.message
-				);
-		},
-	});
+	const deleteVipPackageMutation = useDeleteVipPackageMutation({});
 
 	const onDeleteVipPackage = async (serial: string) => {
-		deleteVipPackageMutation.mutate({ serial });
+		deleteVipPackageMutation.mutate({ serial, date });
 	};
 
-	const signProfileScheduleMutation = useMutation({
-		mutationFn: (data: { date: Date }) =>
-			signProfileSchedule(navigate, data.date),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Signing Schedule...'));
-			return { toastId };
-		},
-		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({
-				queryKey: ['schedules', formatDateToQueryKey(date)],
-			});
-			successToast(context.toastId, t('Schedule Signed Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Sign Schedule'),
-					error.message
-				);
-		},
-	});
+	const signProfileScheduleMutation = useSignProfileScheduleMutation({});
 
 	const onScheduleSigned = async (date: Date) => {
 		signProfileScheduleMutation.mutate({ date });

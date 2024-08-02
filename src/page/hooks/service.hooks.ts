@@ -1,17 +1,21 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { MutationProp, QueryProp } from './props.hooks';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { MutationProp, QueryProp } from './props.hooks';
+
+import {
+	AddServiceRequest,
+	UpdateServiceRequest,
+} from '../../models/requests/Service.Request.Model';
+
 import {
 	addService,
 	deleteService,
 	getServices,
 	updateService,
 } from '../../service/service.service';
-import { useTranslation } from 'react-i18next';
-import {
-	AddServiceRequest,
-	UpdateServiceRequest,
-} from '../../models/requests/Service.Request.Model';
+
 import {
 	createLoadingToast,
 	errorToast,
