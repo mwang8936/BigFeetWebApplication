@@ -37,13 +37,13 @@ import {
 	reservationEmployeeConflict,
 } from '../../../../../../../utils/reservation.utils';
 import {
-	useCustomersQuery,
 	useEmployeesQuery,
 	useSchedulesQuery,
 	useServicesQuery,
-	useUserQuery,
 } from '../../../../../../../service/query/get-items.query';
 import User from '../../../../../../../models/User.Model';
+import { useCustomersQuery } from '../../../../../../hooks/customer.hooks';
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 interface AddReservationProp {
 	setOpen(open: boolean): void;
@@ -63,7 +63,6 @@ const AddReservation: FC<AddReservationProp> = ({
 	onAddReservation,
 }) => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
 
 	const [openBedWarningModal, setOpenBedWarningModal] =
 		useState<boolean>(false);

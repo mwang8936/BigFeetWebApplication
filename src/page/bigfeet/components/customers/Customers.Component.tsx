@@ -1,7 +1,5 @@
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import CustomerList from './components/CustomerList.Component';
 
@@ -15,6 +13,14 @@ import PermissionsButton, {
 import AddInput from '../miscallaneous/add/AddInput.Component';
 
 import AddCustomerModal from '../miscallaneous/modals/customer/AddCustomerModal.Component';
+
+import {
+	useCustomersQuery,
+	useAddCustomerMutation,
+	useDeleteCustomerMutation,
+	useUpdateCustomerMutation,
+} from '../../../hooks/customer.hooks';
+import { useUserQuery } from '../../../hooks/profile.hooks';
 
 import ERRORS from '../../../../constants/error.constants';
 import LABELS from '../../../../constants/label.constants';
@@ -30,27 +36,8 @@ import {
 	UpdateCustomerRequest,
 } from '../../../../models/requests/Customer.Request.Model';
 
-import {
-	addCustomer,
-	deleteCustomer,
-	updateCustomer,
-} from '../../../../service/customer.service';
-
-import {
-	useCustomersQuery,
-	useUserQuery,
-} from '../../../../service/query/get-items.query';
-
-import {
-	createLoadingToast,
-	errorToast,
-	successToast,
-} from '../../../../utils/toast.utils';
-
 const Customers: FC = () => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
-	const queryClient = useQueryClient();
 
 	const [openAddCustomerModal, setOpenAddCustomerModal] = useState(false);
 
@@ -108,78 +95,20 @@ const Customers: FC = () => {
 			: customers;
 	}
 
-	const addCustomerMutation = useMutation({
-		mutationFn: (data: { request: AddCustomerRequest }) =>
-			addCustomer(navigate, data.request),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Adding Customer...'));
-			return { toastId };
-		},
-		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({ queryKey: ['customers'] });
-			successToast(context.toastId, t('Customer Added Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(context.toastId, t('Failed to Add Customer'), error.message);
-		},
-	});
-
+	const addCustomerMutation = useAddCustomerMutation({});
 	const onAddCustomer = async (request: AddCustomerRequest) => {
 		addCustomerMutation.mutate({ request });
 	};
 
-	const editCustomerMutation = useMutation({
-		mutationFn: (data: {
-			phoneNumber: string;
-			request: UpdateCustomerRequest;
-		}) => updateCustomer(navigate, data.phoneNumber, data.request),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Updating Customer...'));
-			return { toastId };
-		},
-		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({ queryKey: ['customers'] });
-			successToast(context.toastId, t('Customer Updated Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Update Customer'),
-					error.message
-				);
-		},
-	});
-
+	const updateCustomerMutation = useUpdateCustomerMutation({});
 	const onEditCustomer = async (
 		phoneNumber: string,
 		request: UpdateCustomerRequest
 	) => {
-		editCustomerMutation.mutate({ phoneNumber, request });
+		updateCustomerMutation.mutate({ phoneNumber, request });
 	};
 
-	const deleteCustomerMutation = useMutation({
-		mutationFn: (data: { phoneNumber: string }) =>
-			deleteCustomer(navigate, data.phoneNumber),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Deleting Customer...'));
-			return { toastId };
-		},
-		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({ queryKey: ['customers'] });
-			successToast(context.toastId, t('Customer Deleted Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Delete Customer'),
-					error.message
-				);
-		},
-	});
-
+	const deleteCustomerMutation = useDeleteCustomerMutation({});
 	const onDeleteCustomer = async (phoneNumber: string) => {
 		deleteCustomerMutation.mutate({ phoneNumber });
 	};

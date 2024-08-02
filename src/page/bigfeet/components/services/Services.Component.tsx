@@ -15,6 +15,8 @@ import Tabs from '../miscallaneous/Tabs.Component.tsx';
 
 import AddServiceModal from '../miscallaneous/modals/service/AddServiceModal.Component.tsx';
 
+import { useUserQuery } from '../../../hooks/profile.hooks.ts';
+
 import ERRORS from '../../../../constants/error.constants.ts';
 
 import { Permissions } from '../../../../models/enums.ts';
@@ -25,10 +27,7 @@ import { AddServiceRequest } from '../../../../models/requests/Service.Request.M
 
 import { addService } from '../../../../service/service.service.ts';
 
-import {
-	useServicesQuery,
-	useUserQuery,
-} from '../../../../service/query/get-items.query.ts';
+import { useServicesQuery } from '../../../../service/query/get-items.query.ts';
 
 import {
 	createLoadingToast,

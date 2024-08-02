@@ -18,24 +18,6 @@ interface QueryProp {
 	refetchIntervalInBackground?: boolean;
 }
 
-export const useCustomersQuery = ({
-	gettable,
-	staleTime = 1000 * 30,
-	refetchInterval,
-	refetchIntervalInBackground,
-}: QueryProp) => {
-	const navigate = useNavigate();
-
-	return useQuery({
-		queryKey: ['customers'],
-		queryFn: () => getCustomers(navigate),
-		enabled: gettable,
-		staleTime,
-		refetchInterval,
-		refetchIntervalInBackground,
-	});
-};
-
 export const useEmployeesQuery = ({
 	gettable,
 	staleTime = 1000 * 30,
@@ -98,24 +80,6 @@ export const useServicesQuery = ({
 	return useQuery({
 		queryKey: ['services'],
 		queryFn: () => getServices(navigate),
-		enabled: gettable,
-		staleTime,
-		refetchInterval,
-		refetchIntervalInBackground,
-	});
-};
-
-export const useUserQuery = ({
-	gettable,
-	staleTime,
-	refetchInterval,
-	refetchIntervalInBackground,
-}: QueryProp) => {
-	const navigate = useNavigate();
-
-	return useQuery({
-		queryKey: ['user'],
-		queryFn: () => getProfile(navigate),
 		enabled: gettable,
 		staleTime,
 		refetchInterval,

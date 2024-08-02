@@ -4,12 +4,12 @@ import MoveReservation from './MoveReservation.Component';
 
 import BaseModal from '../../BaseModal.Component';
 
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+
 import Reservation from '../../../../../../../models/Reservation.Model';
 import User from '../../../../../../../models/User.Model';
 
 import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
-
-import { useUserQuery } from '../../../../../../../service/query/get-items.query';
 
 interface MoveReservationModalProp {
 	open: boolean;

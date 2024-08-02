@@ -15,7 +15,8 @@ import EditablePayRate from '../../miscallaneous/editable/EditablePayRate.Compon
 
 import DeleteEmployeeModal from '../../miscallaneous/modals/employee/DeleteEmployeeModal.Component';
 
-import { useAuthenticationContext } from '../../../../../App';
+import { useLogout } from '../../../../hooks/authentication.hooks';
+import { useUserQuery } from '../../../../hooks/profile.hooks';
 
 import {
 	genderDropDownItems,
@@ -36,13 +37,10 @@ import User from '../../../../../models/User.Model';
 
 import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
 
-import { logout } from '../../../../../service/auth.service';
 import {
 	deleteEmployee,
 	updateEmployee,
 } from '../../../../../service/employee.service';
-
-import { useUserQuery } from '../../../../../service/query/get-items.query';
 
 import { arraysHaveSameContent } from '../../../../../utils/array.utils';
 import {
@@ -65,6 +63,8 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
+
+	const logout = useLogout();
 
 	const [usernameInput, setUsernameInput] = useState<string | null>(
 		employee.username
@@ -110,8 +110,6 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
 	const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
-
-	const { setAuthentication } = useAuthenticationContext();
 
 	useEffect(() => {
 		setUsernameInput(employee.username);
@@ -318,10 +316,7 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 		onSuccess: (_data, variables, context) => {
 			queryClient.invalidateQueries({ queryKey: ['employees'] });
 
-			if (variables.employeeId === user.employee_id) {
-				queryClient.clear();
-				logout(setAuthentication);
-			}
+			if (variables.employeeId === user.employee_id) logout();
 
 			successToast(context.toastId, t('Employee Deleted Successfully'));
 		},

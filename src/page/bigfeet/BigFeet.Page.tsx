@@ -14,13 +14,12 @@ import Profile from './components/profile/Profile.Component';
 import Scheduler from './components/scheduler/Scheduler.Component';
 import Services from './components/services/Services.Component';
 
+import { useUserQuery } from '../hooks/profile.hooks';
+
 import { Permissions } from '../../models/enums';
 import User from '../../models/User.Model';
 
-import {
-	useSchedulesQuery,
-	useUserQuery,
-} from '../../service/query/get-items.query';
+import { useSchedulesQuery } from '../../service/query/get-items.query';
 import { getLanguageFile } from '../../utils/i18n.utils';
 
 export const enum SideBarItems {

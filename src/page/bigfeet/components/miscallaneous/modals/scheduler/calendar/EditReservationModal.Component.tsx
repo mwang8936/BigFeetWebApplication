@@ -3,8 +3,8 @@ import BaseModal from '../../BaseModal.Component';
 import EditReservation from './EditReservation.Component';
 import Reservation from '../../../../../../../models/Reservation.Model';
 import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
-import { useUserQuery } from '../../../../../../../service/query/get-items.query';
 import User from '../../../../../../../models/User.Model';
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 interface EditReservationModalProp {
 	open: boolean;

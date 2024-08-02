@@ -1,7 +1,5 @@
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
 
 import Personal from './personal/Personal.Component.tsx';
 import Professional from './professional/Professional.Component.tsx';
@@ -15,34 +13,22 @@ import Tabs from '../miscallaneous/Tabs.Component.tsx';
 
 import DeleteProfileModal from '../miscallaneous/modals/profile/DeleteProfileModal.Component.tsx';
 
-import { useAuthenticationContext } from '../../../../App.tsx';
+import {
+	useUserQuery,
+	useDeleteProfileMutation,
+} from '../../../hooks/profile.hooks.ts';
 
 import ERRORS from '../../../../constants/error.constants.ts';
 
 import { Permissions } from '../../../../models/enums.ts';
 import User from '../../../../models/User.Model.ts';
 
-import { logout } from '../../../../service/auth.service.ts';
-import { deleteEmployee } from '../../../../service/employee.service.ts';
-
-import { useUserQuery } from '../../../../service/query/get-items.query.ts';
-
-import {
-	createLoadingToast,
-	errorToast,
-	successToast,
-} from '../../../../utils/toast.utils.tsx';
-
 const Profile: FC = () => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
-	const queryClient = useQueryClient();
 
 	const [selectedTab, setSelectedTab] = useState(0);
 
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
-
-	const { setAuthentication } = useAuthenticationContext();
 
 	const userQuery = useUserQuery({ gettable: true });
 	const user: User = userQuery.data;
@@ -54,22 +40,13 @@ const Profile: FC = () => {
 		Permissions.PERMISSION_DELETE_EMPLOYEE
 	);
 
-	const tabs = [t('Personal'), t('Professional'), t('Settings')];
+	const deleteProfileMutation = useDeleteProfileMutation({});
 
 	const onDelete = async (userId: number) => {
-		const toastId = createLoadingToast(t('Deleting Profile...'));
-
-		deleteEmployee(navigate, userId)
-			.then(() => {
-				successToast(toastId, t('Profile Deleted Successfully'));
-
-				queryClient.clear();
-				logout(setAuthentication);
-			})
-			.catch((error) => {
-				errorToast(toastId, t('Failed to Delete Profile'), error.message);
-			});
+		deleteProfileMutation.mutate({ userId });
 	};
+
+	const tabs = [t('Personal'), t('Professional'), t('Settings')];
 
 	const profileElement =
 		selectedTab === 0 ? (

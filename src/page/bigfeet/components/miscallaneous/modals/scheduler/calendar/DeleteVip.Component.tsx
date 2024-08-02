@@ -7,6 +7,8 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 import DeleteBottom from '../../DeleteBottom.Component';
 
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+
 import ERRORS from '../../../../../../../constants/error.constants';
 
 import Employee from '../../../../../../../models/Employee.Model';
@@ -14,10 +16,7 @@ import { Permissions, Role } from '../../../../../../../models/enums';
 import User from '../../../../../../../models/User.Model';
 import VipPackage from '../../../../../../../models/Vip-Package.Model';
 
-import {
-	useEmployeesQuery,
-	useUserQuery,
-} from '../../../../../../../service/query/get-items.query';
+import { useEmployeesQuery } from '../../../../../../../service/query/get-items.query';
 
 interface DeleteVipProp {
 	setOpen(open: boolean): void;

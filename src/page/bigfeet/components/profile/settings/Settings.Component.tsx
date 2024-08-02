@@ -1,7 +1,5 @@
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
 
@@ -9,6 +7,8 @@ import { ToggleColor } from '../../miscallaneous/add/AddToggleSwitch.Component';
 
 import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
 import EditableToggleSwitch from '../../miscallaneous/editable/EditableToggleSwitch.Component';
+
+import { useUpdateProfileSettingsMutation } from '../../../../hooks/profile.hooks';
 
 import { languageDropDownItems } from '../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../constants/error.constants';
@@ -19,24 +19,13 @@ import { Language } from '../../../../../models/enums';
 
 import { UpdateProfileRequest } from '../../../../../models/requests/Profile.Request.Model';
 
-import { updateProfile } from '../../../../../service/profile.service';
-
-import { getLanguageFile } from '../../../../../utils/i18n.utils';
-import {
-	createLoadingToast,
-	errorToast,
-	successToast,
-} from '../../../../../utils/toast.utils';
-
 interface SettingsProp {
 	originalLanguage: Language;
 	originalDarkMode: boolean;
 }
 
 const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
-	const { t, i18n } = useTranslation();
-	const navigate = useNavigate();
-	const queryClient = useQueryClient();
+	const { t } = useTranslation();
 
 	const [languageInput, setLanguageInput] = useState<Language | null>(
 		originalLanguage
@@ -71,33 +60,7 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 		setMissingRequiredInput(missingRequiredInput);
 	}, [languageInput, darkModeInput]);
 
-	const editProfileMutation = useMutation({
-		mutationFn: (data: { request: UpdateProfileRequest }) =>
-			updateProfile(navigate, data.request),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Updating Profile...'));
-			return { toastId };
-		},
-		onSuccess: (_data, variables, context) => {
-			queryClient.invalidateQueries({ queryKey: ['employees'] });
-			queryClient.invalidateQueries({ queryKey: ['user'] });
-
-			const updatedLanguage = variables.request.language;
-
-			if (updatedLanguage)
-				i18n.changeLanguage(getLanguageFile(updatedLanguage));
-
-			successToast(context.toastId, t('Profile Updated Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Update Profile'),
-					error.message
-				);
-		},
-	});
+	const updateProfileSettingsMutation = useUpdateProfileSettingsMutation({});
 
 	const onSave = async () => {
 		const language: Language | undefined =
@@ -112,7 +75,7 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 			...(dark_mode !== undefined && { dark_mode }),
 		};
 
-		editProfileMutation.mutate({ request });
+		updateProfileSettingsMutation.mutate({ request });
 	};
 
 	return (

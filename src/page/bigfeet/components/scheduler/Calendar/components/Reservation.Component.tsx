@@ -22,9 +22,9 @@ import Schedule from '../../../../../../models/Schedule.Model';
 import {
 	useEmployeesQuery,
 	useSchedulesQuery,
-	useUserQuery,
 } from '../../../../../../service/query/get-items.query';
 import User from '../../../../../../models/User.Model';
+import { useUserQuery } from '../../../../../hooks/profile.hooks';
 
 interface ReservationTagProp {
 	reservation: Reservation;

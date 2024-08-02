@@ -52,13 +52,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { formatDateToQueryKey } from '../../../../utils/string.utils';
 import { moneyToString } from '../../../../utils/number.utils';
 import {
-	useCustomersQuery,
 	useEmployeesQuery,
 	useSchedulesQuery,
 	useServicesQuery,
-	useUserQuery,
 } from '../../../../service/query/get-items.query';
 import User from '../../../../models/User.Model';
+import { useCustomersQuery } from '../../../hooks/customer.hooks';
+import { useUserQuery } from '../../../hooks/profile.hooks';
 
 const ScheduleDateContext = createContext<
 	{ date: Date; setDate(date: Date): void } | undefined

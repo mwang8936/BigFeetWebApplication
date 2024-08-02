@@ -1,12 +1,15 @@
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
 
 import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
 import EditableInput from '../../miscallaneous/editable/EditableInput.Component';
+
+import {
+	useUpdateProfileMutation,
+	useUserQuery,
+} from '../../../../hooks/profile.hooks';
 
 import { genderDropDownItems } from '../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../constants/error.constants';
@@ -20,16 +23,6 @@ import { Gender } from '../../../../../models/enums';
 import User from '../../../../../models/User.Model';
 
 import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
-
-import { updateEmployee } from '../../../../../service/employee.service';
-
-import { useUserQuery } from '../../../../../service/query/get-items.query';
-
-import {
-	createLoadingToast,
-	errorToast,
-	successToast,
-} from '../../../../../utils/toast.utils';
 
 interface PersonalProp {
 	editable: boolean;
@@ -47,8 +40,6 @@ const Personal: FC<PersonalProp> = ({
 	originalGender,
 }) => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
-	const queryClient = useQueryClient();
 
 	const [usernameInput, setUsernameInput] = useState<string | null>(
 		originalUsername
@@ -125,30 +116,7 @@ const Personal: FC<PersonalProp> = ({
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
 
-	const editProfileMutation = useMutation({
-		mutationFn: (data: {
-			employeeId: number;
-			request: UpdateEmployeeRequest;
-		}) => updateEmployee(navigate, data.employeeId, data.request),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Updating Profile...'));
-			return { toastId };
-		},
-		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({ queryKey: ['employees'] });
-			queryClient.invalidateQueries({ queryKey: ['user'] });
-
-			successToast(context.toastId, t('Profile Updated Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Update Profile'),
-					error.message
-				);
-		},
-	});
+	const updateProfileMutation = useUpdateProfileMutation({});
 
 	const onSave = async () => {
 		const username: string | undefined =
@@ -174,7 +142,7 @@ const Personal: FC<PersonalProp> = ({
 			...(gender !== undefined && { gender }),
 		};
 
-		editProfileMutation.mutate({ employeeId, request });
+		updateProfileMutation.mutate({ employeeId, request });
 	};
 	return (
 		<>

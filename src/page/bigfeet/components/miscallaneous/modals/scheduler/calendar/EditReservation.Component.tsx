@@ -48,13 +48,13 @@ import {
 	reservationEmployeeConflict,
 } from '../../../../../../../utils/reservation.utils';
 import {
-	useCustomersQuery,
 	useEmployeesQuery,
 	useSchedulesQuery,
 	useServicesQuery,
-	useUserQuery,
 } from '../../../../../../../service/query/get-items.query';
 import User from '../../../../../../../models/User.Model';
+import { useCustomersQuery } from '../../../../../../hooks/customer.hooks';
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 interface EditReservationProp {
 	setOpen(open: boolean): void;

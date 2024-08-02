@@ -6,11 +6,9 @@ import EditVipModal from '../../../miscallaneous/modals/scheduler/calendar/EditV
 import { moneyToString } from '../../../../../../utils/number.utils';
 import { Permissions, Role } from '../../../../../../models/enums';
 import Employee from '../../../../../../models/Employee.Model';
-import {
-	useEmployeesQuery,
-	useUserQuery,
-} from '../../../../../../service/query/get-items.query';
+import { useEmployeesQuery } from '../../../../../../service/query/get-items.query';
 import User from '../../../../../../models/User.Model';
+import { useUserQuery } from '../../../../../hooks/profile.hooks';
 
 interface VipItemProp {
 	vipPackage: VipPackage;

@@ -26,8 +26,8 @@ import {
 } from '../../../../../../models/requests/Vip-Package.Request.Model';
 import { doesDateOverlap } from '../../../../../../utils/date.utils';
 import PayoutGrid from './PayoutGrid.Component';
-import { useUserQuery } from '../../../../../../service/query/get-items.query';
 import User from '../../../../../../models/User.Model';
+import { useUserQuery } from '../../../../../hooks/profile.hooks';
 
 interface CalendarEmployeeColumnProp {
 	date: Date;

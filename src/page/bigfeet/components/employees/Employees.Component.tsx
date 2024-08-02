@@ -15,6 +15,8 @@ import Tabs from '../miscallaneous/Tabs.Component';
 
 import AddEmployeeModal from '../miscallaneous/modals/employee/AddEmployeeModal.Component';
 
+import { useUserQuery } from '../../../hooks/profile.hooks';
+
 import ERRORS from '../../../../constants/error.constants';
 
 import Employee from '../../../../models/Employee.Model';
@@ -25,10 +27,7 @@ import { AddEmployeeRequest } from '../../../../models/requests/Employee.Request
 
 import { addEmployee } from '../../../../service/employee.service';
 
-import {
-	useEmployeesQuery,
-	useUserQuery,
-} from '../../../../service/query/get-items.query';
+import { useEmployeesQuery } from '../../../../service/query/get-items.query';
 
 import {
 	createLoadingToast,

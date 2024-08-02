@@ -26,11 +26,9 @@ import { useNavigate } from 'react-router-dom';
 import { Permissions, Role } from '../../../../../../../models/enums';
 import { useQuery } from '@tanstack/react-query';
 import { getEmployees } from '../../../../../../../service/employee.service';
-import {
-	useEmployeesQuery,
-	useUserQuery,
-} from '../../../../../../../service/query/get-items.query';
+import { useEmployeesQuery } from '../../../../../../../service/query/get-items.query';
 import User from '../../../../../../../models/User.Model';
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 interface EditVipProp {
 	setOpen(open: boolean): void;

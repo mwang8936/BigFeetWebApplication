@@ -5,8 +5,7 @@ import ProfileIcon from '../../../assets/Profile_Icon.svg';
 import ServicesIcon from '../../../assets/Services_Icon.svg';
 import CustomersIcon from '../../../assets/Customers_Icon.svg';
 import { SideBarItems } from '../BigFeet.Page';
-import { logout } from '../../../service/auth.service';
-import { useAuthenticationContext } from '../../../App';
+import { useLogout } from '../../hooks/authentication.hooks';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { getCustomers } from '../../../service/customer.service';
@@ -28,7 +27,7 @@ const SideBar: FC<SideBarProp> = ({
 }) => {
 	const navigate = useNavigate();
 	const { t } = useTranslation();
-	const { setAuthentication } = useAuthenticationContext();
+	const logout = useLogout();
 
 	const queryClient = useQueryClient();
 
@@ -162,10 +161,7 @@ const SideBar: FC<SideBarProp> = ({
 
 			<div
 				className="sidebar-icon landscape:mt-auto landscape:py-5 portrait:ml-auto portrait:px-5 text-center"
-				onClick={() => {
-					queryClient.clear();
-					logout(setAuthentication);
-				}}>
+				onClick={logout}>
 				{t('Log Out')}
 			</div>
 		</div>
