@@ -247,7 +247,7 @@ const Scheduler: FC = () => {
 
 	const totalSessions = totalReservations
 		.flatMap((reservation) => [
-			reservation.service.acupuncture,
+			reservation.service.acupuncture * 1.5,
 			reservation.service.feet,
 			reservation.service.body,
 		])

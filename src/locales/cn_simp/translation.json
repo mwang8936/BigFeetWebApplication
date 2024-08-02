@@ -123,6 +123,7 @@
     "Add Schedule": "Add Schedule",
     "Not Working": "不当班",
     "Working": "当班",
+    "Not On Call": "Not On Call", 
     "Delete Reservation": "Delete Reservation",
     "Are you sure you want to delete this reservation? This action cannot be reversed.": "Are you sure you want to delete this reservation? This action cannot be reversed.",
     "Edit Reservation": "Edit Reservation",
