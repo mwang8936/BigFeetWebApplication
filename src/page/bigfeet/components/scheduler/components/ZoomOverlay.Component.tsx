@@ -4,6 +4,7 @@ import {
 	MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 import { FC } from 'react';
+import Draggable from 'react-draggable';
 
 interface ZoomOverlayProp {
 	zoomIn(): void;
@@ -51,11 +52,13 @@ const ZoomOverlay: FC<ZoomOverlayProp> = ({ zoomIn, zoomOut, zoomReset }) => {
 		);
 	};
 	return (
-		<>
-			<ZoomInButton />
-			<ZoomOutButton />
-			<ZoomResetButton />
-		</>
+		<Draggable axis="y" bounds="parent">
+			<div className="absolute flex flex-row justify-between h-auto w-auto p-2 right-[5%] bottom-0 mb-10 z-[4] border border-black bg-gray-200 bg-opacity-50">
+				<ZoomInButton />
+				<ZoomOutButton />
+				<ZoomResetButton />
+			</div>
+		</Draggable>
 	);
 };
 

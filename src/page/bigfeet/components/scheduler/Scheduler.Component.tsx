@@ -319,9 +319,7 @@ const Scheduler: FC = () => {
 					selectFuture={true}
 				/>
 			</div>
-			<div className="absolute flex flex-row justify-between h-auto w-auto p-2 right-[5%] bottom-0 mb-10 z-[4] border border-black bg-gray-200 bg-opacity-50">
-				<ZoomOverlay zoomIn={zoomIn} zoomOut={zoomOut} zoomReset={zoomReset} />
-			</div>
+			<ZoomOverlay zoomIn={zoomIn} zoomOut={zoomOut} zoomReset={zoomReset} />
 			<div
 				className="flex border border-gray-500 overflow-auto transform transition-transform duration-300 ease-in-out"
 				style={{
