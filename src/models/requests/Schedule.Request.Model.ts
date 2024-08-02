@@ -1,5 +1,6 @@
 export interface UpdateScheduleRequest {
 	is_working?: boolean;
+	on_call?: boolean;
 	start?: Date | null;
 	end?: Date | null;
 	priority?: number | null;
@@ -10,6 +11,7 @@ export interface AddScheduleRequest {
 	date: Date;
 	employee_id: number;
 	is_working?: boolean;
+	on_call?: boolean;
 	start?: Date | null;
 	end?: Date | null;
 	priority?: number | null;

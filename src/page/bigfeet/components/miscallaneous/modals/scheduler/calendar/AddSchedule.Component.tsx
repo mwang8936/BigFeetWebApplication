@@ -13,7 +13,6 @@ import { PlusCircleIcon } from '@heroicons/react/20/solid';
 import AddBottom from '../../AddBottom.Component';
 import { useTranslation } from 'react-i18next';
 import AddDropDown from '../../../add/AddDropDown.Component';
-import { useNavigate } from 'react-router-dom';
 import { Permissions, Role } from '../../../../../../../models/enums';
 import Employee from '../../../../../../../models/Employee.Model';
 import Schedule from '../../../../../../../models/Schedule.Model';
@@ -39,12 +38,12 @@ const AddSchedule: FC<AddScheduleProp> = ({
 	onAddSchedule,
 }) => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
 
 	const [priorityInput, setPriorityInput] = useState<number | null>(null);
 	const [startInput, setStartInput] = useState<Date | null>(null);
 	const [endInput, setEndInput] = useState<Date | null>(null);
 	const [isWorkingInput, setIsWorkingInput] = useState<boolean>(true);
+	const [onCallInput, setOnCallInput] = useState<boolean>(false);
 
 	const [invalidStart, setInvalidStart] = useState<boolean>(false);
 	const [invalidEnd, setInvalidEnd] = useState<boolean>(false);
@@ -102,10 +101,11 @@ const AddSchedule: FC<AddScheduleProp> = ({
 	}, [startInput, invalidStart]);
 
 	const onAdd = () => {
-		const start: Date | undefined = startInput || undefined;
-		const end: Date | undefined = endInput || undefined;
-		const priority: number | undefined = priorityInput || undefined;
+		const start: Date | undefined = startInput ?? undefined;
+		const end: Date | undefined = endInput ?? undefined;
+		const priority: number | undefined = priorityInput ?? undefined;
 		const is_working: boolean = isWorkingInput;
+		const on_call: boolean = onCallInput;
 
 		const addScheduleRequest: AddScheduleRequest = {
 			date,
@@ -114,6 +114,7 @@ const AddSchedule: FC<AddScheduleProp> = ({
 			...(end !== undefined && { end }),
 			...(priority !== undefined && { priority }),
 			is_working,
+			on_call,
 		};
 		onAddSchedule(addScheduleRequest);
 		setOpen(false);
@@ -189,11 +190,22 @@ const AddSchedule: FC<AddScheduleProp> = ({
 							<AddToggleSwitch
 								checked={isWorkingInput}
 								setChecked={setIsWorkingInput}
-								falseText={'Not Working'}
-								trueText={'Working'}
+								falseText={t('Not Working')}
+								trueText={t('Working')}
 								toggleColour={ToggleColor.GREEN}
 								label={LABELS.schedule.is_working}
 								name={NAMES.schedule.is_working}
+								disabled={false}
+							/>
+
+							<AddToggleSwitch
+								checked={onCallInput}
+								setChecked={setOnCallInput}
+								falseText={t('Not On Call')}
+								trueText={t('On Call')}
+								toggleColour={ToggleColor.GREEN}
+								label={LABELS.schedule.on_call}
+								name={NAMES.schedule.on_call}
 								disabled={false}
 							/>
 						</div>

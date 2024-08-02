@@ -36,7 +36,9 @@ const ScheduleGrid: FC<ScheduleGridProp> = ({
 }) => {
 	const [open, setOpen] = useState(false);
 
-	const textColour = schedule?.is_working
+	const textColour = schedule?.on_call
+		? 'text-blue-600 text-xl'
+		: schedule?.is_working
 		? 'text-slate-900 text-xl'
 		: 'text-red-600 text-xl';
 	const startText = schedule?.start ? formatTimeFromDate(schedule.start) : '';

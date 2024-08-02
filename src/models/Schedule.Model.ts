@@ -6,6 +6,7 @@ export default interface Schedule {
 	date: Date;
 	employee: Employee;
 	is_working: boolean;
+	on_call: boolean;
 	start: Date | null;
 	end: Date | null;
 	priority: number | null;

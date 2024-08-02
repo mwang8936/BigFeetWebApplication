@@ -38,6 +38,7 @@ const NAMES = {
 	schedule: {
 		priority: 'priority',
 		is_working: 'is_working',
+		on_call: 'on_call',
 		sign_off: 'sign_off',
 	},
 	service: {

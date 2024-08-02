@@ -15,7 +15,6 @@ import EditableToggleSwitch from '../../../editable/EditableToggleSwitch.Compone
 import { useTranslation } from 'react-i18next';
 import Employee from '../../../../../../../models/Employee.Model';
 import { Permissions, Role } from '../../../../../../../models/enums';
-import { useNavigate } from 'react-router-dom';
 import { getPriorityDropDownItems } from '../../../../../../../constants/drop-down.constants';
 import EditableDropDown from '../../../editable/EditableDropDown.Component';
 import User from '../../../../../../../models/User.Model';
@@ -41,7 +40,6 @@ const EditSchedule: FC<EditScheduleProp> = ({
 	onEditSchedule,
 }) => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
 
 	const [priorityInput, setPriorityInput] = useState<number | null>(
 		schedule.priority
@@ -51,6 +49,7 @@ const EditSchedule: FC<EditScheduleProp> = ({
 	const [isWorkingInput, setIsWorkingInput] = useState<boolean>(
 		schedule.is_working
 	);
+	const [onCallInput, setOnCallInput] = useState<boolean>(schedule.on_call);
 
 	const [invalidStart, setInvalidStart] = useState<boolean>(false);
 	const [invalidEnd, setInvalidEnd] = useState<boolean>(false);
@@ -109,21 +108,24 @@ const EditSchedule: FC<EditScheduleProp> = ({
 			priorityInput === schedule.priority ? undefined : priorityInput;
 		const is_working: boolean | undefined =
 			isWorkingInput === schedule.is_working ? undefined : isWorkingInput;
+		const on_call: boolean | undefined =
+			onCallInput === schedule.on_call ? undefined : onCallInput;
 
 		const changesMade =
 			start !== undefined ||
 			end !== undefined ||
 			priority !== undefined ||
-			is_working !== undefined;
+			is_working !== undefined ||
+			on_call !== undefined;
 
 		setChangesMade(changesMade);
-	}, [startInput, endInput, priorityInput, isWorkingInput]);
+	}, [startInput, endInput, priorityInput, isWorkingInput, onCallInput]);
 
 	useEffect(() => {
 		const invalidInput = invalidStart || invalidEnd;
 
 		setInvalidInput(invalidInput);
-	}, [invalidStart, invalidEnd, startInput, endInput]);
+	}, [invalidStart, invalidEnd]);
 
 	useEffect(() => {
 		if (startInput === null || invalidStart) {
@@ -149,12 +151,15 @@ const EditSchedule: FC<EditScheduleProp> = ({
 			priorityInput === schedule.priority ? undefined : priorityInput;
 		const is_working: boolean | undefined =
 			isWorkingInput === schedule.is_working ? undefined : isWorkingInput;
+		const on_call: boolean | undefined =
+			onCallInput === schedule.on_call ? undefined : onCallInput;
 
 		const updateScheduleRequest: UpdateScheduleRequest = {
 			...(start !== undefined && { start }),
 			...(end !== undefined && { end }),
 			...(priority !== undefined && { priority }),
 			...(is_working !== undefined && { is_working }),
+			...(on_call !== undefined && { on_call }),
 		};
 
 		onEditSchedule(
@@ -249,11 +254,24 @@ const EditSchedule: FC<EditScheduleProp> = ({
 								originalChecked={schedule.is_working}
 								checked={isWorkingInput}
 								setChecked={setIsWorkingInput}
-								falseText={'Not Working'}
-								trueText={'Working'}
+								falseText={t('Not Working')}
+								trueText={t('Working')}
 								toggleColour={ToggleColor.BLUE}
 								label={LABELS.schedule.is_working}
 								name={NAMES.schedule.is_working}
+								editable={editable}
+								missingPermissionMessage={ERRORS.schedule.permissions.edit}
+							/>
+
+							<EditableToggleSwitch
+								originalChecked={schedule.on_call}
+								checked={onCallInput}
+								setChecked={setOnCallInput}
+								falseText={t('Not On Call')}
+								trueText={t('On Call')}
+								toggleColour={ToggleColor.BLUE}
+								label={LABELS.schedule.on_call}
+								name={NAMES.schedule.on_call}
 								editable={editable}
 								missingPermissionMessage={ERRORS.schedule.permissions.edit}
 							/>

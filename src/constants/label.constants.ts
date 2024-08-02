@@ -44,6 +44,7 @@ const LABELS = {
 		end: 'Select End Time',
 		priority: 'Select Priority',
 		is_working: 'Is Working',
+		on_call: 'On Call',
 		filter: 'Select Date',
 	},
 	service: {

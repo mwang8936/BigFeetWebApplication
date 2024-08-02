@@ -123,6 +123,7 @@
     "Add Schedule": "Add Schedule",
     "Not Working": "Not Working",
     "Working": "Working",
+    "Not On Call": "Not On Call", 
     "Delete Reservation": "Delete Reservation",
     "Are you sure you want to delete this reservation? This action cannot be reversed.": "Are you sure you want to delete this reservation? This action cannot be reversed.",
     "Edit Reservation": "Edit Reservation",
@@ -344,6 +345,7 @@
     "Select End Time": "Select End Time",
     "Select Priority": "Select Priority",
     "Is Working": "Is Working",
+    "On Call": "On Call",
 
     "Serial": "Serial",
     "Sold Amount": "Sold Amount",

@@ -45,12 +45,17 @@ export const sortEmployees = (
 		// If only `b` has a defined priority, `b` comes first
 		if (bSchedule?.priority) return 1;
 
-		// If neither has priority, sort based on whether they are working
-		const aIsWorking = aSchedule?.is_working ? -1 : 1;
-		const bIsWorking = bSchedule?.is_working ? -1 : 1;
+		// Determine working and on call status
+		const aStatus = getStatus(aSchedule);
+		const bStatus = getStatus(bSchedule);
 
-		if (aIsWorking !== bIsWorking) {
-			return aIsWorking;
+		// Prioritize the following:
+		// 1. Working and not On Call
+		// 2. Working and On Call
+		// 3. Not Working and On Call
+		// 4. Not Working and Not On Call
+		if (aStatus !== bStatus) {
+			return aStatus - bStatus;
 		}
 
 		// If both are working or not working, sort by start time of their schedule
@@ -69,3 +74,20 @@ export const sortEmployees = (
 		return a.username.localeCompare(b.username);
 	});
 };
+
+/**
+ * Determines the status of an employee based on their schedule.
+ * The status is used for sorting purposes.
+ *
+ * @param schedule - The schedule of the employee.
+ * @returns A numerical value representing the status for sorting.
+ */
+function getStatus(schedule?: Schedule): number {
+	if (schedule?.is_working) {
+		return schedule.on_call ? 1 : 0; // 0: working and not on call, 1: working and on call
+	} else if (schedule?.on_call) {
+		return 2; // 2: on call and not working
+	} else {
+		return 3; // 3: not working and not on call
+	}
+}
