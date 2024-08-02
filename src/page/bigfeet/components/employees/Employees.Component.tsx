@@ -1,7 +1,5 @@
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import EditEmployee from './components/EditEmployee.Component';
 
@@ -15,6 +13,10 @@ import Tabs from '../miscallaneous/Tabs.Component';
 
 import AddEmployeeModal from '../miscallaneous/modals/employee/AddEmployeeModal.Component';
 
+import {
+	useEmployeesQuery,
+	useAddEmployeeMutation,
+} from '../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../hooks/profile.hooks';
 
 import ERRORS from '../../../../constants/error.constants';
@@ -25,20 +27,8 @@ import User from '../../../../models/User.Model';
 
 import { AddEmployeeRequest } from '../../../../models/requests/Employee.Request.Model';
 
-import { addEmployee } from '../../../../service/employee.service';
-
-import { useEmployeesQuery } from '../../../../service/query/get-items.query';
-
-import {
-	createLoadingToast,
-	errorToast,
-	successToast,
-} from '../../../../utils/toast.utils';
-
 const Employees: FC = () => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
-	const queryClient = useQueryClient();
 
 	const [selectedTab, setSelectedTab] = useState(0);
 
@@ -85,22 +75,7 @@ const Employees: FC = () => {
 		tabs = employees.map((employee) => employee.username);
 	}
 
-	const addEmployeeMutation = useMutation({
-		mutationFn: (data: { request: AddEmployeeRequest }) =>
-			addEmployee(navigate, data.request),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Adding Employee...'));
-			return { toastId };
-		},
-		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({ queryKey: ['employees'] });
-			successToast(context.toastId, t('Employee Added Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(context.toastId, t('Failed to Add Employee'), error.message);
-		},
-	});
+	const addEmployeeMutation = useAddEmployeeMutation({});
 
 	const onAdd = async (request: AddEmployeeRequest) => {
 		addEmployeeMutation.mutate({ request });

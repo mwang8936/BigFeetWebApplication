@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useLogout } from './authentication.hooks';
+import { employeesQueryKey } from './employee.hooks';
 import { MutationProp, QueryProp } from './props.hooks';
 
 import { UpdateEmployeeRequest } from '../../models/requests/Employee.Request.Model';
@@ -55,7 +56,7 @@ export const useUpdateProfileMutation = ({ setLoading }: MutationProp) => {
 			return { toastId };
 		},
 		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({ queryKey: ['employees'] });
+			queryClient.invalidateQueries({ queryKey: [employeesQueryKey] });
 			queryClient.invalidateQueries({ queryKey: [userQueryKey] });
 
 			successToast(context.toastId, t('Profile Updated Successfully'));

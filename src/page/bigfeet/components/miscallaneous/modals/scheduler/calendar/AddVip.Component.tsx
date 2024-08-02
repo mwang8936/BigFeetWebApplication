@@ -18,8 +18,8 @@ import NUMBERS from '../../../../../../../constants/numbers.constants';
 import PATTERNS from '../../../../../../../constants/patterns.constants';
 import { Permissions, Role } from '../../../../../../../models/enums';
 import { useNavigate } from 'react-router-dom';
-import { useEmployeesQuery } from '../../../../../../../service/query/get-items.query';
 import User from '../../../../../../../models/User.Model';
+import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 interface AddVipProp {

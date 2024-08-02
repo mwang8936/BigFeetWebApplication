@@ -13,6 +13,7 @@ import EditBottom from '../../EditBottom.Component';
 
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
 
+import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 import ERRORS from '../../../../../../../constants/error.constants';
@@ -25,10 +26,7 @@ import User from '../../../../../../../models/User.Model';
 
 import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
 
-import {
-	useEmployeesQuery,
-	useSchedulesQuery,
-} from '../../../../../../../service/query/get-items.query';
+import { useSchedulesQuery } from '../../../../../../../service/query/get-items.query';
 
 import {
 	reservationBedConflict,

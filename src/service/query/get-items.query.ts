@@ -18,24 +18,6 @@ interface QueryProp {
 	refetchIntervalInBackground?: boolean;
 }
 
-export const useEmployeesQuery = ({
-	gettable,
-	staleTime = 1000 * 30,
-	refetchInterval,
-	refetchIntervalInBackground,
-}: QueryProp) => {
-	const navigate = useNavigate();
-
-	return useQuery({
-		queryKey: ['employees'],
-		queryFn: () => getEmployees(navigate),
-		enabled: gettable,
-		staleTime,
-		refetchInterval,
-		refetchIntervalInBackground,
-	});
-};
-
 interface ScheduleQueryProp extends QueryProp {
 	date: Date;
 }

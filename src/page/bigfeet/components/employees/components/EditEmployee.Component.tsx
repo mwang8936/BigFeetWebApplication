@@ -1,7 +1,5 @@
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import DatesDisplay from '../../miscallaneous/DatesDisplay.Component';
 import PermissionsButton, {
@@ -15,7 +13,10 @@ import EditablePayRate from '../../miscallaneous/editable/EditablePayRate.Compon
 
 import DeleteEmployeeModal from '../../miscallaneous/modals/employee/DeleteEmployeeModal.Component';
 
-import { useLogout } from '../../../../hooks/authentication.hooks';
+import {
+	useDeleteEmployeeMutation,
+	useUpdateEmployeeMutation,
+} from '../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../hooks/profile.hooks';
 
 import {
@@ -37,17 +38,7 @@ import User from '../../../../../models/User.Model';
 
 import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
 
-import {
-	deleteEmployee,
-	updateEmployee,
-} from '../../../../../service/employee.service';
-
 import { arraysHaveSameContent } from '../../../../../utils/array.utils';
-import {
-	createLoadingToast,
-	errorToast,
-	successToast,
-} from '../../../../../utils/toast.utils';
 
 interface EditEmployeeProp {
 	editable: boolean;
@@ -61,10 +52,6 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 	employee,
 }) => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
-	const queryClient = useQueryClient();
-
-	const logout = useLogout();
 
 	const [usernameInput, setUsernameInput] = useState<string | null>(
 		employee.username
@@ -228,32 +215,7 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
 
-	const editEmployeeMutation = useMutation({
-		mutationFn: (data: {
-			employeeId: number;
-			request: UpdateEmployeeRequest;
-		}) => updateEmployee(navigate, data.employeeId, data.request),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Updating Employee...'));
-			return { toastId };
-		},
-		onSuccess: (_data, variables, context) => {
-			queryClient.invalidateQueries({ queryKey: ['employees'] });
-
-			if (variables.employeeId === user.employee_id)
-				queryClient.invalidateQueries({ queryKey: ['user'] });
-
-			successToast(context.toastId, t('Employee Updated Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Update Employee'),
-					error.message
-				);
-		},
-	});
+	const updateEmployeeMutation = useUpdateEmployeeMutation({});
 
 	const onSave = async () => {
 		const username: string | undefined =
@@ -302,36 +264,17 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 			...(acupuncture_rate !== undefined && { acupuncture_rate }),
 			...(per_hour !== undefined && { per_hour }),
 		};
+		const userId = user.employee_id;
 
-		editEmployeeMutation.mutate({ employeeId, request });
+		updateEmployeeMutation.mutate({ employeeId, request, userId });
 	};
 
-	const deleteEmployeeMutation = useMutation({
-		mutationFn: (data: { employeeId: number }) =>
-			deleteEmployee(navigate, data.employeeId),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Deleting Employee...'));
-			return { toastId };
-		},
-		onSuccess: (_data, variables, context) => {
-			queryClient.invalidateQueries({ queryKey: ['employees'] });
-
-			if (variables.employeeId === user.employee_id) logout();
-
-			successToast(context.toastId, t('Employee Deleted Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Delete Employee'),
-					error.message
-				);
-		},
-	});
+	const deleteEmployeeMutation = useDeleteEmployeeMutation({});
 
 	const onDelete = async (employeeId: number) => {
-		deleteEmployeeMutation.mutate({ employeeId });
+		const userId = user.employee_id;
+
+		deleteEmployeeMutation.mutate({ employeeId, userId });
 	};
 
 	return (
