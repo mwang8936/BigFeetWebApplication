@@ -8,6 +8,7 @@ import {
 import { formatTimeFromDate } from '../../../../../../utils/string.utils';
 import EditScheduleModal from '../../../miscallaneous/modals/scheduler/calendar/EditScheduleModal.Component';
 import AddScheduleModal from '../../../miscallaneous/modals/scheduler/calendar/AddScheduleModal.Component';
+import { useTranslation } from 'react-i18next';
 
 interface ScheduleGridProp {
 	colNum: number;
@@ -34,6 +35,8 @@ const ScheduleGrid: FC<ScheduleGridProp> = ({
 	editable,
 	onEditSchedule,
 }) => {
+	const { t } = useTranslation();
+
 	const [open, setOpen] = useState(false);
 
 	const textColour = schedule?.on_call
@@ -41,8 +44,14 @@ const ScheduleGrid: FC<ScheduleGridProp> = ({
 		: schedule?.is_working
 		? 'text-slate-900 text-xl'
 		: 'text-red-600 text-xl';
+
 	const startText = schedule?.start ? formatTimeFromDate(schedule.start) : '';
 	const endText = schedule?.end ? formatTimeFromDate(schedule.end) : '';
+
+	const underText = schedule?.on_call
+		? t('On Call')
+		: `${startText} - ${endText}`;
+
 	return (
 		<>
 			<div
@@ -57,7 +66,7 @@ const ScheduleGrid: FC<ScheduleGridProp> = ({
 					{employee.username +
 						(schedule?.priority ? `(${schedule.priority})` : '')}{' '}
 				</h1>
-				<h1>{`${startText} - ${endText}`}</h1>
+				<h1>{underText}</h1>
 			</div>
 			{schedule ? (
 				<EditScheduleModal
