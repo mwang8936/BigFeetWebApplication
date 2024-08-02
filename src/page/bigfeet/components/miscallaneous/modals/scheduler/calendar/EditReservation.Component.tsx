@@ -47,13 +47,11 @@ import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
 } from '../../../../../../../utils/reservation.utils';
-import {
-	useSchedulesQuery,
-	useServicesQuery,
-} from '../../../../../../../service/query/get-items.query';
+import { useSchedulesQuery } from '../../../../../../../service/query/get-items.query';
 import User from '../../../../../../../models/User.Model';
 import { useCustomersQuery } from '../../../../../../hooks/customer.hooks';
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
+import { useServicesQuery } from '../../../../../../hooks/service.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 interface EditReservationProp {

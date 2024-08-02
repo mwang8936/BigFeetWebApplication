@@ -29,20 +29,17 @@ import STORES from '../../../../../../../constants/store.constants';
 import AddBottom from '../../AddBottom.Component';
 import WarningModal from './WarningModal.Component';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
 import Schedule from '../../../../../../../models/Schedule.Model';
 import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
 } from '../../../../../../../utils/reservation.utils';
-import {
-	useSchedulesQuery,
-	useServicesQuery,
-} from '../../../../../../../service/query/get-items.query';
+import { useSchedulesQuery } from '../../../../../../../service/query/get-items.query';
 import User from '../../../../../../../models/User.Model';
 import { useCustomersQuery } from '../../../../../../hooks/customer.hooks';
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
+import { useServicesQuery } from '../../../../../../hooks/service.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 interface AddReservationProp {

@@ -1,7 +1,5 @@
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import EditableBodyFeetAcupunctureService from './EditableBodyFeetAcupunctureService.Component.tsx';
 
@@ -21,6 +19,11 @@ import EditableToggleSwitch from '../../miscallaneous/editable/EditableToggleSwi
 
 import DeleteServiceModal from '../../miscallaneous/modals/service/DeleteServiceModal.Component.tsx';
 
+import {
+	useDeleteServiceMutation,
+	useUpdateServiceMutation,
+} from '../../../../hooks/service.hooks.ts';
+
 import { colorDropDownItems } from '../../../../../constants/drop-down.constants.ts';
 import ERRORS from '../../../../../constants/error.constants.ts';
 import LABELS from '../../../../../constants/label.constants.ts';
@@ -36,17 +39,6 @@ import Service from '../../../../../models/Service.Model.ts';
 
 import { UpdateServiceRequest } from '../../../../../models/requests/Service.Request.Model.ts';
 
-import {
-	deleteService,
-	updateService,
-} from '../../../../../service/service.service.ts';
-
-import {
-	createLoadingToast,
-	errorToast,
-	successToast,
-} from '../../../../../utils/toast.utils';
-
 interface EditServiceProp {
 	editable: boolean;
 	deletable: boolean;
@@ -55,8 +47,6 @@ interface EditServiceProp {
 
 const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
-	const queryClient = useQueryClient();
 
 	const [serviceNameInput, setServiceNameInput] = useState<string | null>(
 		service.service_name
@@ -216,26 +206,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 		invalidBedsRequired,
 	]);
 
-	const editServiceMutation = useMutation({
-		mutationFn: (data: { serviceId: number; request: UpdateServiceRequest }) =>
-			updateService(navigate, data.serviceId, data.request),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Updating Service...'));
-			return { toastId };
-		},
-		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({ queryKey: ['services'] });
-			successToast(context.toastId, t('Service Updated Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Update Service'),
-					error.message
-				);
-		},
-	});
+	const updateServiceMutation = useUpdateServiceMutation({});
 
 	const onSave = async () => {
 		const service_name: string | undefined =
@@ -281,29 +252,10 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			...(color !== undefined && { color }),
 		};
 
-		editServiceMutation.mutate({ serviceId, request });
+		updateServiceMutation.mutate({ serviceId, request });
 	};
 
-	const deleteServiceMutation = useMutation({
-		mutationFn: (data: { serviceId: number }) =>
-			deleteService(navigate, data.serviceId),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Deleting Service...'));
-			return { toastId };
-		},
-		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({ queryKey: ['services'] });
-			successToast(context.toastId, t('Service Deleted Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(
-					context.toastId,
-					t('Failed to Delete Service'),
-					error.message
-				);
-		},
-	});
+	const deleteServiceMutation = useDeleteServiceMutation({});
 
 	const onDelete = async (serviceId: number) => {
 		deleteServiceMutation.mutate({ serviceId });

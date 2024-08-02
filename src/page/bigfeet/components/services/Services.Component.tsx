@@ -1,7 +1,5 @@
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import EditService from './components/EditService.Component.tsx';
 
@@ -15,6 +13,10 @@ import Tabs from '../miscallaneous/Tabs.Component.tsx';
 
 import AddServiceModal from '../miscallaneous/modals/service/AddServiceModal.Component.tsx';
 
+import {
+	useServicesQuery,
+	useAddServiceMutation,
+} from '../../../hooks/service.hooks.ts';
 import { useUserQuery } from '../../../hooks/profile.hooks.ts';
 
 import ERRORS from '../../../../constants/error.constants.ts';
@@ -25,20 +27,8 @@ import User from '../../../../models/User.Model.ts';
 
 import { AddServiceRequest } from '../../../../models/requests/Service.Request.Model.ts';
 
-import { addService } from '../../../../service/service.service.ts';
-
-import { useServicesQuery } from '../../../../service/query/get-items.query.ts';
-
-import {
-	createLoadingToast,
-	errorToast,
-	successToast,
-} from '../../../../utils/toast.utils.tsx';
-
 const Services: FC = () => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
-	const queryClient = useQueryClient();
 
 	const [selectedTab, setSelectedTab] = useState(0);
 
@@ -80,22 +70,7 @@ const Services: FC = () => {
 		tabs = services.map((service) => service.service_name);
 	}
 
-	const addServiceMutation = useMutation({
-		mutationFn: (data: { request: AddServiceRequest }) =>
-			addService(navigate, data.request),
-		onMutate: async () => {
-			const toastId = createLoadingToast(t('Adding Service...'));
-			return { toastId };
-		},
-		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({ queryKey: ['services'] });
-			successToast(context.toastId, t('Service Added Successfully'));
-		},
-		onError: (error, _variables, context) => {
-			if (context)
-				errorToast(context.toastId, t('Failed to Add Service'), error.message);
-		},
-	});
+	const addServiceMutation = useAddServiceMutation({});
 
 	const onAdd = async (request: AddServiceRequest) => {
 		addServiceMutation.mutate({ request });

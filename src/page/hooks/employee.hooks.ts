@@ -1,24 +1,28 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { MutationProp, QueryProp } from './props.hooks';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { useLogout } from './authentication.hooks';
+import { userQueryKey } from './profile.hooks';
+import { MutationProp, QueryProp } from './props.hooks';
+
+import {
+	AddEmployeeRequest,
+	UpdateEmployeeRequest,
+} from '../../models/requests/Employee.Request.Model';
+
 import {
 	addEmployee,
 	deleteEmployee,
 	getEmployees,
 	updateEmployee,
 } from '../../service/employee.service';
-import { useTranslation } from 'react-i18next';
-import {
-	AddEmployeeRequest,
-	UpdateEmployeeRequest,
-} from '../../models/requests/Employee.Request.Model';
+
 import {
 	createLoadingToast,
 	errorToast,
 	successToast,
 } from '../../utils/toast.utils';
-import { userQueryKey } from './profile.hooks';
-import { useLogout } from './authentication.hooks';
 
 export const employeesQueryKey = 'employees';
 
@@ -94,7 +98,8 @@ export const useAddEmployeeMutation = ({ setLoading }: MutationProp) => {
 			return { toastId };
 		},
 		onSuccess: (_data, _variables, context) => {
-			queryClient.invalidateQueries({ queryKey: ['employees'] });
+			queryClient.invalidateQueries({ queryKey: [employeesQueryKey] });
+
 			successToast(context.toastId, t('Employee Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -124,11 +129,11 @@ export const useDeleteEmployeeMutation = ({ setLoading }: MutationProp) => {
 			return { toastId };
 		},
 		onSuccess: (_data, variables, context) => {
-			queryClient.invalidateQueries({ queryKey: ['employees'] });
-
-			if (variables.employeeId === variables.userId) logout();
+			queryClient.invalidateQueries({ queryKey: [employeesQueryKey] });
 
 			successToast(context.toastId, t('Employee Deleted Successfully'));
+
+			if (variables.employeeId === variables.userId) logout();
 		},
 		onError: (error, _variables, context) => {
 			if (context)
