@@ -1,18 +1,10 @@
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import secureLocalStorage from 'react-secure-storage';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import Cookies from 'js-cookie';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
-import { useAuthenticationContext } from '../../../App';
-
-import {
-	passwordKey,
-	tokenKey,
-	usernameKey,
-} from '../../../constants/api.constants';
+import { passwordKey, usernameKey } from '../../../constants/api.constants';
 import ERRORS from '../../../constants/error.constants';
 import LENGTHS from '../../../constants/lengths.constants';
 import NAMES from '../../../constants/name.constants';
@@ -22,11 +14,10 @@ import STORES from '../../../constants/store.constants';
 
 import { LoginRequest } from '../../../models/requests/Login.Request.Model';
 
-import { login } from '../../../service/auth.service';
+import { useLoginMutation } from '../../hooks/authentication.hooks';
 
 const LoginForm: FC = () => {
 	const { t } = useTranslation();
-	const queryClient = useQueryClient();
 
 	//Obtain last used username and password from secure storage.
 	const savedUsername = secureLocalStorage.getItem(usernameKey);
@@ -55,36 +46,7 @@ const LoginForm: FC = () => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
 
-	const { setAuthentication } = useAuthenticationContext();
-
-	const loginMutation = useMutation({
-		mutationFn: (data: { request: LoginRequest; rememberMe: boolean }) =>
-			login(data.request),
-		onMutate: async () => setLoading(true),
-		onSuccess: (data, variables) => {
-			// Obtain user profile and access token from login response
-			const { user, accessToken } = data;
-
-			// Set user as authenticated and add access token to authorization cookie
-			setAuthentication(true);
-			Cookies.set(tokenKey, accessToken);
-
-			//If remember me is checked, securely store username and password in local storage.
-			const rememberMe = variables.rememberMe;
-			if (rememberMe) {
-				secureLocalStorage.setItem(usernameKey, username);
-				secureLocalStorage.setItem(passwordKey, password);
-			} else {
-				secureLocalStorage.removeItem(usernameKey);
-				secureLocalStorage.removeItem(passwordKey);
-			}
-
-			// Store the user
-			queryClient.setQueryData(['user'], user);
-		},
-		onError: (error) => setError(error.message),
-		onSettled: () => setLoading(false),
-	});
+	const loginMutation = useLoginMutation({ setLoading, setError });
 
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();

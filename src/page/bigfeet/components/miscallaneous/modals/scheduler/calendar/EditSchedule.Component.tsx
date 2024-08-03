@@ -211,7 +211,7 @@ const EditSchedule: FC<EditScheduleProp> = ({
 									required: false,
 								}}
 								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+								missingPermissionMessage={ERRORS.schedule.permissions.edit}
 							/>
 							<EditableTime
 								originalTime={schedule.start}

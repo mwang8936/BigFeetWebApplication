@@ -7,4 +7,5 @@ export interface QueryProp {
 
 export interface MutationProp {
 	setLoading?: (loading: boolean) => void;
+	setError?: (error: string) => void;
 }
