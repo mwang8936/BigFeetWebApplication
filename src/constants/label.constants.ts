@@ -19,6 +19,12 @@ const LABELS = {
 		acupuncture_rate: 'Acupuncture Rate',
 		per_hour: 'Hourly Rate',
 	},
+	gift_card: {
+		gift_card_id: 'Gift Card ID',
+		date: 'Select Date',
+		payment_method: 'Payment Method',
+		payment_amount: 'Payment Amount',
+	},
 	profile: {
 		language: 'Language',
 		dark_mode: 'Dark Mode',

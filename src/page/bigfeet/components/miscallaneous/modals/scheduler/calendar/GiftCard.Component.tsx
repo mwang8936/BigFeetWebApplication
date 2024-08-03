@@ -5,48 +5,46 @@ import { Dialog } from '@headlessui/react';
 
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 
-import AddVipModal from './AddVipModal.Component';
-
 import AddBottom from '../../AddBottom.Component';
-
-import VipItem from '../../../../scheduler/Calendar/components/VipItem.Component';
 
 import ERRORS from '../../../../../../../constants/error.constants';
 
-import VipPackage from '../../../../../../../models/Vip-Package.Model';
+import GiftCard from '../../../../../../../models/Gift-Card.Model';
 
 import {
-	AddVipPackageRequest,
-	UpdateVipPackageRequest,
-} from '../../../../../../../models/requests/Vip-Package.Request.Model';
+	AddGiftCardRequest,
+	UpdateGiftCardRequest,
+} from '../../../../../../../models/requests/GIft-Card.Request';
+import AddGiftCardModal from './AddGiftCardModal.Component';
+import GiftCardItem from '../../../../scheduler/Calendar/components/GiftCardItem.Component';
 
-interface VipsProp {
+interface GiftCardProp {
 	setOpen(open: boolean): void;
-	vipPackages: VipPackage[];
+	giftCards: GiftCard[];
 	creatable: boolean;
-	onAddVipPackage(request: AddVipPackageRequest): Promise<void>;
+	onAddGiftCard(request: AddGiftCardRequest): Promise<void>;
 	editable: boolean;
-	onEditVipPackage(
-		serial: string,
-		request: UpdateVipPackageRequest
+	onEditGiftCard(
+		gift_card_id: string,
+		request: UpdateGiftCardRequest
 	): Promise<void>;
 	deletable: boolean;
-	onDeleteVipPackage(serial: string): Promise<void>;
+	onDeleteGiftCard(gift_card_id: string): Promise<void>;
 }
 
-const Vips: FC<VipsProp> = ({
+const GiftCards: FC<GiftCardProp> = ({
 	setOpen,
-	vipPackages,
+	giftCards,
 	creatable,
-	onAddVipPackage,
+	onAddGiftCard,
 	editable,
-	onEditVipPackage,
+	onEditGiftCard,
 	deletable,
-	onDeleteVipPackage,
+	onDeleteGiftCard,
 }) => {
 	const { t } = useTranslation();
 
-	const [openAddVipPackageModal, setOpenAddVipPackageModal] =
+	const [openAddGiftCardModal, setOpenAddGiftCardModal] =
 		useState<boolean>(false);
 
 	return (
@@ -64,24 +62,24 @@ const Vips: FC<VipsProp> = ({
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
-							{t('Vip Packages')}
+							{t('Gift Cards')}
 						</Dialog.Title>
 
 						<div className="list-div">
-							{vipPackages.length !== 0 ? (
-								vipPackages.map((vipPackage) => (
-									<VipItem
-										key={vipPackage.serial}
-										vipPackage={vipPackage}
+							{giftCards.length !== 0 ? (
+								giftCards.map((giftCard) => (
+									<GiftCardItem
+										key={giftCard.gift_card_id}
+										giftCard={giftCard}
 										editable={editable}
-										onEditVipPackage={onEditVipPackage}
+										onEditGiftCard={onEditGiftCard}
 										deletable={deletable}
-										onDeleteVipPackage={onDeleteVipPackage}
+										onDeleteGiftCard={onDeleteGiftCard}
 									/>
 								))
 							) : (
 								<h1 className="large-centered-text">
-									{t('No Vip Packages Created')}
+									{t('No Gift Cards Created')}
 								</h1>
 							)}
 						</div>
@@ -93,17 +91,17 @@ const Vips: FC<VipsProp> = ({
 				onCancel={() => setOpen(false)}
 				disabledAdd={!creatable}
 				addMissingPermissionMessage={ERRORS.vip_package.permissions.add}
-				onAdd={() => setOpenAddVipPackageModal(true)}
+				onAdd={() => setOpenAddGiftCardModal(true)}
 			/>
 
-			<AddVipModal
-				open={openAddVipPackageModal}
-				setOpen={setOpenAddVipPackageModal}
+			<AddGiftCardModal
+				open={openAddGiftCardModal}
+				setOpen={setOpenAddGiftCardModal}
 				creatable={creatable}
-				onAddVipPackage={onAddVipPackage}
+				onAddGiftCard={onAddGiftCard}
 			/>
 		</>
 	);
 };
 
-export default Vips;
+export default GiftCards;

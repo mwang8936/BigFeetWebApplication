@@ -1,7 +1,7 @@
 import { useState, createContext, useContext, FC } from 'react';
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import Calendar from './Calendar/Calendar.Component';
-import { Permissions, Role } from '../../../../models/enums';
+import { PaymentMethod, Permissions, Role } from '../../../../models/enums';
 import Schedule from '../../../../models/Schedule.Model';
 import { sameDate } from '../../../../utils/date.utils';
 import Employee from '../../../../models/Employee.Model';
@@ -52,6 +52,18 @@ import {
 	useDeleteVipPackageMutation,
 	useUpdateVipPackageMutation,
 } from '../../../hooks/vip-package.hooks';
+import {
+	useAddGiftCardMutation,
+	useDeleteGiftCardMutation,
+	useGiftCardsQuery,
+	useUpdateGiftCardMutation,
+} from '../../../hooks/gift-card.hooks';
+import GiftCard from '../../../../models/Gift-Card.Model';
+import GiftCardsModal from '../miscallaneous/modals/scheduler/calendar/GiftCardModal.Component';
+import {
+	AddGiftCardRequest,
+	UpdateGiftCardRequest,
+} from '../../../../models/requests/GIft-Card.Request';
 
 const ScheduleDateContext = createContext<
 	{ date: Date; setDate(date: Date): void } | undefined
@@ -71,9 +83,9 @@ export function useScheduleDateContext() {
 const Scheduler: FC = () => {
 	const { t } = useTranslation();
 	const queryClient = useQueryClient();
-	const navigate = useNavigate();
 
 	const [openAddReservationModal, setOpenAddReservationModal] = useState(false);
+	const [openGiftCardModal, setOpenGiftCardModal] = useState(false);
 
 	const [date, setDate] = useState<Date>(new Date());
 	const [filtered, setFiltered] = useState(false);
@@ -101,6 +113,9 @@ const Scheduler: FC = () => {
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
 	);
+	const giftCardGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_GIFT_CARD
+	);
 	const serviceGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_SERVICE
 	);
@@ -116,6 +131,12 @@ const Scheduler: FC = () => {
 		gettable: employeeGettable,
 		refetchInterval: 1000 * 60 * 5,
 	});
+	const giftCardsQuery = useGiftCardsQuery({
+		date,
+		gettable: giftCardGettable,
+		refetchInterval: 1000 * 60 * 5,
+	});
+	const giftCards: GiftCard[] = (giftCardsQuery.data as GiftCard[]) || [];
 	useServicesQuery({
 		gettable: serviceGettable,
 		refetchInterval: 1000 * 60 * 5,
@@ -142,9 +163,16 @@ const Scheduler: FC = () => {
 	sortEmployees(employeeList, schedules, date);
 
 	const creatable = [
+		Permissions.PERMISSION_ADD_GIFT_CARD,
 		Permissions.PERMISSION_ADD_RESERVATION,
 		Permissions.PERMISSION_ADD_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
+
+	const addGiftCardMutation = useAddGiftCardMutation({});
+
+	const onAddGiftCard = async (request: AddGiftCardRequest) => {
+		addGiftCardMutation.mutate({ request });
+	};
 
 	const addReservationMutation = useAddReservationMutation({});
 
@@ -165,9 +193,27 @@ const Scheduler: FC = () => {
 	};
 
 	const editable = [
+		Permissions.PERMISSION_UPDATE_GIFT_CARD,
 		Permissions.PERMISSION_UPDATE_RESERVATION,
 		Permissions.PERMISSION_UPDATE_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
+
+	const updateGiftCardMutation = useUpdateGiftCardMutation({});
+
+	const onEditGiftCard = async (
+		giftCardId: string,
+		request: UpdateGiftCardRequest
+	) => {
+		const originalDate = date;
+		const newDate = request.date;
+
+		updateGiftCardMutation.mutate({
+			giftCardId,
+			request,
+			originalDate,
+			newDate,
+		});
+	};
 
 	const updateReservationMutation = useUpdateReservationMutation({});
 
@@ -213,6 +259,12 @@ const Scheduler: FC = () => {
 		Permissions.PERMISSION_DELETE_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
 
+	const deleteGiftCardMutation = useDeleteGiftCardMutation({});
+
+	const onDeleteGiftCard = async (giftCardId: string) => {
+		deleteGiftCardMutation.mutate({ giftCardId, date });
+	};
+
 	const deleteReservationMutation = useDeleteReservationMutation({});
 
 	const onDeleteReservation = async (reservationId: number) => {
@@ -241,6 +293,10 @@ const Scheduler: FC = () => {
 			: date.toDateString();
 	};
 
+	const totalGiftCardAmount = giftCards
+		.map((giftCard) => giftCard.payment_amount)
+		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+
 	const totalReservations = schedules.flatMap(
 		(schedule) => schedule.reservations
 	);
@@ -252,9 +308,14 @@ const Scheduler: FC = () => {
 			reservation.service.body,
 		])
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
-	const totalCash = totalReservations
-		.map((reservation) => reservation.cash || 0)
-		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+	const totalCash =
+		totalReservations
+			.map((reservation) => reservation.cash || 0)
+			.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0) +
+		giftCards
+			.filter((giftCard) => giftCard.payment_method === PaymentMethod.CASH)
+			.map((giftCard) => giftCard.payment_amount)
+			.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
 
 	const onDateFiltered = (selectedDate: Date) => {
 		const currentDate = new Date();
@@ -275,7 +336,7 @@ const Scheduler: FC = () => {
 	return (
 		<ScheduleDateContext.Provider value={{ date, setDate }}>
 			<div className="h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
-				<div className="vertical-center ms-10">
+				<div className="vertical-center ms-10 flex flex-col">
 					<PermissionsButton
 						btnTitle={t('Add Reservation')}
 						btnType={ButtonType.ADD}
@@ -285,10 +346,20 @@ const Scheduler: FC = () => {
 						missingPermissionMessage={ERRORS.reservation.permissions.add}
 						onClick={() => setOpenAddReservationModal(true)}
 					/>
+
+					<PermissionsButton
+						btnTitle={t('Add Gift Card')}
+						btnType={ButtonType.ADD}
+						top={false}
+						right={false}
+						disabled={!creatable}
+						missingPermissionMessage={ERRORS.gift_card.permissions.add}
+						onClick={() => setOpenGiftCardModal(true)}
+					/>
 				</div>
 				<div className="vertical-center flex text-gray-600 text-xl">
 					{t('Total Cash')}:
-					<span className="font-bold ms-2">{moneyToString(totalCash)}</span>
+					<span className="font-bold ms-2">${moneyToString(totalCash)}</span>
 				</div>
 				<div className="vertical-center flex flex-col">
 					<h1 className="my-auto mx-auto text-gray-600 text-3xl">
@@ -296,10 +367,19 @@ const Scheduler: FC = () => {
 					</h1>
 					<h1 className="mx-auto text-gray-600 text-xl">{displayDate()}</h1>
 				</div>
-				<div className="vertical-center flex text-gray-600 text-xl">
-					{t('Total Reservations')}:
-					<span className="font-bold ms-2">{totalSessions}</span>
+				<div className="vertical-center flex flex-col text-gray-600 text-xl">
+					<div className="flex">
+						{t('Total Reservations')}:
+						<span className="font-bold ms-2">{totalSessions}</span>
+					</div>
+					<div className="flex">
+						{t('Total Gift Cards')}:
+						<span className="font-bold ms-2">
+							${moneyToString(totalGiftCardAmount)}
+						</span>
+					</div>
 				</div>
+
 				<AdjustmentsHorizontalIcon
 					className={`h-16 w-16 ${
 						filtered ? 'text-blue-600' : 'text-gray-600'
@@ -353,6 +433,18 @@ const Scheduler: FC = () => {
 				setOpen={setOpenAddReservationModal}
 				creatable={creatable}
 				onAddReservation={onAddReservation}
+			/>
+
+			<GiftCardsModal
+				open={openGiftCardModal}
+				setOpen={setOpenGiftCardModal}
+				giftCards={giftCards}
+				creatable={creatable}
+				onAddGiftCard={onAddGiftCard}
+				editable={editable}
+				onEditGiftCard={onEditGiftCard}
+				deletable={deletable}
+				onDeleteGiftCard={onDeleteGiftCard}
 			/>
 		</ScheduleDateContext.Provider>
 	);

@@ -111,6 +111,40 @@ const ERRORS = {
 			delete: 'You do not have permission to delete employees.',
 		},
 	},
+	gift_card: {
+		gift_card_id: {
+			required: 'Gift Card ID cannot be empty.',
+			invalid: {
+				key: "Gift Card ID must start with a 't' and be followed by 6 or 7 digits.",
+				value: {},
+			},
+		},
+		date: {
+			required: 'Date cannot be empty.',
+			invalid: {
+				key: 'Date must be in format: MM/DD/YYYY and selected date is outside of date range.',
+				value: {},
+			},
+		},
+		payment_method: {
+			required: 'Payment Method cannot be empty.',
+		},
+		payment_amount: {
+			required: 'Payment Amount cannot be empty.',
+			invalid: {
+				key: 'Payment Amount Invalid',
+				value: {
+					max: NUMBERS.gift_card.payment_amount,
+				},
+			},
+		},
+		permissions: {
+			get: 'You do not have permissions to get gift cards.',
+			edit: 'You do not have permissions to edit gift cards.',
+			add: 'You do not have permissions to add gift cards.',
+			delete: 'You do not have permission to delete gift cards.',
+		},
+	},
 	login: {
 		username: {
 			required: 'Username cannot be empty.',

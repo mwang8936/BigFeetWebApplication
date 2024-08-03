@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import VipPackage from '../../../../../../models/Vip-Package.Model';
-import VipModal from '../../../miscallaneous/modals/scheduler/calendar/VipModal.Component';
+import VipsModal from '../../../miscallaneous/modals/scheduler/calendar/VipModal.Component';
 import {
 	AddVipPackageRequest,
 	UpdateVipPackageRequest,
@@ -82,7 +82,7 @@ const VipGrid: FC<VipGridProp> = ({
 					)}`}</span>
 				</span>
 			</div>
-			<VipModal
+			<VipsModal
 				open={open}
 				setOpen={setOpen}
 				vipPackages={vipPackages}

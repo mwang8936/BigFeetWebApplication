@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import Vip from './Vip.Component';
+import Vips from './Vip.Component';
 
 import BaseModal from '../../BaseModal.Component';
 
@@ -11,7 +11,7 @@ import {
 	UpdateVipPackageRequest,
 } from '../../../../../../../models/requests/Vip-Package.Request.Model';
 
-interface VipModalProp {
+interface VipsModalProp {
 	open: boolean;
 	setOpen(open: boolean): void;
 	vipPackages: VipPackage[];
@@ -26,7 +26,7 @@ interface VipModalProp {
 	onDeleteVipPackage(serial: string): Promise<void>;
 }
 
-const VipModal: FC<VipModalProp> = ({
+const VipsModal: FC<VipsModalProp> = ({
 	open,
 	setOpen,
 	vipPackages,
@@ -42,7 +42,7 @@ const VipModal: FC<VipModalProp> = ({
 			open={open}
 			setOpen={setOpen}
 			contentElement={
-				<Vip
+				<Vips
 					setOpen={setOpen}
 					vipPackages={vipPackages}
 					creatable={creatable}
@@ -57,4 +57,4 @@ const VipModal: FC<VipModalProp> = ({
 	);
 };
 
-export default VipModal;
+export default VipsModal;

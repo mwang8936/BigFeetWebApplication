@@ -9,6 +9,9 @@ const LENGTHS = {
 		first_name: 30,
 		last_name: 30,
 	},
+	gift_card: {
+		gift_card_id: 8,
+	},
 	login: {
 		username: 30,
 		password: 30,

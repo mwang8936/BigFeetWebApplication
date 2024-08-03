@@ -44,6 +44,20 @@
     "Delete Employee": "删除员工: {{employee}}",
     "Are you sure you want to delete this employee? This action cannot be reversed.": "请确认是否要删除？",
 
+    "Adding Gift Card...": "Adding Gift Card...",
+    "Gift Card Added Successfully": "Gift Card Added Successfully",
+    "Failed to Add Gift Card": "Failed to Add Gift Card",
+    "Add Gift Card": "Add Gift Card",
+    "No Gift Cards Created": "No Gift Cards Created",
+    "Updating Gift Card...": "Updating Gift Card...",
+    "Gift Card Updated Successfully": "Gift Card Updated Successfully",
+    "Failed to Update Gift Card": "Failed to Update Gift Card",
+    "Deleting Gift Card...": "Deleting Gift Card...",
+    "Gift Card Deleted Successfully": "Gift Card Deleted Successfully",
+    "Failed to Delete Gift Card": "Failed to Delete Gift Card",
+    "Delete Gift Card": "Delete Gift Card",
+    "Are you sure you want to delete this gift card? This action cannot be reversed.": "Are you sure you want to delete this gift card? This action cannot be reversed.",
+    
     "Personal": "个人资料",
     "Professional": "专业信息",
     "Settings": "设置",
@@ -93,6 +107,7 @@
     "Add Reservation": "Add Reservation",
     "Total Cash": "现金总额",
     "Total Reservations": "当天钟数",
+    "Total Gift Cards": "Total Gift Cards",
     "Scheduler": "工作表",
     "Filter Reservations": "其他日期的预约表",
     "Filter": "查找",
@@ -188,6 +203,8 @@
 
     "No Language Selected": "未选语言",
 
+    "No Payment Selected": "No Payment Selected",
+
     "No Role Selected": "未选职位",
     "STORE EMPLOYEE": "店内员工",
     "RECEPTIONIST": "前台",
@@ -230,6 +247,7 @@
     "Role cannot be empty.": "Role cannot be empty.",
     "Body Rate Invalid": "Body Rate must be between $0-{{max}} and limited to 2 decimal places.",
     "Feet Rate Invalid": "Feet Rate must be between $0-{{max}} and limited to 2 decimal places.",
+    "Acupuncture Rate Invalid": "Acupuncture Rate must be between $0-{{max}} and limited to 2 decimal places.",
     "Per Hour Invalid": "Per Hour must be between $0-{{max}} and limited to 2 decimal places.",
     "You do not have permissions to get employees.": "你无此权限",
     "You do not have permissions to edit employees.": "你无此权限",
@@ -237,6 +255,21 @@
     "You do not have permission to delete employees.": "你无此权限",
 
     "Language cannot be empty.": "Language cannot be empty.",
+
+    "Gift Cards": "Gift Cards",
+    "Gift Card ID":"Gift Card ID",
+    "Gift Card ID cannot be empty.": "Gift Card ID cannot be empty.",
+    "Gift Card ID must start with a 'T' and be followed by 6 or 7 digits.": "Gift Card ID must start with a 'T' and be followed by 6 or 7 digits.",
+    "Payment Method": "Payment Method",
+    "Payment Method cannot be empty.": "Payment Method cannot be empty.",
+    "Payment Amount": "Payment Amount",
+    "Payment Amount cannot be empty.": "Payment Amount cannot be empty.",
+    "Payment Amount Invalid": "Payment Amount must be between $0.01-{{max}} and limited to 2 decimal places.",
+    "Edit Gift Card": "Edit Gift Card",
+    "You do not have permissions to get gift cards.": "You do not have permissions to get gift cards.",
+    "You do not have permissions to edit gift cards.": "You do not have permissions to edit gift cards.",
+    "You do not have permissions to add gift cards.": "You do not have permissions to add gift cards.",
+    "You do not have permission to delete gift cards.": "You do not have permission to delete gift cards.",
 
     "Date cannot be empty.": "Date cannot be empty.",
     "Date must be in format: MM/DD/YYYY and selected date is outside of date range.": "Date must be in format: MM/DD/YYYY and selected date is outside of date range.",

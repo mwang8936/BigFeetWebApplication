@@ -8,23 +8,23 @@ import DeleteBottom from '../../DeleteBottom.Component';
 
 import ERRORS from '../../../../../../../constants/error.constants';
 
-interface DeleteReservationProp {
+interface DeleteGiftCardProp {
 	setOpen(open: boolean): void;
-	reservationId: number;
+	giftCardId: string;
 	deletable: boolean;
-	onDeleteReservation(reservationId: number): Promise<void>;
+	onDeleteGiftCard(giftCardId: string): Promise<void>;
 }
 
-const DeleteReservation: FC<DeleteReservationProp> = ({
+const DeleteGiftCard: FC<DeleteGiftCardProp> = ({
 	setOpen,
-	reservationId,
+	giftCardId,
 	deletable,
-	onDeleteReservation,
+	onDeleteGiftCard,
 }) => {
 	const { t } = useTranslation();
 
 	const onDelete = () => {
-		onDeleteReservation(reservationId);
+		onDeleteGiftCard(giftCardId);
 		setOpen(false);
 	};
 
@@ -43,12 +43,12 @@ const DeleteReservation: FC<DeleteReservationProp> = ({
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
-							{t('Delete Reservation')}
+							{t('Delete Gift Card')}: {giftCardId}
 						</Dialog.Title>
 
 						<div className="mt-2">
 							{t(
-								'Are you sure you want to delete this reservation? This action cannot be reversed.'
+								'Are you sure you want to delete this gift card? This action cannot be reversed.'
 							)}
 						</div>
 					</div>
@@ -58,11 +58,11 @@ const DeleteReservation: FC<DeleteReservationProp> = ({
 			<DeleteBottom
 				onCancel={() => setOpen(false)}
 				disabledDelete={!deletable}
-				deleteMissingPermissionMessage={ERRORS.reservation.permissions.delete}
+				deleteMissingPermissionMessage={ERRORS.gift_card.permissions.delete}
 				onDelete={onDelete}
 			/>
 		</>
 	);
 };
 
-export default DeleteReservation;
+export default DeleteGiftCard;

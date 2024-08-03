@@ -85,7 +85,7 @@ const AddVip: FC<AddVipProp> = ({ setOpen, creatable, onAddVipPackage }) => {
 			invalidSerial || invalidSoldAmount || invalidCommissionAmount;
 
 		setInvalidInput(invalidInput);
-	}, [invalidSerial, invalidInput]);
+	}, [invalidSerial]);
 
 	const onAdd = () => {
 		const serial = serialInput as string;
@@ -202,7 +202,7 @@ const AddVip: FC<AddVipProp> = ({ setOpen, creatable, onAddVipPackage }) => {
 				disabledAdd={!creatable || missingRequiredInput || invalidInput}
 				addMissingPermissionMessage={
 					!creatable
-						? ERRORS.reservation.permissions.add
+						? ERRORS.vip_package.permissions.add
 						: missingRequiredInput
 						? ERRORS.required
 						: invalidInput

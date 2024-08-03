@@ -72,7 +72,7 @@ const DeleteVip: FC<DeleteVipProp> = ({
 
 						<div className="mt-2">
 							{t(
-								'Are you sure you want to delete this reservation? This action cannot be reversed.'
+								'Are you sure you want to delete this VIP package? This action cannot be reversed.'
 							)}
 
 							<br />

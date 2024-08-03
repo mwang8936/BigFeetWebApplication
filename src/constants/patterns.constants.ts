@@ -11,6 +11,9 @@ const PATTERNS = {
 		first_name: `^[A-Za-z\\s'\\-]{1,${LENGTHS.employee.first_name}}$`,
 		last_name: `^[A-Za-z\\s'\\-]{1,${LENGTHS.employee.last_name}}$`,
 	},
+	gift_card: {
+		gift_card_id: '^T\\d{6,7}$',
+	},
 	login: {
 		username: `^[A-Za-z0-9.]{1,${LENGTHS.employee.username}}`,
 		password: `^.{1,${LENGTHS.employee.password}}`,

@@ -20,6 +20,10 @@ const PLACEHOLDERS = {
 		username: 'Add Username',
 		password: '******************',
 	},
+	gift_card: {
+		gift_card_id: 'T123456',
+		payment_amount: '50.00',
+	},
 	reservation: {
 		cash: '0.00',
 		machine: '0.00',

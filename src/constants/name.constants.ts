@@ -17,6 +17,10 @@ const NAMES = {
 		acupuncture_rate: 'acupuncture_rate',
 		per_hour: 'per_hour',
 	},
+	gift_card: {
+		gift_card_id: 'gift_card_id',
+		payment_amount: 'payment_amount',
+	},
 	login: {
 		username: 'username',
 		password: 'password',

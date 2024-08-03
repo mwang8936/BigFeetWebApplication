@@ -5,7 +5,7 @@ import {
 	AddVipPackageRequest,
 	UpdateVipPackageRequest,
 } from '../../../../../../../models/requests/Vip-Package.Request.Model';
-import Vip from './Vip.Component';
+import Vips from './Vip.Component';
 import EditVip from './EditVip.Component';
 
 interface EditVipModalProp {

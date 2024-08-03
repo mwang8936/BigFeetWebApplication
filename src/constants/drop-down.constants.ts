@@ -1,6 +1,7 @@
 import {
 	Gender,
 	Language,
+	PaymentMethod,
 	Role,
 	ServiceColor,
 	TipMethod,
@@ -77,6 +78,12 @@ export const languageDropDownItems = [
 		name: '繁體中文',
 		avatar: ChinaFlagIcon,
 	},
+];
+
+export const paymentMethodDropDownItems = [
+	{ id: null, name: 'No Payment Method Selected' },
+	{ id: PaymentMethod.CASH, name: PaymentMethod.CASH },
+	{ id: PaymentMethod.MACHINE, name: PaymentMethod.MACHINE },
 ];
 
 export const roleDropDownItems = [
