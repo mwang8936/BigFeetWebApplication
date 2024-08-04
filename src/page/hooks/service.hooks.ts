@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { MutationProp, QueryProp } from './props.hooks';
+
+import { useAuthenticationContext } from '../../App';
 
 import {
 	AddServiceRequest,
@@ -24,17 +25,35 @@ import {
 
 export const servicesQueryKey = 'services';
 
+export const usePrefetchServicesQuery = () => {
+	const { i18n } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
+
+	const prefetchServices = async () =>
+		queryClient.prefetchQuery({
+			queryKey: [servicesQueryKey],
+			queryFn: () => getServices(i18n, queryClient, setAuthentication),
+		});
+
+	return prefetchServices;
+};
+
 export const useServicesQuery = ({
 	gettable,
 	staleTime = 1000 * 30,
 	refetchInterval,
 	refetchIntervalInBackground,
 }: QueryProp) => {
-	const navigate = useNavigate();
+	const { i18n } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useQuery({
 		queryKey: [servicesQueryKey],
-		queryFn: () => getServices(navigate),
+		queryFn: () => getServices(i18n, queryClient, setAuthentication),
 		enabled: gettable,
 		staleTime,
 		refetchInterval,
@@ -42,14 +61,24 @@ export const useServicesQuery = ({
 	});
 };
 
-export const useUpdateServiceMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useUpdateServiceMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: { serviceId: number; request: UpdateServiceRequest }) =>
-			updateService(navigate, data.serviceId, data.request),
+			updateService(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.serviceId,
+				data.request
+			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -62,6 +91,8 @@ export const useUpdateServiceMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Service Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,
@@ -75,14 +106,18 @@ export const useUpdateServiceMutation = ({ setLoading }: MutationProp) => {
 	});
 };
 
-export const useAddServiceMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useAddServiceMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: { request: AddServiceRequest }) =>
-			addService(navigate, data.request),
+			addService(i18n, queryClient, setAuthentication, data.request),
 		onMutate: async () => {
 			const toastId = createLoadingToast(t('Adding Service...'));
 			return { toastId };
@@ -94,6 +129,8 @@ export const useAddServiceMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Service Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(context.toastId, t('Failed to Add Service'), error.message);
 		},
@@ -103,14 +140,18 @@ export const useAddServiceMutation = ({ setLoading }: MutationProp) => {
 	});
 };
 
-export const useDeleteServiceMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useDeleteServiceMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: { serviceId: number }) =>
-			deleteService(navigate, data.serviceId),
+			deleteService(i18n, queryClient, setAuthentication, data.serviceId),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -122,6 +163,8 @@ export const useDeleteServiceMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Service Deleted Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,

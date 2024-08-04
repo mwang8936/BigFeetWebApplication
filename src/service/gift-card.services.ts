@@ -1,4 +1,6 @@
-import { NavigateFunction } from 'react-router-dom';
+import { QueryClient } from '@tanstack/react-query';
+
+import { i18n } from 'i18next';
 
 import authorizedRequest from './base.service';
 
@@ -12,11 +14,15 @@ import {
 } from '../models/requests/GIft-Card.Request';
 
 export async function getGiftCards(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	params?: GetGiftCardsParam
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${giftCardPath}`,
 		'get',
 		undefined,
@@ -25,19 +31,31 @@ export async function getGiftCards(
 }
 
 export async function getGiftCard(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	gift_card_id: string
 ) {
-	return authorizedRequest(navigate, `${giftCardPath}/${gift_card_id}`, 'get');
+	return authorizedRequest(
+		i18n,
+		queryClient,
+		setAuthentication,
+		`${giftCardPath}/${gift_card_id}`,
+		'get'
+	);
 }
 
 export async function updateGiftCard(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	gift_card_id: string,
 	request: UpdateGiftCardRequest
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${giftCardPath}/${gift_card_id}`,
 		'patch',
 		request
@@ -45,18 +63,31 @@ export async function updateGiftCard(
 }
 
 export async function addGiftCard(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	request: AddGiftCardRequest
 ) {
-	return authorizedRequest(navigate, `${giftCardPath}`, 'post', request);
+	return authorizedRequest(
+		i18n,
+		queryClient,
+		setAuthentication,
+		`${giftCardPath}`,
+		'post',
+		request
+	);
 }
 
 export async function deleteGiftCard(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	gift_card_id: string
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${giftCardPath}/${gift_card_id}`,
 		'delete'
 	);

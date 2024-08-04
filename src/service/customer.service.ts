@@ -1,4 +1,6 @@
-import { NavigateFunction } from 'react-router-dom';
+import { QueryClient } from '@tanstack/react-query';
+
+import { i18n } from 'i18next';
 
 import authorizedRequest from './base.service';
 
@@ -15,11 +17,15 @@ import {
 } from '../models/requests/Customer.Request.Model';
 
 export async function getCustomers(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	params?: GetCustomersParam
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${customerPath}`,
 		'get',
 		undefined,
@@ -28,12 +34,16 @@ export async function getCustomers(
 }
 
 export async function getCustomer(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	phone_number: string,
 	params?: GetCustomerParam
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${customerPath}/${phone_number}`,
 		'get',
 		undefined,
@@ -42,12 +52,16 @@ export async function getCustomer(
 }
 
 export async function updateCustomer(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	phone_number: string,
 	request: UpdateCustomerRequest
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${customerPath}/${phone_number}`,
 		'patch',
 		request
@@ -55,29 +69,46 @@ export async function updateCustomer(
 }
 
 export async function addCustomer(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	request: AddCustomerRequest
 ) {
-	return authorizedRequest(navigate, `${customerPath}`, 'post', request);
+	return authorizedRequest(
+		i18n,
+		queryClient,
+		setAuthentication,
+		`${customerPath}`,
+		'post',
+		request
+	);
 }
 
 export async function deleteCustomer(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	phone_number: string
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${customerPath}/${phone_number}`,
 		'delete'
 	);
 }
 
 export async function recoverCustomer(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	phone_number: string
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${customerPath}/${phone_number}/recover`,
 		'delete'
 	);

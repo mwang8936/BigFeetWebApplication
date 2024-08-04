@@ -1,4 +1,6 @@
-import { NavigateFunction } from 'react-router-dom';
+import { QueryClient } from '@tanstack/react-query';
+
+import { i18n } from 'i18next';
 
 import authorizedRequest from './base.service';
 
@@ -12,11 +14,15 @@ import {
 } from '../models/requests/Schedule.Request.Model';
 
 export async function getSchedules(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	params?: GetSchedulesParam
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${schedulePath}`,
 		'get',
 		undefined,
@@ -25,25 +31,33 @@ export async function getSchedules(
 }
 
 export async function getSchedule(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	date: Date,
 	employee_id: number
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${schedulePath}/${date.toISOString()}/employee/${employee_id}`,
 		'get'
 	);
 }
 
 export async function updateSchedule(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	date: Date,
 	employee_id: number,
 	request: UpdateScheduleRequest
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${schedulePath}/${date.toISOString()}/employee/${employee_id}`,
 		'patch',
 		request
@@ -51,19 +65,32 @@ export async function updateSchedule(
 }
 
 export async function addSchedule(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	request: AddScheduleRequest
 ) {
-	return authorizedRequest(navigate, `${schedulePath}`, 'post', request);
+	return authorizedRequest(
+		i18n,
+		queryClient,
+		setAuthentication,
+		`${schedulePath}`,
+		'post',
+		request
+	);
 }
 
 export async function deleteSchedule(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	date: Date,
 	employee_id: number
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${schedulePath}/${date.toISOString()}/employee/${employee_id}`,
 		'delete'
 	);

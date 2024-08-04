@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { MutationProp, QueryProp } from './props.hooks';
+
+import { useAuthenticationContext } from '../../App';
 
 import { GetSchedulesParam } from '../../models/params/Schedule.Param';
 
@@ -41,7 +42,10 @@ export const useSchedulesQuery = ({
 	refetchInterval,
 	refetchIntervalInBackground,
 }: ScheduleQueryProp) => {
-	const navigate = useNavigate();
+	const { i18n } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useQuery({
 		queryKey: [schedulesQueryKey, formatDateToQueryKey(date)],
@@ -52,9 +56,9 @@ export const useSchedulesQuery = ({
 					end: date,
 				};
 
-				return getSchedules(navigate, params);
+				return getSchedules(i18n, queryClient, setAuthentication, params);
 			} else {
-				return getProfileSchedules(navigate);
+				return getProfileSchedules(i18n, queryClient, setAuthentication);
 			}
 		},
 		staleTime,
@@ -63,17 +67,29 @@ export const useSchedulesQuery = ({
 	});
 };
 
-export const useUpdateScheduleMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useUpdateScheduleMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: {
 			date: Date;
 			employeeId: number;
 			request: UpdateScheduleRequest;
-		}) => updateSchedule(navigate, data.date, data.employeeId, data.request),
+		}) =>
+			updateSchedule(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.date,
+				data.employeeId,
+				data.request
+			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -88,6 +104,8 @@ export const useUpdateScheduleMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Schedule Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,
@@ -101,14 +119,18 @@ export const useUpdateScheduleMutation = ({ setLoading }: MutationProp) => {
 	});
 };
 
-export const useAddScheduleMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useAddScheduleMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: { request: AddScheduleRequest }) =>
-			addSchedule(navigate, data.request),
+			addSchedule(i18n, queryClient, setAuthentication, data.request),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -126,6 +148,8 @@ export const useAddScheduleMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Schedule Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(context.toastId, t('Failed to Add Schedule'), error.message);
 		},
@@ -137,14 +161,16 @@ export const useAddScheduleMutation = ({ setLoading }: MutationProp) => {
 
 export const useSignProfileScheduleMutation = ({
 	setLoading,
+	setError,
 }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: { date: Date }) =>
-			signProfileSchedule(navigate, data.date),
+			signProfileSchedule(i18n, queryClient, setAuthentication, data.date),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -159,6 +185,8 @@ export const useSignProfileScheduleMutation = ({
 			successToast(context.toastId, t('Schedule Signed Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,

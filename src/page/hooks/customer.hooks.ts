@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { MutationProp, QueryProp } from './props.hooks';
+
+import { useAuthenticationContext } from '../../App';
 
 import {
 	AddCustomerRequest,
@@ -24,17 +25,35 @@ import {
 
 export const customersQueryKey = 'customers';
 
+export const usePrefetchCustomersQuery = () => {
+	const { i18n } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
+
+	const prefetchCustomers = async () =>
+		queryClient.prefetchQuery({
+			queryKey: [customersQueryKey],
+			queryFn: () => getCustomers(i18n, queryClient, setAuthentication),
+		});
+
+	return prefetchCustomers;
+};
+
 export const useCustomersQuery = ({
 	gettable,
 	staleTime = 1000 * 30,
 	refetchInterval,
 	refetchIntervalInBackground,
 }: QueryProp) => {
-	const navigate = useNavigate();
+	const { i18n } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useQuery({
 		queryKey: [customersQueryKey],
-		queryFn: () => getCustomers(navigate),
+		queryFn: () => getCustomers(i18n, queryClient, setAuthentication),
 		enabled: gettable,
 		staleTime,
 		refetchInterval,
@@ -42,16 +61,27 @@ export const useCustomersQuery = ({
 	});
 };
 
-export const useUpdateCustomerMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useUpdateCustomerMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: {
 			phoneNumber: string;
 			request: UpdateCustomerRequest;
-		}) => updateCustomer(navigate, data.phoneNumber, data.request),
+		}) =>
+			updateCustomer(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.phoneNumber,
+				data.request
+			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -64,6 +94,8 @@ export const useUpdateCustomerMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Customer Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,
@@ -77,14 +109,18 @@ export const useUpdateCustomerMutation = ({ setLoading }: MutationProp) => {
 	});
 };
 
-export const useAddCustomerMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useAddCustomerMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: { request: AddCustomerRequest }) =>
-			addCustomer(navigate, data.request),
+			addCustomer(i18n, queryClient, setAuthentication, data.request),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -97,6 +133,8 @@ export const useAddCustomerMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Customer Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(context.toastId, t('Failed to Add Customer'), error.message);
 		},
@@ -106,14 +144,18 @@ export const useAddCustomerMutation = ({ setLoading }: MutationProp) => {
 	});
 };
 
-export const useDeleteCustomerMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useDeleteCustomerMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: { phoneNumber: string }) =>
-			deleteCustomer(navigate, data.phoneNumber),
+			deleteCustomer(i18n, queryClient, setAuthentication, data.phoneNumber),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -126,6 +168,8 @@ export const useDeleteCustomerMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Customer Deleted Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,

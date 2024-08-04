@@ -108,10 +108,3 @@ function onError(error: AxiosError) {
 		return error.message || 'An unidentified error occurred.';
 	}
 }
-
-export function logout(setAuthentication: (authenticated: boolean) => void) {
-	Cookies.remove(tokenKey);
-	setAuthentication(false);
-
-	console.log('User logged out.');
-}

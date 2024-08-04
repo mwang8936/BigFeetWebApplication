@@ -1,12 +1,21 @@
-import { NavigateFunction } from 'react-router-dom';
+import { QueryClient } from '@tanstack/react-query';
 
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+
+import { i18n } from 'i18next';
+
 import Cookies from 'js-cookie';
 
 import BASE_API_URL, { tokenKey } from '../constants/api.constants';
 
+import { Language } from '../models/enums';
+
+import { getLanguageFile } from '../utils/i18n.utils';
+
 export default async function authorizedRequest(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	url: string,
 	method: string,
 	data?: any,
@@ -32,7 +41,7 @@ export default async function authorizedRequest(
 		.catch((error: AxiosError) => {
 			console.error('API Error:', error);
 
-			const message = onError(error, navigate);
+			const message = onError(error, i18n, queryClient, setAuthentication);
 			if (typeof message === 'string') throw new Error(message);
 		});
 }
@@ -71,11 +80,23 @@ function parseData(data: any) {
 	return data;
 }
 
-function onError(error: AxiosError, navigate: NavigateFunction) {
+function onError(
+	error: AxiosError,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void
+) {
 	if (error.response) {
 		const responseData: any = error.response.data;
 		if (error.response.status === 401) {
-			return navigate('/login');
+			i18n.changeLanguage(getLanguageFile(Language.ENGLISH));
+
+			queryClient.clear();
+
+			Cookies.remove(tokenKey);
+			setAuthentication(false);
+
+			return 'Access token invalid.';
 		}
 		if (responseData) {
 			return `${responseData.error}: ${responseData.messages}`;

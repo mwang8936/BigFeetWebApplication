@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { MutationProp, QueryProp } from './props.hooks';
+
+import { useAuthenticationContext } from '../../App';
 
 import { GetGiftCardsParam } from '../../models/params/Gift-Card.Param';
 
@@ -38,7 +39,10 @@ export const useGiftCardsQuery = ({
 	refetchInterval,
 	refetchIntervalInBackground,
 }: GiftCardQueryProp) => {
-	const navigate = useNavigate();
+	const { i18n } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useQuery({
 		queryKey: [giftCardsQueryKey, formatDateToQueryKey(date)],
@@ -48,7 +52,7 @@ export const useGiftCardsQuery = ({
 				end: date,
 			};
 
-			return getGiftCards(navigate, params);
+			return getGiftCards(i18n, queryClient, setAuthentication, params);
 		},
 		enabled: gettable,
 		staleTime,
@@ -57,10 +61,14 @@ export const useGiftCardsQuery = ({
 	});
 };
 
-export const useUpdateGiftCardMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useUpdateGiftCardMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: {
@@ -68,7 +76,14 @@ export const useUpdateGiftCardMutation = ({ setLoading }: MutationProp) => {
 			request: UpdateGiftCardRequest;
 			originalDate: Date;
 			newDate?: Date;
-		}) => updateGiftCard(navigate, data.giftCardId, data.request),
+		}) =>
+			updateGiftCard(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.giftCardId,
+				data.request
+			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -94,6 +109,8 @@ export const useUpdateGiftCardMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Gift Card Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,
@@ -107,14 +124,18 @@ export const useUpdateGiftCardMutation = ({ setLoading }: MutationProp) => {
 	});
 };
 
-export const useAddGiftCardMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useAddGiftCardMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: { request: AddGiftCardRequest }) =>
-			addGiftCard(navigate, data.request),
+			addGiftCard(i18n, queryClient, setAuthentication, data.request),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -132,6 +153,8 @@ export const useAddGiftCardMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Gift Card Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,
@@ -145,14 +168,18 @@ export const useAddGiftCardMutation = ({ setLoading }: MutationProp) => {
 	});
 };
 
-export const useDeleteGiftCardMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useDeleteGiftCardMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: { giftCardId: string; date: Date }) =>
-			deleteGiftCard(navigate, data.giftCardId),
+			deleteGiftCard(i18n, queryClient, setAuthentication, data.giftCardId),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -167,6 +194,8 @@ export const useDeleteGiftCardMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Gift Card Deleted Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,

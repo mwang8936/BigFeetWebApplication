@@ -7,12 +7,10 @@ import CustomersIcon from '../../../assets/Customers_Icon.svg';
 import { SideBarItems } from '../BigFeet.Page';
 import { useLogout } from '../../hooks/authentication.hooks';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from '@tanstack/react-query';
-import { getCustomers } from '../../../service/customer.service';
-import { useNavigate } from 'react-router-dom';
-import { getServices } from '../../../service/service.service';
-import { getEmployees } from '../../../service/employee.service';
 import { FC } from 'react';
+import { usePrefetchCustomersQuery } from '../../hooks/customer.hooks';
+import { usePrefetchServicesQuery } from '../../hooks/service.hooks';
+import { usePrefetchEmployeesQuery } from '../../hooks/employee.hooks';
 
 interface SideBarProp {
 	selectedIndex: number;
@@ -25,32 +23,13 @@ const SideBar: FC<SideBarProp> = ({
 	onIndexSelected,
 	sideBarItems,
 }) => {
-	const navigate = useNavigate();
 	const { t } = useTranslation();
+
+	const prefetchEmployees = usePrefetchEmployeesQuery();
+	const prefetchServices = usePrefetchServicesQuery();
+	const prefetchCustomers = usePrefetchCustomersQuery();
+
 	const logout = useLogout();
-
-	const queryClient = useQueryClient();
-
-	const prefetchEmployees = async () => {
-		await queryClient.prefetchQuery({
-			queryKey: ['employees'],
-			queryFn: () => getEmployees(navigate),
-		});
-	};
-
-	const prefetchServices = async () => {
-		await queryClient.prefetchQuery({
-			queryKey: ['services'],
-			queryFn: () => getServices(navigate),
-		});
-	};
-
-	const prefetchCustomers = async () => {
-		await queryClient.prefetchQuery({
-			queryKey: ['customers'],
-			queryFn: () => getCustomers(navigate),
-		});
-	};
 
 	return (
 		<div className="sidebar">

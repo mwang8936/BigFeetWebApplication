@@ -1,4 +1,6 @@
-import { NavigateFunction } from 'react-router-dom';
+import { QueryClient } from '@tanstack/react-query';
+
+import { i18n } from 'i18next';
 
 import authorizedRequest from './base.service';
 
@@ -15,11 +17,15 @@ import {
 } from '../models/requests/Service.Request.Model';
 
 export async function getServices(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	params?: GetServicesParam
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${servicePath}`,
 		'get',
 		undefined,
@@ -28,12 +34,16 @@ export async function getServices(
 }
 
 export async function getService(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	service_id: number,
 	params?: GetServiceParam
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${servicePath}/${service_id}`,
 		'get',
 		undefined,
@@ -42,12 +52,16 @@ export async function getService(
 }
 
 export async function updateService(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	service_id: number,
 	request: UpdateServiceRequest
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${servicePath}/${service_id}`,
 		'patch',
 		request
@@ -55,25 +69,46 @@ export async function updateService(
 }
 
 export async function addService(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	request: AddServiceRequest
 ) {
-	return authorizedRequest(navigate, `${servicePath}`, 'post', request);
+	return authorizedRequest(
+		i18n,
+		queryClient,
+		setAuthentication,
+		`${servicePath}`,
+		'post',
+		request
+	);
 }
 
 export async function deleteService(
-	navigate: NavigateFunction,
-	service_id: number
-) {
-	return authorizedRequest(navigate, `${servicePath}/${service_id}`, 'delete');
-}
-
-export async function recoverService(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	service_id: number
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
+		`${servicePath}/${service_id}`,
+		'delete'
+	);
+}
+
+export async function recoverService(
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
+	service_id: number
+) {
+	return authorizedRequest(
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${servicePath}/${service_id}/recover`,
 		'delete'
 	);

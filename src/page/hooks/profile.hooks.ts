@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useLogout } from './authentication.hooks';
 import { employeesQueryKey } from './employee.hooks';
 import { MutationProp, QueryProp } from './props.hooks';
+
+import { useAuthenticationContext } from '../../App';
 
 import { UpdateEmployeeRequest } from '../../models/requests/Employee.Request.Model';
 import { UpdateProfileRequest } from '../../models/requests/Profile.Request.Model';
@@ -27,11 +28,14 @@ export const useUserQuery = ({
 	refetchInterval,
 	refetchIntervalInBackground,
 }: QueryProp) => {
-	const navigate = useNavigate();
+	const { i18n } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useQuery({
 		queryKey: [userQueryKey],
-		queryFn: () => getProfile(navigate),
+		queryFn: () => getProfile(i18n, queryClient, setAuthentication),
 		enabled: gettable,
 		staleTime,
 		refetchInterval,
@@ -39,16 +43,27 @@ export const useUserQuery = ({
 	});
 };
 
-export const useUpdateProfileMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useUpdateProfileMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: {
 			employeeId: number;
 			request: UpdateEmployeeRequest;
-		}) => updateEmployee(navigate, data.employeeId, data.request),
+		}) =>
+			updateEmployee(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.employeeId,
+				data.request
+			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -62,6 +77,8 @@ export const useUpdateProfileMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Profile Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,
@@ -77,14 +94,16 @@ export const useUpdateProfileMutation = ({ setLoading }: MutationProp) => {
 
 export const useUpdateProfileSettingsMutation = ({
 	setLoading,
+	setError,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
-	const navigate = useNavigate();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: { request: UpdateProfileRequest }) =>
-			updateProfile(navigate, data.request),
+			updateProfile(i18n, queryClient, setAuthentication, data.request),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -102,6 +121,8 @@ export const useUpdateProfileSettingsMutation = ({
 			successToast(context.toastId, t('Profile Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,
@@ -115,16 +136,20 @@ export const useUpdateProfileSettingsMutation = ({
 	});
 };
 
-export const useDeleteProfileMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useDeleteProfileMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	const logout = useLogout();
 
 	return useMutation({
 		mutationFn: (data: { userId: number }) =>
-			deleteEmployee(navigate, data.userId),
+			deleteEmployee(i18n, queryClient, setAuthentication, data.userId),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -139,6 +164,8 @@ export const useDeleteProfileMutation = ({ setLoading }: MutationProp) => {
 			logout();
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,

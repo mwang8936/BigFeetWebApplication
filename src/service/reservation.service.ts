@@ -1,4 +1,6 @@
-import { NavigateFunction } from 'react-router-dom';
+import { QueryClient } from '@tanstack/react-query';
+
+import { i18n } from 'i18next';
 
 import authorizedRequest from './base.service';
 
@@ -12,11 +14,15 @@ import {
 } from '../models/requests/Reservation.Request.Model';
 
 export async function getReservations(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	params?: GetReservationsParam
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${reservationPath}`,
 		'get',
 		undefined,
@@ -25,23 +31,31 @@ export async function getReservations(
 }
 
 export async function getReservation(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	reservation_id: number
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${reservationPath}/${reservation_id}`,
 		'get'
 	);
 }
 
 export async function updateReservation(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	reservation_id: number,
 	request: UpdateReservationRequest
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${reservationPath}/${reservation_id}`,
 		'patch',
 		request
@@ -49,18 +63,31 @@ export async function updateReservation(
 }
 
 export async function addReservation(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	request: AddReservationRequest
 ) {
-	return authorizedRequest(navigate, `${reservationPath}`, 'post', request);
+	return authorizedRequest(
+		i18n,
+		queryClient,
+		setAuthentication,
+		`${reservationPath}`,
+		'post',
+		request
+	);
 }
 
 export async function deleteReservation(
-	navigate: NavigateFunction,
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
 	reservation_id: number
 ) {
 	return authorizedRequest(
-		navigate,
+		i18n,
+		queryClient,
+		setAuthentication,
 		`${reservationPath}/${reservation_id}`,
 		'delete'
 	);

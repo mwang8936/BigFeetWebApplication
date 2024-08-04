@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { customersQueryKey } from './customer.hooks';
 import { MutationProp } from './props.hooks';
 import { schedulesQueryKey } from './schedule.hooks';
+
+import { useAuthenticationContext } from '../../App';
 
 import {
 	AddReservationRequest,
@@ -24,10 +25,14 @@ import {
 	successToast,
 } from '../../utils/toast.utils';
 
-export const useUpdateReservationMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useUpdateReservationMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: {
@@ -35,7 +40,14 @@ export const useUpdateReservationMutation = ({ setLoading }: MutationProp) => {
 			request: UpdateReservationRequest;
 			originalDate: Date;
 			newDate?: Date;
-		}) => updateReservation(navigate, data.reservationId, data.request),
+		}) =>
+			updateReservation(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.reservationId,
+				data.request
+			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -68,6 +80,8 @@ export const useUpdateReservationMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Reservation Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,
@@ -81,14 +95,18 @@ export const useUpdateReservationMutation = ({ setLoading }: MutationProp) => {
 	});
 };
 
-export const useAddReservationMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useAddReservationMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: { request: AddReservationRequest }) =>
-			addReservation(navigate, data.request),
+			addReservation(i18n, queryClient, setAuthentication, data.request),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -113,6 +131,8 @@ export const useAddReservationMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Reservation Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,
@@ -126,14 +146,23 @@ export const useAddReservationMutation = ({ setLoading }: MutationProp) => {
 	});
 };
 
-export const useDeleteReservationMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useDeleteReservationMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: { reservationId: number; date: Date }) =>
-			deleteReservation(navigate, data.reservationId),
+			deleteReservation(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.reservationId
+			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -148,6 +177,8 @@ export const useDeleteReservationMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Reservation Deleted Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,

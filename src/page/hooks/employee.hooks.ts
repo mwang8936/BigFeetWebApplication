@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useLogout } from './authentication.hooks';
 import { userQueryKey } from './profile.hooks';
 import { MutationProp, QueryProp } from './props.hooks';
+
+import { useAuthenticationContext } from '../../App';
 
 import {
 	AddEmployeeRequest,
@@ -26,17 +27,35 @@ import {
 
 export const employeesQueryKey = 'employees';
 
+export const usePrefetchEmployeesQuery = () => {
+	const { i18n } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
+
+	const prefetchEmployees = async () =>
+		queryClient.prefetchQuery({
+			queryKey: [employeesQueryKey],
+			queryFn: () => getEmployees(i18n, queryClient, setAuthentication),
+		});
+
+	return prefetchEmployees;
+};
+
 export const useEmployeesQuery = ({
 	gettable,
 	staleTime = 1000 * 30,
 	refetchInterval,
 	refetchIntervalInBackground,
 }: QueryProp) => {
-	const navigate = useNavigate();
+	const { i18n } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useQuery({
 		queryKey: [employeesQueryKey],
-		queryFn: () => getEmployees(navigate),
+		queryFn: () => getEmployees(i18n, queryClient, setAuthentication),
 		enabled: gettable,
 		staleTime,
 		refetchInterval,
@@ -44,17 +63,28 @@ export const useEmployeesQuery = ({
 	});
 };
 
-export const useUpdateEmployeeMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useUpdateEmployeeMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: {
 			employeeId: number;
 			request: UpdateEmployeeRequest;
 			userId: number;
-		}) => updateEmployee(navigate, data.employeeId, data.request),
+		}) =>
+			updateEmployee(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.employeeId,
+				data.request
+			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -70,6 +100,8 @@ export const useUpdateEmployeeMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Employee Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,
@@ -83,14 +115,18 @@ export const useUpdateEmployeeMutation = ({ setLoading }: MutationProp) => {
 	});
 };
 
-export const useAddEmployeeMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useAddEmployeeMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: { request: AddEmployeeRequest }) =>
-			addEmployee(navigate, data.request),
+			addEmployee(i18n, queryClient, setAuthentication, data.request),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -103,6 +139,8 @@ export const useAddEmployeeMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Employee Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(context.toastId, t('Failed to Add Employee'), error.message);
 		},
@@ -112,16 +150,20 @@ export const useAddEmployeeMutation = ({ setLoading }: MutationProp) => {
 	});
 };
 
-export const useDeleteEmployeeMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useDeleteEmployeeMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	const logout = useLogout();
 
 	return useMutation({
 		mutationFn: (data: { employeeId: number; userId: number }) =>
-			deleteEmployee(navigate, data.employeeId),
+			deleteEmployee(i18n, queryClient, setAuthentication, data.employeeId),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -136,6 +178,8 @@ export const useDeleteEmployeeMutation = ({ setLoading }: MutationProp) => {
 			if (variables.employeeId === variables.userId) logout();
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,

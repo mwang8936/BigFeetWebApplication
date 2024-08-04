@@ -1,9 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { MutationProp } from './props.hooks';
 import { schedulesQueryKey } from './schedule.hooks';
+
+import { useAuthenticationContext } from '../../App';
 
 import {
 	AddVipPackageRequest,
@@ -23,10 +24,14 @@ import {
 	successToast,
 } from '../../utils/toast.utils';
 
-export const useUpdateVipPackageMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useUpdateVipPackageMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: {
@@ -34,7 +39,14 @@ export const useUpdateVipPackageMutation = ({ setLoading }: MutationProp) => {
 			request: UpdateVipPackageRequest;
 			originalDate: Date;
 			newDate?: Date;
-		}) => updateVipPackage(navigate, data.serial, data.request),
+		}) =>
+			updateVipPackage(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.serial,
+				data.request
+			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -60,6 +72,8 @@ export const useUpdateVipPackageMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Vip Package Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,
@@ -73,14 +87,18 @@ export const useUpdateVipPackageMutation = ({ setLoading }: MutationProp) => {
 	});
 };
 
-export const useAddVipPackageMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useAddVipPackageMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: { request: AddVipPackageRequest }) =>
-			addVipPackage(navigate, data.request),
+			addVipPackage(i18n, queryClient, setAuthentication, data.request),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -98,6 +116,8 @@ export const useAddVipPackageMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Vip Package Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,
@@ -111,14 +131,18 @@ export const useAddVipPackageMutation = ({ setLoading }: MutationProp) => {
 	});
 };
 
-export const useDeleteVipPackageMutation = ({ setLoading }: MutationProp) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
+export const useDeleteVipPackageMutation = ({
+	setLoading,
+	setError,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
 		mutationFn: (data: { serial: string; date: Date }) =>
-			deleteVipPackage(navigate, data.serial),
+			deleteVipPackage(i18n, queryClient, setAuthentication, data.serial),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -132,6 +156,8 @@ export const useDeleteVipPackageMutation = ({ setLoading }: MutationProp) => {
 			successToast(context.toastId, t('Vip Package Deleted Successfully'));
 		},
 		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
 			if (context)
 				errorToast(
 					context.toastId,
