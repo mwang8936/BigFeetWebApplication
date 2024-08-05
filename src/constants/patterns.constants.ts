@@ -4,6 +4,7 @@ const PATTERNS = {
 	customer: {
 		phone_number: '\\(\\d{3}\\) \\d{3}-\\d{4}',
 		customer_name: `^.{1,${LENGTHS.customer.customer_name}}$`,
+		vip_serial: `^[0-9]{${LENGTHS.customer.vip_serial}}$`,
 	},
 	employee: {
 		username: `^[A-Za-z0-9.]{1,${LENGTHS.employee.username}}$`,
@@ -23,7 +24,7 @@ const PATTERNS = {
 		shorthand: `^.{1,${LENGTHS.service.shorthand}}$`,
 	},
 	vip_package: {
-		serial: `^[0-9]{1,${LENGTHS.vip_package.serial}}$`,
+		serial: `^[0-9]{${LENGTHS.vip_package.serial}}$`,
 	},
 };
 

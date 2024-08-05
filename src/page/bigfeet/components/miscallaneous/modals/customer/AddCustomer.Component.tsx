@@ -16,6 +16,7 @@ import ERRORS from '../../../../../../constants/error.constants';
 import LABELS from '../../../../../../constants/label.constants';
 import LENGTHS from '../../../../../../constants/lengths.constants';
 import NAMES from '../../../../../../constants/name.constants';
+import PATTERNS from '../../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../../constants/placeholder.constants';
 
 interface AddCustomerProp {
@@ -32,10 +33,12 @@ const AddCustomer: FC<AddCustomerProp> = ({
 	const { t } = useTranslation();
 
 	const [phoneNumberInput, setPhoneNumberInput] = useState<string | null>(null);
+	const [vipSerialInput, setVipSerialInput] = useState<string | null>(null);
 	const [nameInput, setNameInput] = useState<string | null>(null);
 	const [notesInput, setNotesInput] = useState<string | null>(null);
 
 	const [invalidPhoneNumber, setInvalidPhoneNumber] = useState<boolean>(false);
+	const [invalidVipSerial, setInvalidVipSerial] = useState<boolean>(false);
 	const [invalidName, setInvalidName] = useState<boolean>(false);
 
 	const [missingRequiredInput, setMissingRequiredInput] =
@@ -43,24 +46,27 @@ const AddCustomer: FC<AddCustomerProp> = ({
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
 	useEffect(() => {
-		const missingRequiredInput = phoneNumberInput === null;
+		const missingRequiredInput =
+			phoneNumberInput === null && vipSerialInput === null;
 
 		setMissingRequiredInput(missingRequiredInput);
-	}, [phoneNumberInput]);
+	}, [phoneNumberInput, vipSerialInput]);
 
 	useEffect(() => {
-		const invalidInput = invalidPhoneNumber || invalidName;
+		const invalidInput = invalidPhoneNumber || invalidVipSerial || invalidName;
 
 		setInvalidInput(invalidInput);
-	}, [invalidPhoneNumber, invalidName]);
+	}, [invalidPhoneNumber, invalidVipSerial, invalidName]);
 
 	const onAdd = async () => {
-		const phone_number = (phoneNumberInput as string).trim();
+		const phone_number = phoneNumberInput?.trim();
+		const vip_serial = vipSerialInput?.trim();
 		const customer_name = nameInput?.trim();
 		const notes = notesInput?.trim();
 
 		const addCustomerRequest: AddCustomerRequest = {
 			phone_number,
+			vip_serial,
 			customer_name,
 			notes,
 		};
@@ -93,12 +99,30 @@ const AddCustomer: FC<AddCustomerProp> = ({
 								label={LABELS.customer.phone_number}
 								name={NAMES.customer.phone_number}
 								validationProp={{
-									required: true,
+									required: vipSerialInput === null,
 									requiredMessage: ERRORS.customer.phone_number.required,
 									invalid: invalidPhoneNumber,
 									setInvalid: setInvalidPhoneNumber,
 									invalidMessage: ERRORS.customer.phone_number.invalid,
 								}}
+							/>
+
+							<AddInput
+								text={vipSerialInput}
+								setText={setVipSerialInput}
+								label={LABELS.customer.vip_serial}
+								name={NAMES.customer.vip_serial}
+								type="text"
+								validationProp={{
+									maxLength: LENGTHS.customer.vip_serial,
+									pattern: PATTERNS.customer.vip_serial,
+									required: phoneNumberInput === null,
+									requiredMessage: ERRORS.customer.vip_serial.required,
+									invalid: invalidVipSerial,
+									setInvalid: setInvalidVipSerial,
+									invalidMessage: ERRORS.customer.vip_serial.invalid,
+								}}
+								placeholder={PLACEHOLDERS.customer.vip_serial}
 							/>
 
 							<AddInput

@@ -10,12 +10,14 @@ import DeleteCustomerModal from './DeleteCustomerModal.Component';
 import EditBottom from '../EditBottom.Component';
 
 import EditableInput from '../../editable/EditableInput.Component';
+import EditablePhoneNumber from '../../editable/EditablePhoneNumber.Component';
 import EditableTextArea from '../../editable/EditableTextArea.Component';
 
 import ERRORS from '../../../../../../constants/error.constants';
 import LABELS from '../../../../../../constants/label.constants';
 import LENGTHS from '../../../../../../constants/lengths.constants';
 import NAMES from '../../../../../../constants/name.constants';
+import PATTERNS from '../../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../../constants/placeholder.constants';
 
 import Customer from '../../../../../../models/Customer.Model';
@@ -29,11 +31,11 @@ interface EditCustomerProp {
 	customer: Customer;
 	editable: boolean;
 	onEditCustomer(
-		phoneNumber: string,
+		customerId: number,
 		request: UpdateCustomerRequest
 	): Promise<void>;
 	deletable: boolean;
-	onDeleteCustomer(phoneNumber: string): Promise<void>;
+	onDeleteCustomer(customerId: number): Promise<void>;
 }
 
 const EditCustomer: FC<EditCustomerProp> = ({
@@ -48,17 +50,39 @@ const EditCustomer: FC<EditCustomerProp> = ({
 
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
+	const [phoneNumberInput, setPhoneNumberInput] = useState<string | null>(
+		customer.phone_number
+	);
+	const [vipSerialInput, setVipSerialInput] = useState<string | null>(
+		customer.vip_serial
+	);
 	const [nameInput, setNameInput] = useState<string | null>(
 		customer.customer_name
 	);
 	const [notesInput, setNotesInput] = useState<string | null>(customer.notes);
 
+	const [invalidPhoneNumber, setInvalidPhoneNumber] = useState<boolean>(false);
+	const [invalidVipSerial, setInvalidVipSerial] = useState<boolean>(false);
 	const [invalidName, setInvalidName] = useState<boolean>(false);
 
 	const [changesMade, setChangesMade] = useState<boolean>(false);
+	const [missingRequiredInput, setMissingRequiredInput] =
+		useState<boolean>(false);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
 	useEffect(() => {
+		const trimmedPhoneNumber = phoneNumberInput
+			? phoneNumberInput.trim()
+			: null;
+		const phone_number: string | null | undefined =
+			trimmedPhoneNumber === customer.phone_number
+				? undefined
+				: trimmedPhoneNumber;
+		const trimmedVipSerial: string | null | undefined = vipSerialInput
+			? vipSerialInput.trim()
+			: null;
+		const vip_serial: string | null | undefined =
+			trimmedVipSerial === customer.vip_serial ? undefined : trimmedVipSerial;
 		const trimmedCustomerName = nameInput ? nameInput.trim() : null;
 		const customer_name: string | null | undefined =
 			trimmedCustomerName === customer.customer_name
@@ -68,16 +92,39 @@ const EditCustomer: FC<EditCustomerProp> = ({
 		const notes: string | null | undefined =
 			trimmedNotes === customer.notes ? undefined : trimmedNotes;
 
-		const changesMade = customer_name !== undefined || notes !== undefined;
+		const changesMade =
+			phone_number !== undefined ||
+			vip_serial !== undefined ||
+			customer_name !== undefined ||
+			notes !== undefined;
 
 		setChangesMade(changesMade);
-	}, [nameInput, notesInput]);
+
+		const missingRequiredInput =
+			phoneNumberInput === null && vipSerialInput === null;
+
+		setMissingRequiredInput(missingRequiredInput);
+	}, [phoneNumberInput, vipSerialInput, nameInput, notesInput]);
 
 	useEffect(() => {
-		setInvalidInput(invalidName);
-	}, [invalidName]);
+		const invalidInput = invalidPhoneNumber || invalidVipSerial || invalidName;
+
+		setInvalidInput(invalidInput);
+	}, [invalidPhoneNumber, invalidVipSerial, invalidName]);
 
 	const onEdit = () => {
+		const trimmedPhoneNumber = phoneNumberInput
+			? phoneNumberInput.trim()
+			: null;
+		const phone_number: string | null | undefined =
+			trimmedPhoneNumber === customer.phone_number
+				? undefined
+				: trimmedPhoneNumber;
+		const trimmedVipSerial: string | null | undefined = vipSerialInput
+			? vipSerialInput.trim()
+			: null;
+		const vip_serial: string | null | undefined =
+			trimmedVipSerial === customer.vip_serial ? undefined : trimmedVipSerial;
 		const trimmedName = nameInput ? nameInput.trim() : null;
 		const customer_name: string | null | undefined =
 			trimmedName === customer.customer_name ? undefined : trimmedName;
@@ -86,16 +133,18 @@ const EditCustomer: FC<EditCustomerProp> = ({
 			trimmedNotes === customer.notes ? undefined : trimmedNotes;
 
 		const updateCustomerRequest: UpdateCustomerRequest = {
+			...(phone_number !== undefined && { phone_number }),
+			...(vip_serial !== undefined && { vip_serial }),
 			...(customer_name !== undefined && { customer_name }),
 			...(notes !== undefined && { notes }),
 		};
 
-		onEditCustomer(customer.phone_number, updateCustomerRequest);
+		onEditCustomer(customer.customer_id, updateCustomerRequest);
 		setOpen(false);
 	};
 
-	const onDelete = async (phoneNumber: string) => {
-		onDeleteCustomer(phoneNumber);
+	const onDelete = async (customerId: number) => {
+		onDeleteCustomer(customerId);
 		setOpen(false);
 	};
 
@@ -115,11 +164,51 @@ const EditCustomer: FC<EditCustomerProp> = ({
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Edit Customer', {
-								phone_number: formatPhoneNumber(customer.phone_number),
+								id: customer.phone_number
+									? formatPhoneNumber(customer.phone_number)
+									: customer.vip_serial ?? '',
 							})}
 						</Dialog.Title>
 
 						<div className="mt-2">
+							<EditablePhoneNumber
+								originalPhoneNumber={customer.phone_number}
+								phoneNumber={phoneNumberInput}
+								setPhoneNumber={setPhoneNumberInput}
+								label={LABELS.customer.phone_number}
+								name={NAMES.customer.phone_number}
+								validationProp={{
+									required: vipSerialInput === null,
+									requiredMessage: ERRORS.customer.phone_number.required,
+									invalid: invalidPhoneNumber,
+									setInvalid: setInvalidPhoneNumber,
+									invalidMessage: ERRORS.customer.phone_number.invalid,
+								}}
+								editable={editable}
+								missingPermissionMessage={ERRORS.customer.permissions.edit}
+							/>
+
+							<EditableInput
+								originalText={customer.vip_serial}
+								text={vipSerialInput}
+								setText={setVipSerialInput}
+								label={LABELS.customer.vip_serial}
+								name={NAMES.customer.vip_serial}
+								type="text"
+								placeholder={PLACEHOLDERS.customer.vip_serial}
+								validationProp={{
+									maxLength: LENGTHS.customer.vip_serial,
+									pattern: PATTERNS.customer.vip_serial,
+									required: phoneNumberInput === null,
+									requiredMessage: ERRORS.vip_package.serial.required,
+									invalid: invalidVipSerial,
+									setInvalid: setInvalidVipSerial,
+									invalidMessage: ERRORS.customer.vip_serial.invalid,
+								}}
+								editable={editable}
+								missingPermissionMessage={ERRORS.customer.permissions.edit}
+							/>
+
 							<EditableInput
 								originalText={customer.customer_name}
 								text={nameInput}
@@ -164,6 +253,8 @@ const EditCustomer: FC<EditCustomerProp> = ({
 					!editable
 						? ERRORS.customer.permissions.edit
 						: !changesMade
+						? ERRORS.no_changes
+						: missingRequiredInput
 						? ERRORS.required
 						: invalidInput
 						? ERRORS.invalid
@@ -178,7 +269,7 @@ const EditCustomer: FC<EditCustomerProp> = ({
 			<DeleteCustomerModal
 				open={openDeleteModal}
 				setOpen={setOpenDeleteModal}
-				phoneNumber={customer.phone_number}
+				customer={customer}
 				deletable={deletable}
 				onDeleteCustomer={onDelete}
 			/>

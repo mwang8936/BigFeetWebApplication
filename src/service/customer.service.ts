@@ -37,14 +37,14 @@ export async function getCustomer(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	phone_number: string,
+	customer_id: number,
 	params?: GetCustomerParam
 ) {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
-		`${customerPath}/${phone_number}`,
+		`${customerPath}/${customer_id}`,
 		'get',
 		undefined,
 		params
@@ -55,14 +55,14 @@ export async function updateCustomer(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	phone_number: string,
+	customer_id: number,
 	request: UpdateCustomerRequest
 ) {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
-		`${customerPath}/${phone_number}`,
+		`${customerPath}/${customer_id}`,
 		'patch',
 		request
 	);
@@ -88,13 +88,13 @@ export async function deleteCustomer(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	phone_number: string
+	customer_id: number
 ) {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
-		`${customerPath}/${phone_number}`,
+		`${customerPath}/${customer_id}`,
 		'delete'
 	);
 }
@@ -103,13 +103,13 @@ export async function recoverCustomer(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	phone_number: string
+	customer_id: number
 ) {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
-		`${customerPath}/${phone_number}/recover`,
+		`${customerPath}/${customer_id}/recover`,
 		'delete'
 	);
 }

@@ -208,10 +208,17 @@ const ReservationTag: FC<ReservationTagProp> = ({
 		</span>
 	);
 
-	const customerPhoneText = reservation.customer && (
+	const customerPhoneText = reservation.customer?.phone_number && (
 		<span className="font-medium">
 			{t('Customer Phone #')}: <br />
 			{formatPhoneNumber(reservation.customer.phone_number)}
+		</span>
+	);
+
+	const customerSerialText = reservation.customer?.vip_serial && (
+		<span className="font-medium">
+			{t('Customer VIP Serial')}: <br />
+			{reservation.customer.vip_serial}
 		</span>
 	);
 
@@ -307,6 +314,8 @@ const ReservationTag: FC<ReservationTagProp> = ({
 					{customerNameText && <br />}
 					{customerPhoneText}
 					{customerPhoneText && <br />}
+					{customerSerialText}
+					{customerSerialText && <br />}
 					{customerNoteText}
 					{customerNoteText && <br />}
 

@@ -2,6 +2,7 @@ const LABELS = {
 	customer: {
 		search_customer: 'Search Customer',
 		phone_number: 'Phone Number',
+		vip_serial: 'VIP Serial',
 		customer_name: 'Customer Name',
 		notes: 'Customer Notes',
 	},

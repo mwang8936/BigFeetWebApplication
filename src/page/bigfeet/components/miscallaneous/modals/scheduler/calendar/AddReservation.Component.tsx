@@ -41,6 +41,8 @@ import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
 import { useServicesQuery } from '../../../../../../hooks/service.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+import PATTERNS from '../../../../../../../constants/patterns.constants';
+import { formatPhoneNumber } from '../../../../../../../utils/string.utils';
 
 interface AddReservationProp {
 	setOpen(open: boolean): void;
@@ -78,7 +80,11 @@ const AddReservation: FC<AddReservationProp> = ({
 	const [genderInput, setGenderInput] = useState<Gender | null>(null);
 	const [requestedInput, setRequestedInput] = useState<boolean>(false);
 	const [messageInput, setMessageInput] = useState<string | null>(null);
+	const [customerIdInput, setCustomerIdInput] = useState<number | null>(null);
 	const [customerPhoneNumberInput, setCustomerPhoneNumberInput] = useState<
+		string | null
+	>(null);
+	const [customerVipSerialInput, setCustomerVipSerialInput] = useState<
 		string | null
 	>(null);
 	const [customerNameInput, setCustomerNameInput] = useState<string | null>(
@@ -91,6 +97,8 @@ const AddReservation: FC<AddReservationProp> = ({
 	const [invalidDate, setInvalidDate] = useState<boolean>(false);
 	const [invalidTime, setInvalidTime] = useState<boolean>(false);
 	const [invalidCustomerPhoneNumber, setInvalidCustomerPhoneNumber] =
+		useState<boolean>(false);
+	const [invalidCustomerVipSerial, setInvalidCustomerVipSerial] =
 		useState<boolean>(false);
 	const [invalidCustomerName, setInvalidCustomerName] =
 		useState<boolean>(false);
@@ -157,12 +165,14 @@ const AddReservation: FC<AddReservationProp> = ({
 			dateInput === null || employeeIdInput === null || serviceIdInput === null;
 
 		setMissingRequiredInput(missingRequiredInput);
-	}, [dateInput, employeeIdInput, serviceIdInput, genderInput]);
+	}, [dateInput, employeeIdInput, serviceIdInput]);
 
 	useEffect(() => {
 		const invalidCustomer =
-			customerPhoneNumberInput !== null
-				? invalidCustomerPhoneNumber || invalidCustomerName
+			customerPhoneNumberInput !== null || customerVipSerialInput !== null
+				? invalidCustomerPhoneNumber ||
+				  invalidCustomerVipSerial ||
+				  invalidCustomerName
 				: false;
 		const invalidInput = invalidDate || invalidTime || invalidCustomer;
 
@@ -171,28 +181,59 @@ const AddReservation: FC<AddReservationProp> = ({
 		invalidDate,
 		invalidTime,
 		invalidCustomerPhoneNumber,
+		invalidCustomerVipSerial,
 		invalidCustomerName,
 		customerPhoneNumberInput,
 	]);
 
 	useEffect(() => {
-		if (customerPhoneNumberInput?.length === 10) {
+		if (
+			customerPhoneNumberInput?.length === LENGTHS.customer.phone_number - 4 &&
+			customerIdInput === null
+		) {
 			const customer = customers.find(
 				(customer) => customer.phone_number === customerPhoneNumberInput
 			);
 			if (customer) {
+				setCustomerIdInput(customer.customer_id);
+
+				setCustomerVipSerialInput(customer.vip_serial);
 				setCustomerNameInput(customer.customer_name);
 				setCustomerNotesInput(customer.notes);
 
+				setInvalidCustomerVipSerial(false);
 				setInvalidCustomerName(false);
 			}
-		} else {
+		} else if (
+			customerVipSerialInput?.length === LENGTHS.customer.vip_serial &&
+			customerIdInput === null
+		) {
+			const customer = customers.find(
+				(customer) => customer.vip_serial === customerVipSerialInput
+			);
+			if (customer) {
+				setCustomerIdInput(customer.customer_id);
+
+				setCustomerPhoneNumberInput(customer.phone_number);
+				setCustomerNameInput(customer.customer_name);
+				setCustomerNotesInput(customer.notes);
+
+				setInvalidCustomerPhoneNumber(false);
+				setInvalidCustomerName(false);
+			}
+		} else if (
+			customerIdInput !== null &&
+			customerPhoneNumberInput?.length !== LENGTHS.customer.phone_number - 4 &&
+			customerVipSerialInput?.length !== LENGTHS.customer.vip_serial
+		) {
+			setCustomerIdInput(null);
+
 			setCustomerNameInput(null);
 			setCustomerNotesInput(null);
 
 			setInvalidCustomerName(false);
 		}
-	}, [customerPhoneNumberInput]);
+	}, [customerPhoneNumberInput, customerVipSerialInput]);
 
 	useEffect(() => {
 		if (dateInput && serviceIdInput) {
@@ -273,10 +314,12 @@ const AddReservation: FC<AddReservationProp> = ({
 		const reserved_date = dateInput as Date;
 		const employee_id = employeeIdInput as number;
 		const service_id = serviceIdInput as number;
-		const requested_gender = genderInput || undefined;
+		const requested_gender = genderInput ?? undefined;
 		const requested_employee = requestedInput;
 		const message = messageInput?.trim();
+		const customer_id = customerIdInput ?? undefined;
 		const phone_number = customerPhoneNumberInput?.trim();
+		const vip_serial = customerVipSerialInput?.trim();
 		const customer_name = customerNameInput?.trim();
 		const notes = customerNotesInput?.trim();
 		const addReservationRequest: AddReservationRequest = {
@@ -286,7 +329,9 @@ const AddReservation: FC<AddReservationProp> = ({
 			requested_gender,
 			requested_employee,
 			message,
+			customer_id,
 			phone_number,
+			vip_serial,
 			customer_name,
 			notes,
 			created_by: createdBy,
@@ -294,6 +339,19 @@ const AddReservation: FC<AddReservationProp> = ({
 		onAddReservation(addReservationRequest);
 		setOpen(false);
 	};
+
+	const currentCustomer: Customer | undefined =
+		customerIdInput !== null
+			? customers.find((customer) => customer.customer_id === customerIdInput)
+			: undefined;
+
+	const currentPhoneNumberText =
+		currentCustomer?.phone_number &&
+		t('Phone Number') + ': ' + formatPhoneNumber(currentCustomer.phone_number);
+
+	const currentVipSerialText =
+		currentCustomer?.vip_serial &&
+		t('VIP Serial') + ': ' + currentCustomer.vip_serial;
 
 	return (
 		<>
@@ -421,55 +479,86 @@ const AddReservation: FC<AddReservationProp> = ({
 							/>
 
 							<div className="flex flex-col border-t-2 border-black p-2">
-								<span className="font-bold mb-2">
+								<span className="font-bold mb-2 flex flex-col">
 									{t('Customer (Optional)')}:
+									{customerIdInput !== null && (
+										<span className="flex flex-col text-green-500 font-medium text-sm">
+											<span className="text-green-500">
+												{t('Current Customer')}:
+											</span>
+											<span className="text-green-500">
+												{currentPhoneNumberText}
+											</span>
+											<span className="text-green-500">
+												{currentVipSerialText}
+											</span>
+										</span>
+									)}
 								</span>
+
 								<AddPhoneNumber
 									phoneNumber={customerPhoneNumberInput}
 									setPhoneNumber={setCustomerPhoneNumberInput}
 									label={LABELS.customer.phone_number}
 									name={NAMES.customer.phone_number}
 									validationProp={{
-										required: customerPhoneNumberInput !== null,
-										requiredMessage: ERRORS.customer.phone_number.required,
+										required: false,
 										invalid: invalidCustomerPhoneNumber,
 										setInvalid: setInvalidCustomerPhoneNumber,
 										invalidMessage: ERRORS.customer.phone_number.invalid,
 									}}
 								/>
 
-								{customerPhoneNumberInput !== null &&
-									customerPhoneNumberInput.length === 10 &&
-									!invalidCustomerPhoneNumber && (
-										<>
-											<AddInput
-												text={customerNameInput}
-												setText={setCustomerNameInput}
-												label={LABELS.customer.customer_name}
-												name={NAMES.customer.customer_name}
-												type="text"
-												validationProp={{
-													maxLength: LENGTHS.customer.customer_name,
-													required: false,
-													invalid: invalidCustomerName,
-													setInvalid: setInvalidCustomerName,
-													invalidMessage: ERRORS.customer.customer_name.invalid,
-												}}
-												placeholder={PLACEHOLDERS.customer.customer_name}
-											/>
+								<AddInput
+									text={customerVipSerialInput}
+									setText={setCustomerVipSerialInput}
+									label={LABELS.customer.vip_serial}
+									name={NAMES.customer.vip_serial}
+									type="text"
+									validationProp={{
+										maxLength: LENGTHS.customer.vip_serial,
+										pattern: PATTERNS.customer.vip_serial,
+										required: false,
+										invalid: invalidCustomerVipSerial,
+										setInvalid: setInvalidCustomerVipSerial,
+										invalidMessage: ERRORS.customer.vip_serial.invalid,
+									}}
+									placeholder={PLACEHOLDERS.customer.vip_serial}
+								/>
 
-											<AddTextArea
-												text={customerNotesInput}
-												setText={setCustomerNotesInput}
-												label={LABELS.customer.notes}
-												name={NAMES.customer.notes}
-												validationProp={{
-													required: false,
-												}}
-												placeholder={PLACEHOLDERS.customer.notes}
-											/>
-										</>
-									)}
+								{((customerPhoneNumberInput?.length === 10 &&
+									!invalidCustomerPhoneNumber) ||
+									(customerVipSerialInput?.length === 6 &&
+										!invalidCustomerVipSerial)) && (
+									<>
+										<AddInput
+											text={customerNameInput}
+											setText={setCustomerNameInput}
+											label={LABELS.customer.customer_name}
+											name={NAMES.customer.customer_name}
+											type="text"
+											validationProp={{
+												maxLength: LENGTHS.customer.customer_name,
+												required: false,
+												invalid: invalidCustomerName,
+												setInvalid: setInvalidCustomerName,
+												invalidMessage: ERRORS.customer.customer_name.invalid,
+											}}
+											placeholder={PLACEHOLDERS.customer.customer_name}
+										/>
+
+										<AddTextArea
+											text={customerNotesInput}
+											setText={setCustomerNotesInput}
+											label={LABELS.customer.notes}
+											name={NAMES.customer.notes}
+											validationProp={{
+												required: false,
+											}}
+											placeholder={PLACEHOLDERS.customer.notes}
+										/>
+									</>
+								)}
 							</div>
 						</div>
 					</div>

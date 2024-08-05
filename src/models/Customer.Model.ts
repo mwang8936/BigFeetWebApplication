@@ -1,5 +1,7 @@
 export default interface Customer {
-	phone_number: string;
+	customer_id: number;
+	phone_number: string | null;
+	vip_serial: string | null;
 	customer_name: string | null;
 	notes: string | null;
 	created_at: Date;

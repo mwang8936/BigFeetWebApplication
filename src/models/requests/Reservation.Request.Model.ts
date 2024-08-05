@@ -4,7 +4,9 @@ export interface UpdateReservationRequest {
 	reserved_date?: Date;
 	employee_id?: number;
 	service_id?: number;
+	customer_id?: number | null;
 	phone_number?: string | null;
+	vip_serial?: string | null;
 	customer_name?: string | null;
 	notes?: string | null;
 	requested_gender?: Gender | null;
@@ -25,7 +27,9 @@ export interface AddReservationRequest {
 	employee_id: number;
 	service_id: number;
 	created_by: string;
+	customer_id?: number;
 	phone_number?: string;
+	vip_serial?: string;
 	customer_name?: string;
 	notes?: string;
 	requested_gender?: Gender;

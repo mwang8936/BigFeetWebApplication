@@ -14,11 +14,11 @@ interface EditCustomerModalProp {
 	customer: Customer;
 	editable: boolean;
 	onEditCustomer(
-		phoneNumber: string,
+		customerId: number,
 		request: UpdateCustomerRequest
 	): Promise<void>;
 	deletable: boolean;
-	onDeleteCustomer(phoneNumber: string): Promise<void>;
+	onDeleteCustomer(customerId: number): Promise<void>;
 }
 
 const EditCustomerModal: FC<EditCustomerModalProp> = ({

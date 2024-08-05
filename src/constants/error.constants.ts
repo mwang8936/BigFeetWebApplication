@@ -13,11 +13,20 @@ const ERRORS = {
 			},
 		},
 		phone_number: {
-			required: 'Phone Number cannot be empty.',
+			required: 'Phone Number and VIP Serial cannot both be empty.',
 			invalid: {
 				key: 'Phone Number Invalid',
 				value: {
 					length: LENGTHS.customer.phone_number - 4,
+				},
+			},
+		},
+		vip_serial: {
+			required: 'Phone Number and VIP Serial cannot both be empty.',
+			invalid: {
+				key: 'VIP Serial Invalid',
+				value: {
+					length: LENGTHS.customer.vip_serial,
 				},
 			},
 		},

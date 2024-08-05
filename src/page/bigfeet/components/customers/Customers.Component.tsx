@@ -85,12 +85,15 @@ const Customers: FC = () => {
 		filteredCustomers = searchFilter
 			? customers.filter(
 					(customer) =>
-						customer.customer_name
+						customer.phone_number
 							?.toLowerCase()
 							?.includes(searchFilter.toLowerCase()) ||
-						customer.phone_number
-							.toLowerCase()
-							.includes(searchFilter.toLowerCase())
+						customer.vip_serial
+							?.toLowerCase()
+							?.includes(searchFilter.toLowerCase()) ||
+						customer.customer_name
+							?.toLowerCase()
+							?.includes(searchFilter.toLowerCase())
 			  )
 			: customers;
 	}
@@ -102,15 +105,15 @@ const Customers: FC = () => {
 
 	const updateCustomerMutation = useUpdateCustomerMutation({});
 	const onEditCustomer = async (
-		phoneNumber: string,
+		customerId: number,
 		request: UpdateCustomerRequest
 	) => {
-		updateCustomerMutation.mutate({ phoneNumber, request });
+		updateCustomerMutation.mutate({ customerId, request });
 	};
 
 	const deleteCustomerMutation = useDeleteCustomerMutation({});
-	const onDeleteCustomer = async (phoneNumber: string) => {
-		deleteCustomerMutation.mutate({ phoneNumber });
+	const onDeleteCustomer = async (customerId: number) => {
+		deleteCustomerMutation.mutate({ customerId });
 	};
 
 	const customersElement =

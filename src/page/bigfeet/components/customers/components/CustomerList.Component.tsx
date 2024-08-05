@@ -4,17 +4,18 @@ import { useTranslation } from 'react-i18next';
 import CustomerItem from './CustomerItem.Component';
 
 import Customer from '../../../../../models/Customer.Model';
+
 import { UpdateCustomerRequest } from '../../../../../models/requests/Customer.Request.Model';
 
 interface CustomerListProp {
 	customers: Customer[];
 	editable: boolean;
 	onEditCustomer(
-		phoneNumber: string,
+		customerId: number,
 		request: UpdateCustomerRequest
 	): Promise<void>;
 	deletable: boolean;
-	onDeleteCustomer(phoneNumber: string): Promise<void>;
+	onDeleteCustomer(customerId: number): Promise<void>;
 }
 
 const CustomerList: FC<CustomerListProp> = ({
@@ -30,7 +31,7 @@ const CustomerList: FC<CustomerListProp> = ({
 		customers.length !== 0 ? (
 			customers.map((customer) => (
 				<CustomerItem
-					key={customer.phone_number}
+					key={customer.customer_id}
 					customer={customer}
 					editable={editable}
 					onEditCustomer={onEditCustomer}

@@ -12,11 +12,11 @@ interface CustomerItemProp {
 	customer: Customer;
 	editable: boolean;
 	onEditCustomer(
-		phoneNumber: string,
+		customerId: number,
 		request: UpdateCustomerRequest
 	): Promise<void>;
 	deletable: boolean;
-	onDeleteCustomer(phoneNumber: string): Promise<void>;
+	onDeleteCustomer(customerId: number): Promise<void>;
 }
 
 const CustomerItem: FC<CustomerItemProp> = ({
@@ -33,10 +33,19 @@ const CustomerItem: FC<CustomerItemProp> = ({
 	return (
 		<>
 			<div className="list-item-div" onClick={() => setOpen(true)}>
-				<span>
-					<span className="list-item-field">{t('Phone Number')}:</span>
-					{formatPhoneNumber(customer.phone_number)}
-				</span>
+				{customer.phone_number && (
+					<span>
+						<span className="list-item-field">{t('Phone Number')}:</span>
+						{formatPhoneNumber(customer.phone_number)}
+					</span>
+				)}
+
+				{customer.vip_serial && (
+					<span>
+						<span className="list-item-field">{t('VIP Serial')}:</span>
+						{customer.vip_serial}
+					</span>
+				)}
 
 				{customer.customer_name && (
 					<span>

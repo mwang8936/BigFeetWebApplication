@@ -2,6 +2,7 @@ const PLACEHOLDERS = {
 	customer: {
 		search_customer: 'Search by name or phone number',
 		phone_number: '(123) 456-7890',
+		vip_serial: '123456',
 		customer_name: 'Add Customer Name',
 		notes: 'Add Notes',
 	},

@@ -72,14 +72,14 @@ export const useUpdateCustomerMutation = ({
 
 	return useMutation({
 		mutationFn: (data: {
-			phoneNumber: string;
+			customerId: number;
 			request: UpdateCustomerRequest;
 		}) =>
 			updateCustomer(
 				i18n,
 				queryClient,
 				setAuthentication,
-				data.phoneNumber,
+				data.customerId,
 				data.request
 			),
 		onMutate: async () => {
@@ -154,8 +154,8 @@ export const useDeleteCustomerMutation = ({
 	const { setAuthentication } = useAuthenticationContext();
 
 	return useMutation({
-		mutationFn: (data: { phoneNumber: string }) =>
-			deleteCustomer(i18n, queryClient, setAuthentication, data.phoneNumber),
+		mutationFn: (data: { customerId: number }) =>
+			deleteCustomer(i18n, queryClient, setAuthentication, data.customerId),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 

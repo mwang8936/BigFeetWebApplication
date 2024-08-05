@@ -103,7 +103,7 @@
   }
 
   .list-div {
-    @apply flex flex-col flex-1 h-full w-full mx-auto border-black border-2
+    @apply flex flex-col flex-1 h-fit w-full mx-auto border-black border-2
   }
 
   .list-item-div {

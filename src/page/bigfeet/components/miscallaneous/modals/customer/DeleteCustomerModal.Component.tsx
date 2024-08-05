@@ -4,18 +4,20 @@ import DeleteCustomer from './DeleteCustomer.Component';
 
 import BaseModal from '../BaseModal.Component';
 
+import Customer from '../../../../../../models/Customer.Model';
+
 interface DeleteCustomerModalProp {
 	open: boolean;
 	setOpen(open: boolean): void;
-	phoneNumber: string;
+	customer: Customer;
 	deletable: boolean;
-	onDeleteCustomer(phoneNumber: string): Promise<void>;
+	onDeleteCustomer(customerId: number): Promise<void>;
 }
 
 const DeleteCustomerModal: FC<DeleteCustomerModalProp> = ({
 	open,
 	setOpen,
-	phoneNumber,
+	customer,
 	deletable,
 	onDeleteCustomer,
 }) => {
@@ -26,7 +28,7 @@ const DeleteCustomerModal: FC<DeleteCustomerModalProp> = ({
 			contentElement={
 				<DeleteCustomer
 					setOpen={setOpen}
-					phoneNumber={phoneNumber}
+					customer={customer}
 					deletable={deletable}
 					onDeleteCustomer={onDeleteCustomer}
 				/>

@@ -8,25 +8,27 @@ import DeleteBottom from '../DeleteBottom.Component';
 
 import ERRORS from '../../../../../../constants/error.constants';
 
+import Customer from '../../../../../../models/Customer.Model';
+
 import { formatPhoneNumber } from '../../../../../../utils/string.utils';
 
 interface DeleteCustomerProp {
 	setOpen(open: boolean): void;
-	phoneNumber: string;
+	customer: Customer;
 	deletable: boolean;
-	onDeleteCustomer(phoneNumber: string): Promise<void>;
+	onDeleteCustomer(customerId: number): Promise<void>;
 }
 
 const DeleteCustomer: FC<DeleteCustomerProp> = ({
 	setOpen,
-	phoneNumber,
+	customer,
 	deletable,
 	onDeleteCustomer,
 }) => {
 	const { t } = useTranslation();
 
 	const onDelete = () => {
-		onDeleteCustomer(phoneNumber);
+		onDeleteCustomer(customer.customer_id);
 		setOpen(false);
 	};
 
@@ -45,8 +47,10 @@ const DeleteCustomer: FC<DeleteCustomerProp> = ({
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
-							{t('Delete Customer', {
-								phone_number: formatPhoneNumber(phoneNumber),
+							{t('Edit Customer', {
+								id: customer.phone_number
+									? formatPhoneNumber(customer.phone_number)
+									: customer.vip_serial ?? '',
 							})}
 						</Dialog.Title>
 

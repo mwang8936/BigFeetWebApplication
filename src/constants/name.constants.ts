@@ -2,6 +2,7 @@ const NAMES = {
 	customer: {
 		search_customer: 'search_customer',
 		phone_number: 'phone_number',
+		vip_serial: 'vip_serial',
 		customer_name: 'customer_name',
 		notes: 'notes',
 	},
