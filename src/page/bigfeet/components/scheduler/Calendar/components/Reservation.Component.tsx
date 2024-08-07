@@ -17,7 +17,6 @@ import STORES from '../../../../../../constants/store.constants';
 import { sortEmployees } from '../../../../../../utils/employee.utils';
 import { useScheduleDateContext } from '../../Scheduler.Component';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import Schedule from '../../../../../../models/Schedule.Model';
 import User from '../../../../../../models/User.Model';
 import { useEmployeesQuery } from '../../../../../hooks/employee.hooks';
@@ -45,7 +44,6 @@ const ReservationTag: FC<ReservationTagProp> = ({
 	onDeleteReservation,
 }) => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
 
 	const [openEdit, setOpenEdit] = useState(false);
 	const [openMove, setOpenMove] = useState(false);

@@ -1,7 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
-import Employee from '../../../../../../../models/Employee.Model';
 import AddInput from '../../../add/AddInput.Component';
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
@@ -11,20 +10,10 @@ import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
 import AddBottom from '../../AddBottom.Component';
 import { useTranslation } from 'react-i18next';
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
-import { AddVipPackageRequest } from '../../../../../../../models/requests/Vip-Package.Request.Model';
-import AddMultiSelect from '../../../add/AddMultiSelect.Component';
 import AddPayRate from '../../../add/AddPayRate.Component';
 import NUMBERS from '../../../../../../../constants/numbers.constants';
 import PATTERNS from '../../../../../../../constants/patterns.constants';
-import {
-	PaymentMethod,
-	Permissions,
-	Role,
-} from '../../../../../../../models/enums';
-import { useNavigate } from 'react-router-dom';
-import User from '../../../../../../../models/User.Model';
-import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
-import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+import { PaymentMethod } from '../../../../../../../models/enums';
 import { AddGiftCardRequest } from '../../../../../../../models/requests/GIft-Card.Request';
 import AddDate from '../../../add/AddDate.Component';
 import AddDropDown from '../../../add/AddDropDown.Component';

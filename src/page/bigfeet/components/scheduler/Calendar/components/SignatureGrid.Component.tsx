@@ -3,7 +3,6 @@ import AddToggleSwitch, {
 	ToggleColor,
 } from '../../../miscallaneous/add/AddToggleSwitch.Component';
 import SignScheduleModal from '../../../miscallaneous/modals/scheduler/calendar/SignScheduleModal.Component';
-import LABELS from '../../../../../../constants/label.constants';
 import NAMES from '../../../../../../constants/name.constants';
 
 interface SignatureGridProp {

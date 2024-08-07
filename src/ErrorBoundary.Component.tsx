@@ -9,10 +9,10 @@ const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children }) => {
 
 	useEffect(() => {
 		const errorHandler = (
-			event: Event | string,
-			source?: string,
-			lineno?: number,
-			colno?: number,
+			_event: Event | string,
+			_source?: string,
+			_lineno?: number,
+			_colno?: number,
 			error?: Error
 		) => {
 			setHasError(true);

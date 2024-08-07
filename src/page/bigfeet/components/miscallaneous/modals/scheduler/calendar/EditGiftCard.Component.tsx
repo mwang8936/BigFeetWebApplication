@@ -1,36 +1,15 @@
 import { FC, useState, useEffect } from 'react';
-import { PencilSquareIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
-import Employee from '../../../../../../../models/Employee.Model';
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
 import NAMES from '../../../../../../../constants/name.constants';
-import LENGTHS from '../../../../../../../constants/lengths.constants';
 import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
-import AddBottom from '../../AddBottom.Component';
 import { useTranslation } from 'react-i18next';
-import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
-import {
-	AddVipPackageRequest,
-	UpdateVipPackageRequest,
-} from '../../../../../../../models/requests/Vip-Package.Request.Model';
 import NUMBERS from '../../../../../../../constants/numbers.constants';
-import PATTERNS from '../../../../../../../constants/patterns.constants';
-import VipPackage from '../../../../../../../models/Vip-Package.Model';
 import EditBottom from '../../EditBottom.Component';
-import EditableMultiSelect from '../../../editable/EditableMultiSelect.Component';
 import EditablePayRate from '../../../editable/EditablePayRate.Component';
-import { arraysHaveSameContent } from '../../../../../../../utils/array.utils';
-import DeleteVipModal from './DeleteVipModal.Component';
-import { useNavigate } from 'react-router-dom';
-import {
-	PaymentMethod,
-	Permissions,
-	Role,
-} from '../../../../../../../models/enums';
-import User from '../../../../../../../models/User.Model';
-import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
-import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+import { PaymentMethod } from '../../../../../../../models/enums';
 import GiftCard from '../../../../../../../models/Gift-Card.Model';
 import { UpdateGiftCardRequest } from '../../../../../../../models/requests/GIft-Card.Request';
 import DeleteGiftCardModal from './DeleteGiftCardModal.Component';

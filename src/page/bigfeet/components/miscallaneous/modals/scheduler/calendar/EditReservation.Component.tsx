@@ -39,7 +39,6 @@ import EditableInput from '../../../editable/EditableInput.Component';
 import EditablePhoneNumber from '../../../editable/EditablePhoneNumber.Component';
 import WarningModal from './WarningModal.Component';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
 import Schedule from '../../../../../../../models/Schedule.Model';
 import EditablePayRateAutomatic from '../../../editable/EditablePayRateAutomatic.Component';
@@ -81,7 +80,6 @@ const EditReservation: FC<EditReservationProp> = ({
 	onDeleteReservation,
 }) => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
 
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
 	const [openBedWarningModal, setOpenBedWarningModal] =

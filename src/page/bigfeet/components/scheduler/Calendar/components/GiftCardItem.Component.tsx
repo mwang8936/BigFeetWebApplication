@@ -1,18 +1,9 @@
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import VipPackage from '../../../../../../models/Vip-Package.Model';
-import { UpdateVipPackageRequest } from '../../../../../../models/requests/Vip-Package.Request.Model';
-import EditVipModal from '../../../miscallaneous/modals/scheduler/calendar/EditVipModal.Component';
 import { moneyToString } from '../../../../../../utils/number.utils';
-import { Permissions, Role } from '../../../../../../models/enums';
-import Employee from '../../../../../../models/Employee.Model';
-import User from '../../../../../../models/User.Model';
-import { useEmployeesQuery } from '../../../../../hooks/employee.hooks';
-import { useUserQuery } from '../../../../../hooks/profile.hooks';
 import GiftCard from '../../../../../../models/Gift-Card.Model';
 import { UpdateGiftCardRequest } from '../../../../../../models/requests/GIft-Card.Request';
 import DatesDisplay from '../../../miscallaneous/DatesDisplay.Component';
-import EditGiftCard from '../../../miscallaneous/modals/scheduler/calendar/EditGiftCard.Component';
 import EditGiftCardModal from '../../../miscallaneous/modals/scheduler/calendar/EditGiftCardModal.Component';
 
 interface GiftCardItemProp {

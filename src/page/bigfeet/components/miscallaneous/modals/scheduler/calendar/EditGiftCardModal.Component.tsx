@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import BaseModal from '../../BaseModal.Component';
-import EditVip from './EditVip.Component';
 import GiftCard from '../../../../../../../models/Gift-Card.Model';
 import { UpdateGiftCardRequest } from '../../../../../../../models/requests/GIft-Card.Request';
 import EditGiftCard from './EditGiftCard.Component';

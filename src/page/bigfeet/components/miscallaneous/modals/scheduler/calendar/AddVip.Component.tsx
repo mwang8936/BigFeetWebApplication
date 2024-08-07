@@ -17,7 +17,6 @@ import AddPayRate from '../../../add/AddPayRate.Component';
 import NUMBERS from '../../../../../../../constants/numbers.constants';
 import PATTERNS from '../../../../../../../constants/patterns.constants';
 import { Permissions, Role } from '../../../../../../../models/enums';
-import { useNavigate } from 'react-router-dom';
 import User from '../../../../../../../models/User.Model';
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
@@ -30,7 +29,6 @@ interface AddVipProp {
 
 const AddVip: FC<AddVipProp> = ({ setOpen, creatable, onAddVipPackage }) => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
 
 	const [serialInput, setSerialInput] = useState<string | null>(null);
 	const [soldAmountInput, setSoldAmountInput] = useState<number | null>(null);

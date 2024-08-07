@@ -13,7 +13,6 @@ import {
 	AddScheduleRequest,
 	UpdateScheduleRequest,
 } from '../../../../models/requests/Schedule.Request.Model';
-import { useNavigate } from 'react-router-dom';
 import AddReservationModal from '../miscallaneous/modals/scheduler/calendar/AddReservationModal.Component';
 import PermissionsButton, {
 	ButtonType,
