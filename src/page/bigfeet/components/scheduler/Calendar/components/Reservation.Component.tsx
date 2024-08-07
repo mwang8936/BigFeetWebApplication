@@ -122,6 +122,14 @@ const ReservationTag: FC<ReservationTagProp> = ({
 		(startHour - STORES.start) * 2 + 2 + Math.floor(startMinute / 30);
 	const topMargin = (((startMinute % 30) / 60) * 100).toString() + '%';
 
+	const leftBound = -200 * currEmployeeIndex;
+	const rightBound = 200 * (employeeList.length - currEmployeeIndex - 1);
+	const topBound =
+		-100 * (rowStart - 2) - (100 / 6) * Math.floor((startMinute % 30) / 5);
+	const bottomBound =
+		100 * ((STORES.end + 1 - STORES.start) * 2 - rowStart) -
+		(100 / 6) * (Math.floor(startMinute % 30) / 5);
+
 	const time = reservation.service.time;
 	const height = ((time / 60) * 100).toString() + '%';
 
@@ -276,10 +284,10 @@ const ReservationTag: FC<ReservationTagProp> = ({
 			disabled={!editable || openEdit || openMove}
 			position={position}
 			bounds={{
-				left: -200 * currEmployeeIndex,
-				right: 200 * (employeeList.length - currEmployeeIndex - 1),
-				top: -100 * (rowStart - 2),
-				bottom: 100 * ((STORES.end + 1 - STORES.start) / 0.5 - rowStart),
+				left: leftBound,
+				right: rightBound,
+				top: topBound,
+				bottom: bottomBound,
 			}}
 			onDrag={(_, data) => {
 				setPosition({ x: data.x, y: data.y });
