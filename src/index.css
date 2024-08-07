@@ -99,7 +99,7 @@
   }
 
   .content-div {
-    @apply mt-8 mb-4 pr-4 overflow-auto
+    @apply mt-8 mb-4 pr-4 overflow-auto flex-1
   }
 
   .list-div {
@@ -162,7 +162,7 @@
   }
 
   .tab-ul {
-    @apply flex flex-wrap text-sm font-medium text-center border-b border-gray-200 mt-3
+    @apply flex flex-wrap text-sm font-medium text-center border-b border-gray-200 mt-3 max-h-28 overflow-auto
   }
 
   .selected-tab {
