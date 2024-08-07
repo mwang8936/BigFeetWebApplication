@@ -73,7 +73,12 @@ function parseData(data: any) {
 					if (/^\d{4}-\d{2}-\d{2}$/.test(property)) {
 						const [year, month, day] = property.split('-').map(Number);
 						const date = new Date(year, month - 1, day);
-						data[key] = date;
+
+						const pstDate = new Date(
+							date.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })
+						);
+
+						data[key] = pstDate;
 					} else if (
 						/(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/.exec(
 							property
