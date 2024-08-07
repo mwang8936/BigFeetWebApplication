@@ -1,23 +1,30 @@
 import { FC, useState, useEffect } from 'react';
-import { PlusCircleIcon } from '@heroicons/react/24/outline';
-import { Dialog } from '@headlessui/react';
-import AddInput from '../../../add/AddInput.Component';
-import ERRORS from '../../../../../../../constants/error.constants';
-import LABELS from '../../../../../../../constants/label.constants';
-import NAMES from '../../../../../../../constants/name.constants';
-import LENGTHS from '../../../../../../../constants/lengths.constants';
-import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
-import AddBottom from '../../AddBottom.Component';
 import { useTranslation } from 'react-i18next';
-import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
-import AddPayRate from '../../../add/AddPayRate.Component';
-import NUMBERS from '../../../../../../../constants/numbers.constants';
-import PATTERNS from '../../../../../../../constants/patterns.constants';
-import { PaymentMethod } from '../../../../../../../models/enums';
-import { AddGiftCardRequest } from '../../../../../../../models/requests/GIft-Card.Request';
+
+import { Dialog } from '@headlessui/react';
+import { PlusCircleIcon } from '@heroicons/react/24/outline';
+
+import AddBottom from '../../AddBottom.Component';
+
+import AddInput from '../../../add/AddInput.Component';
 import AddDate from '../../../add/AddDate.Component';
 import AddDropDown from '../../../add/AddDropDown.Component';
+import AddPayRate from '../../../add/AddPayRate.Component';
+
+import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
+
 import { paymentMethodDropDownItems } from '../../../../../../../constants/drop-down.constants';
+import ERRORS from '../../../../../../../constants/error.constants';
+import LABELS from '../../../../../../../constants/label.constants';
+import LENGTHS from '../../../../../../../constants/lengths.constants';
+import NAMES from '../../../../../../../constants/name.constants';
+import NUMBERS from '../../../../../../../constants/numbers.constants';
+import PATTERNS from '../../../../../../../constants/patterns.constants';
+import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
+
+import { PaymentMethod } from '../../../../../../../models/enums';
+
+import { AddGiftCardRequest } from '../../../../../../../models/requests/GIft-Card.Request';
 
 interface AddGiftCardProp {
 	setOpen(open: boolean): void;

@@ -1,6 +1,9 @@
 import { FC } from 'react';
-import BaseModal from '../../BaseModal.Component';
+
 import AddVip from './AddVip.Component';
+
+import BaseModal from '../../BaseModal.Component';
+
 import { AddVipPackageRequest } from '../../../../../../../models/requests/Vip-Package.Request.Model';
 
 interface AddVipModalProp {

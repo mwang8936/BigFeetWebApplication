@@ -1,25 +1,35 @@
 import { FC, useState, useEffect } from 'react';
-import { PencilSquareIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
+
 import { Dialog } from '@headlessui/react';
-import Employee from '../../../../../../../models/Employee.Model';
+import { PencilSquareIcon } from '@heroicons/react/24/outline';
+
+import DeleteVipModal from './DeleteVipModal.Component';
+
+import EditBottom from '../../EditBottom.Component';
+
+import EditableMultiSelect from '../../../editable/EditableMultiSelect.Component';
+import EditablePayRate from '../../../editable/EditablePayRate.Component';
+
+import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
+
+import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
 import NAMES from '../../../../../../../constants/name.constants';
-import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
-import { useTranslation } from 'react-i18next';
-import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
-import { UpdateVipPackageRequest } from '../../../../../../../models/requests/Vip-Package.Request.Model';
 import NUMBERS from '../../../../../../../constants/numbers.constants';
-import VipPackage from '../../../../../../../models/Vip-Package.Model';
-import EditBottom from '../../EditBottom.Component';
-import EditableMultiSelect from '../../../editable/EditableMultiSelect.Component';
-import EditablePayRate from '../../../editable/EditablePayRate.Component';
-import { arraysHaveSameContent } from '../../../../../../../utils/array.utils';
-import DeleteVipModal from './DeleteVipModal.Component';
+import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
+
+import Employee from '../../../../../../../models/Employee.Model';
 import { Permissions, Role } from '../../../../../../../models/enums';
 import User from '../../../../../../../models/User.Model';
-import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
-import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+import VipPackage from '../../../../../../../models/Vip-Package.Model';
+
+import { UpdateVipPackageRequest } from '../../../../../../../models/requests/Vip-Package.Request.Model';
+
+import { arraysHaveSameContent } from '../../../../../../../utils/array.utils';
 
 interface EditVipProp {
 	setOpen(open: boolean): void;

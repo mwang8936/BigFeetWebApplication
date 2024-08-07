@@ -1,47 +1,57 @@
 import { FC, useState, useEffect } from 'react';
-import { PlusCircleIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
+
 import { Dialog } from '@headlessui/react';
-import { Gender, Permissions, Role } from '../../../../../../../models/enums';
-import Employee from '../../../../../../../models/Employee.Model';
-import Service from '../../../../../../../models/Service.Model';
-import {
-	genderDropDownItems,
-	getEmployeeDropDownItems,
-	getServiceDropDownItems,
-} from '../../../../../../../constants/drop-down.constants';
+import { PlusCircleIcon } from '@heroicons/react/24/outline';
+
+import WarningModal from './WarningModal.Component';
+
+import AddBottom from '../../AddBottom.Component';
+
+import AddDate from '../../../add/AddDate.Component';
+import AddDropDown from '../../../add/AddDropDown.Component';
+import AddInput from '../../../add/AddInput.Component';
+import AddPhoneNumber from '../../../add/AddPhoneNumber.Component';
+import AddTextArea from '../../../add/AddTextArea.Component';
+import AddTime from '../../../add/AddTime.Component';
 import AddToggleSwitch, {
 	ToggleColor,
 } from '../../../add/AddToggleSwitch.Component';
-import AddTime from '../../../add/AddTime.Component';
-import AddDate from '../../../add/AddDate.Component';
-import { AddReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
-import AddTextArea from '../../../add/AddTextArea.Component';
-import AddInput from '../../../add/AddInput.Component';
-import AddPhoneNumber from '../../../add/AddPhoneNumber.Component';
-import Customer from '../../../../../../../models/Customer.Model';
-import ERRORS from '../../../../../../../constants/error.constants';
-import LABELS from '../../../../../../../constants/label.constants';
-import AddDropDown from '../../../add/AddDropDown.Component';
-import NAMES from '../../../../../../../constants/name.constants';
-import LENGTHS from '../../../../../../../constants/lengths.constants';
-import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
-import STORES from '../../../../../../../constants/store.constants';
-import AddBottom from '../../AddBottom.Component';
-import WarningModal from './WarningModal.Component';
-import { useTranslation } from 'react-i18next';
+
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
-import Schedule from '../../../../../../../models/Schedule.Model';
-import {
-	reservationBedConflict,
-	reservationEmployeeConflict,
-} from '../../../../../../../utils/reservation.utils';
-import User from '../../../../../../../models/User.Model';
+
 import { useCustomersQuery } from '../../../../../../hooks/customer.hooks';
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
 import { useServicesQuery } from '../../../../../../hooks/service.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+
+import {
+	genderDropDownItems,
+	getEmployeeDropDownItems,
+	getServiceDropDownItems,
+} from '../../../../../../../constants/drop-down.constants';
+import ERRORS from '../../../../../../../constants/error.constants';
+import LABELS from '../../../../../../../constants/label.constants';
+import LENGTHS from '../../../../../../../constants/lengths.constants';
+import NAMES from '../../../../../../../constants/name.constants';
 import PATTERNS from '../../../../../../../constants/patterns.constants';
+import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
+import STORES from '../../../../../../../constants/store.constants';
+
+import Customer from '../../../../../../../models/Customer.Model';
+import Employee from '../../../../../../../models/Employee.Model';
+import { Gender, Permissions, Role } from '../../../../../../../models/enums';
+import Schedule from '../../../../../../../models/Schedule.Model';
+import Service from '../../../../../../../models/Service.Model';
+import User from '../../../../../../../models/User.Model';
+
+import { AddReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
+
+import {
+	reservationBedConflict,
+	reservationEmployeeConflict,
+} from '../../../../../../../utils/reservation.utils';
 import { formatPhoneNumber } from '../../../../../../../utils/string.utils';
 
 interface AddReservationProp {
