@@ -2,6 +2,11 @@
   "name": "bigfeetwebapplication",
   "private": true,
   "version": "0.0.0",
+  "description": "The dedicated (React) frontend web application.",
+  "engines": {
+		"node": "16.16.0",
+		"npm": "9.6.0"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
