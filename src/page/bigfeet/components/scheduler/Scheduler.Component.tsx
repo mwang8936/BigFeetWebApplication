@@ -149,17 +149,11 @@ const Scheduler: FC = () => {
 		(scheduleQuery.data as Schedule[]) || []
 	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
-	let employeeList: Employee[] = [];
+	const employees: Employee[] = (
+		(employeeQuery.data as Employee[]) || [user]
+	).filter((employee) => employee.role !== Role.DEVELOPER);
 
-	try {
-		const employees: Employee[] = (
-			(employeeQuery.data as Employee[]) || []
-		).filter((employee) => employee.role !== Role.DEVELOPER);
-		employeeList.push(...employees);
-	} catch {
-		employeeList.push(user);
-	}
-	sortEmployees(employeeList, schedules, date);
+	sortEmployees(employees, schedules, date);
 
 	const creatable = [
 		Permissions.PERMISSION_ADD_GIFT_CARD,
@@ -411,7 +405,7 @@ const Scheduler: FC = () => {
 					date={date}
 					start={STORES.start}
 					end={STORES.end}
-					employees={employeeList}
+					employees={employees}
 					schedules={schedules}
 					creatable={creatable}
 					onAddReservation={onAddReservation}

@@ -1,26 +1,35 @@
 import { FC, useState, useEffect } from 'react';
-import { PencilSquareIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
+
 import { Dialog } from '@headlessui/react';
-import Schedule from '../../../../../../../models/Schedule.Model';
-import { UpdateScheduleRequest } from '../../../../../../../models/requests/Schedule.Request.Model';
-import { sameTime } from '../../../../../../../utils/date.utils';
-import { ToggleColor } from '../../../add/AddToggleSwitch.Component';
-import LABELS from '../../../../../../../constants/label.constants';
-import NAMES from '../../../../../../../constants/name.constants';
-import ERRORS from '../../../../../../../constants/error.constants';
-import STORES from '../../../../../../../constants/store.constants';
+import { PencilSquareIcon } from '@heroicons/react/24/outline';
+
 import EditBottom from '../../EditBottom.Component';
+
+import { ToggleColor } from '../../../add/AddToggleSwitch.Component';
+
+import EditableDropDown from '../../../editable/EditableDropDown.Component';
 import EditableTime from '../../../editable/EditableTime.Component';
 import EditableToggleSwitch from '../../../editable/EditableToggleSwitch.Component';
-import { useTranslation } from 'react-i18next';
-import Employee from '../../../../../../../models/Employee.Model';
-import { Permissions, Role } from '../../../../../../../models/enums';
-import { getPriorityDropDownItems } from '../../../../../../../constants/drop-down.constants';
-import EditableDropDown from '../../../editable/EditableDropDown.Component';
-import User from '../../../../../../../models/User.Model';
+
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+
+import { getPriorityDropDownItems } from '../../../../../../../constants/drop-down.constants';
+import ERRORS from '../../../../../../../constants/error.constants';
+import LABELS from '../../../../../../../constants/label.constants';
+import NAMES from '../../../../../../../constants/name.constants';
+import STORES from '../../../../../../../constants/store.constants';
+
+import Employee from '../../../../../../../models/Employee.Model';
+import { Permissions, Role } from '../../../../../../../models/enums';
+import Schedule from '../../../../../../../models/Schedule.Model';
+import User from '../../../../../../../models/User.Model';
+
+import { UpdateScheduleRequest } from '../../../../../../../models/requests/Schedule.Request.Model';
+
+import { sameTime } from '../../../../../../../utils/date.utils';
 
 interface EditScheduleProp {
 	setOpen(open: boolean): void;
@@ -72,7 +81,7 @@ const EditSchedule: FC<EditScheduleProp> = ({
 		staleTime: Infinity,
 	});
 	const employees: Employee[] = (
-		(employeeQuery.data as Employee[]) || []
+		(employeeQuery.data as Employee[]) || [user]
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	const scheduleQuery = useSchedulesQuery({
@@ -180,12 +189,14 @@ const EditSchedule: FC<EditScheduleProp> = ({
 							aria-hidden="true"
 						/>
 					</div>
+
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Edit Schedule')}
 						</Dialog.Title>
+
 						<div className="mt-2">
 							<EditableDropDown
 								originalOption={
@@ -213,6 +224,7 @@ const EditSchedule: FC<EditScheduleProp> = ({
 								editable={editable}
 								missingPermissionMessage={ERRORS.schedule.permissions.edit}
 							/>
+
 							<EditableTime
 								originalTime={schedule.start}
 								time={startInput}
@@ -230,6 +242,7 @@ const EditSchedule: FC<EditScheduleProp> = ({
 								editable={editable}
 								missingPermissionMessage={ERRORS.schedule.permissions.edit}
 							/>
+
 							{startInput && !invalidStart && (
 								<EditableTime
 									originalTime={schedule.end}
@@ -279,6 +292,7 @@ const EditSchedule: FC<EditScheduleProp> = ({
 					</div>
 				</div>
 			</div>
+
 			<EditBottom
 				onCancel={() => setOpen(false)}
 				disabledEdit={!editable || !changesMade || invalidInput}

@@ -55,7 +55,7 @@ const Employees: FC = () => {
 
 	const employeeQuery = useEmployeesQuery({ gettable });
 
-	const employees: Employee[] = employeeQuery.data || [];
+	const employees: Employee[] = employeeQuery.data || [user];
 
 	const isEmployeeLoading = employeeQuery.isLoading;
 

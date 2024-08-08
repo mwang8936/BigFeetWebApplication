@@ -59,6 +59,8 @@ const MoveReservation: FC<MoveReservationProp> = ({
 }) => {
 	const { t } = useTranslation();
 
+	const { date } = useScheduleDateContext();
+
 	const [openBedWarningModal, setOpenBedWarningModal] =
 		useState<boolean>(false);
 	const [openConflictWarningModal, setOpenConflictWarningModal] =
@@ -69,8 +71,6 @@ const MoveReservation: FC<MoveReservationProp> = ({
 	const [noBeds, setNoBeds] = useState<boolean>(false);
 	const [conflict, setConflict] = useState<boolean>(false);
 	const [genderMismatch, setGenderMismatch] = useState<boolean>(false);
-
-	const { date } = useScheduleDateContext();
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
@@ -87,7 +87,7 @@ const MoveReservation: FC<MoveReservationProp> = ({
 		staleTime: Infinity,
 	});
 	const employees: Employee[] = (
-		(employeeQuery.data as Employee[]) || []
+		(employeeQuery.data as Employee[]) || [user]
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	const scheduleQuery = useSchedulesQuery({
@@ -217,11 +217,14 @@ const MoveReservation: FC<MoveReservationProp> = ({
 									prevEmployeeUsername !== newEmployeeUsername && (
 										<span className="flex flex-row">
 											<span className="me-3 font-medium">{t('Employee')}:</span>
+
 											{prevEmployeeUsername}
+
 											<ArrowLongRightIcon
 												className="h-6 w-6 mx-3 text-black"
 												aria-hidden="true"
 											/>
+
 											{newEmployeeUsername}
 										</span>
 									)}
@@ -229,11 +232,14 @@ const MoveReservation: FC<MoveReservationProp> = ({
 								{newTime && (
 									<span className="flex flex-row">
 										<span className="me-3 font-medium">{t('Time')}:</span>
+
 										{formatTimeFromDate(reservation.reserved_date)}
+
 										<ArrowLongRightIcon
 											className="h-6 w-6 mx-3 text-black"
 											aria-hidden="true"
 										/>
+
 										{newTime && formatTimeFromDate(newTime)}
 									</span>
 								)}

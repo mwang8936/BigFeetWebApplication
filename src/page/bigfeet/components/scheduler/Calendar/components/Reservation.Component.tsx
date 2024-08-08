@@ -76,19 +76,15 @@ const ReservationTag: FC<ReservationTagProp> = ({
 		(scheduleQuery.data as Schedule[]) || []
 	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
-	try {
-		const employeeQuery = useEmployeesQuery({
-			gettable: employeeGettable,
-			staleTime: Infinity,
-		});
-		const employees: Employee[] = (
-			(employeeQuery.data as Employee[]) || []
-		).filter((employee) => employee.role !== Role.DEVELOPER);
-		employeeList.push(...employees);
-	} catch {
-		employeeList.push(user);
-	}
-	sortEmployees(employeeList, schedules, date);
+	const employeeQuery = useEmployeesQuery({
+		gettable: employeeGettable,
+		staleTime: Infinity,
+	});
+	const employees: Employee[] = (
+		(employeeQuery.data as Employee[]) || [user]
+	).filter((employee) => employee.role !== Role.DEVELOPER);
+
+	sortEmployees(employees, schedules, date);
 
 	useEffect(() => {
 		setPosition({ x: 0, y: 0 });
@@ -97,14 +93,14 @@ const ReservationTag: FC<ReservationTagProp> = ({
 	const employeeOffset = Math.round(position.x / 200);
 	const timeOffset = Math.round(position.y / (100 / 6));
 
-	const currEmployeeIndex = employeeList.findIndex(
+	const currEmployeeIndex = employees.findIndex(
 		(employee) => employee.employee_id === reservation.employee_id
 	);
 
 	const newEmployeeId =
 		employeeOffset === 0
 			? undefined
-			: employeeList[currEmployeeIndex + employeeOffset || 0].employee_id;
+			: employees[currEmployeeIndex + employeeOffset || 0].employee_id;
 
 	const newTime =
 		timeOffset === 0 ? undefined : new Date(reservation.reserved_date);
@@ -121,7 +117,7 @@ const ReservationTag: FC<ReservationTagProp> = ({
 	const topMargin = (((startMinute % 30) / 60) * 100).toString() + '%';
 
 	const leftBound = -200 * currEmployeeIndex;
-	const rightBound = 200 * (employeeList.length - currEmployeeIndex - 1);
+	const rightBound = 200 * (employees.length - currEmployeeIndex - 1);
 	const topBound =
 		-100 * (rowStart - 2) - (100 / 6) * Math.floor((startMinute % 30) / 5);
 	const bottomBound =

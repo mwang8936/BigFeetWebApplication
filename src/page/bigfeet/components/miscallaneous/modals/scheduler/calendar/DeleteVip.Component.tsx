@@ -44,7 +44,7 @@ const DeleteVip: FC<DeleteVipProp> = ({
 		staleTime: Infinity,
 	});
 	const employees: Employee[] = (
-		(employeeQuery.data as Employee[]) || []
+		(employeeQuery.data as Employee[]) || [user]
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	const onDelete = () => {

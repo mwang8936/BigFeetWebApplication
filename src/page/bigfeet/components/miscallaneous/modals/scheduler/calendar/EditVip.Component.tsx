@@ -53,6 +53,8 @@ const EditVip: FC<EditVipProp> = ({
 }) => {
 	const { t } = useTranslation();
 
+	const { date } = useScheduleDateContext();
+
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
 	const [soldAmountInput, setSoldAmountInput] = useState<number | null>(
@@ -76,7 +78,6 @@ const EditVip: FC<EditVipProp> = ({
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
-	const { date } = useScheduleDateContext();
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -87,7 +88,7 @@ const EditVip: FC<EditVipProp> = ({
 		staleTime: Infinity,
 	});
 	const employees: Employee[] = (
-		(employeeQuery.data as Employee[]) || []
+		(employeeQuery.data as Employee[]) || [user]
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	useEffect(() => {
@@ -166,12 +167,14 @@ const EditVip: FC<EditVipProp> = ({
 							aria-hidden="true"
 						/>
 					</div>
+
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Edit Serial')}
 						</Dialog.Title>
+
 						<div className="mt-2">
 							<EditablePayRate
 								originalAmount={vipPackage.sold_amount}
@@ -244,6 +247,7 @@ const EditVip: FC<EditVipProp> = ({
 					</div>
 				</div>
 			</div>
+
 			<EditBottom
 				onCancel={() => setOpen(false)}
 				disabledEdit={
