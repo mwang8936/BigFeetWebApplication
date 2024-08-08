@@ -30,13 +30,6 @@ const ModalPermissionsButton: FC<ModalPermissionsButtonProp> = ({
 			? 'bg-red-600 hover:bg-red-500 disabled:bg-red-300'
 			: 'bg-blue-600 hover:bg-blue-500 disabled:bg-blue-300';
 
-	const tipOriginCss =
-		'origin' + (top ? '-bottom' : '-top') + (right ? '-right' : '-left');
-	const tipLocationCss =
-		(top ? 'bottom-[100%]' : 'top-[100%]') +
-		' ' +
-		(right ? 'right-[0%]' : 'left-[0%]');
-
 	return (
 		<button
 			type="button"
@@ -44,7 +37,20 @@ const ModalPermissionsButton: FC<ModalPermissionsButtonProp> = ({
 			disabled={disabled}
 			onClick={onClick}>
 			<span
-				className={`button-tip ${tipLocationCss} ${tipOriginCss} group-hover:group-disabled:scale-100`}>
+				style={{
+					bottom: top ? '100%' : undefined,
+					top: !top ? '100%' : undefined,
+					right: right ? '0%' : undefined,
+					left: !right ? '0%' : undefined,
+					transformOrigin: top
+						? right
+							? 'bottom right'
+							: 'bottom left'
+						: right
+						? 'top right'
+						: 'top left',
+				}}
+				className={`button-tip group-hover:group-disabled:scale-100`}>
 				{missingPermissionMessage}
 			</span>
 
