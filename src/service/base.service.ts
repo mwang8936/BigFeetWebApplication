@@ -31,15 +31,20 @@ export default async function authorizedRequest(
 		data: data,
 		params: params,
 	};
-	console.log('API Request:', config);
+
+	if (import.meta.env.VITE_ENV === 'development')
+		console.log('API Request:', config);
 
 	return axios(config)
 		.then((response) => {
-			console.log('API Response:', response);
+			if (import.meta.env.VITE_ENV === 'development')
+				console.log('API Response:', response);
+
 			return parseData(response.data);
 		})
 		.catch((error: AxiosError) => {
-			console.error('API Error:', error);
+			if (import.meta.env.VITE_ENV === 'development')
+				console.error('API Error:', error);
 
 			const message = onError(error, i18n, queryClient, setAuthentication);
 			if (typeof message === 'string') throw new Error(message);
