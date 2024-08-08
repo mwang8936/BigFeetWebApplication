@@ -957,22 +957,16 @@ const EditReservation: FC<EditReservationProp> = ({
 								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
-							<div className="flex flex-col border-t-2 border-black p-2">
-								<span className="font-bold mb-2 flex flex-col">
+							<div className="customer-optional-div">
+								<span className="customer-optional-title">
 									{t('Customer (Optional)')}:
 									{customerIdInput !== null && (
-										<span className="flex flex-col text-green-500 font-medium text-sm">
-											<span className="text-green-500">
-												{t('Current Customer')}:
-											</span>
+										<span className="current-customer-span">
+											<span>{t('Current Customer')}:</span>
 
-											<span className="text-green-500">
-												{currentPhoneNumberText}
-											</span>
+											<span>{currentPhoneNumberText}</span>
 
-											<span className="text-green-500">
-												{currentVipSerialText}
-											</span>
+											<span>{currentVipSerialText}</span>
 										</span>
 									)}
 								</span>

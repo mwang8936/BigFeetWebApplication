@@ -1,10 +1,60 @@
 import { useState, createContext, useContext, FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
+
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+
 import Calendar from './Calendar/Calendar.Component';
-import { PaymentMethod, Permissions, Role } from '../../../../models/enums';
-import Schedule from '../../../../models/Schedule.Model';
-import { sameDate } from '../../../../utils/date.utils';
+import ZoomOverlay from './components/ZoomOverlay.Component';
+
+import PermissionsButton, {
+	ButtonType,
+} from '../miscallaneous/PermissionsButton.Component';
+
+import FilterDateModal from '../miscallaneous/modals/scheduler/FilterDateModal.Component';
+import AddReservationModal from '../miscallaneous/modals/scheduler/calendar/AddReservationModal.Component';
+import GiftCardsModal from '../miscallaneous/modals/scheduler/calendar/GiftCardModal.Component';
+
+import { useCustomersQuery } from '../../../hooks/customer.hooks';
+import { useEmployeesQuery } from '../../../hooks/employee.hooks';
+import {
+	useAddGiftCardMutation,
+	useDeleteGiftCardMutation,
+	useGiftCardsQuery,
+	useUpdateGiftCardMutation,
+} from '../../../hooks/gift-card.hooks';
+import {
+	useAddScheduleMutation,
+	useSignProfileScheduleMutation,
+	useSchedulesQuery,
+	useUpdateScheduleMutation,
+} from '../../../hooks/schedule.hooks';
+import {
+	useAddReservationMutation,
+	useDeleteReservationMutation,
+	useUpdateReservationMutation,
+} from '../../../hooks/reservation.hooks';
+import { useServicesQuery } from '../../../hooks/service.hooks';
+import { useUserQuery } from '../../../hooks/profile.hooks';
+import {
+	useAddVipPackageMutation,
+	useDeleteVipPackageMutation,
+	useUpdateVipPackageMutation,
+} from '../../../hooks/vip-package.hooks';
+
+import ERRORS from '../../../../constants/error.constants';
+import STORES from '../../../../constants/store.constants';
+
 import Employee from '../../../../models/Employee.Model';
+import { PaymentMethod, Permissions, Role } from '../../../../models/enums';
+import GiftCard from '../../../../models/Gift-Card.Model';
+import Schedule from '../../../../models/Schedule.Model';
+import User from '../../../../models/User.Model';
+
+import {
+	AddGiftCardRequest,
+	UpdateGiftCardRequest,
+} from '../../../../models/requests/GIft-Card.Request';
 import {
 	AddReservationRequest,
 	UpdateReservationRequest,
@@ -13,56 +63,16 @@ import {
 	AddScheduleRequest,
 	UpdateScheduleRequest,
 } from '../../../../models/requests/Schedule.Request.Model';
-import AddReservationModal from '../miscallaneous/modals/scheduler/calendar/AddReservationModal.Component';
-import PermissionsButton, {
-	ButtonType,
-} from '../miscallaneous/PermissionsButton.Component';
-import ZoomOverlay from './components/ZoomOverlay.Component';
+
 import {
 	AddVipPackageRequest,
 	UpdateVipPackageRequest,
 } from '../../../../models/requests/Vip-Package.Request.Model';
-import FilterDateModal from '../miscallaneous/modals/scheduler/FilterDateModal.Component';
-import STORES from '../../../../constants/store.constants';
+
+import { sameDate } from '../../../../utils/date.utils';
 import { sortEmployees } from '../../../../utils/employee.utils';
-import ERRORS from '../../../../constants/error.constants';
-import { useTranslation } from 'react-i18next';
-import { useQueryClient } from '@tanstack/react-query';
-import { formatDateToQueryKey } from '../../../../utils/string.utils';
 import { moneyToString } from '../../../../utils/number.utils';
-import User from '../../../../models/User.Model';
-import { useCustomersQuery } from '../../../hooks/customer.hooks';
-import { useEmployeesQuery } from '../../../hooks/employee.hooks';
-import { useSchedulesQuery } from '../../../hooks/schedule.hooks';
-import { useServicesQuery } from '../../../hooks/service.hooks';
-import { useUserQuery } from '../../../hooks/profile.hooks';
-import {
-	useAddScheduleMutation,
-	useSignProfileScheduleMutation,
-	useUpdateScheduleMutation,
-} from '../../../hooks/schedule.hooks';
-import {
-	useAddReservationMutation,
-	useDeleteReservationMutation,
-	useUpdateReservationMutation,
-} from '../../../hooks/reservation.hooks';
-import {
-	useAddVipPackageMutation,
-	useDeleteVipPackageMutation,
-	useUpdateVipPackageMutation,
-} from '../../../hooks/vip-package.hooks';
-import {
-	useAddGiftCardMutation,
-	useDeleteGiftCardMutation,
-	useGiftCardsQuery,
-	useUpdateGiftCardMutation,
-} from '../../../hooks/gift-card.hooks';
-import GiftCard from '../../../../models/Gift-Card.Model';
-import GiftCardsModal from '../miscallaneous/modals/scheduler/calendar/GiftCardModal.Component';
-import {
-	AddGiftCardRequest,
-	UpdateGiftCardRequest,
-} from '../../../../models/requests/GIft-Card.Request';
+import { formatDateToQueryKey } from '../../../../utils/string.utils';
 
 const ScheduleDateContext = createContext<
 	{ date: Date; setDate(date: Date): void } | undefined
@@ -89,19 +99,8 @@ const Scheduler: FC = () => {
 	const [date, setDate] = useState<Date>(new Date());
 	const [filtered, setFiltered] = useState(false);
 	const [openFilterDialog, setOpenFilterDialog] = useState(false);
+
 	const [scale, setScale] = useState(1);
-
-	const zoomIn = () => {
-		setScale((prevScale) => prevScale + 0.1);
-	};
-
-	const zoomOut = () => {
-		setScale((prevScale) => Math.max(0.1, prevScale - 0.1));
-	};
-
-	const zoomReset = () => {
-		setScale(1);
-	};
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
@@ -126,20 +125,27 @@ const Scheduler: FC = () => {
 		gettable: customerGettable,
 		refetchInterval: 1000 * 60 * 5,
 	});
+
 	const employeeQuery = useEmployeesQuery({
 		gettable: employeeGettable,
 		refetchInterval: 1000 * 60 * 5,
 	});
+	const employees: Employee[] = (
+		(employeeQuery.data as Employee[]) || [user]
+	).filter((employee) => employee.role !== Role.DEVELOPER);
+
 	const giftCardsQuery = useGiftCardsQuery({
 		date,
 		gettable: giftCardGettable,
 		refetchInterval: 1000 * 60 * 5,
 	});
 	const giftCards: GiftCard[] = (giftCardsQuery.data as GiftCard[]) || [];
+
 	useServicesQuery({
 		gettable: serviceGettable,
 		refetchInterval: 1000 * 60 * 5,
 	});
+
 	const scheduleQuery = useSchedulesQuery({
 		date,
 		gettable: scheduleGettable,
@@ -149,14 +155,12 @@ const Scheduler: FC = () => {
 		(scheduleQuery.data as Schedule[]) || []
 	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
-	const employees: Employee[] = (
-		(employeeQuery.data as Employee[]) || [user]
-	).filter((employee) => employee.role !== Role.DEVELOPER);
-
 	sortEmployees(employees, schedules, date);
 
-	const creatable = [
-		Permissions.PERMISSION_ADD_GIFT_CARD,
+	const giftCardCreatable = user.permissions.includes(
+		Permissions.PERMISSION_ADD_GIFT_CARD
+	);
+	const scheduleCreatable = [
 		Permissions.PERMISSION_ADD_RESERVATION,
 		Permissions.PERMISSION_ADD_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
@@ -185,8 +189,10 @@ const Scheduler: FC = () => {
 		addVipPackageMutation.mutate({ request });
 	};
 
-	const editable = [
-		Permissions.PERMISSION_UPDATE_GIFT_CARD,
+	const giftCardEditable = user.permissions.includes(
+		Permissions.PERMISSION_UPDATE_GIFT_CARD
+	);
+	const scheduleEditable = [
 		Permissions.PERMISSION_UPDATE_RESERVATION,
 		Permissions.PERMISSION_UPDATE_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
@@ -247,6 +253,9 @@ const Scheduler: FC = () => {
 		updateVipPackageMutation.mutate({ serial, request, originalDate, newDate });
 	};
 
+	const giftCardDeletable = user.permissions.includes(
+		Permissions.PERMISSION_DELETE_GIFT_CARD
+	);
 	const deletable = [
 		Permissions.PERMISSION_DELETE_RESERVATION,
 		Permissions.PERMISSION_DELETE_SCHEDULE,
@@ -276,16 +285,6 @@ const Scheduler: FC = () => {
 		signProfileScheduleMutation.mutate({ date });
 	};
 
-	const getPermission = user.permissions.includes(
-		Permissions.PERMISSION_GET_SCHEDULE
-	);
-
-	const displayDate = () => {
-		return sameDate(new Date(), date)
-			? `${t('Today')} - ${date.toDateString()}`
-			: date.toDateString();
-	};
-
 	const totalGiftCardAmount = giftCards
 		.map((giftCard) => giftCard.payment_amount)
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
@@ -301,6 +300,7 @@ const Scheduler: FC = () => {
 			reservation.service.body,
 		])
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+
 	const totalCash =
 		totalReservations
 			.map((reservation) => reservation.cash || 0)
@@ -319,11 +319,29 @@ const Scheduler: FC = () => {
 		);
 		setDate(selectedDate);
 
-		if (getPermission && !sameDate(date, selectedDate)) {
+		if (scheduleGettable && !sameDate(date, selectedDate)) {
 			queryClient.invalidateQueries({
 				queryKey: ['schedules', formatDateToQueryKey(selectedDate)],
 			});
 		}
+	};
+
+	const zoomIn = () => {
+		setScale((prevScale) => prevScale + 0.1);
+	};
+
+	const zoomOut = () => {
+		setScale((prevScale) => Math.max(0.1, prevScale - 0.1));
+	};
+
+	const zoomReset = () => {
+		setScale(1);
+	};
+
+	const displayDate = () => {
+		return sameDate(new Date(), date)
+			? `${t('Today')} - ${date.toDateString()}`
+			: date.toDateString();
 	};
 
 	return (
@@ -335,7 +353,7 @@ const Scheduler: FC = () => {
 						btnType={ButtonType.ADD}
 						top={false}
 						right={false}
-						disabled={!creatable}
+						disabled={!scheduleCreatable}
 						missingPermissionMessage={ERRORS.reservation.permissions.add}
 						onClick={() => setOpenAddReservationModal(true)}
 					/>
@@ -345,7 +363,7 @@ const Scheduler: FC = () => {
 						btnType={ButtonType.ADD}
 						top={false}
 						right={false}
-						disabled={!creatable}
+						disabled={!giftCardCreatable}
 						missingPermissionMessage={ERRORS.gift_card.permissions.add}
 						onClick={() => setOpenGiftCardModal(true)}
 					/>
@@ -407,11 +425,11 @@ const Scheduler: FC = () => {
 					end={STORES.end}
 					employees={employees}
 					schedules={schedules}
-					creatable={creatable}
+					creatable={scheduleCreatable}
 					onAddReservation={onAddReservation}
 					onAddSchedule={onAddSchedule}
 					onAddVipPackage={onAddVipPackage}
-					editable={editable}
+					editable={scheduleEditable}
 					onEditReservation={onEditReservation}
 					onEditSchedule={onEditSchedule}
 					onEditVipPackage={onEditVipPackage}
@@ -424,7 +442,7 @@ const Scheduler: FC = () => {
 			<AddReservationModal
 				open={openAddReservationModal}
 				setOpen={setOpenAddReservationModal}
-				creatable={creatable}
+				creatable={scheduleCreatable}
 				onAddReservation={onAddReservation}
 			/>
 
@@ -432,11 +450,11 @@ const Scheduler: FC = () => {
 				open={openGiftCardModal}
 				setOpen={setOpenGiftCardModal}
 				giftCards={giftCards}
-				creatable={creatable}
+				creatable={scheduleCreatable}
 				onAddGiftCard={onAddGiftCard}
-				editable={editable}
+				editable={giftCardEditable}
 				onEditGiftCard={onEditGiftCard}
-				deletable={deletable}
+				deletable={giftCardDeletable}
 				onDeleteGiftCard={onDeleteGiftCard}
 			/>
 		</ScheduleDateContext.Provider>

@@ -1,10 +1,15 @@
 import { FC } from 'react';
-import BaseModal from '../../BaseModal.Component';
+
 import EditReservation from './EditReservation.Component';
-import Reservation from '../../../../../../../models/Reservation.Model';
-import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
-import User from '../../../../../../../models/User.Model';
+
+import BaseModal from '../../BaseModal.Component';
+
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+
+import Reservation from '../../../../../../../models/Reservation.Model';
+import User from '../../../../../../../models/User.Model';
+
+import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
 
 interface EditReservationModalProp {
 	open: boolean;
