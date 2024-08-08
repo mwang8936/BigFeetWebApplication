@@ -165,6 +165,7 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 			<VipGrid
 				row={timeArr.length + 4}
 				colNum={colNum}
+				defaultEmployeeId={employee.employee_id}
 				vipPackages={schedule?.vip_packages || []}
 				creatable={creatable}
 				onAddVipPackage={onAddVipPackage}

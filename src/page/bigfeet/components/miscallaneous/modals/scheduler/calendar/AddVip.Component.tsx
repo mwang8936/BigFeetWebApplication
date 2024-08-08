@@ -31,18 +31,26 @@ import { AddVipPackageRequest } from '../../../../../../../models/requests/Vip-P
 
 interface AddVipProp {
 	setOpen(open: boolean): void;
+	defaultEmployeeId?: number;
 	creatable: boolean;
 	onAddVipPackage(request: AddVipPackageRequest): Promise<void>;
 }
 
-const AddVip: FC<AddVipProp> = ({ setOpen, creatable, onAddVipPackage }) => {
+const AddVip: FC<AddVipProp> = ({
+	setOpen,
+	defaultEmployeeId,
+	creatable,
+	onAddVipPackage,
+}) => {
 	const { t } = useTranslation();
 
 	const { date } = useScheduleDateContext();
 
 	const [serialInput, setSerialInput] = useState<string | null>(null);
 	const [soldAmountInput, setSoldAmountInput] = useState<number | null>(null);
-	const [employeesInput, setEmployeesInput] = useState<number[]>([]);
+	const [employeesInput, setEmployeesInput] = useState<number[]>(
+		defaultEmployeeId ? [defaultEmployeeId] : []
+	);
 	const [commissionAmountInput, setCommissionAmountInput] = useState<
 		number | null
 	>(null);
