@@ -306,28 +306,28 @@ const BigFeet: FC = () => {
 			const channel = pusher.subscribe(schedules_channel);
 
 			const onReservationEvent = (reservation: Reservation, event: string) => {
-				const reservedDate = new Date(reservation.reserved_date);
-				const time = reservedDate.toLocaleTimeString('en-US', {
-					timeZone: 'America/Los_Angeles',
-					hour12: true,
-					hour: '2-digit',
-					minute: '2-digit',
-				});
-
-				let message: string = '';
-				if (event === add_reservation_event) {
-					message = t('Reservation Added', { time });
-				} else if (event === update_reservation_event) {
-					message = t('Reservation Updated', { time });
-				} else if (event === delete_reservation_event) {
-					message = t('Reservation Deleted', { time });
-				}
-				pusherToast(message);
-
 				if (
 					permissions.includes(Permissions.PERMISSION_GET_SCHEDULE) ||
 					reservation.employee_id === user.employee_id
 				) {
+					const reservedDate = new Date(reservation.reserved_date);
+					const time = reservedDate.toLocaleTimeString('en-US', {
+						timeZone: 'America/Los_Angeles',
+						hour12: true,
+						hour: '2-digit',
+						minute: '2-digit',
+					});
+
+					let message: string = '';
+					if (event === add_reservation_event) {
+						message = t('Reservation Added', { time });
+					} else if (event === update_reservation_event) {
+						message = t('Reservation Updated', { time });
+					} else if (event === delete_reservation_event) {
+						message = t('Reservation Deleted', { time });
+					}
+					pusherToast(message);
+
 					queryClient.invalidateQueries({
 						queryKey: [schedulesQueryKey, formatDateToQueryKey(new Date())],
 					});
@@ -354,22 +354,22 @@ const BigFeet: FC = () => {
 			);
 
 			const onScheduleEvent = (schedule: Schedule, event: string) => {
-				const username = schedule.employee.username;
-
-				let message: string = '';
-				if (event === add_schedule_event) {
-					message = t('Schedule Added', { username });
-				} else if (event === update_schedule_event) {
-					message = t('Schedule Updated', { username });
-				} else if (event === delete_schedule_event) {
-					message = t('Schedule Deleted', { username });
-				}
-				pusherToast(message);
-
 				if (
 					permissions.includes(Permissions.PERMISSION_GET_SCHEDULE) ||
 					schedule.employee.employee_id === user.employee_id
 				) {
+					const username = schedule.employee.username;
+
+					let message: string = '';
+					if (event === add_schedule_event) {
+						message = t('Schedule Added', { username });
+					} else if (event === update_schedule_event) {
+						message = t('Schedule Updated', { username });
+					} else if (event === delete_schedule_event) {
+						message = t('Schedule Deleted', { username });
+					}
+					pusherToast(message);
+
 					queryClient.invalidateQueries({
 						queryKey: [schedulesQueryKey, formatDateToQueryKey(new Date())],
 					});
@@ -387,22 +387,22 @@ const BigFeet: FC = () => {
 			);
 
 			const onVipPackageEvent = (vipPackage: VipPackage, event: string) => {
-				const serial = vipPackage.serial;
-
-				let message: string = '';
-				if (event === add_vip_package_event) {
-					message = t('Vip Package Added', { serial });
-				} else if (event === update_vip_package_event) {
-					message = t('Vip Package Updated', { serial });
-				} else if (event === delete_vip_package_event) {
-					message = t('Vip Package Deleted', { serial });
-				}
-				pusherToast(message);
-
 				if (
 					permissions.includes(Permissions.PERMISSION_GET_SCHEDULE) ||
 					vipPackage.employee_ids.includes(user.employee_id)
 				) {
+					const serial = vipPackage.serial;
+
+					let message: string = '';
+					if (event === add_vip_package_event) {
+						message = t('Vip Package Added', { serial });
+					} else if (event === update_vip_package_event) {
+						message = t('Vip Package Updated', { serial });
+					} else if (event === delete_vip_package_event) {
+						message = t('Vip Package Deleted', { serial });
+					}
+					pusherToast(message);
+
 					queryClient.invalidateQueries({
 						queryKey: [schedulesQueryKey, formatDateToQueryKey(new Date())],
 					});
