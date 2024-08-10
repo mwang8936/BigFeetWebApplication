@@ -56,7 +56,8 @@ export async function updateService(
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
 	service_id: number,
-	request: UpdateServiceRequest
+	request: UpdateServiceRequest,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
@@ -64,7 +65,9 @@ export async function updateService(
 		setAuthentication,
 		`${servicePath}/${service_id}`,
 		'patch',
-		request
+		request,
+		undefined,
+		socket_id
 	);
 }
 
@@ -72,7 +75,8 @@ export async function addService(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	request: AddServiceRequest
+	request: AddServiceRequest,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
@@ -80,7 +84,9 @@ export async function addService(
 		setAuthentication,
 		`${servicePath}`,
 		'post',
-		request
+		request,
+		undefined,
+		socket_id
 	);
 }
 
@@ -88,14 +94,18 @@ export async function deleteService(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	service_id: number
+	service_id: number,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
 		`${servicePath}/${service_id}`,
-		'delete'
+		'delete',
+		undefined,
+		undefined,
+		socket_id
 	);
 }
 
@@ -103,13 +113,17 @@ export async function recoverService(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	service_id: number
+	service_id: number,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
 		`${servicePath}/${service_id}/recover`,
-		'delete'
+		'delete',
+		undefined,
+		undefined,
+		socket_id
 	);
 }

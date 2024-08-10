@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { createContext, FC, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -20,7 +20,7 @@ import { customersQueryKey } from '../hooks/customer.hooks';
 import { employeesQueryKey } from '../hooks/employee.hooks';
 import { giftCardsQueryKey } from '../hooks/gift-card.hooks';
 import { useUserQuery } from '../hooks/profile.hooks';
-import { schedulesQueryKey, useSchedulesQuery } from '../hooks/schedule.hooks';
+import { schedulesQueryKey } from '../hooks/schedule.hooks';
 import { servicesQueryKey } from '../hooks/service.hooks';
 
 import API_BASE_URL, { authenticatePath } from '../../constants/api.constants';
@@ -76,7 +76,6 @@ import {
 	update_vip_package_event,
 } from '../../models/events/vip-package.events';
 
-import { sameDate } from '../../utils/date.utils';
 import { getLanguageFile } from '../../utils/i18n.utils';
 import {
 	formatDateToQueryKey,
@@ -93,7 +92,18 @@ export const enum SideBarItems {
 	Customers = 5,
 }
 
+const SocketIdContext = createContext<{
+	socketId: string;
+	setSocketId(socketId: string): void;
+}>({ socketId: '', setSocketId: () => {} });
+
+export function useSocketIdContext() {
+	return useContext(SocketIdContext);
+}
+
 const BigFeet: FC = () => {
+	const [socketId, setSocketId] = useState<string>('');
+
 	const [retryingUserQuery, setRetryingUserQuery] = useState(false);
 
 	const [sideBarItems] = useState([SideBarItems.Profile]);
@@ -146,6 +156,10 @@ const BigFeet: FC = () => {
 					endpoint: `${API_BASE_URL}/${authenticatePath}/pusher`,
 					transport: 'ajax',
 				},
+			});
+
+			pusher.connection.bind('connected', () => {
+				setSocketId(pusher.connection.socket_id);
 			});
 
 			const subscribedChannels: Channel[] = [];
@@ -311,9 +325,8 @@ const BigFeet: FC = () => {
 				pusherToast(message);
 
 				if (
-					(permissions.includes(Permissions.PERMISSION_GET_SCHEDULE) ||
-						reservation.employee_id === user.employee_id) &&
-					sameDate(reservedDate, new Date())
+					permissions.includes(Permissions.PERMISSION_GET_SCHEDULE) ||
+					reservation.employee_id === user.employee_id
 				) {
 					queryClient.invalidateQueries({
 						queryKey: [schedulesQueryKey, formatDateToQueryKey(new Date())],
@@ -353,16 +366,9 @@ const BigFeet: FC = () => {
 				}
 				pusherToast(message);
 
-				const [year, month, day] = schedule.date
-					.toString()
-					.split('-')
-					.map(Number);
-				const date = new Date(year, month - 1, day);
-
 				if (
-					(permissions.includes(Permissions.PERMISSION_GET_SCHEDULE) ||
-						schedule.employee.employee_id === user.employee_id) &&
-					sameDate(date, new Date())
+					permissions.includes(Permissions.PERMISSION_GET_SCHEDULE) ||
+					schedule.employee.employee_id === user.employee_id
 				) {
 					queryClient.invalidateQueries({
 						queryKey: [schedulesQueryKey, formatDateToQueryKey(new Date())],
@@ -472,30 +478,21 @@ const BigFeet: FC = () => {
 
 	const isLoadingElement = isUserLoading ? <Loading /> : errorsElement;
 
-	useSchedulesQuery({
-		date: new Date(),
-		gettable:
-			user?.permissions?.includes(Permissions.PERMISSION_GET_SCHEDULE) ?? false,
-		staleTime: 0,
-		refetchInterval: 1000 * 60,
-		refetchIntervalInBackground: true,
-	});
-
 	return (
-		<div className="flex min-h-screen">
-			<SideBar
-				selectedIndex={selectedIndex}
-				onIndexSelected={setSelectedIndex}
-				sideBarItems={sideBarItems}
-			/>
+		<SocketIdContext.Provider value={{ socketId, setSocketId }}>
+			<div className="flex min-h-screen">
+				<SideBar
+					selectedIndex={selectedIndex}
+					onIndexSelected={setSelectedIndex}
+					sideBarItems={sideBarItems}
+				/>
 
-			{
 				<div className="grid landscape:grow landscape:h-screen landscape:ml-[9%] portrait:w-screen portrait:mt-[20%] portrait:sm:mt-[12%]">
 					{isLoadingElement}
 					<ToastContainer limit={5} />
 				</div>
-			}
-		</div>
+			</div>
+		</SocketIdContext.Provider>
 	);
 };
 

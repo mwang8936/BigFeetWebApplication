@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { MutationProp, QueryProp } from './props.hooks';
 
+import { useSocketIdContext } from '../bigfeet/BigFeet.Page';
 import { useAuthenticationContext } from '../../App';
 
 import {
@@ -69,6 +70,7 @@ export const useUpdateServiceMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: { serviceId: number; request: UpdateServiceRequest }) =>
@@ -77,7 +79,8 @@ export const useUpdateServiceMutation = ({
 				queryClient,
 				setAuthentication,
 				data.serviceId,
-				data.request
+				data.request,
+				socketId
 			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
@@ -114,10 +117,11 @@ export const useAddServiceMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: { request: AddServiceRequest }) =>
-			addService(i18n, queryClient, setAuthentication, data.request),
+			addService(i18n, queryClient, setAuthentication, data.request, socketId),
 		onMutate: async () => {
 			const toastId = createLoadingToast(t('Adding Service...'));
 			return { toastId };
@@ -148,10 +152,17 @@ export const useDeleteServiceMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: { serviceId: number }) =>
-			deleteService(i18n, queryClient, setAuthentication, data.serviceId),
+			deleteService(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.serviceId,
+				socketId
+			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 

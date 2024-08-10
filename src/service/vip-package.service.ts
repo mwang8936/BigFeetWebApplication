@@ -50,7 +50,8 @@ export async function updateVipPackage(
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
 	serial: string,
-	request: UpdateVipPackageRequest
+	request: UpdateVipPackageRequest,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
@@ -58,7 +59,9 @@ export async function updateVipPackage(
 		setAuthentication,
 		`${vipPackagePath}/${serial}`,
 		'patch',
-		request
+		request,
+		undefined,
+		socket_id
 	);
 }
 
@@ -66,7 +69,8 @@ export async function addVipPackage(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	request: AddVipPackageRequest
+	request: AddVipPackageRequest,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
@@ -74,7 +78,9 @@ export async function addVipPackage(
 		setAuthentication,
 		`${vipPackagePath}`,
 		'post',
-		request
+		request,
+		undefined,
+		socket_id
 	);
 }
 
@@ -82,13 +88,17 @@ export async function deleteVipPackage(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	serial: string
+	serial: string,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
 		`${vipPackagePath}/${serial}`,
-		'delete'
+		'delete',
+		undefined,
+		undefined,
+		socket_id
 	);
 }

@@ -5,6 +5,7 @@ import { customersQueryKey } from './customer.hooks';
 import { MutationProp } from './props.hooks';
 import { schedulesQueryKey } from './schedule.hooks';
 
+import { useSocketIdContext } from '../bigfeet/BigFeet.Page';
 import { useAuthenticationContext } from '../../App';
 
 import {
@@ -33,6 +34,7 @@ export const useUpdateReservationMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: {
@@ -46,7 +48,8 @@ export const useUpdateReservationMutation = ({
 				queryClient,
 				setAuthentication,
 				data.reservationId,
-				data.request
+				data.request,
+				socketId
 			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
@@ -103,10 +106,17 @@ export const useAddReservationMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: { request: AddReservationRequest }) =>
-			addReservation(i18n, queryClient, setAuthentication, data.request),
+			addReservation(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.request,
+				socketId
+			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -154,6 +164,7 @@ export const useDeleteReservationMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: { reservationId: number; date: Date }) =>
@@ -161,7 +172,8 @@ export const useDeleteReservationMutation = ({
 				i18n,
 				queryClient,
 				setAuthentication,
-				data.reservationId
+				data.reservationId,
+				socketId
 			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
