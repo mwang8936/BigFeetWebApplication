@@ -50,7 +50,8 @@ export async function updateGiftCard(
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
 	gift_card_id: string,
-	request: UpdateGiftCardRequest
+	request: UpdateGiftCardRequest,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
@@ -58,7 +59,9 @@ export async function updateGiftCard(
 		setAuthentication,
 		`${giftCardPath}/${gift_card_id}`,
 		'patch',
-		request
+		request,
+		undefined,
+		socket_id
 	);
 }
 
@@ -66,7 +69,8 @@ export async function addGiftCard(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	request: AddGiftCardRequest
+	request: AddGiftCardRequest,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
@@ -74,7 +78,9 @@ export async function addGiftCard(
 		setAuthentication,
 		`${giftCardPath}`,
 		'post',
-		request
+		request,
+		undefined,
+		socket_id
 	);
 }
 
@@ -82,13 +88,17 @@ export async function deleteGiftCard(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	gift_card_id: string
+	gift_card_id: string,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
 		`${giftCardPath}/${gift_card_id}`,
-		'delete'
+		'delete',
+		undefined,
+		undefined,
+		socket_id
 	);
 }

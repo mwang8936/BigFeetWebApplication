@@ -19,7 +19,7 @@ import { Language } from '../../models/enums';
 
 import { LoginRequest } from '../../models/requests/Login.Request.Model';
 
-import { authenticate, login } from '../../service/auth.service';
+import { login } from '../../service/auth.service';
 
 import { getLanguageFile } from '../../utils/i18n.utils';
 

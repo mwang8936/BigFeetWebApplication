@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { MutationProp, QueryProp } from './props.hooks';
 
+import { useSocketIdContext } from '../bigfeet/BigFeet.Page';
 import { useAuthenticationContext } from '../../App';
 
 import { GetSchedulesParam } from '../../models/params/Schedule.Param';
@@ -75,6 +76,7 @@ export const useUpdateScheduleMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: {
@@ -88,7 +90,8 @@ export const useUpdateScheduleMutation = ({
 				setAuthentication,
 				data.date,
 				data.employeeId,
-				data.request
+				data.request,
+				socketId
 			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
@@ -127,10 +130,11 @@ export const useAddScheduleMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: { request: AddScheduleRequest }) =>
-			addSchedule(i18n, queryClient, setAuthentication, data.request),
+			addSchedule(i18n, queryClient, setAuthentication, data.request, socketId),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -167,10 +171,17 @@ export const useSignProfileScheduleMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: { date: Date }) =>
-			signProfileSchedule(i18n, queryClient, setAuthentication, data.date),
+			signProfileSchedule(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.date,
+				socketId
+			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 

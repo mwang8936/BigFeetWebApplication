@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { MutationProp, QueryProp } from './props.hooks';
 
+import { useSocketIdContext } from '../bigfeet/BigFeet.Page';
 import { useAuthenticationContext } from '../../App';
 
 import {
@@ -69,6 +70,7 @@ export const useUpdateCustomerMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: {
@@ -80,7 +82,8 @@ export const useUpdateCustomerMutation = ({
 				queryClient,
 				setAuthentication,
 				data.customerId,
-				data.request
+				data.request,
+				socketId
 			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
@@ -117,10 +120,11 @@ export const useAddCustomerMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: { request: AddCustomerRequest }) =>
-			addCustomer(i18n, queryClient, setAuthentication, data.request),
+			addCustomer(i18n, queryClient, setAuthentication, data.request, socketId),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -152,10 +156,17 @@ export const useDeleteCustomerMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: { customerId: number }) =>
-			deleteCustomer(i18n, queryClient, setAuthentication, data.customerId),
+			deleteCustomer(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.customerId,
+				socketId
+			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 

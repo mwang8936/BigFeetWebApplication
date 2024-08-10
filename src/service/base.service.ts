@@ -19,17 +19,24 @@ export default async function authorizedRequest(
 	url: string,
 	method: string,
 	data?: any,
-	params?: any
+	params?: any,
+	socket_id?: string
 ) {
 	const accessToken = Cookies.get(tokenKey);
 
+	const requestData = data || {};
+
+	if (socket_id) {
+		requestData.socket_id = socket_id;
+	}
+
 	const config: AxiosRequestConfig = {
-		method: method,
+		method,
 		baseURL: BASE_API_URL,
-		url: url,
+		url,
 		headers: { Authorization: `Bearer ${accessToken}` },
-		data: data,
-		params: params,
+		data: requestData,
+		params,
 	};
 
 	if (import.meta.env.VITE_ENV === 'development')

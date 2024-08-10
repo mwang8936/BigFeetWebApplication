@@ -52,7 +52,8 @@ export async function updateSchedule(
 	setAuthentication: (authenticated: boolean) => void,
 	date: Date,
 	employee_id: number,
-	request: UpdateScheduleRequest
+	request: UpdateScheduleRequest,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
@@ -60,7 +61,9 @@ export async function updateSchedule(
 		setAuthentication,
 		`${schedulePath}/${date.toISOString()}/employee/${employee_id}`,
 		'patch',
-		request
+		request,
+		undefined,
+		socket_id
 	);
 }
 
@@ -68,7 +71,8 @@ export async function addSchedule(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	request: AddScheduleRequest
+	request: AddScheduleRequest,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
@@ -76,7 +80,9 @@ export async function addSchedule(
 		setAuthentication,
 		`${schedulePath}`,
 		'post',
-		request
+		request,
+		undefined,
+		socket_id
 	);
 }
 
@@ -85,13 +91,17 @@ export async function deleteSchedule(
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
 	date: Date,
-	employee_id: number
+	employee_id: number,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
 		`${schedulePath}/${date.toISOString()}/employee/${employee_id}`,
-		'delete'
+		'delete',
+		undefined,
+		undefined,
+		socket_id
 	);
 }

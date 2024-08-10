@@ -5,6 +5,7 @@ import { useLogout } from './authentication.hooks';
 import { userQueryKey } from './profile.hooks';
 import { MutationProp, QueryProp } from './props.hooks';
 
+import { useSocketIdContext } from '../bigfeet/BigFeet.Page';
 import { useAuthenticationContext } from '../../App';
 
 import {
@@ -71,6 +72,7 @@ export const useUpdateEmployeeMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: {
@@ -83,7 +85,8 @@ export const useUpdateEmployeeMutation = ({
 				queryClient,
 				setAuthentication,
 				data.employeeId,
-				data.request
+				data.request,
+				socketId
 			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
@@ -123,10 +126,11 @@ export const useAddEmployeeMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: { request: AddEmployeeRequest }) =>
-			addEmployee(i18n, queryClient, setAuthentication, data.request),
+			addEmployee(i18n, queryClient, setAuthentication, data.request, socketId),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -158,12 +162,19 @@ export const useDeleteEmployeeMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	const logout = useLogout();
 
 	return useMutation({
 		mutationFn: (data: { employeeId: number; userId: number }) =>
-			deleteEmployee(i18n, queryClient, setAuthentication, data.employeeId),
+			deleteEmployee(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.employeeId,
+				socketId
+			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
