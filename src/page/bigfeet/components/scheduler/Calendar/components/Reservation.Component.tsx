@@ -58,8 +58,6 @@ const ReservationTag: FC<ReservationTagProp> = ({
 
 	const { date } = useScheduleDateContext();
 
-	let employeeList: Employee[] = [];
-
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
 	);
