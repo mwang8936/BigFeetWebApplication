@@ -130,6 +130,7 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 				key={reservation.reservation_id}
 				reservation={reservation}
 				colNum={colNum}
+				onAddReservation={onAddReservation}
 				editable={editable}
 				onEditReservation={onEditReservation}
 				deletable={deletable}

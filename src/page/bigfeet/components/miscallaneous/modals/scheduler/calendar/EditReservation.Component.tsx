@@ -5,9 +5,13 @@ import { Dialog } from '@headlessui/react';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 
 import DeleteReservationModal from './DeleteReservationModal.Component';
+import ReservationAddOnModal from './ReservationAddOnModal.Component';
 import WarningModal from './WarningModal.Component';
 
 import EditBottom from '../../EditBottom.Component';
+
+import FilledPermissionsButton from '../../../FilledPermissionsButton.Component';
+import { ButtonType } from '../../../PermissionsButton.Component';
 
 import { ToggleColor } from '../../../add/AddToggleSwitch.Component';
 
@@ -42,7 +46,10 @@ import Schedule from '../../../../../../../models/Schedule.Model';
 import Service from '../../../../../../../models/Service.Model';
 import User from '../../../../../../../models/User.Model';
 
-import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
+import {
+	AddReservationRequest,
+	UpdateReservationRequest,
+} from '../../../../../../../models/requests/Reservation.Request.Model';
 
 import {
 	genderDropDownItems,
@@ -71,6 +78,7 @@ interface EditReservationProp {
 	updatedBy: string;
 	reservation: Reservation;
 	reservationEmployeeId: number;
+	onAddReservation(addReservationRequest: AddReservationRequest): Promise<void>;
 	editable: boolean;
 	onEditReservation(
 		reservationId: number,
@@ -85,6 +93,7 @@ const EditReservation: FC<EditReservationProp> = ({
 	updatedBy,
 	reservation,
 	reservationEmployeeId,
+	onAddReservation,
 	editable,
 	onEditReservation,
 	deletable,
@@ -94,6 +103,7 @@ const EditReservation: FC<EditReservationProp> = ({
 
 	const { date } = useScheduleDateContext();
 
+	const [openAddModal, setOpenAddModal] = useState(false);
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
 	const [openBedWarningModal, setOpenBedWarningModal] =
 		useState<boolean>(false);
@@ -176,6 +186,10 @@ const EditReservation: FC<EditReservationProp> = ({
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
+
+	const reservationCreatable = user.permissions.includes(
+		Permissions.PERMISSION_ADD_RESERVATION
+	);
 
 	const customerGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_CUSTOMER
@@ -604,6 +618,11 @@ const EditReservation: FC<EditReservationProp> = ({
 		setOpen(false);
 	};
 
+	const onAdd = async (addReservationRequest: AddReservationRequest) => {
+		onAddReservation(addReservationRequest);
+		setOpen(false);
+	};
+
 	const onDelete = async (reservationId: number) => {
 		onDeleteReservation(reservationId);
 		setOpen(false);
@@ -652,6 +671,18 @@ const EditReservation: FC<EditReservationProp> = ({
 						</Dialog.Title>
 
 						<div className="mt-2">
+							<FilledPermissionsButton
+								btnTitle={t('Reservation Add On')}
+								btnType={ButtonType.ADD}
+								top={false}
+								right={false}
+								disabled={!reservationCreatable}
+								missingPermissionMessage={ERRORS.reservation.permissions.add}
+								onClick={() => {
+									setOpenAddModal(true);
+								}}
+							/>
+
 							<EditableDate
 								originalDate={reservation.reserved_date}
 								date={dateInput}
@@ -1090,6 +1121,13 @@ const EditReservation: FC<EditReservationProp> = ({
 				disabledDelete={!deletable}
 				deleteMissingPermissionMessage={ERRORS.reservation.permissions.delete}
 				onDelete={() => setOpenDeleteModal(true)}
+			/>
+
+			<ReservationAddOnModal
+				open={openAddModal}
+				setOpen={setOpenAddModal}
+				reservation={reservation}
+				onAddReservation={onAdd}
 			/>
 
 			<DeleteReservationModal

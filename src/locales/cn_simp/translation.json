@@ -443,5 +443,8 @@
 
     "Vip Package Added": "New Vip Package with Serial: {{serial}}, added.",
     "Vip Package Updated": "Vip Package with Serial: {{serial}}, updated.",
-    "Vip Package Deleted": "Vip Package with Serial: {{serial}}, deleted."
+    "Vip Package Deleted": "Vip Package with Serial: {{serial}}, deleted.",
+
+    "Reservation Add On": "Reservation Add On",
+    "Add on a reservation": "Add on a reservation"
 }
