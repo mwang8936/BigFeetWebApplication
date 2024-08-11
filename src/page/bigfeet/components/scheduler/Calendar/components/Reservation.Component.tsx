@@ -8,7 +8,10 @@ import {
 	TipMethod,
 } from '../../../../../../models/enums';
 import { formatPhoneNumber } from '../../../../../../utils/string.utils';
-import { UpdateReservationRequest } from '../../../../../../models/requests/Reservation.Request.Model';
+import {
+	AddReservationRequest,
+	UpdateReservationRequest,
+} from '../../../../../../models/requests/Reservation.Request.Model';
 import EditReservationModal from '../../../miscallaneous/modals/scheduler/calendar/EditReservationModal.Component';
 import Employee from '../../../../../../models/Employee.Model';
 import Draggable from 'react-draggable';
@@ -26,6 +29,7 @@ import { useUserQuery } from '../../../../../hooks/profile.hooks';
 interface ReservationTagProp {
 	reservation: Reservation;
 	colNum: number;
+	onAddReservation(request: AddReservationRequest): Promise<void>;
 	editable: boolean;
 	onEditReservation(
 		reservationId: number,
@@ -38,6 +42,7 @@ interface ReservationTagProp {
 const ReservationTag: FC<ReservationTagProp> = ({
 	reservation,
 	colNum,
+	onAddReservation,
 	editable,
 	onEditReservation,
 	deletable,
@@ -359,6 +364,7 @@ const ReservationTag: FC<ReservationTagProp> = ({
 					setOpen={setOpenEdit}
 					reservation={reservation}
 					employeeId={reservation.employee_id}
+					onAddReservation={onAddReservation}
 					editable={editable}
 					onEditReservation={onEditReservation}
 					deletable={deletable}

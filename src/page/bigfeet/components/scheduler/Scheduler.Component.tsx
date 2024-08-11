@@ -23,19 +23,19 @@ import {
 	useGiftCardsQuery,
 	useUpdateGiftCardMutation,
 } from '../../../hooks/gift-card.hooks';
+import { useUserQuery } from '../../../hooks/profile.hooks';
+import {
+	useAddReservationMutation,
+	useDeleteReservationMutation,
+	useUpdateReservationMutation,
+} from '../../../hooks/reservation.hooks';
 import {
 	useAddScheduleMutation,
 	useSignProfileScheduleMutation,
 	useSchedulesQuery,
 	useUpdateScheduleMutation,
 } from '../../../hooks/schedule.hooks';
-import {
-	useAddReservationMutation,
-	useDeleteReservationMutation,
-	useUpdateReservationMutation,
-} from '../../../hooks/reservation.hooks';
 import { useServicesQuery } from '../../../hooks/service.hooks';
-import { useUserQuery } from '../../../hooks/profile.hooks';
 import {
 	useAddVipPackageMutation,
 	useDeleteVipPackageMutation,
@@ -114,11 +114,11 @@ const Scheduler: FC = () => {
 	const giftCardGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_GIFT_CARD
 	);
-	const serviceGettable = user.permissions.includes(
-		Permissions.PERMISSION_GET_SERVICE
-	);
 	const scheduleGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_SCHEDULE
+	);
+	const serviceGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_SERVICE
 	);
 
 	useCustomersQuery({
@@ -128,7 +128,7 @@ const Scheduler: FC = () => {
 
 	const employeeQuery = useEmployeesQuery({
 		gettable: employeeGettable,
-		refetchInterval: 1000 * 60 * 5,
+		staleTime: Infinity,
 	});
 	const employees: Employee[] = (
 		(employeeQuery.data as Employee[]) || [user]
@@ -137,23 +137,23 @@ const Scheduler: FC = () => {
 	const giftCardsQuery = useGiftCardsQuery({
 		date,
 		gettable: giftCardGettable,
-		refetchInterval: 1000 * 60 * 5,
+		staleTime: Infinity,
 	});
 	const giftCards: GiftCard[] = (giftCardsQuery.data as GiftCard[]) || [];
+
+	const scheduleQuery = useSchedulesQuery({
+		date,
+		gettable: scheduleGettable,
+		staleTime: Infinity,
+	});
+	const schedules: Schedule[] = (
+		(scheduleQuery.data as Schedule[]) || []
+	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
 	useServicesQuery({
 		gettable: serviceGettable,
 		refetchInterval: 1000 * 60 * 5,
 	});
-
-	const scheduleQuery = useSchedulesQuery({
-		date,
-		gettable: scheduleGettable,
-		staleTime: 0,
-	});
-	const schedules: Schedule[] = (
-		(scheduleQuery.data as Schedule[]) || []
-	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
 	sortEmployees(employees, schedules, date);
 

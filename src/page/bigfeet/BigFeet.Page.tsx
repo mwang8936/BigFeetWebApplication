@@ -106,9 +106,13 @@ const BigFeet: FC = () => {
 
 	const [retryingUserQuery, setRetryingUserQuery] = useState(false);
 
-	const [sideBarItems] = useState([SideBarItems.Profile]);
+	const [sideBarItems] = useState([
+		SideBarItems.Profile,
+		SideBarItems.Scheduler,
+		SideBarItems.PayRoll,
+	]);
 
-	const [selectedIndex, setSelectedIndex] = useState(0);
+	const [selectedIndex, setSelectedIndex] = useState(1);
 
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -121,8 +125,6 @@ const BigFeet: FC = () => {
 	useEffect(() => {
 		if (user) {
 			i18n.changeLanguage(getLanguageFile(user.language));
-
-			sideBarItems.push(SideBarItems.Scheduler, SideBarItems.PayRoll);
 
 			const permissions = user.permissions;
 
