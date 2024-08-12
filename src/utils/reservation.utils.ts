@@ -23,23 +23,19 @@ export const reservationEmployeeConflict = (
 	reservations: Reservation[],
 	reservationId?: number
 ): boolean => {
-	// If the service allows overlapping reservations, no conflict can be determined from the provided reservations.
-	if (service.can_overlap) return false;
+	// Filter to find reservations where the employee ID matches the ID being checked.
+	const reservationsForSameEmployee = reservations.filter(
+		(res) => res.employee_id === employeeId
+	);
 
 	// Calculate the end date and time for the new reservation based on the service duration.
 	const endDate = new Date(startDate.getTime() + service.time * 60000);
 
-	// Filter reservations to find those that overlap with the new reservation and do not allow overlapping.
-	const reservationsAtSameTime = reservations.filter(
+	// Further filter reservations to find those that overlap with the new reservation.
+	const conflictingReservations = reservationsForSameEmployee.filter(
 		(res) =>
 			res.reservation_id !== reservationId && // Exclude the current reservation from conflict checks.
-			!res.service.can_overlap && // Ensure the existing reservation does not allow overlap.
 			doesDateOverlap(res.reserved_date, startDate, endDate, res.service.time) // Check for overlap in date and time.
-	);
-
-	// Further filter to find conflicts where the employee ID matches the ID being checked.
-	const conflictingReservations = reservationsAtSameTime.filter(
-		(res) => res.employee_id === employeeId
 	);
 
 	// Return true if there are any conflicting reservations for the specified employee.
@@ -173,4 +169,53 @@ export const reservationBedConflict = (
 
 	// Return false if no bed conflict was found.
 	return false;
+};
+
+export const getReservationOverlappingOrder = (
+	reservation: Reservation,
+	reservations: Reservation[]
+) => {
+	const employeeId = reservation.employee_id;
+
+	// Filter to find reservations where the employee ID matches the ID being checked.
+	const reservationsForSameEmployee = reservations.filter(
+		(res) => res.employee_id === employeeId
+	);
+
+	const startDate = reservation.reserved_date;
+	const service = reservation.service;
+
+	// Calculate the end date and time for the current reservation based on the service duration.
+	const endDate = new Date(startDate.getTime() + service.time * 60000);
+
+	// Further filter reservations to find those that the current reservation falls within.
+	const conflictingReservations = reservationsForSameEmployee.filter((res) => {
+		const resStartDate = res.reserved_date;
+		const resEndDate = new Date(
+			resStartDate.getTime() + res.service.time * 60000
+		);
+
+		return (
+			doesDateOverlap(startDate, resStartDate, resEndDate) && // Check if start date falls within the reservation
+			doesDateOverlap(endDate, resStartDate, resEndDate) // Check if end date falls within the reservation
+		);
+	});
+
+	// Sort overlapping reservations by when the reservation was created.
+	const sortedConflictingReservations = conflictingReservations.sort(
+		(a, b) => a.created_at.getTime() - b.created_at.getTime()
+	);
+
+	const reservationId = reservation.reservation_id;
+
+	// Find the rank of our reservation
+	const rank = sortedConflictingReservations.findIndex(
+		(res) => res.reservation_id === reservationId
+	);
+
+	if (rank === -1) {
+		return 0;
+	} else {
+		return rank;
+	}
 };

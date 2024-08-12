@@ -168,8 +168,6 @@
     "B": "B",
     "F": "F",
     "A": "A",
-    "Can Overlap": "Can Overlap",
-    "Cannot Overlap": "Cannot Overlap",
     "Delete Service": "Delete Service: {{service}}",
     "Are you sure you want to delete this service? This action cannot be reversed.": "Are you sure you want to delete this service? This action cannot be reversed.",
 
@@ -331,7 +329,7 @@
     "No beds available!": "No beds available!",
     "Bed Conflict": "There are {{max}}/{{max}} beds being used at this time. Please choose another time.",
     "Conflicting Schedule!": "Conflicting Schedule!",
-    "There is another reservation at this time. Please choose another time or employee.": "There is another reservation at this time. Please choose another time or employee.",
+    "There is another reservation at this time for this employee.": "There is another reservation at this time for this employee.",
 
     "You are missing a required input.": "You are missing a required input.",
     "An input is invalid.": "An input is invalid.",

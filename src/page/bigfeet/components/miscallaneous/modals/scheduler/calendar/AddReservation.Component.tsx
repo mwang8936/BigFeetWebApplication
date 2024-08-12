@@ -112,7 +112,6 @@ const AddReservation: FC<AddReservationProp> = ({
 		useState<boolean>(true);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 	const [noBeds, setNoBeds] = useState<boolean>(false);
-	const [conflict, setConflict] = useState<boolean>(false);
 	const [genderMismatch, setGenderMismatch] = useState<boolean>(false);
 
 	const [openBedWarningModal, setOpenBedWarningModal] =
@@ -279,21 +278,14 @@ const AddReservation: FC<AddReservationProp> = ({
 					);
 
 					if (reservationConflict) {
-						setConflict(true);
 						setOpenConflictWarningModal(true);
-					} else {
-						setConflict(false);
 					}
-				} else {
-					setConflict(false);
 				}
 			} else {
 				setNoBeds(false);
-				setConflict(false);
 			}
 		} else {
 			setNoBeds(false);
-			setConflict(false);
 		}
 	}, [dateInput, employeeIdInput, serviceIdInput]);
 
@@ -581,7 +573,6 @@ const AddReservation: FC<AddReservationProp> = ({
 					!creatable ||
 					missingRequiredInput ||
 					invalidInput ||
-					conflict ||
 					noBeds ||
 					genderMismatch
 				}
@@ -592,8 +583,6 @@ const AddReservation: FC<AddReservationProp> = ({
 						? t(ERRORS.required)
 						: invalidInput
 						? t(ERRORS.invalid)
-						: conflict
-						? t(ERRORS.warnings.conflicts.title)
 						: noBeds
 						? t(ERRORS.warnings.no_beds.title)
 						: genderMismatch

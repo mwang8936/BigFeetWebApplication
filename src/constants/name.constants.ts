@@ -55,7 +55,6 @@ const NAMES = {
 		feet: 'feet',
 		acupuncture: 'acupuncture',
 		beds_required: 'beds_required',
-		can_overlap: 'can_overlap',
 	},
 	vip_package: {
 		serial: 'serial',

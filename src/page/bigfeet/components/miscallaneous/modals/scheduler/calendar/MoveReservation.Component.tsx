@@ -61,16 +61,15 @@ const MoveReservation: FC<MoveReservationProp> = ({
 
 	const { date } = useScheduleDateContext();
 
+	const [noBeds, setNoBeds] = useState<boolean>(false);
+	const [genderMismatch, setGenderMismatch] = useState<boolean>(false);
+
 	const [openBedWarningModal, setOpenBedWarningModal] =
 		useState<boolean>(false);
 	const [openConflictWarningModal, setOpenConflictWarningModal] =
 		useState<boolean>(false);
 	const [openGenderMismatchWarningModel, setOpenGenderMismatchWarningModal] =
 		useState<boolean>(false);
-
-	const [noBeds, setNoBeds] = useState<boolean>(false);
-	const [conflict, setConflict] = useState<boolean>(false);
-	const [genderMismatch, setGenderMismatch] = useState<boolean>(false);
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
@@ -143,10 +142,7 @@ const MoveReservation: FC<MoveReservationProp> = ({
 		);
 
 		if (reservationConflict) {
-			setConflict(true);
 			setOpenConflictWarningModal(true);
-		} else {
-			setConflict(false);
 		}
 	}, []);
 
@@ -254,12 +250,10 @@ const MoveReservation: FC<MoveReservationProp> = ({
 					onCancel();
 					setOpen(false);
 				}}
-				disabledEdit={!editable || conflict || noBeds || genderMismatch}
+				disabledEdit={!editable || noBeds || genderMismatch}
 				editMissingPermissionMessage={
 					!editable
 						? t(ERRORS.reservation.permissions.edit)
-						: conflict
-						? t(ERRORS.warnings.conflicts.title)
 						: noBeds
 						? t(ERRORS.warnings.no_beds.title)
 						: genderMismatch

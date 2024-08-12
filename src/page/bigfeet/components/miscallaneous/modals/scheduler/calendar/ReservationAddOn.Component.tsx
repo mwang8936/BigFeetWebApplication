@@ -52,15 +52,14 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 
 	const [serviceIdInput, setServiceIdInput] = useState<number | null>(null);
 
+	const [noBeds, setNoBeds] = useState<boolean>(false);
+
 	const [missingRequiredInput, setMissingRequiredInput] =
 		useState<boolean>(true);
 	const [openBedWarningModal, setOpenBedWarningModal] =
 		useState<boolean>(false);
 	const [openConflictWarningModal, setOpenConflictWarningModal] =
 		useState<boolean>(false);
-
-	const [noBeds, setNoBeds] = useState<boolean>(false);
-	const [conflict, setConflict] = useState<boolean>(false);
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
@@ -150,17 +149,12 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 				);
 
 				if (reservationConflict) {
-					setConflict(true);
 					setOpenConflictWarningModal(true);
-				} else {
-					setConflict(false);
 				}
 			} else {
-				setConflict(false);
 				setNoBeds(false);
 			}
 		} else {
-			setConflict(false);
 			setNoBeds(false);
 		}
 	}, [serviceIdInput]);
@@ -264,14 +258,12 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 
 			<AddBottom
 				onCancel={() => setOpen(false)}
-				disabledAdd={!creatable || missingRequiredInput || conflict || noBeds}
+				disabledAdd={!creatable || missingRequiredInput || noBeds}
 				addMissingPermissionMessage={
 					!creatable
 						? t(ERRORS.reservation.permissions.add)
 						: missingRequiredInput
 						? t(ERRORS.required)
-						: conflict
-						? t(ERRORS.warnings.conflicts.title)
 						: noBeds
 						? t(ERRORS.warnings.no_beds.title)
 						: ''

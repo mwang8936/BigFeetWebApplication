@@ -103,15 +103,6 @@ const EditReservation: FC<EditReservationProp> = ({
 
 	const { date } = useScheduleDateContext();
 
-	const [openAddModal, setOpenAddModal] = useState(false);
-	const [openDeleteModal, setOpenDeleteModal] = useState(false);
-	const [openBedWarningModal, setOpenBedWarningModal] =
-		useState<boolean>(false);
-	const [openConflictWarningModal, setOpenConflictWarningModal] =
-		useState<boolean>(false);
-	const [openGenderMismatchWarningModel, setOpenGenderMismatchWarningModal] =
-		useState<boolean>(false);
-
 	const [dateInput, setDateInput] = useState<Date | null>(
 		reservation.reserved_date
 	);
@@ -181,8 +172,17 @@ const EditReservation: FC<EditReservationProp> = ({
 		useState<boolean>(false);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 	const [noBeds, setNoBeds] = useState<boolean>(false);
-	const [conflict, setConflict] = useState<boolean>(false);
 	const [genderMismatch, setGenderMismatch] = useState<boolean>(false);
+
+	const [openAddModal, setOpenAddModal] = useState(false);
+	const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
+	const [openBedWarningModal, setOpenBedWarningModal] =
+		useState<boolean>(false);
+	const [openConflictWarningModal, setOpenConflictWarningModal] =
+		useState<boolean>(false);
+	const [openGenderMismatchWarningModel, setOpenGenderMismatchWarningModal] =
+		useState<boolean>(false);
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
@@ -476,21 +476,14 @@ const EditReservation: FC<EditReservationProp> = ({
 					);
 
 					if (reservationConflict) {
-						setConflict(true);
 						setOpenConflictWarningModal(true);
-					} else {
-						setConflict(false);
 					}
-				} else {
-					setConflict(false);
 				}
 			} else {
 				setNoBeds(false);
-				setConflict(false);
 			}
 		} else {
 			setNoBeds(false);
-			setConflict(false);
 		}
 	}, [dateInput, employeeIdInput, serviceIdInput]);
 
@@ -1096,7 +1089,6 @@ const EditReservation: FC<EditReservationProp> = ({
 					!changesMade ||
 					missingRequiredInput ||
 					invalidInput ||
-					conflict ||
 					noBeds ||
 					genderMismatch
 				}
@@ -1109,8 +1101,6 @@ const EditReservation: FC<EditReservationProp> = ({
 						? t(ERRORS.required)
 						: invalidInput
 						? t(ERRORS.invalid)
-						: conflict
-						? t(ERRORS.warnings.conflicts.title)
 						: noBeds
 						? t(ERRORS.warnings.no_beds.title)
 						: genderMismatch
