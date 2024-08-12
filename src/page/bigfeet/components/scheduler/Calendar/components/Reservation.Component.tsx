@@ -18,7 +18,10 @@ import Draggable from 'react-draggable';
 import MoveReservationModal from '../../../miscallaneous/modals/scheduler/calendar/MoveReservationModal.Component';
 import STORES from '../../../../../../constants/store.constants';
 import { sortEmployees } from '../../../../../../utils/employee.utils';
-import { useScheduleDateContext } from '../../Scheduler.Component';
+import {
+	useScaleContext,
+	useScheduleDateContext,
+} from '../../Scheduler.Component';
 import { useTranslation } from 'react-i18next';
 import Schedule from '../../../../../../models/Schedule.Model';
 import User from '../../../../../../models/User.Model';
@@ -62,6 +65,7 @@ const ReservationTag: FC<ReservationTagProp> = ({
 	const user: User = userQuery.data;
 
 	const { date } = useScheduleDateContext();
+	const { scale } = useScaleContext();
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -277,7 +281,8 @@ const ReservationTag: FC<ReservationTagProp> = ({
 
 	return (
 		<Draggable
-			grid={[200, 100 / 6]}
+			grid={[200 * scale, (100 / 6) * scale]}
+			scale={scale}
 			disabled={!editable || openEdit || openMove}
 			position={position}
 			bounds={{
