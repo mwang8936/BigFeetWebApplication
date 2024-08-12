@@ -429,13 +429,14 @@
     "Gift Card Updated": "Gift Card Updated",
     "Gift Card Deleted": "Gift Card Deleted",
 
-    "Reservation Added": "New Reservation was added at: {{time}}.",
-    "Reservation Updated": "Reservation at: {{time}}, updated.",
-    "Reservation Deleted": "Reservation at: {{time}}, deleted.",
+    "Reservation Added": "New Reservation was added at: {{time}} for employee: {{username}} was created by: {{created_by}}.",
+    "Reservation Updated": "Reservation at: {{time}} for employee: {{username}}, was updated by {{updated_by}}.",
+    "Reservation Deleted": "Reservation at: {{time}} for employee: {{username}}, was deleted by {{deleted_by}}.",
 
     "Schedule Added": "New Schedule was added for employee: {{username}}.",
     "Schedule Updated": "Schedule for employee: {{username}}, updated.",
     "Schedule Deleted": "Schedule for employee: {{username}}, deleted.",
+    "Schedule Signed": "{{username}} signed schedule.",
 
     "Service Added": "New Service with Name: {{service_name}}, added.",
     "Service Updated": "Service with Name: {{service_name}}, updated.",
