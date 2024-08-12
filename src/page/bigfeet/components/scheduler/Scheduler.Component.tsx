@@ -89,6 +89,20 @@ export function useScheduleDateContext() {
 	return context;
 }
 
+const ScaleContext = createContext<
+	{ scale: number; setScale(scale: number): void } | undefined
+>(undefined);
+
+export function useScaleContext() {
+	const context = useContext(ScaleContext);
+
+	if (context === undefined) {
+		throw new Error('useScaleContext must be within ScaleProvider.');
+	}
+
+	return context;
+}
+
 const Scheduler: FC = () => {
 	const { t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -346,117 +360,119 @@ const Scheduler: FC = () => {
 
 	return (
 		<ScheduleDateContext.Provider value={{ date, setDate }}>
-			<div className="h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
-				<div className="vertical-center ms-10 flex flex-col">
-					<PermissionsButton
-						btnTitle={t('Add Reservation')}
-						btnType={ButtonType.ADD}
-						top={false}
-						right={false}
-						disabled={!scheduleCreatable}
-						missingPermissionMessage={ERRORS.reservation.permissions.add}
-						onClick={() => setOpenAddReservationModal(true)}
+			<ScaleContext.Provider value={{ scale, setScale }}>
+				<div className="h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
+					<div className="vertical-center ms-10 flex flex-col">
+						<PermissionsButton
+							btnTitle={t('Add Reservation')}
+							btnType={ButtonType.ADD}
+							top={false}
+							right={false}
+							disabled={!scheduleCreatable}
+							missingPermissionMessage={ERRORS.reservation.permissions.add}
+							onClick={() => setOpenAddReservationModal(true)}
+						/>
+
+						<PermissionsButton
+							btnTitle={t('Add Gift Card')}
+							btnType={ButtonType.ADD}
+							top={false}
+							right={false}
+							disabled={!giftCardCreatable}
+							missingPermissionMessage={ERRORS.gift_card.permissions.add}
+							onClick={() => setOpenGiftCardModal(true)}
+						/>
+					</div>
+					<div className="vertical-center flex text-gray-600 text-xl">
+						{t('Total Cash')}:
+						<span className="font-bold ms-2">${moneyToString(totalCash)}</span>
+					</div>
+					<div className="vertical-center flex flex-col">
+						<h1 className="my-auto mx-auto text-gray-600 text-3xl">
+							{t('Scheduler')}
+						</h1>
+						<h1 className="mx-auto text-gray-600 text-xl">{displayDate()}</h1>
+					</div>
+					<div className="vertical-center flex flex-col text-gray-600 text-xl">
+						<div className="flex">
+							{t('Total Reservations')}:
+							<span className="font-bold ms-2">{totalSessions}</span>
+						</div>
+						<div className="flex">
+							{t('Total Gift Cards')}:
+							<span className="font-bold ms-2">
+								${moneyToString(totalGiftCardAmount)}
+							</span>
+						</div>
+					</div>
+
+					<AdjustmentsHorizontalIcon
+						className={`h-16 w-16 ${
+							filtered ? 'text-blue-600' : 'text-gray-600'
+						} my-auto me-10 cursor-pointer`}
+						onClick={() => {
+							setOpenFilterDialog(true);
+						}}
 					/>
 
-					<PermissionsButton
-						btnTitle={t('Add Gift Card')}
-						btnType={ButtonType.ADD}
-						top={false}
-						right={false}
-						disabled={!giftCardCreatable}
-						missingPermissionMessage={ERRORS.gift_card.permissions.add}
-						onClick={() => setOpenGiftCardModal(true)}
+					<FilterDateModal
+						open={openFilterDialog}
+						setOpen={setOpenFilterDialog}
+						date={date}
+						onDateSelected={onDateFiltered}
+						editable={true}
+						selectPast={true}
+						selectFuture={true}
 					/>
 				</div>
-				<div className="vertical-center flex text-gray-600 text-xl">
-					{t('Total Cash')}:
-					<span className="font-bold ms-2">${moneyToString(totalCash)}</span>
+				<ZoomOverlay zoomIn={zoomIn} zoomOut={zoomOut} zoomReset={zoomReset} />
+				<div
+					className="flex border border-gray-500 overflow-auto transform transition-transform duration-300 ease-in-out"
+					style={{
+						transform: `scale(${scale})`,
+						transformOrigin: 'top left',
+						width: `${100 / scale}%`,
+						height: `${100 / scale}%`,
+					}}>
+					<Calendar
+						date={date}
+						start={STORES.start}
+						end={STORES.end}
+						employees={employees}
+						schedules={schedules}
+						creatable={scheduleCreatable}
+						onAddReservation={onAddReservation}
+						onAddSchedule={onAddSchedule}
+						onAddVipPackage={onAddVipPackage}
+						editable={scheduleEditable}
+						onEditReservation={onEditReservation}
+						onEditSchedule={onEditSchedule}
+						onEditVipPackage={onEditVipPackage}
+						deletable={deletable}
+						onDeleteReservation={onDeleteReservation}
+						onDeleteVipPackage={onDeleteVipPackage}
+						onScheduleSigned={onScheduleSigned}
+					/>
 				</div>
-				<div className="vertical-center flex flex-col">
-					<h1 className="my-auto mx-auto text-gray-600 text-3xl">
-						{t('Scheduler')}
-					</h1>
-					<h1 className="mx-auto text-gray-600 text-xl">{displayDate()}</h1>
-				</div>
-				<div className="vertical-center flex flex-col text-gray-600 text-xl">
-					<div className="flex">
-						{t('Total Reservations')}:
-						<span className="font-bold ms-2">{totalSessions}</span>
-					</div>
-					<div className="flex">
-						{t('Total Gift Cards')}:
-						<span className="font-bold ms-2">
-							${moneyToString(totalGiftCardAmount)}
-						</span>
-					</div>
-				</div>
-
-				<AdjustmentsHorizontalIcon
-					className={`h-16 w-16 ${
-						filtered ? 'text-blue-600' : 'text-gray-600'
-					} my-auto me-10 cursor-pointer`}
-					onClick={() => {
-						setOpenFilterDialog(true);
-					}}
-				/>
-
-				<FilterDateModal
-					open={openFilterDialog}
-					setOpen={setOpenFilterDialog}
-					date={date}
-					onDateSelected={onDateFiltered}
-					editable={true}
-					selectPast={true}
-					selectFuture={true}
-				/>
-			</div>
-			<ZoomOverlay zoomIn={zoomIn} zoomOut={zoomOut} zoomReset={zoomReset} />
-			<div
-				className="flex border border-gray-500 overflow-auto transform transition-transform duration-300 ease-in-out"
-				style={{
-					transform: `scale(${scale})`,
-					transformOrigin: 'top left',
-					width: `${100 / scale}%`,
-					height: `${100 / scale}%`,
-				}}>
-				<Calendar
-					date={date}
-					start={STORES.start}
-					end={STORES.end}
-					employees={employees}
-					schedules={schedules}
+				<AddReservationModal
+					open={openAddReservationModal}
+					setOpen={setOpenAddReservationModal}
 					creatable={scheduleCreatable}
 					onAddReservation={onAddReservation}
-					onAddSchedule={onAddSchedule}
-					onAddVipPackage={onAddVipPackage}
-					editable={scheduleEditable}
-					onEditReservation={onEditReservation}
-					onEditSchedule={onEditSchedule}
-					onEditVipPackage={onEditVipPackage}
-					deletable={deletable}
-					onDeleteReservation={onDeleteReservation}
-					onDeleteVipPackage={onDeleteVipPackage}
-					onScheduleSigned={onScheduleSigned}
 				/>
-			</div>
-			<AddReservationModal
-				open={openAddReservationModal}
-				setOpen={setOpenAddReservationModal}
-				creatable={scheduleCreatable}
-				onAddReservation={onAddReservation}
-			/>
 
-			<GiftCardsModal
-				open={openGiftCardModal}
-				setOpen={setOpenGiftCardModal}
-				giftCards={giftCards}
-				creatable={scheduleCreatable}
-				onAddGiftCard={onAddGiftCard}
-				editable={giftCardEditable}
-				onEditGiftCard={onEditGiftCard}
-				deletable={giftCardDeletable}
-				onDeleteGiftCard={onDeleteGiftCard}
-			/>
+				<GiftCardsModal
+					open={openGiftCardModal}
+					setOpen={setOpenGiftCardModal}
+					giftCards={giftCards}
+					creatable={scheduleCreatable}
+					onAddGiftCard={onAddGiftCard}
+					editable={giftCardEditable}
+					onEditGiftCard={onEditGiftCard}
+					deletable={giftCardDeletable}
+					onDeleteGiftCard={onDeleteGiftCard}
+				/>
+			</ScaleContext.Provider>
 		</ScheduleDateContext.Provider>
 	);
 };
