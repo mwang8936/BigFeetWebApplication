@@ -320,11 +320,11 @@ const AddService: FC<AddServiceProp> = ({
 				disabledAdd={!creatable || missingRequiredInput || invalidInput}
 				addMissingPermissionMessage={
 					!creatable
-						? ERRORS.service.permissions.add
+						? t(ERRORS.service.permissions.add)
 						: missingRequiredInput
-						? ERRORS.required
+						? t(ERRORS.required)
 						: invalidInput
-						? ERRORS.invalid
+						? t(ERRORS.invalid)
 						: ''
 				}
 				onAdd={onAdd}

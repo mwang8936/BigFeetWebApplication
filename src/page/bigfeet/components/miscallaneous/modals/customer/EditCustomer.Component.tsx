@@ -251,18 +251,18 @@ const EditCustomer: FC<EditCustomerProp> = ({
 				disabledEdit={!editable || !changesMade || invalidInput}
 				editMissingPermissionMessage={
 					!editable
-						? ERRORS.customer.permissions.edit
+						? t(ERRORS.customer.permissions.edit)
 						: !changesMade
-						? ERRORS.no_changes
+						? t(ERRORS.no_changes)
 						: missingRequiredInput
-						? ERRORS.required
+						? t(ERRORS.required)
 						: invalidInput
-						? ERRORS.invalid
+						? t(ERRORS.invalid)
 						: ''
 				}
 				onEdit={onEdit}
 				disabledDelete={!deletable}
-				deleteMissingPermissionMessage={ERRORS.customer.permissions.delete}
+				deleteMissingPermissionMessage={t(ERRORS.customer.permissions.delete)}
 				onDelete={() => setOpenDeleteModal(true)}
 			/>
 

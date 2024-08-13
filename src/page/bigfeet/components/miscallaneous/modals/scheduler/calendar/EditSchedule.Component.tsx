@@ -298,11 +298,11 @@ const EditSchedule: FC<EditScheduleProp> = ({
 				disabledEdit={!editable || !changesMade || invalidInput}
 				editMissingPermissionMessage={
 					!editable
-						? ERRORS.schedule.permissions.add
+						? t(ERRORS.schedule.permissions.edit)
 						: !changesMade
-						? ERRORS.no_changes
+						? t(ERRORS.no_changes)
 						: invalidInput
-						? ERRORS.invalid
+						? t(ERRORS.invalid)
 						: ''
 				}
 				onEdit={onEdit}

@@ -148,7 +148,7 @@ const Services: FC = () => {
 							btnType={ButtonType.ADD}
 							top={false}
 							disabled={!creatable}
-							missingPermissionMessage={ERRORS.service.permissions.add}
+							missingPermissionMessage={t(ERRORS.service.permissions.add)}
 							onClick={() => {
 								setOpenAddModal(true);
 							}}

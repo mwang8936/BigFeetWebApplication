@@ -255,18 +255,20 @@ const EditVip: FC<EditVipProp> = ({
 				}
 				editMissingPermissionMessage={
 					!editable
-						? ERRORS.vip_package.permissions.edit
+						? t(ERRORS.vip_package.permissions.edit)
 						: !changesMade
-						? ERRORS.no_changes
+						? t(ERRORS.no_changes)
 						: missingRequiredInput
-						? ERRORS.required
+						? t(ERRORS.required)
 						: invalidInput
-						? ERRORS.invalid
+						? t(ERRORS.invalid)
 						: ''
 				}
 				onEdit={onEdit}
 				disabledDelete={!deletable}
-				deleteMissingPermissionMessage={ERRORS.vip_package.permissions.delete}
+				deleteMissingPermissionMessage={t(
+					ERRORS.vip_package.permissions.delete
+				)}
 				onDelete={() => setOpenDeleteModal(true)}
 			/>
 

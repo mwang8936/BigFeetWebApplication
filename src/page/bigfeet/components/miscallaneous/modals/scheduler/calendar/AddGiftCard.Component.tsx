@@ -188,11 +188,11 @@ const AddGiftCard: FC<AddGiftCardProp> = ({
 				disabledAdd={!creatable || missingRequiredInput || invalidInput}
 				addMissingPermissionMessage={
 					!creatable
-						? ERRORS.gift_card.permissions.add
+						? t(ERRORS.gift_card.permissions.add)
 						: missingRequiredInput
-						? ERRORS.required
+						? t(ERRORS.required)
 						: invalidInput
-						? ERRORS.invalid
+						? t(ERRORS.invalid)
 						: ''
 				}
 				onAdd={onAdd}

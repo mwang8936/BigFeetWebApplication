@@ -230,11 +230,11 @@ const AddSchedule: FC<AddScheduleProp> = ({
 				disabledAdd={!creatable || missingRequiredInput || invalidInput}
 				addMissingPermissionMessage={
 					!creatable
-						? ERRORS.schedule.permissions.add
+						? t(ERRORS.schedule.permissions.add)
 						: missingRequiredInput
-						? ERRORS.required
+						? t(ERRORS.required)
 						: invalidInput
-						? ERRORS.invalid
+						? t(ERRORS.invalid)
 						: ''
 				}
 				onAdd={onAdd}

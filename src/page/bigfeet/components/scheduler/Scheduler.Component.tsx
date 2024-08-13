@@ -46,7 +46,12 @@ import ERRORS from '../../../../constants/error.constants';
 import STORES from '../../../../constants/store.constants';
 
 import Employee from '../../../../models/Employee.Model';
-import { PaymentMethod, Permissions, Role } from '../../../../models/enums';
+import {
+	Language,
+	PaymentMethod,
+	Permissions,
+	Role,
+} from '../../../../models/enums';
 import GiftCard from '../../../../models/Gift-Card.Model';
 import Schedule from '../../../../models/Schedule.Model';
 import User from '../../../../models/User.Model';
@@ -118,6 +123,8 @@ const Scheduler: FC = () => {
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
+
+	const language = user.language;
 
 	const customerGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_CUSTOMER
@@ -353,9 +360,23 @@ const Scheduler: FC = () => {
 	};
 
 	const displayDate = () => {
+		let localeDateFormat;
+		if (language === Language.SIMPLIFIED_CHINESE) {
+			localeDateFormat = 'zh-CN';
+		} else if (language === Language.TRADITIONAL_CHINESE) {
+			localeDateFormat = 'zh-TW';
+		} else {
+			localeDateFormat = undefined;
+		}
+
 		return sameDate(new Date(), date)
-			? `${t('Today')} - ${date.toDateString()}`
-			: date.toDateString();
+			? `${t('Today')} - ${date.toLocaleDateString(localeDateFormat, {
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric',
+					weekday: 'short',
+			  })}`
+			: date.toLocaleDateString(localeDateFormat);
 	};
 
 	return (
@@ -369,7 +390,7 @@ const Scheduler: FC = () => {
 							top={false}
 							right={false}
 							disabled={!scheduleCreatable}
-							missingPermissionMessage={ERRORS.reservation.permissions.add}
+							missingPermissionMessage={t(ERRORS.reservation.permissions.add)}
 							onClick={() => setOpenAddReservationModal(true)}
 						/>
 
@@ -379,7 +400,7 @@ const Scheduler: FC = () => {
 							top={false}
 							right={false}
 							disabled={!giftCardCreatable}
-							missingPermissionMessage={ERRORS.gift_card.permissions.add}
+							missingPermissionMessage={t(ERRORS.gift_card.permissions.add)}
 							onClick={() => setOpenGiftCardModal(true)}
 						/>
 					</div>

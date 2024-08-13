@@ -100,9 +100,6 @@
     "Deleting Vip Package...": "Deleting Vip Package...",
     "Vip Package Deleted Successfully": "Vip Package Deleted Successfully",
     "Failed to Delete Vip Package": "Failed to Delete Vip Package",
-    "Getting Schedules...": "Getting Schedules...",
-    "Schedule Retrieved Successfully": "Schedule Retrieved Successfully",
-    "Failed to Get Schedules": "Failed to Get Schedules",
     "Today": "Today",
     "Add Reservation": "Add Reservation",
     "Total Cash": "Total Cash",
@@ -116,7 +113,6 @@
     "Body Services": "Body Services",
     "Feet Services": "Feet Services",
     "Acupuncture Services": "Acupuncture Services",
-    "Requested Services": "Requested Services",
     "Holiday": "Holiday",
     "Tips: ": "Tips: ",
     "No Tips": "No Tips",
@@ -135,6 +131,7 @@
     "Signed": "Signed",
     "Not Requested": "Not Requested",
     "Requested": "Requested",
+    "Requested Pay": "Requested Pay",
     "Customer (Optional)": "Customer (Optional)",
     "Add Schedule": "Add Schedule",
     "Not Working": "Not Working",
@@ -181,6 +178,7 @@
     "Change": "Change",
     "Cancel": "Cancel",
     "Fill": "Fill",
+    "Total Amount Missing": "Total Amount Missing",
     "No remaining amount left.": "No remaining amount left.",
     "Add": "Add",
     "Edit": "Edit",
@@ -204,7 +202,7 @@
 
     "No Language Selected": "No Language Selected",
 
-    "No Payment Selected": "No Payment Selected",
+    "No Payment Method Selected": "No Payment Selected",
 
     "No Role Selected": "No Role Selected",
     "STORE EMPLOYEE": "STORE EMPLOYEE",
@@ -425,9 +423,9 @@
     "Employee Updated": "Employee with Username: {{username}}, updated.",
     "Employee Deleted": "Employee with Username: {{username}}, deleted.",
 
-    "Gift Card Added": "New Gift Card Added",
-    "Gift Card Updated": "Gift Card Updated",
-    "Gift Card Deleted": "Gift Card Deleted",
+    "Gift Card Added": "New Gift Card Added.",
+    "Gift Card Updated": "Gift Card Updated.",
+    "Gift Card Deleted": "Gift Card Deleted.",
 
     "Reservation Added": "New Reservation was added at: {{time}} for employee: {{username}} was created by: {{created_by}}.",
     "Reservation Updated": "Reservation at: {{time}} for employee: {{username}}, was updated by {{updated_by}}.",

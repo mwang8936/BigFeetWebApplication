@@ -84,7 +84,7 @@ const Profile: FC = () => {
 						btnType={ButtonType.DELETE}
 						top={false}
 						disabled={!deletable}
-						missingPermissionMessage={ERRORS.employee.permissions.delete}
+						missingPermissionMessage={t(ERRORS.employee.permissions.delete)}
 						onClick={() => {
 							setOpenDeleteModal(true);
 						}}

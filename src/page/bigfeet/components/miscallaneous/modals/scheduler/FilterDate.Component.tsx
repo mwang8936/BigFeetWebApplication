@@ -86,13 +86,13 @@ const FilterDate: FC<FilterDateProp> = ({
 				}
 				addMissingPermissionMessage={
 					!editable
-						? ERRORS.schedule.permissions.get
+						? t(ERRORS.schedule.permissions.get)
 						: selectedDate && sameDate(date, selectedDate)
-						? ERRORS.no_changes
+						? t(ERRORS.no_changes)
 						: date === null
-						? ERRORS.required
+						? t(ERRORS.required)
 						: invalidDate
-						? ERRORS.invalid
+						? t(ERRORS.invalid)
 						: ''
 				}
 				onAdd={() => {
@@ -106,7 +106,7 @@ const FilterDate: FC<FilterDateProp> = ({
 				}
 				editMissingPermissionMessage={
 					!editable
-						? ERRORS.schedule.permissions.get
+						? t(ERRORS.schedule.permissions.get)
 						: t('Current date already selected.')
 				}
 				onEdit={() => setSelectedDate(new Date())}

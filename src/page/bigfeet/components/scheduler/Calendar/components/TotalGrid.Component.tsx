@@ -126,7 +126,7 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 					{t('A')}: <span className="font-bold">{acupunctureTotal}</span>
 				</span>
 				<span>
-					{t('Requested')}:{' '}
+					{t('Requested Pay')}:{' '}
 					<span className="font-bold">{`${requestedTotal} X \$1 = \$${moneyToString(
 						requestedTotal
 					)}`}</span>

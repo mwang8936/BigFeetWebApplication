@@ -50,7 +50,7 @@ const SignSchedule: FC<SignScheduleProp> = ({
 						<div className="mt-2">
 							{signable
 								? t('Sign Off Message', { date: date.toDateString() })
-								: ERRORS.schedule.permissions.signed}
+								: t(ERRORS.schedule.permissions.signed)}
 						</div>
 					</div>
 				</div>
@@ -60,7 +60,7 @@ const SignSchedule: FC<SignScheduleProp> = ({
 				onCancel={() => setOpen(false)}
 				editText={t('Sign')}
 				disabledEdit={!signable}
-				editMissingPermissionMessage={ERRORS.schedule.permissions.signed}
+				editMissingPermissionMessage={t(ERRORS.schedule.permissions.signed)}
 				onEdit={onSign}
 			/>
 		</>
