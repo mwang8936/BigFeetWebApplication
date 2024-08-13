@@ -917,7 +917,7 @@ const EditReservation: FC<EditReservationProp> = ({
 
 							{remainingAmount > 0 && (
 								<p className="error-label mb-4">
-									{`Total Amount Missing: \$${remainingAmount.toFixed(2)}`}
+									{t('Total Amount Missing')}: {remainingAmount.toFixed(2)}
 								</p>
 							)}
 
