@@ -1,13 +1,8 @@
 import { FC } from 'react';
 
-export enum ButtonType {
-	ADD = 'ADD',
-	CANCEL = 'CANCEL',
-	DEFAULT = 'DEFAULT',
-	DELETE = 'DELETE',
-}
+import { ButtonType } from './PermissionsButton.Component';
 
-interface PermissionsButtonProp {
+interface FilledPermissionsButtonProp {
 	btnTitle: string;
 	btnType?: ButtonType;
 	top?: boolean;
@@ -17,7 +12,7 @@ interface PermissionsButtonProp {
 	onClick(): void;
 }
 
-const PermissionsButton: FC<PermissionsButtonProp> = ({
+const FilledPermissionsButton: FC<FilledPermissionsButtonProp> = ({
 	btnTitle,
 	btnType = ButtonType.DEFAULT,
 	top = true,
@@ -38,7 +33,7 @@ const PermissionsButton: FC<PermissionsButtonProp> = ({
 	return (
 		<button
 			type="button"
-			className={`button ${btnColorCss} group`}
+			className={`filled-button ${btnColorCss} group`}
 			disabled={disabled}
 			onClick={onClick}>
 			<span
@@ -63,4 +58,4 @@ const PermissionsButton: FC<PermissionsButtonProp> = ({
 	);
 };
 
-export default PermissionsButton;
+export default FilledPermissionsButton;

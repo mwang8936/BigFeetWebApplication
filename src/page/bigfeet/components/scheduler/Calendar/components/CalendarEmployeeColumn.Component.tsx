@@ -130,6 +130,7 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 				key={reservation.reservation_id}
 				reservation={reservation}
 				colNum={colNum}
+				onAddReservation={onAddReservation}
 				editable={editable}
 				onEditReservation={onEditReservation}
 				deletable={deletable}
@@ -165,6 +166,7 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 			<VipGrid
 				row={timeArr.length + 4}
 				colNum={colNum}
+				defaultEmployeeId={employee.employee_id}
 				vipPackages={schedule?.vip_packages || []}
 				creatable={creatable}
 				onAddVipPackage={onAddVipPackage}

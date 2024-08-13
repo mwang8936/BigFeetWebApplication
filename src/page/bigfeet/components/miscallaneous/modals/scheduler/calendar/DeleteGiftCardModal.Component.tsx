@@ -1,7 +1,8 @@
 import { FC } from 'react';
 
-import BaseModal from '../../BaseModal.Component';
 import DeleteGiftCard from './DeleteGiftCard.Component';
+
+import BaseModal from '../../BaseModal.Component';
 
 interface DeleteGiftCardModalProp {
 	open: boolean;

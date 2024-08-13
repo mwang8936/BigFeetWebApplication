@@ -2,10 +2,13 @@ import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Dialog } from '@headlessui/react';
-
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 
+import AddGiftCardModal from './AddGiftCardModal.Component';
+
 import AddBottom from '../../AddBottom.Component';
+
+import GiftCardItem from '../../../../scheduler/Calendar/components/GiftCardItem.Component';
 
 import ERRORS from '../../../../../../../constants/error.constants';
 
@@ -15,8 +18,6 @@ import {
 	AddGiftCardRequest,
 	UpdateGiftCardRequest,
 } from '../../../../../../../models/requests/GIft-Card.Request';
-import AddGiftCardModal from './AddGiftCardModal.Component';
-import GiftCardItem from '../../../../scheduler/Calendar/components/GiftCardItem.Component';
 
 interface GiftCardProp {
 	setOpen(open: boolean): void;

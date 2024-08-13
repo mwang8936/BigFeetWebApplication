@@ -1,11 +1,15 @@
 import { FC } from 'react';
-import BaseModal from '../../BaseModal.Component';
+
 import AddVip from './AddVip.Component';
+
+import BaseModal from '../../BaseModal.Component';
+
 import { AddVipPackageRequest } from '../../../../../../../models/requests/Vip-Package.Request.Model';
 
 interface AddVipModalProp {
 	open: boolean;
 	setOpen(open: boolean): void;
+	defaultEmployeeId?: number;
 	creatable: boolean;
 	onAddVipPackage(request: AddVipPackageRequest): Promise<void>;
 }
@@ -13,6 +17,7 @@ interface AddVipModalProp {
 const AddVipModal: FC<AddVipModalProp> = ({
 	open,
 	setOpen,
+	defaultEmployeeId,
 	creatable,
 	onAddVipPackage,
 }) => {
@@ -23,6 +28,7 @@ const AddVipModal: FC<AddVipModalProp> = ({
 			contentElement={
 				<AddVip
 					setOpen={setOpen}
+					defaultEmployeeId={defaultEmployeeId}
 					creatable={creatable}
 					onAddVipPackage={onAddVipPackage}
 				/>

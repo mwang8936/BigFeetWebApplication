@@ -22,6 +22,7 @@ import {
 
 interface VipsProp {
 	setOpen(open: boolean): void;
+	defaultEmployeeId?: number;
 	vipPackages: VipPackage[];
 	creatable: boolean;
 	onAddVipPackage(request: AddVipPackageRequest): Promise<void>;
@@ -36,6 +37,7 @@ interface VipsProp {
 
 const Vips: FC<VipsProp> = ({
 	setOpen,
+	defaultEmployeeId,
 	vipPackages,
 	creatable,
 	onAddVipPackage,
@@ -99,6 +101,7 @@ const Vips: FC<VipsProp> = ({
 			<AddVipModal
 				open={openAddVipPackageModal}
 				setOpen={setOpenAddVipPackageModal}
+				defaultEmployeeId={defaultEmployeeId}
 				creatable={creatable}
 				onAddVipPackage={onAddVipPackage}
 			/>

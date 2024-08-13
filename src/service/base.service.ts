@@ -19,27 +19,39 @@ export default async function authorizedRequest(
 	url: string,
 	method: string,
 	data?: any,
-	params?: any
+	params?: any,
+	socket_id?: string
 ) {
 	const accessToken = Cookies.get(tokenKey);
 
+	const requestData = data || {};
+
+	if (socket_id) {
+		requestData.socket_id = socket_id;
+	}
+
 	const config: AxiosRequestConfig = {
-		method: method,
+		method,
 		baseURL: BASE_API_URL,
-		url: url,
+		url,
 		headers: { Authorization: `Bearer ${accessToken}` },
-		data: data,
-		params: params,
+		data: requestData,
+		params,
 	};
-	console.log('API Request:', config);
+
+	if (import.meta.env.VITE_ENV === 'development')
+		console.log('API Request:', config);
 
 	return axios(config)
 		.then((response) => {
-			console.log('API Response:', response);
+			if (import.meta.env.VITE_ENV === 'development')
+				console.log('API Response:', response);
+
 			return parseData(response.data);
 		})
 		.catch((error: AxiosError) => {
-			console.error('API Error:', error);
+			if (import.meta.env.VITE_ENV === 'development')
+				console.error('API Error:', error);
 
 			const message = onError(error, i18n, queryClient, setAuthentication);
 			if (typeof message === 'string') throw new Error(message);

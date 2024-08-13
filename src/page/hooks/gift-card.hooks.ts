@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { MutationProp, QueryProp } from './props.hooks';
 
+import { useSocketIdContext } from '../bigfeet/BigFeet.Page';
 import { useAuthenticationContext } from '../../App';
 
 import { GetGiftCardsParam } from '../../models/params/Gift-Card.Param';
@@ -69,6 +70,7 @@ export const useUpdateGiftCardMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: {
@@ -82,7 +84,8 @@ export const useUpdateGiftCardMutation = ({
 				queryClient,
 				setAuthentication,
 				data.giftCardId,
-				data.request
+				data.request,
+				socketId
 			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
@@ -132,10 +135,11 @@ export const useAddGiftCardMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: { request: AddGiftCardRequest }) =>
-			addGiftCard(i18n, queryClient, setAuthentication, data.request),
+			addGiftCard(i18n, queryClient, setAuthentication, data.request, socketId),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -176,10 +180,17 @@ export const useDeleteGiftCardMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: { giftCardId: string; date: Date }) =>
-			deleteGiftCard(i18n, queryClient, setAuthentication, data.giftCardId),
+			deleteGiftCard(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.giftCardId,
+				socketId
+			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 

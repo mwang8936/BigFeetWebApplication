@@ -100,9 +100,6 @@
     "Deleting Vip Package...": "Deleting Vip Package...",
     "Vip Package Deleted Successfully": "Vip Package Deleted Successfully",
     "Failed to Delete Vip Package": "Failed to Delete Vip Package",
-    "Getting Schedules...": "Getting Schedules...",
-    "Schedule Retrieved Successfully": "Schedule Retrieved Successfully",
-    "Failed to Get Schedules": "Failed to Get Schedules",
     "Today": "Today",
     "Add Reservation": "Add Reservation",
     "Total Cash": "Total Cash",
@@ -116,7 +113,6 @@
     "Body Services": "Body Services",
     "Feet Services": "Feet Services",
     "Acupuncture Services": "Acupuncture Services",
-    "Requested Services": "Requested Services",
     "Holiday": "Holiday",
     "Tips: ": "Tips: ",
     "No Tips": "No Tips",
@@ -181,6 +177,7 @@
     "Change": "Change",
     "Cancel": "Cancel",
     "Fill": "Fill",
+    "Total Amount Missing": "Total Amount Missing",
     "No remaining amount left.": "No remaining amount left.",
     "Add": "Add",
     "Edit": "Edit",
@@ -412,5 +409,40 @@
 
     "Remember me": "Remember me",
     "Signing In": "Signing In",
-    "Sign in": "Sign In"
+    "Sign in": "Sign In",
+
+    "Customer Added Phone Number": "New Customer with Phone Number: {{phone_number}}, added.",
+    "Customer Added VIP Serial": "New Customer with VIP Serial: {{vip_serial}}, added.",
+    "Customer Updated Phone Number": "Customer with Phone Number: {{phone_number}}, updated.",
+    "Customer Updated VIP Serial": "Customer with VIP Serial: {{vip_serial}}, updated.",
+    "Customer Deleted Phone Number": "Customer with Phone Number: {{phone_number}}, deleted.",
+    "Customer Deleted VIP Serial":  "Customer with VIP Serial: {{vip_serial}}, deleted.",
+
+    "Employee Added": "New Employee with Username: {{username}}, added.",
+    "Employee Updated": "Employee with Username: {{username}}, updated.",
+    "Employee Deleted": "Employee with Username: {{username}}, deleted.",
+
+    "Gift Card Added": "New Gift Card Added.",
+    "Gift Card Updated": "Gift Card Updated.",
+    "Gift Card Deleted": "Gift Card Deleted.",
+
+    "Reservation Added": "New Reservation was added at: {{time}} for employee: {{username}} was created by: {{created_by}}.",
+    "Reservation Updated": "Reservation at: {{time}} for employee: {{username}}, was updated by {{updated_by}}.",
+    "Reservation Deleted": "Reservation at: {{time}} for employee: {{username}}, was deleted by {{deleted_by}}.",
+
+    "Schedule Added": "New Schedule was added for employee: {{username}}.",
+    "Schedule Updated": "Schedule for employee: {{username}}, updated.",
+    "Schedule Deleted": "Schedule for employee: {{username}}, deleted.",
+    "Schedule Signed": "{{username}} signed schedule.",
+
+    "Service Added": "New Service with Name: {{service_name}}, added.",
+    "Service Updated": "Service with Name: {{service_name}}, updated.",
+    "Service Deleted": "Service with Name: {{service_name}}, deleted.",
+
+    "Vip Package Added": "New Vip Package with Serial: {{serial}}, added.",
+    "Vip Package Updated": "Vip Package with Serial: {{serial}}, updated.",
+    "Vip Package Deleted": "Vip Package with Serial: {{serial}}, deleted.",
+
+    "Reservation Add On": "Reservation Add On",
+    "Add on a reservation": "Add on a reservation"
 }

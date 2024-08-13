@@ -380,8 +380,7 @@ const ERRORS = {
 		},
 		conflicts: {
 			title: 'Conflicting Schedule!',
-			message:
-				'There is another reservation at this time. Please choose another time or employee.',
+			message: 'There is another reservation at this time.',
 		},
 		gender_mismatch: {
 			title: 'Gender Mismatch!',

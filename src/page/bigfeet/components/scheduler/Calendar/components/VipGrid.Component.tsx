@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 interface VipGridProp {
 	row: number;
 	colNum: number;
+	defaultEmployeeId?: number;
 	vipPackages: VipPackage[];
 	creatable: boolean;
 	onAddVipPackage(request: AddVipPackageRequest): Promise<void>;
@@ -26,6 +27,7 @@ interface VipGridProp {
 const VipGrid: FC<VipGridProp> = ({
 	row,
 	colNum,
+	defaultEmployeeId,
 	vipPackages,
 	creatable,
 	onAddVipPackage,
@@ -85,6 +87,7 @@ const VipGrid: FC<VipGridProp> = ({
 			<VipsModal
 				open={open}
 				setOpen={setOpen}
+				defaultEmployeeId={defaultEmployeeId}
 				vipPackages={vipPackages}
 				creatable={creatable}
 				onAddVipPackage={onAddVipPackage}

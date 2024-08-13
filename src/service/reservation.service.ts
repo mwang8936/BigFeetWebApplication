@@ -50,7 +50,8 @@ export async function updateReservation(
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
 	reservation_id: number,
-	request: UpdateReservationRequest
+	request: UpdateReservationRequest,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
@@ -58,7 +59,9 @@ export async function updateReservation(
 		setAuthentication,
 		`${reservationPath}/${reservation_id}`,
 		'patch',
-		request
+		request,
+		undefined,
+		socket_id
 	);
 }
 
@@ -66,7 +69,8 @@ export async function addReservation(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	request: AddReservationRequest
+	request: AddReservationRequest,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
@@ -74,7 +78,9 @@ export async function addReservation(
 		setAuthentication,
 		`${reservationPath}`,
 		'post',
-		request
+		request,
+		undefined,
+		socket_id
 	);
 }
 
@@ -82,13 +88,17 @@ export async function deleteReservation(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	reservation_id: number
+	reservation_id: number,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
 		`${reservationPath}/${reservation_id}`,
-		'delete'
+		'delete',
+		undefined,
+		undefined,
+		socket_id
 	);
 }

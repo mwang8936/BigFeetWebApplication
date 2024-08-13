@@ -19,7 +19,7 @@ import { Language } from '../../models/enums';
 
 import { LoginRequest } from '../../models/requests/Login.Request.Model';
 
-import { authenticate, login } from '../../service/auth.service';
+import { login } from '../../service/auth.service';
 
 import { getLanguageFile } from '../../utils/i18n.utils';
 
@@ -48,11 +48,17 @@ export const useLoginMutation = ({ setLoading, setError }: MutationProp) => {
 
 			const rememberMe = variables.rememberMe;
 			if (rememberMe) {
-				secureLocalStorage.setItem(usernameKey, username);
-				secureLocalStorage.setItem(passwordKey, password);
+				secureLocalStorage.setItem(
+					usernameKey + import.meta.env.VITE_ENV,
+					username
+				);
+				secureLocalStorage.setItem(
+					passwordKey + import.meta.env.VITE_ENV,
+					password
+				);
 			} else {
-				secureLocalStorage.removeItem(usernameKey);
-				secureLocalStorage.removeItem(passwordKey);
+				secureLocalStorage.removeItem(usernameKey + import.meta.env.VITE_ENV);
+				secureLocalStorage.removeItem(passwordKey + import.meta.env.VITE_ENV);
 			}
 
 			// Store the user
@@ -60,31 +66,6 @@ export const useLoginMutation = ({ setLoading, setError }: MutationProp) => {
 		},
 		onError: (error) => {
 			if (setError) setError(error.message);
-		},
-		onSettled: () => {
-			if (setLoading) setLoading(false);
-		},
-	});
-};
-
-export const useAuthenticateMutation = ({
-	setLoading,
-	setError,
-}: MutationProp) => {
-	const { setAuthentication } = useAuthenticationContext();
-
-	return useMutation({
-		mutationFn: () => authenticate(setAuthentication),
-		onMutate: async () => {
-			if (setLoading) setLoading(true);
-		},
-		onSuccess: () => setAuthentication(true),
-		onError: (error) => {
-			if (setError) {
-				setError(error.message);
-			}
-
-			console.error('Error during authentication:', error.message);
 		},
 		onSettled: () => {
 			if (setLoading) setLoading(false);
@@ -106,7 +87,8 @@ export const useLogout = () => {
 		Cookies.remove(tokenKey);
 		setAuthentication(false);
 
-		console.log('User logged out.');
+		if (import.meta.env.VITE_ENV === 'development')
+			console.log('User logged out.');
 	};
 
 	return logout;

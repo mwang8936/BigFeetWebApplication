@@ -1,9 +1,14 @@
 import { FC } from 'react';
-import BaseModal from '../../BaseModal.Component';
+
 import AddReservation from './AddReservation.Component';
-import { AddReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
-import User from '../../../../../../../models/User.Model';
+
+import BaseModal from '../../BaseModal.Component';
+
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+
+import User from '../../../../../../../models/User.Model';
+
+import { AddReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
 
 interface AddReservationModalProp {
 	open: boolean;

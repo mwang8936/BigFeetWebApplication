@@ -1,16 +1,25 @@
 import { FC } from 'react';
-import BaseModal from '../../BaseModal.Component';
+
 import EditReservation from './EditReservation.Component';
-import Reservation from '../../../../../../../models/Reservation.Model';
-import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
-import User from '../../../../../../../models/User.Model';
+
+import BaseModal from '../../BaseModal.Component';
+
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+
+import Reservation from '../../../../../../../models/Reservation.Model';
+import User from '../../../../../../../models/User.Model';
+
+import {
+	AddReservationRequest,
+	UpdateReservationRequest,
+} from '../../../../../../../models/requests/Reservation.Request.Model';
 
 interface EditReservationModalProp {
 	open: boolean;
 	setOpen(open: boolean): void;
 	reservation: Reservation;
 	employeeId: number;
+	onAddReservation(addReservationRequest: AddReservationRequest): Promise<void>;
 	editable: boolean;
 	onEditReservation(
 		reservationId: number,
@@ -25,6 +34,7 @@ const EditReservationModal: FC<EditReservationModalProp> = ({
 	setOpen,
 	reservation,
 	employeeId,
+	onAddReservation,
 	editable,
 	onEditReservation,
 	deletable,
@@ -43,6 +53,7 @@ const EditReservationModal: FC<EditReservationModalProp> = ({
 					updatedBy={user.username}
 					reservation={reservation}
 					reservationEmployeeId={employeeId}
+					onAddReservation={onAddReservation}
 					editable={editable}
 					onEditReservation={onEditReservation}
 					deletable={deletable}

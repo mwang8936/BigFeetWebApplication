@@ -1,10 +1,60 @@
 import { useState, createContext, useContext, FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
+
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+
 import Calendar from './Calendar/Calendar.Component';
-import { PaymentMethod, Permissions, Role } from '../../../../models/enums';
-import Schedule from '../../../../models/Schedule.Model';
-import { sameDate } from '../../../../utils/date.utils';
+import ZoomOverlay from './components/ZoomOverlay.Component';
+
+import PermissionsButton, {
+	ButtonType,
+} from '../miscallaneous/PermissionsButton.Component';
+
+import FilterDateModal from '../miscallaneous/modals/scheduler/FilterDateModal.Component';
+import AddReservationModal from '../miscallaneous/modals/scheduler/calendar/AddReservationModal.Component';
+import GiftCardsModal from '../miscallaneous/modals/scheduler/calendar/GiftCardModal.Component';
+
+import { useCustomersQuery } from '../../../hooks/customer.hooks';
+import { useEmployeesQuery } from '../../../hooks/employee.hooks';
+import {
+	useAddGiftCardMutation,
+	useDeleteGiftCardMutation,
+	useGiftCardsQuery,
+	useUpdateGiftCardMutation,
+} from '../../../hooks/gift-card.hooks';
+import { useUserQuery } from '../../../hooks/profile.hooks';
+import {
+	useAddReservationMutation,
+	useDeleteReservationMutation,
+	useUpdateReservationMutation,
+} from '../../../hooks/reservation.hooks';
+import {
+	useAddScheduleMutation,
+	useSignProfileScheduleMutation,
+	useSchedulesQuery,
+	useUpdateScheduleMutation,
+} from '../../../hooks/schedule.hooks';
+import { useServicesQuery } from '../../../hooks/service.hooks';
+import {
+	useAddVipPackageMutation,
+	useDeleteVipPackageMutation,
+	useUpdateVipPackageMutation,
+} from '../../../hooks/vip-package.hooks';
+
+import ERRORS from '../../../../constants/error.constants';
+import STORES from '../../../../constants/store.constants';
+
 import Employee from '../../../../models/Employee.Model';
+import { PaymentMethod, Permissions, Role } from '../../../../models/enums';
+import GiftCard from '../../../../models/Gift-Card.Model';
+import Schedule from '../../../../models/Schedule.Model';
+import User from '../../../../models/User.Model';
+
+import {
+	AddGiftCardRequest,
+	UpdateGiftCardRequest,
+} from '../../../../models/requests/GIft-Card.Request';
 import {
 	AddReservationRequest,
 	UpdateReservationRequest,
@@ -13,56 +63,16 @@ import {
 	AddScheduleRequest,
 	UpdateScheduleRequest,
 } from '../../../../models/requests/Schedule.Request.Model';
-import AddReservationModal from '../miscallaneous/modals/scheduler/calendar/AddReservationModal.Component';
-import PermissionsButton, {
-	ButtonType,
-} from '../miscallaneous/PermissionsButton.Component';
-import ZoomOverlay from './components/ZoomOverlay.Component';
+
 import {
 	AddVipPackageRequest,
 	UpdateVipPackageRequest,
 } from '../../../../models/requests/Vip-Package.Request.Model';
-import FilterDateModal from '../miscallaneous/modals/scheduler/FilterDateModal.Component';
-import STORES from '../../../../constants/store.constants';
+
+import { sameDate } from '../../../../utils/date.utils';
 import { sortEmployees } from '../../../../utils/employee.utils';
-import ERRORS from '../../../../constants/error.constants';
-import { useTranslation } from 'react-i18next';
-import { useQueryClient } from '@tanstack/react-query';
-import { formatDateToQueryKey } from '../../../../utils/string.utils';
 import { moneyToString } from '../../../../utils/number.utils';
-import User from '../../../../models/User.Model';
-import { useCustomersQuery } from '../../../hooks/customer.hooks';
-import { useEmployeesQuery } from '../../../hooks/employee.hooks';
-import { useSchedulesQuery } from '../../../hooks/schedule.hooks';
-import { useServicesQuery } from '../../../hooks/service.hooks';
-import { useUserQuery } from '../../../hooks/profile.hooks';
-import {
-	useAddScheduleMutation,
-	useSignProfileScheduleMutation,
-	useUpdateScheduleMutation,
-} from '../../../hooks/schedule.hooks';
-import {
-	useAddReservationMutation,
-	useDeleteReservationMutation,
-	useUpdateReservationMutation,
-} from '../../../hooks/reservation.hooks';
-import {
-	useAddVipPackageMutation,
-	useDeleteVipPackageMutation,
-	useUpdateVipPackageMutation,
-} from '../../../hooks/vip-package.hooks';
-import {
-	useAddGiftCardMutation,
-	useDeleteGiftCardMutation,
-	useGiftCardsQuery,
-	useUpdateGiftCardMutation,
-} from '../../../hooks/gift-card.hooks';
-import GiftCard from '../../../../models/Gift-Card.Model';
-import GiftCardsModal from '../miscallaneous/modals/scheduler/calendar/GiftCardModal.Component';
-import {
-	AddGiftCardRequest,
-	UpdateGiftCardRequest,
-} from '../../../../models/requests/GIft-Card.Request';
+import { formatDateToQueryKey } from '../../../../utils/string.utils';
 
 const ScheduleDateContext = createContext<
 	{ date: Date; setDate(date: Date): void } | undefined
@@ -79,6 +89,20 @@ export function useScheduleDateContext() {
 	return context;
 }
 
+const ScaleContext = createContext<
+	{ scale: number; setScale(scale: number): void } | undefined
+>(undefined);
+
+export function useScaleContext() {
+	const context = useContext(ScaleContext);
+
+	if (context === undefined) {
+		throw new Error('useScaleContext must be within ScaleProvider.');
+	}
+
+	return context;
+}
+
 const Scheduler: FC = () => {
 	const { t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -89,19 +113,8 @@ const Scheduler: FC = () => {
 	const [date, setDate] = useState<Date>(new Date());
 	const [filtered, setFiltered] = useState(false);
 	const [openFilterDialog, setOpenFilterDialog] = useState(false);
+
 	const [scale, setScale] = useState(1);
-
-	const zoomIn = () => {
-		setScale((prevScale) => prevScale + 0.1);
-	};
-
-	const zoomOut = () => {
-		setScale((prevScale) => Math.max(0.1, prevScale - 0.1));
-	};
-
-	const zoomReset = () => {
-		setScale(1);
-	};
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
@@ -115,54 +128,53 @@ const Scheduler: FC = () => {
 	const giftCardGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_GIFT_CARD
 	);
-	const serviceGettable = user.permissions.includes(
-		Permissions.PERMISSION_GET_SERVICE
-	);
 	const scheduleGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_SCHEDULE
+	);
+	const serviceGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_SERVICE
 	);
 
 	useCustomersQuery({
 		gettable: customerGettable,
 		refetchInterval: 1000 * 60 * 5,
 	});
+
 	const employeeQuery = useEmployeesQuery({
 		gettable: employeeGettable,
-		refetchInterval: 1000 * 60 * 5,
+		staleTime: Infinity,
 	});
+	const employees: Employee[] = (
+		(employeeQuery.data as Employee[]) || [user]
+	).filter((employee) => employee.role !== Role.DEVELOPER);
+
 	const giftCardsQuery = useGiftCardsQuery({
 		date,
 		gettable: giftCardGettable,
-		refetchInterval: 1000 * 60 * 5,
+		staleTime: Infinity,
 	});
 	const giftCards: GiftCard[] = (giftCardsQuery.data as GiftCard[]) || [];
-	useServicesQuery({
-		gettable: serviceGettable,
-		refetchInterval: 1000 * 60 * 5,
-	});
+
 	const scheduleQuery = useSchedulesQuery({
 		date,
 		gettable: scheduleGettable,
-		staleTime: 0,
+		staleTime: Infinity,
 	});
 	const schedules: Schedule[] = (
 		(scheduleQuery.data as Schedule[]) || []
 	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
-	let employeeList: Employee[] = [];
+	useServicesQuery({
+		gettable: serviceGettable,
+		refetchInterval: 1000 * 60 * 5,
+	});
 
-	try {
-		const employees: Employee[] = (
-			(employeeQuery.data as Employee[]) || []
-		).filter((employee) => employee.role !== Role.DEVELOPER);
-		employeeList.push(...employees);
-	} catch {
-		employeeList.push(user);
-	}
-	sortEmployees(employeeList, schedules, date);
+	sortEmployees(employees, schedules, date);
 
-	const creatable = [
-		Permissions.PERMISSION_ADD_GIFT_CARD,
+	const giftCardCreatable = user.permissions.includes(
+		Permissions.PERMISSION_ADD_GIFT_CARD
+	);
+	const scheduleCreatable = [
 		Permissions.PERMISSION_ADD_RESERVATION,
 		Permissions.PERMISSION_ADD_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
@@ -191,8 +203,10 @@ const Scheduler: FC = () => {
 		addVipPackageMutation.mutate({ request });
 	};
 
-	const editable = [
-		Permissions.PERMISSION_UPDATE_GIFT_CARD,
+	const giftCardEditable = user.permissions.includes(
+		Permissions.PERMISSION_UPDATE_GIFT_CARD
+	);
+	const scheduleEditable = [
 		Permissions.PERMISSION_UPDATE_RESERVATION,
 		Permissions.PERMISSION_UPDATE_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
@@ -253,6 +267,9 @@ const Scheduler: FC = () => {
 		updateVipPackageMutation.mutate({ serial, request, originalDate, newDate });
 	};
 
+	const giftCardDeletable = user.permissions.includes(
+		Permissions.PERMISSION_DELETE_GIFT_CARD
+	);
 	const deletable = [
 		Permissions.PERMISSION_DELETE_RESERVATION,
 		Permissions.PERMISSION_DELETE_SCHEDULE,
@@ -282,16 +299,6 @@ const Scheduler: FC = () => {
 		signProfileScheduleMutation.mutate({ date });
 	};
 
-	const getPermission = user.permissions.includes(
-		Permissions.PERMISSION_GET_SCHEDULE
-	);
-
-	const displayDate = () => {
-		return sameDate(new Date(), date)
-			? `${t('Today')} - ${date.toDateString()}`
-			: date.toDateString();
-	};
-
 	const totalGiftCardAmount = giftCards
 		.map((giftCard) => giftCard.payment_amount)
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
@@ -307,6 +314,7 @@ const Scheduler: FC = () => {
 			reservation.service.body,
 		])
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+
 	const totalCash =
 		totalReservations
 			.map((reservation) => reservation.cash || 0)
@@ -325,126 +333,146 @@ const Scheduler: FC = () => {
 		);
 		setDate(selectedDate);
 
-		if (getPermission && !sameDate(date, selectedDate)) {
+		if (scheduleGettable && !sameDate(date, selectedDate)) {
 			queryClient.invalidateQueries({
 				queryKey: ['schedules', formatDateToQueryKey(selectedDate)],
 			});
 		}
 	};
 
+	const zoomIn = () => {
+		setScale((prevScale) => prevScale + 0.1);
+	};
+
+	const zoomOut = () => {
+		setScale((prevScale) => Math.max(0.1, prevScale - 0.1));
+	};
+
+	const zoomReset = () => {
+		setScale(1);
+	};
+
+	const displayDate = () => {
+		return sameDate(new Date(), date)
+			? `${t('Today')} - ${date.toDateString()}`
+			: date.toDateString();
+	};
+
 	return (
 		<ScheduleDateContext.Provider value={{ date, setDate }}>
-			<div className="h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
-				<div className="vertical-center ms-10 flex flex-col">
-					<PermissionsButton
-						btnTitle={t('Add Reservation')}
-						btnType={ButtonType.ADD}
-						top={false}
-						right={false}
-						disabled={!creatable}
-						missingPermissionMessage={ERRORS.reservation.permissions.add}
-						onClick={() => setOpenAddReservationModal(true)}
+			<ScaleContext.Provider value={{ scale, setScale }}>
+				<div className="h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
+					<div className="vertical-center ms-10 flex flex-col">
+						<PermissionsButton
+							btnTitle={t('Add Reservation')}
+							btnType={ButtonType.ADD}
+							top={false}
+							right={false}
+							disabled={!scheduleCreatable}
+							missingPermissionMessage={ERRORS.reservation.permissions.add}
+							onClick={() => setOpenAddReservationModal(true)}
+						/>
+
+						<PermissionsButton
+							btnTitle={t('Add Gift Card')}
+							btnType={ButtonType.ADD}
+							top={false}
+							right={false}
+							disabled={!giftCardCreatable}
+							missingPermissionMessage={ERRORS.gift_card.permissions.add}
+							onClick={() => setOpenGiftCardModal(true)}
+						/>
+					</div>
+					<div className="vertical-center flex text-gray-600 text-xl">
+						{t('Total Cash')}:
+						<span className="font-bold ms-2">${moneyToString(totalCash)}</span>
+					</div>
+					<div className="vertical-center flex flex-col">
+						<h1 className="my-auto mx-auto text-gray-600 text-3xl">
+							{t('Scheduler')}
+						</h1>
+						<h1 className="mx-auto text-gray-600 text-xl">{displayDate()}</h1>
+					</div>
+					<div className="vertical-center flex flex-col text-gray-600 text-xl">
+						<div className="flex">
+							{t('Total Reservations')}:
+							<span className="font-bold ms-2">{totalSessions}</span>
+						</div>
+						<div className="flex">
+							{t('Total Gift Cards')}:
+							<span className="font-bold ms-2">
+								${moneyToString(totalGiftCardAmount)}
+							</span>
+						</div>
+					</div>
+
+					<AdjustmentsHorizontalIcon
+						className={`h-16 w-16 ${
+							filtered ? 'text-blue-600' : 'text-gray-600'
+						} my-auto me-10 cursor-pointer`}
+						onClick={() => {
+							setOpenFilterDialog(true);
+						}}
 					/>
 
-					<PermissionsButton
-						btnTitle={t('Add Gift Card')}
-						btnType={ButtonType.ADD}
-						top={false}
-						right={false}
-						disabled={!creatable}
-						missingPermissionMessage={ERRORS.gift_card.permissions.add}
-						onClick={() => setOpenGiftCardModal(true)}
+					<FilterDateModal
+						open={openFilterDialog}
+						setOpen={setOpenFilterDialog}
+						date={date}
+						onDateSelected={onDateFiltered}
+						editable={true}
+						selectPast={true}
+						selectFuture={true}
 					/>
 				</div>
-				<div className="vertical-center flex text-gray-600 text-xl">
-					{t('Total Cash')}:
-					<span className="font-bold ms-2">${moneyToString(totalCash)}</span>
+				<ZoomOverlay zoomIn={zoomIn} zoomOut={zoomOut} zoomReset={zoomReset} />
+				<div
+					className="flex border border-gray-500 overflow-auto transform transition-transform duration-300 ease-in-out"
+					style={{
+						transform: `scale(${scale})`,
+						transformOrigin: 'top left',
+						width: `${100 / scale}%`,
+						height: `${100 / scale}%`,
+					}}>
+					<Calendar
+						date={date}
+						start={STORES.start}
+						end={STORES.end}
+						employees={employees}
+						schedules={schedules}
+						creatable={scheduleCreatable}
+						onAddReservation={onAddReservation}
+						onAddSchedule={onAddSchedule}
+						onAddVipPackage={onAddVipPackage}
+						editable={scheduleEditable}
+						onEditReservation={onEditReservation}
+						onEditSchedule={onEditSchedule}
+						onEditVipPackage={onEditVipPackage}
+						deletable={deletable}
+						onDeleteReservation={onDeleteReservation}
+						onDeleteVipPackage={onDeleteVipPackage}
+						onScheduleSigned={onScheduleSigned}
+					/>
 				</div>
-				<div className="vertical-center flex flex-col">
-					<h1 className="my-auto mx-auto text-gray-600 text-3xl">
-						{t('Scheduler')}
-					</h1>
-					<h1 className="mx-auto text-gray-600 text-xl">{displayDate()}</h1>
-				</div>
-				<div className="vertical-center flex flex-col text-gray-600 text-xl">
-					<div className="flex">
-						{t('Total Reservations')}:
-						<span className="font-bold ms-2">{totalSessions}</span>
-					</div>
-					<div className="flex">
-						{t('Total Gift Cards')}:
-						<span className="font-bold ms-2">
-							${moneyToString(totalGiftCardAmount)}
-						</span>
-					</div>
-				</div>
-
-				<AdjustmentsHorizontalIcon
-					className={`h-16 w-16 ${
-						filtered ? 'text-blue-600' : 'text-gray-600'
-					} my-auto me-10 cursor-pointer`}
-					onClick={() => {
-						setOpenFilterDialog(true);
-					}}
-				/>
-
-				<FilterDateModal
-					open={openFilterDialog}
-					setOpen={setOpenFilterDialog}
-					date={date}
-					onDateSelected={onDateFiltered}
-					editable={true}
-					selectPast={true}
-					selectFuture={true}
-				/>
-			</div>
-			<ZoomOverlay zoomIn={zoomIn} zoomOut={zoomOut} zoomReset={zoomReset} />
-			<div
-				className="flex border border-gray-500 overflow-auto transform transition-transform duration-300 ease-in-out"
-				style={{
-					transform: `scale(${scale})`,
-					transformOrigin: 'top left',
-					width: `${100 / scale}%`,
-					height: `${100 / scale}%`,
-				}}>
-				<Calendar
-					date={date}
-					start={STORES.start}
-					end={STORES.end}
-					employees={employeeList}
-					schedules={schedules}
-					creatable={creatable}
+				<AddReservationModal
+					open={openAddReservationModal}
+					setOpen={setOpenAddReservationModal}
+					creatable={scheduleCreatable}
 					onAddReservation={onAddReservation}
-					onAddSchedule={onAddSchedule}
-					onAddVipPackage={onAddVipPackage}
-					editable={editable}
-					onEditReservation={onEditReservation}
-					onEditSchedule={onEditSchedule}
-					onEditVipPackage={onEditVipPackage}
-					deletable={deletable}
-					onDeleteReservation={onDeleteReservation}
-					onDeleteVipPackage={onDeleteVipPackage}
-					onScheduleSigned={onScheduleSigned}
 				/>
-			</div>
-			<AddReservationModal
-				open={openAddReservationModal}
-				setOpen={setOpenAddReservationModal}
-				creatable={creatable}
-				onAddReservation={onAddReservation}
-			/>
 
-			<GiftCardsModal
-				open={openGiftCardModal}
-				setOpen={setOpenGiftCardModal}
-				giftCards={giftCards}
-				creatable={creatable}
-				onAddGiftCard={onAddGiftCard}
-				editable={editable}
-				onEditGiftCard={onEditGiftCard}
-				deletable={deletable}
-				onDeleteGiftCard={onDeleteGiftCard}
-			/>
+				<GiftCardsModal
+					open={openGiftCardModal}
+					setOpen={setOpenGiftCardModal}
+					giftCards={giftCards}
+					creatable={scheduleCreatable}
+					onAddGiftCard={onAddGiftCard}
+					editable={giftCardEditable}
+					onEditGiftCard={onEditGiftCard}
+					deletable={giftCardDeletable}
+					onDeleteGiftCard={onDeleteGiftCard}
+				/>
+			</ScaleContext.Provider>
 		</ScheduleDateContext.Provider>
 	);
 };

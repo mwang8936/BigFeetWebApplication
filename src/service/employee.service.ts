@@ -56,7 +56,8 @@ export async function updateEmployee(
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
 	employee_id: number,
-	request: UpdateEmployeeRequest
+	request: UpdateEmployeeRequest,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
@@ -64,7 +65,9 @@ export async function updateEmployee(
 		setAuthentication,
 		`employee/${employee_id}`,
 		'patch',
-		request
+		request,
+		undefined,
+		socket_id
 	);
 }
 
@@ -72,7 +75,8 @@ export async function addEmployee(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	request: AddEmployeeRequest
+	request: AddEmployeeRequest,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
@@ -80,7 +84,9 @@ export async function addEmployee(
 		setAuthentication,
 		`${employeePath}`,
 		'post',
-		request
+		request,
+		undefined,
+		socket_id
 	);
 }
 
@@ -88,14 +94,18 @@ export async function deleteEmployee(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	employee_id: number
+	employee_id: number,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
 		`${employeePath}/${employee_id}`,
-		'delete'
+		'delete',
+		undefined,
+		undefined,
+		socket_id
 	);
 }
 
@@ -103,13 +113,17 @@ export async function recoverEmployee(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	employee_id: number
+	employee_id: number,
+	socket_id?: string
 ) {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
 		`${employeePath}/${employee_id}/recover`,
-		'delete'
+		'delete',
+		undefined,
+		undefined,
+		socket_id
 	);
 }
