@@ -499,13 +499,13 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 					}
 					missingPermissionMessage={
 						!editable
-							? ERRORS.employee.permissions.edit
+							? t(ERRORS.employee.permissions.edit)
 							: !changesMade
-							? ERRORS.no_changes
+							? t(ERRORS.no_changes)
 							: missingRequiredInput
-							? ERRORS.required
+							? t(ERRORS.required)
 							: invalidInput
-							? ERRORS.invalid
+							? t(ERRORS.invalid)
 							: ''
 					}
 					onClick={onSave}
@@ -515,7 +515,7 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 					btnTitle={t('Delete')}
 					btnType={ButtonType.DELETE}
 					disabled={!deletable}
-					missingPermissionMessage={ERRORS.employee.permissions.delete}
+					missingPermissionMessage={t(ERRORS.employee.permissions.delete)}
 					onClick={() => {
 						setOpenDeleteModal(true);
 					}}

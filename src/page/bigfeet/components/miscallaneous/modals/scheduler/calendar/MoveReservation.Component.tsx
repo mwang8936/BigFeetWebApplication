@@ -257,13 +257,13 @@ const MoveReservation: FC<MoveReservationProp> = ({
 				disabledEdit={!editable || conflict || noBeds || genderMismatch}
 				editMissingPermissionMessage={
 					!editable
-						? ERRORS.reservation.permissions.edit
+						? t(ERRORS.reservation.permissions.edit)
 						: conflict
-						? ERRORS.warnings.conflicts.title
+						? t(ERRORS.warnings.conflicts.title)
 						: noBeds
-						? ERRORS.warnings.no_beds.title
+						? t(ERRORS.warnings.no_beds.title)
 						: genderMismatch
-						? ERRORS.warnings.gender_mismatch.title
+						? t(ERRORS.warnings.gender_mismatch.title)
 						: ''
 				}
 				onEdit={onEdit}
@@ -272,14 +272,14 @@ const MoveReservation: FC<MoveReservationProp> = ({
 			<WarningModal
 				open={openGenderMismatchWarningModel}
 				setOpen={setOpenGenderMismatchWarningModal}
-				title={ERRORS.warnings.gender_mismatch.title}
-				message={ERRORS.warnings.gender_mismatch.message}
+				title={t(ERRORS.warnings.gender_mismatch.title)}
+				message={t(ERRORS.warnings.gender_mismatch.message)}
 			/>
 
 			<WarningModal
 				open={openBedWarningModal}
 				setOpen={setOpenBedWarningModal}
-				title={ERRORS.warnings.no_beds.title}
+				title={t(ERRORS.warnings.no_beds.title)}
 				message={t(
 					ERRORS.warnings.no_beds.message.key,
 					ERRORS.warnings.no_beds.message.value
@@ -289,8 +289,8 @@ const MoveReservation: FC<MoveReservationProp> = ({
 			<WarningModal
 				open={openConflictWarningModal}
 				setOpen={setOpenConflictWarningModal}
-				title={ERRORS.warnings.conflicts.title}
-				message={ERRORS.warnings.conflicts.message}
+				title={t(ERRORS.warnings.conflicts.title)}
+				message={t(ERRORS.warnings.conflicts.message)}
 			/>
 		</>
 	);

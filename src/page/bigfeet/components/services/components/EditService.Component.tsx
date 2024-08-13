@@ -446,13 +446,13 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 					}
 					missingPermissionMessage={
 						!editable
-							? ERRORS.service.permissions.edit
+							? t(ERRORS.service.permissions.edit)
 							: !changesMade
-							? ERRORS.no_changes
+							? t(ERRORS.no_changes)
 							: missingRequiredInput
-							? ERRORS.required
+							? t(ERRORS.required)
 							: invalidInput
-							? ERRORS.invalid
+							? t(ERRORS.invalid)
 							: ''
 					}
 					onClick={onSave}
@@ -462,7 +462,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 					btnTitle={t('Delete')}
 					btnType={ButtonType.DELETE}
 					disabled={!deletable}
-					missingPermissionMessage={ERRORS.service.permissions.delete}
+					missingPermissionMessage={t(ERRORS.service.permissions.delete)}
 					onClick={() => {
 						setOpenDeleteModal(true);
 					}}

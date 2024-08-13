@@ -131,6 +131,7 @@
     "Signed": "已签",
     "Not Requested": "无指定",
     "Requested": "指定",
+    "Requested Pay": "约钟",
     "Customer (Optional)": "顾客 (非强制的)",
     "Add Schedule": "添加当班技师",
     "Not Working": "不当班",
@@ -201,7 +202,7 @@
 
     "No Language Selected": "未选语言",
 
-    "No Payment Selected": "未选付款方式",
+    "No Payment Method Selected": "未选付款方式",
 
     "No Role Selected": "未选职位",
     "STORE EMPLOYEE": "店内员工",

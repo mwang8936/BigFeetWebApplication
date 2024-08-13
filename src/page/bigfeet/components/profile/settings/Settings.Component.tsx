@@ -126,9 +126,9 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 					disabled={!changesMade || missingRequiredInput}
 					missingPermissionMessage={
 						!changesMade
-							? ERRORS.no_changes
+							? t(ERRORS.no_changes)
 							: missingRequiredInput
-							? ERRORS.required
+							? t(ERRORS.required)
 							: ''
 					}
 					onClick={onSave}

@@ -155,7 +155,7 @@ const Employees: FC = () => {
 							btnType={ButtonType.ADD}
 							top={false}
 							disabled={!creatable}
-							missingPermissionMessage={ERRORS.employee.permissions.add}
+							missingPermissionMessage={t(ERRORS.employee.permissions.add)}
 							onClick={() => {
 								setOpenAddModal(true);
 							}}

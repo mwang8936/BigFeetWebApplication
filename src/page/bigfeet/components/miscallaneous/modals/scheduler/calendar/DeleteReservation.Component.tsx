@@ -58,7 +58,9 @@ const DeleteReservation: FC<DeleteReservationProp> = ({
 			<DeleteBottom
 				onCancel={() => setOpen(false)}
 				disabledDelete={!deletable}
-				deleteMissingPermissionMessage={ERRORS.reservation.permissions.delete}
+				deleteMissingPermissionMessage={t(
+					ERRORS.reservation.permissions.delete
+				)}
 				onDelete={onDelete}
 			/>
 		</>

@@ -677,7 +677,7 @@ const EditReservation: FC<EditReservationProp> = ({
 								top={false}
 								right={false}
 								disabled={!reservationCreatable}
-								missingPermissionMessage={ERRORS.reservation.permissions.add}
+								missingPermissionMessage={t(ERRORS.reservation.permissions.add)}
 								onClick={() => {
 									setOpenAddModal(true);
 								}}
@@ -1102,24 +1102,26 @@ const EditReservation: FC<EditReservationProp> = ({
 				}
 				editMissingPermissionMessage={
 					!editable
-						? ERRORS.reservation.permissions.edit
+						? t(ERRORS.reservation.permissions.edit)
 						: !changesMade
-						? ERRORS.no_changes
+						? t(ERRORS.no_changes)
 						: missingRequiredInput
-						? ERRORS.required
+						? t(ERRORS.required)
 						: invalidInput
-						? ERRORS.invalid
+						? t(ERRORS.invalid)
 						: conflict
-						? ERRORS.warnings.conflicts.title
+						? t(ERRORS.warnings.conflicts.title)
 						: noBeds
-						? ERRORS.warnings.no_beds.title
+						? t(ERRORS.warnings.no_beds.title)
 						: genderMismatch
-						? ERRORS.warnings.gender_mismatch.title
+						? t(ERRORS.warnings.gender_mismatch.title)
 						: ''
 				}
 				onEdit={onEdit}
 				disabledDelete={!deletable}
-				deleteMissingPermissionMessage={ERRORS.reservation.permissions.delete}
+				deleteMissingPermissionMessage={t(
+					ERRORS.reservation.permissions.delete
+				)}
 				onDelete={() => setOpenDeleteModal(true)}
 			/>
 
@@ -1141,14 +1143,14 @@ const EditReservation: FC<EditReservationProp> = ({
 			<WarningModal
 				open={openGenderMismatchWarningModel}
 				setOpen={setOpenGenderMismatchWarningModal}
-				title={ERRORS.warnings.gender_mismatch.title}
-				message={ERRORS.warnings.gender_mismatch.message}
+				title={t(ERRORS.warnings.gender_mismatch.title)}
+				message={t(ERRORS.warnings.gender_mismatch.message)}
 			/>
 
 			<WarningModal
 				open={openBedWarningModal}
 				setOpen={setOpenBedWarningModal}
-				title={ERRORS.warnings.no_beds.title}
+				title={t(ERRORS.warnings.no_beds.title)}
 				message={t(
 					ERRORS.warnings.no_beds.message.key,
 					ERRORS.warnings.no_beds.message.value
@@ -1158,8 +1160,8 @@ const EditReservation: FC<EditReservationProp> = ({
 			<WarningModal
 				open={openConflictWarningModal}
 				setOpen={setOpenConflictWarningModal}
-				title={ERRORS.warnings.conflicts.title}
-				message={ERRORS.warnings.conflicts.message}
+				title={t(ERRORS.warnings.conflicts.title)}
+				message={t(ERRORS.warnings.conflicts.message)}
 			/>
 		</>
 	);

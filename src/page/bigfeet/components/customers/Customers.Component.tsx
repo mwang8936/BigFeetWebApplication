@@ -197,7 +197,7 @@ const Customers: FC = () => {
 							btnType={ButtonType.ADD}
 							top={false}
 							disabled={!creatable}
-							missingPermissionMessage={ERRORS.customer.permissions.add}
+							missingPermissionMessage={t(ERRORS.customer.permissions.add)}
 							onClick={() => {
 								setOpenAddCustomerModal(true);
 							}}

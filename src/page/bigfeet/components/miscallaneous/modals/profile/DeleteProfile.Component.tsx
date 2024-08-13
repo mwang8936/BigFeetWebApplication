@@ -61,7 +61,7 @@ const DeleteProfile: FC<DeleteProfileProp> = ({
 			<DeleteBottom
 				onCancel={() => setOpen(false)}
 				disabledDelete={!deletable}
-				deleteMissingPermissionMessage={ERRORS.employee.permissions.delete}
+				deleteMissingPermissionMessage={t(ERRORS.employee.permissions.delete)}
 				onDelete={onDelete}
 			/>
 		</>

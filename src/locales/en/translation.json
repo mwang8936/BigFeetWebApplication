@@ -131,6 +131,7 @@
     "Signed": "Signed",
     "Not Requested": "Not Requested",
     "Requested": "Requested",
+    "Requested Pay": "Requested Pay",
     "Customer (Optional)": "Customer (Optional)",
     "Add Schedule": "Add Schedule",
     "Not Working": "Not Working",
@@ -201,7 +202,7 @@
 
     "No Language Selected": "No Language Selected",
 
-    "No Payment Selected": "No Payment Selected",
+    "No Payment Method Selected": "No Payment Selected",
 
     "No Role Selected": "No Role Selected",
     "STORE EMPLOYEE": "STORE EMPLOYEE",

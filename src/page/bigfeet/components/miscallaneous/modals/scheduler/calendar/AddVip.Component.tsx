@@ -219,11 +219,11 @@ const AddVip: FC<AddVipProp> = ({
 				disabledAdd={!creatable || missingRequiredInput || invalidInput}
 				addMissingPermissionMessage={
 					!creatable
-						? ERRORS.vip_package.permissions.add
+						? t(ERRORS.vip_package.permissions.add)
 						: missingRequiredInput
-						? ERRORS.required
+						? t(ERRORS.required)
 						: invalidInput
-						? ERRORS.invalid
+						? t(ERRORS.invalid)
 						: ''
 				}
 				onAdd={onAdd}

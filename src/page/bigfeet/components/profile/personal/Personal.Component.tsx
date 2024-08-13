@@ -244,13 +244,13 @@ const Personal: FC<PersonalProp> = ({
 					}
 					missingPermissionMessage={
 						!editable
-							? ERRORS.employee.permissions.edit
+							? t(ERRORS.employee.permissions.edit)
 							: !changesMade
-							? ERRORS.no_changes
+							? t(ERRORS.no_changes)
 							: missingRequiredInput
-							? ERRORS.required
+							? t(ERRORS.required)
 							: invalidInput
-							? ERRORS.invalid
+							? t(ERRORS.invalid)
 							: ''
 					}
 					onClick={onSave}

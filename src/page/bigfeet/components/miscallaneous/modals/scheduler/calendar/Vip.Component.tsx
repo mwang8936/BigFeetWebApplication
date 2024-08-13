@@ -94,7 +94,7 @@ const Vips: FC<VipsProp> = ({
 			<AddBottom
 				onCancel={() => setOpen(false)}
 				disabledAdd={!creatable}
-				addMissingPermissionMessage={ERRORS.vip_package.permissions.add}
+				addMissingPermissionMessage={t(ERRORS.vip_package.permissions.add)}
 				onAdd={() => setOpenAddVipPackageModal(true)}
 			/>
 
