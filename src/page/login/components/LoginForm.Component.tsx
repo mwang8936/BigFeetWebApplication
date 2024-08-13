@@ -20,12 +20,8 @@ const LoginForm: FC = () => {
 	const { t } = useTranslation();
 
 	//Obtain last used username and password from secure storage.
-	const savedUsername = secureLocalStorage.getItem(
-		usernameKey + import.meta.env.VITE_ENV
-	);
-	const savedPassword = secureLocalStorage.getItem(
-		passwordKey + import.meta.env.VITE_ENV
-	);
+	const savedUsername = secureLocalStorage.getItem(usernameKey);
+	const savedPassword = secureLocalStorage.getItem(passwordKey);
 
 	const [username, setUsername] = useState<string>(
 		typeof savedUsername == 'string' ? savedUsername : ''

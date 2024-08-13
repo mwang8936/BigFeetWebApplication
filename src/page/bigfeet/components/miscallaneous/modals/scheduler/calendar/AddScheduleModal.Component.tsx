@@ -1,10 +1,7 @@
 import { FC } from 'react';
-
-import AddSchedule from './AddSchedule.Component';
-
 import BaseModal from '../../BaseModal.Component';
-
 import { AddScheduleRequest } from '../../../../../../../models/requests/Schedule.Request.Model';
+import AddSchedule from './AddSchedule.Component';
 
 interface AddScheduleModalProp {
 	open: boolean;

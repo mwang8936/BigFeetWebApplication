@@ -1,11 +1,7 @@
 import { FC } from 'react';
-
-import EditSchedule from './EditSchedule.Component';
-
 import BaseModal from '../../BaseModal.Component';
-
+import EditSchedule from './EditSchedule.Component';
 import Schedule from '../../../../../../../models/Schedule.Model';
-
 import { UpdateScheduleRequest } from '../../../../../../../models/requests/Schedule.Request.Model';
 
 interface EditScheduleModalProp {

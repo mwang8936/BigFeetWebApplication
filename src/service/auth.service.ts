@@ -19,14 +19,11 @@ export function login(request: LoginRequest) {
 
 	return axios(config)
 		.then((response) => {
-			if (import.meta.env.VITE_ENV === 'development')
-				console.log('Login Response:', response);
-
+			console.log('Login Response:', response);
 			return parseData(response.data);
 		})
 		.catch((error: AxiosError) => {
-			if (import.meta.env.VITE_ENV === 'development')
-				console.error('Error logging in:', error);
+			console.error('Error logging in:', error);
 
 			const message = onError(error);
 			if (typeof message === 'string') throw new Error(message);
@@ -44,20 +41,16 @@ export async function authenticate(
 			url: authenticatePath,
 			headers: { Authorization: `Bearer ${accessToken}` },
 		};
-
-		if (import.meta.env.VITE_ENV === 'development')
-			console.log('Login Request:', config);
+		console.log('Login Request:', config);
 
 		axios(config)
 			.then((response) => {
-				if (import.meta.env.VITE_ENV === 'development')
-					console.log('Login Response:', response);
+				console.log('Login Response:', response);
 
 				setAuthentication(true);
 			})
 			.catch((error: AxiosError) => {
-				if (import.meta.env.VITE_ENV === 'development')
-					console.error('Error logging in:', error);
+				console.error('Error logging in:', error);
 
 				setAuthentication(false);
 

@@ -56,8 +56,7 @@ export async function updateCustomer(
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
 	customer_id: number,
-	request: UpdateCustomerRequest,
-	socket_id?: string
+	request: UpdateCustomerRequest
 ) {
 	return authorizedRequest(
 		i18n,
@@ -65,9 +64,7 @@ export async function updateCustomer(
 		setAuthentication,
 		`${customerPath}/${customer_id}`,
 		'patch',
-		request,
-		undefined,
-		socket_id
+		request
 	);
 }
 
@@ -75,8 +72,7 @@ export async function addCustomer(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	request: AddCustomerRequest,
-	socket_id?: string
+	request: AddCustomerRequest
 ) {
 	return authorizedRequest(
 		i18n,
@@ -84,9 +80,7 @@ export async function addCustomer(
 		setAuthentication,
 		`${customerPath}`,
 		'post',
-		request,
-		undefined,
-		socket_id
+		request
 	);
 }
 
@@ -94,18 +88,14 @@ export async function deleteCustomer(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	customer_id: number,
-	socket_id?: string
+	customer_id: number
 ) {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
 		`${customerPath}/${customer_id}`,
-		'delete',
-		undefined,
-		undefined,
-		socket_id
+		'delete'
 	);
 }
 
@@ -113,17 +103,13 @@ export async function recoverCustomer(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	customer_id: number,
-	socket_id?: string
+	customer_id: number
 ) {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
 		`${customerPath}/${customer_id}/recover`,
-		'delete',
-		undefined,
-		undefined,
-		socket_id
+		'delete'
 	);
 }

@@ -1,29 +1,21 @@
 import { FC, useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-
-import { Dialog } from '@headlessui/react';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
-
-import DeleteGiftCardModal from './DeleteGiftCardModal.Component';
-
-import EditBottom from '../../EditBottom.Component';
-
-import EditableDate from '../../../editable/EditableDate.Component';
-import EditableDropDown from '../../../editable/EditableDropDown.Component';
-import EditablePayRate from '../../../editable/EditablePayRate.Component';
-
-import { paymentMethodDropDownItems } from '../../../../../../../constants/drop-down.constants';
+import { Dialog } from '@headlessui/react';
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
 import NAMES from '../../../../../../../constants/name.constants';
-import NUMBERS from '../../../../../../../constants/numbers.constants';
 import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
-
+import { useTranslation } from 'react-i18next';
+import NUMBERS from '../../../../../../../constants/numbers.constants';
+import EditBottom from '../../EditBottom.Component';
+import EditablePayRate from '../../../editable/EditablePayRate.Component';
 import { PaymentMethod } from '../../../../../../../models/enums';
 import GiftCard from '../../../../../../../models/Gift-Card.Model';
-
 import { UpdateGiftCardRequest } from '../../../../../../../models/requests/GIft-Card.Request';
-
+import DeleteGiftCardModal from './DeleteGiftCardModal.Component';
+import EditableDate from '../../../editable/EditableDate.Component';
+import EditableDropDown from '../../../editable/EditableDropDown.Component';
+import { paymentMethodDropDownItems } from '../../../../../../../constants/drop-down.constants';
 import { sameDate } from '../../../../../../../utils/date.utils';
 
 interface EditGiftCardProp {
@@ -139,14 +131,12 @@ const EditGiftCard: FC<EditGiftCardProp> = ({
 							aria-hidden="true"
 						/>
 					</div>
-
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Edit Gift Card')}: {giftCard.gift_card_id}
 						</Dialog.Title>
-
 						<div className="mt-2">
 							<EditableDate
 								originalDate={giftCard.date}
@@ -216,7 +206,6 @@ const EditGiftCard: FC<EditGiftCardProp> = ({
 					</div>
 				</div>
 			</div>
-
 			<EditBottom
 				onCancel={() => setOpen(false)}
 				disabledEdit={
