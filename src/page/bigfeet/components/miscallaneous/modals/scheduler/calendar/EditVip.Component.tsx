@@ -1,35 +1,25 @@
 import { FC, useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-
-import { Dialog } from '@headlessui/react';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
-
-import DeleteVipModal from './DeleteVipModal.Component';
-
-import EditBottom from '../../EditBottom.Component';
-
-import EditableMultiSelect from '../../../editable/EditableMultiSelect.Component';
-import EditablePayRate from '../../../editable/EditablePayRate.Component';
-
-import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
-
-import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
-import { useUserQuery } from '../../../../../../hooks/profile.hooks';
-
+import { Dialog } from '@headlessui/react';
+import Employee from '../../../../../../../models/Employee.Model';
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
 import NAMES from '../../../../../../../constants/name.constants';
-import NUMBERS from '../../../../../../../constants/numbers.constants';
 import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
-
-import Employee from '../../../../../../../models/Employee.Model';
+import { useTranslation } from 'react-i18next';
+import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
+import { UpdateVipPackageRequest } from '../../../../../../../models/requests/Vip-Package.Request.Model';
+import NUMBERS from '../../../../../../../constants/numbers.constants';
+import VipPackage from '../../../../../../../models/Vip-Package.Model';
+import EditBottom from '../../EditBottom.Component';
+import EditableMultiSelect from '../../../editable/EditableMultiSelect.Component';
+import EditablePayRate from '../../../editable/EditablePayRate.Component';
+import { arraysHaveSameContent } from '../../../../../../../utils/array.utils';
+import DeleteVipModal from './DeleteVipModal.Component';
 import { Permissions, Role } from '../../../../../../../models/enums';
 import User from '../../../../../../../models/User.Model';
-import VipPackage from '../../../../../../../models/Vip-Package.Model';
-
-import { UpdateVipPackageRequest } from '../../../../../../../models/requests/Vip-Package.Request.Model';
-
-import { arraysHaveSameContent } from '../../../../../../../utils/array.utils';
+import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 interface EditVipProp {
 	setOpen(open: boolean): void;
@@ -52,8 +42,6 @@ const EditVip: FC<EditVipProp> = ({
 	onDeleteVipPackage,
 }) => {
 	const { t } = useTranslation();
-
-	const { date } = useScheduleDateContext();
 
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
@@ -78,6 +66,7 @@ const EditVip: FC<EditVipProp> = ({
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
+	const { date } = useScheduleDateContext();
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -88,7 +77,7 @@ const EditVip: FC<EditVipProp> = ({
 		staleTime: Infinity,
 	});
 	const employees: Employee[] = (
-		(employeeQuery.data as Employee[]) || [user]
+		(employeeQuery.data as Employee[]) || []
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	useEffect(() => {
@@ -167,14 +156,12 @@ const EditVip: FC<EditVipProp> = ({
 							aria-hidden="true"
 						/>
 					</div>
-
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Edit Serial')}
 						</Dialog.Title>
-
 						<div className="mt-2">
 							<EditablePayRate
 								originalAmount={vipPackage.sold_amount}
@@ -247,7 +234,6 @@ const EditVip: FC<EditVipProp> = ({
 					</div>
 				</div>
 			</div>
-
 			<EditBottom
 				onCancel={() => setOpen(false)}
 				disabledEdit={

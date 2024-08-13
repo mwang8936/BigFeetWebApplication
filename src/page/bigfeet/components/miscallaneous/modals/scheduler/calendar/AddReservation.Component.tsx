@@ -1,57 +1,47 @@
 import { FC, useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-
-import { Dialog } from '@headlessui/react';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
-
-import WarningModal from './WarningModal.Component';
-
-import AddBottom from '../../AddBottom.Component';
-
-import AddDate from '../../../add/AddDate.Component';
-import AddDropDown from '../../../add/AddDropDown.Component';
-import AddInput from '../../../add/AddInput.Component';
-import AddPhoneNumber from '../../../add/AddPhoneNumber.Component';
-import AddTextArea from '../../../add/AddTextArea.Component';
-import AddTime from '../../../add/AddTime.Component';
-import AddToggleSwitch, {
-	ToggleColor,
-} from '../../../add/AddToggleSwitch.Component';
-
-import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
-
-import { useCustomersQuery } from '../../../../../../hooks/customer.hooks';
-import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
-import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
-import { useServicesQuery } from '../../../../../../hooks/service.hooks';
-import { useUserQuery } from '../../../../../../hooks/profile.hooks';
-
+import { Dialog } from '@headlessui/react';
+import { Gender, Permissions, Role } from '../../../../../../../models/enums';
+import Employee from '../../../../../../../models/Employee.Model';
+import Service from '../../../../../../../models/Service.Model';
 import {
 	genderDropDownItems,
 	getEmployeeDropDownItems,
 	getServiceDropDownItems,
 } from '../../../../../../../constants/drop-down.constants';
+import AddToggleSwitch, {
+	ToggleColor,
+} from '../../../add/AddToggleSwitch.Component';
+import AddTime from '../../../add/AddTime.Component';
+import AddDate from '../../../add/AddDate.Component';
+import { AddReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
+import AddTextArea from '../../../add/AddTextArea.Component';
+import AddInput from '../../../add/AddInput.Component';
+import AddPhoneNumber from '../../../add/AddPhoneNumber.Component';
+import Customer from '../../../../../../../models/Customer.Model';
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
-import LENGTHS from '../../../../../../../constants/lengths.constants';
+import AddDropDown from '../../../add/AddDropDown.Component';
 import NAMES from '../../../../../../../constants/name.constants';
-import PATTERNS from '../../../../../../../constants/patterns.constants';
+import LENGTHS from '../../../../../../../constants/lengths.constants';
 import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
 import STORES from '../../../../../../../constants/store.constants';
-
-import Customer from '../../../../../../../models/Customer.Model';
-import Employee from '../../../../../../../models/Employee.Model';
-import { Gender, Permissions, Role } from '../../../../../../../models/enums';
+import AddBottom from '../../AddBottom.Component';
+import WarningModal from './WarningModal.Component';
+import { useTranslation } from 'react-i18next';
+import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
 import Schedule from '../../../../../../../models/Schedule.Model';
-import Service from '../../../../../../../models/Service.Model';
-import User from '../../../../../../../models/User.Model';
-
-import { AddReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
-
 import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
 } from '../../../../../../../utils/reservation.utils';
+import User from '../../../../../../../models/User.Model';
+import { useCustomersQuery } from '../../../../../../hooks/customer.hooks';
+import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
+import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
+import { useServicesQuery } from '../../../../../../hooks/service.hooks';
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+import PATTERNS from '../../../../../../../constants/patterns.constants';
 import { formatPhoneNumber } from '../../../../../../../utils/string.utils';
 
 interface AddReservationProp {
@@ -73,7 +63,12 @@ const AddReservation: FC<AddReservationProp> = ({
 }) => {
 	const { t } = useTranslation();
 
-	const { date } = useScheduleDateContext();
+	const [openBedWarningModal, setOpenBedWarningModal] =
+		useState<boolean>(false);
+	const [openConflictWarningModal, setOpenConflictWarningModal] =
+		useState<boolean>(false);
+	const [openGenderMismatchWarningModel, setOpenGenderMismatchWarningModal] =
+		useState<boolean>(false);
 
 	const [dateInput, setDateInput] = useState<Date | null>(
 		defaultDate || new Date()
@@ -115,15 +110,10 @@ const AddReservation: FC<AddReservationProp> = ({
 	const [conflict, setConflict] = useState<boolean>(false);
 	const [genderMismatch, setGenderMismatch] = useState<boolean>(false);
 
-	const [openBedWarningModal, setOpenBedWarningModal] =
-		useState<boolean>(false);
-	const [openConflictWarningModal, setOpenConflictWarningModal] =
-		useState<boolean>(false);
-	const [openGenderMismatchWarningModel, setOpenGenderMismatchWarningModal] =
-		useState<boolean>(false);
-
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
+
+	const { date } = useScheduleDateContext();
 
 	const customerGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_CUSTOMER
@@ -149,7 +139,7 @@ const AddReservation: FC<AddReservationProp> = ({
 		staleTime: Infinity,
 	});
 	const employees: Employee[] = (
-		(employeeQuery.data as Employee[]) || [user]
+		(employeeQuery.data as Employee[]) || []
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	const serviceQuery = useServicesQuery({
@@ -332,7 +322,6 @@ const AddReservation: FC<AddReservationProp> = ({
 		const vip_serial = customerVipSerialInput?.trim();
 		const customer_name = customerNameInput?.trim();
 		const notes = customerNotesInput?.trim();
-
 		const addReservationRequest: AddReservationRequest = {
 			reserved_date,
 			employee_id,
@@ -347,7 +336,6 @@ const AddReservation: FC<AddReservationProp> = ({
 			notes,
 			created_by: createdBy,
 		};
-
 		onAddReservation(addReservationRequest);
 		setOpen(false);
 	};
@@ -375,14 +363,12 @@ const AddReservation: FC<AddReservationProp> = ({
 							aria-hidden="true"
 						/>
 					</div>
-
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Add Reservation')}
 						</Dialog.Title>
-
 						<div className="mt-2">
 							<AddDate
 								date={dateInput}
@@ -492,16 +478,20 @@ const AddReservation: FC<AddReservationProp> = ({
 								placeholder={PLACEHOLDERS.reservation.message}
 							/>
 
-							<div className="customer-optional-div">
-								<span className="customer-optional-title">
+							<div className="flex flex-col border-t-2 border-black p-2">
+								<span className="font-bold mb-2 flex flex-col">
 									{t('Customer (Optional)')}:
 									{customerIdInput !== null && (
-										<span className="current-customer-span">
-											<span>{t('Current Customer')}:</span>
-
-											<span>{currentPhoneNumberText}</span>
-
-											<span>{currentVipSerialText}</span>
+										<span className="flex flex-col text-green-500 font-medium text-sm">
+											<span className="text-green-500">
+												{t('Current Customer')}:
+											</span>
+											<span className="text-green-500">
+												{currentPhoneNumberText}
+											</span>
+											<span className="text-green-500">
+												{currentVipSerialText}
+											</span>
 										</span>
 									)}
 								</span>
@@ -574,7 +564,6 @@ const AddReservation: FC<AddReservationProp> = ({
 					</div>
 				</div>
 			</div>
-
 			<AddBottom
 				onCancel={() => setOpen(false)}
 				disabledAdd={
@@ -602,14 +591,12 @@ const AddReservation: FC<AddReservationProp> = ({
 				}
 				onAdd={onAdd}
 			/>
-
 			<WarningModal
 				open={openGenderMismatchWarningModel}
 				setOpen={setOpenGenderMismatchWarningModal}
 				title={ERRORS.warnings.gender_mismatch.title}
 				message={ERRORS.warnings.gender_mismatch.message}
 			/>
-
 			<WarningModal
 				open={openBedWarningModal}
 				setOpen={setOpenBedWarningModal}
@@ -619,7 +606,6 @@ const AddReservation: FC<AddReservationProp> = ({
 					ERRORS.warnings.no_beds.message.value
 				)}
 			/>
-
 			<WarningModal
 				open={openConflictWarningModal}
 				setOpen={setOpenConflictWarningModal}

@@ -44,7 +44,7 @@ const VipItem: FC<VipItemProp> = ({
 		staleTime: Infinity,
 	});
 	const employees: Employee[] = (
-		(employeeQuery.data as Employee[]) || [user]
+		(employeeQuery.data as Employee[]) || []
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	return (

@@ -4,7 +4,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { MutationProp } from './props.hooks';
 import { schedulesQueryKey } from './schedule.hooks';
 
-import { useSocketIdContext } from '../bigfeet/BigFeet.Page';
 import { useAuthenticationContext } from '../../App';
 
 import {
@@ -33,7 +32,6 @@ export const useUpdateVipPackageMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
-	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: {
@@ -47,8 +45,7 @@ export const useUpdateVipPackageMutation = ({
 				queryClient,
 				setAuthentication,
 				data.serial,
-				data.request,
-				socketId
+				data.request
 			),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
@@ -98,17 +95,10 @@ export const useAddVipPackageMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
-	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: { request: AddVipPackageRequest }) =>
-			addVipPackage(
-				i18n,
-				queryClient,
-				setAuthentication,
-				data.request,
-				socketId
-			),
+			addVipPackage(i18n, queryClient, setAuthentication, data.request),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 
@@ -149,17 +139,10 @@ export const useDeleteVipPackageMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
-	const { socketId } = useSocketIdContext();
 
 	return useMutation({
 		mutationFn: (data: { serial: string; date: Date }) =>
-			deleteVipPackage(
-				i18n,
-				queryClient,
-				setAuthentication,
-				data.serial,
-				socketId
-			),
+			deleteVipPackage(i18n, queryClient, setAuthentication, data.serial),
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 

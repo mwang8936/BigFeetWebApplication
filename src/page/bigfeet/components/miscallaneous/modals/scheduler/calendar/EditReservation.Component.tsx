@@ -1,84 +1,65 @@
 import { FC, useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-
-import { Dialog } from '@headlessui/react';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
-
-import DeleteReservationModal from './DeleteReservationModal.Component';
-import ReservationAddOnModal from './ReservationAddOnModal.Component';
-import WarningModal from './WarningModal.Component';
-
-import EditBottom from '../../EditBottom.Component';
-
-import FilledPermissionsButton from '../../../FilledPermissionsButton.Component';
-import { ButtonType } from '../../../PermissionsButton.Component';
-
-import { ToggleColor } from '../../../add/AddToggleSwitch.Component';
-
-import EditableDate from '../../../editable/EditableDate.Component';
-import EditableDropDown from '../../../editable/EditableDropDown.Component';
-import EditableInput from '../../../editable/EditableInput.Component';
-import EditablePayRate from '../../../editable/EditablePayRate.Component';
-import EditablePayRateAutomatic from '../../../editable/EditablePayRateAutomatic.Component';
-import EditablePhoneNumber from '../../../editable/EditablePhoneNumber.Component';
-import EditableTextArea from '../../../editable/EditableTextArea.Component';
-import EditableTime from '../../../editable/EditableTime.Component';
-import EditableToggleSwitch from '../../../editable/EditableToggleSwitch.Component';
-
-import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
-
-import { useCustomersQuery } from '../../../../../../hooks/customer.hooks';
-import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
-import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
-import { useServicesQuery } from '../../../../../../hooks/service.hooks';
-import { useUserQuery } from '../../../../../../hooks/profile.hooks';
-
-import Customer from '../../../../../../../models/Customer.Model';
-import Employee from '../../../../../../../models/Employee.Model';
+import { Dialog } from '@headlessui/react';
 import {
 	Gender,
 	Permissions,
 	Role,
 	TipMethod,
 } from '../../../../../../../models/enums';
-import Reservation from '../../../../../../../models/Reservation.Model';
-import Schedule from '../../../../../../../models/Schedule.Model';
+import Employee from '../../../../../../../models/Employee.Model';
 import Service from '../../../../../../../models/Service.Model';
-import User from '../../../../../../../models/User.Model';
-
-import {
-	AddReservationRequest,
-	UpdateReservationRequest,
-} from '../../../../../../../models/requests/Reservation.Request.Model';
-
 import {
 	genderDropDownItems,
 	getEmployeeDropDownItems,
 	getServiceDropDownItems,
 	tipMethodDropDownItems,
 } from '../../../../../../../constants/drop-down.constants';
-import ERRORS from '../../../../../../../constants/error.constants';
+import { ToggleColor } from '../../../add/AddToggleSwitch.Component';
+import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
+import Reservation from '../../../../../../../models/Reservation.Model';
+import EditableDropDown from '../../../editable/EditableDropDown.Component';
+import DeleteReservationModal from './DeleteReservationModal.Component';
+import EditablePayRate from '../../../editable/EditablePayRate.Component';
 import LABELS from '../../../../../../../constants/label.constants';
-import LENGTHS from '../../../../../../../constants/lengths.constants';
 import NAMES from '../../../../../../../constants/name.constants';
-import NUMBERS from '../../../../../../../constants/numbers.constants';
-import PATTERNS from '../../../../../../../constants/patterns.constants';
-import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
-import STORES from '../../../../../../../constants/store.constants';
-
+import EditableToggleSwitch from '../../../editable/EditableToggleSwitch.Component';
+import ERRORS from '../../../../../../../constants/error.constants';
+import EditableDate from '../../../editable/EditableDate.Component';
 import { sameDate, sameTime } from '../../../../../../../utils/date.utils';
+import Customer from '../../../../../../../models/Customer.Model';
+import EditableTime from '../../../editable/EditableTime.Component';
+import STORES from '../../../../../../../constants/store.constants';
+import EditBottom from '../../EditBottom.Component';
+import EditableTextArea from '../../../editable/EditableTextArea.Component';
+import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
+import NUMBERS from '../../../../../../../constants/numbers.constants';
+import LENGTHS from '../../../../../../../constants/lengths.constants';
+import EditableInput from '../../../editable/EditableInput.Component';
+import EditablePhoneNumber from '../../../editable/EditablePhoneNumber.Component';
+import WarningModal from './WarningModal.Component';
+import { useTranslation } from 'react-i18next';
+import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
+import Schedule from '../../../../../../../models/Schedule.Model';
+import EditablePayRateAutomatic from '../../../editable/EditablePayRateAutomatic.Component';
 import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
 } from '../../../../../../../utils/reservation.utils';
+import User from '../../../../../../../models/User.Model';
+import { useCustomersQuery } from '../../../../../../hooks/customer.hooks';
+import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
+import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
+import { useServicesQuery } from '../../../../../../hooks/service.hooks';
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 import { formatPhoneNumber } from '../../../../../../../utils/string.utils';
+import PATTERNS from '../../../../../../../constants/patterns.constants';
 
 interface EditReservationProp {
 	setOpen(open: boolean): void;
 	updatedBy: string;
 	reservation: Reservation;
 	reservationEmployeeId: number;
-	onAddReservation(addReservationRequest: AddReservationRequest): Promise<void>;
 	editable: boolean;
 	onEditReservation(
 		reservationId: number,
@@ -93,7 +74,6 @@ const EditReservation: FC<EditReservationProp> = ({
 	updatedBy,
 	reservation,
 	reservationEmployeeId,
-	onAddReservation,
 	editable,
 	onEditReservation,
 	deletable,
@@ -101,9 +81,6 @@ const EditReservation: FC<EditReservationProp> = ({
 }) => {
 	const { t } = useTranslation();
 
-	const { date } = useScheduleDateContext();
-
-	const [openAddModal, setOpenAddModal] = useState(false);
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
 	const [openBedWarningModal, setOpenBedWarningModal] =
 		useState<boolean>(false);
@@ -187,9 +164,7 @@ const EditReservation: FC<EditReservationProp> = ({
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
 
-	const reservationCreatable = user.permissions.includes(
-		Permissions.PERMISSION_ADD_RESERVATION
-	);
+	const { date } = useScheduleDateContext();
 
 	const customerGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_CUSTOMER
@@ -215,7 +190,7 @@ const EditReservation: FC<EditReservationProp> = ({
 		staleTime: Infinity,
 	});
 	const employees: Employee[] =
-		((employeeQuery.data as Employee[]) || [user]).filter(
+		((employeeQuery.data as Employee[]) || []).filter(
 			(employee) => employee.role !== Role.DEVELOPER
 		) || [];
 
@@ -394,7 +369,6 @@ const EditReservation: FC<EditReservationProp> = ({
 			const customer = customers.find(
 				(customer) => customer.phone_number === customerPhoneNumberInput
 			);
-
 			if (customer) {
 				setCustomerIdInput(customer.customer_id);
 
@@ -412,7 +386,6 @@ const EditReservation: FC<EditReservationProp> = ({
 			const customer = customers.find(
 				(customer) => customer.vip_serial === customerVipSerialInput
 			);
-
 			if (customer) {
 				setCustomerIdInput(customer.customer_id);
 
@@ -442,7 +415,6 @@ const EditReservation: FC<EditReservationProp> = ({
 			const service = services.find(
 				(service) => service.service_id === serviceIdInput
 			);
-
 			if (service) {
 				const startDate = new Date(dateInput);
 
@@ -618,11 +590,6 @@ const EditReservation: FC<EditReservationProp> = ({
 		setOpen(false);
 	};
 
-	const onAdd = async (addReservationRequest: AddReservationRequest) => {
-		onAddReservation(addReservationRequest);
-		setOpen(false);
-	};
-
 	const onDelete = async (reservationId: number) => {
 		onDeleteReservation(reservationId);
 		setOpen(false);
@@ -662,27 +629,13 @@ const EditReservation: FC<EditReservationProp> = ({
 							aria-hidden="true"
 						/>
 					</div>
-
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Edit Reservation')}
 						</Dialog.Title>
-
 						<div className="mt-2">
-							<FilledPermissionsButton
-								btnTitle={t('Reservation Add On')}
-								btnType={ButtonType.ADD}
-								top={false}
-								right={false}
-								disabled={!reservationCreatable}
-								missingPermissionMessage={ERRORS.reservation.permissions.add}
-								onClick={() => {
-									setOpenAddModal(true);
-								}}
-							/>
-
 							<EditableDate
 								originalDate={reservation.reserved_date}
 								date={dateInput}
@@ -917,7 +870,7 @@ const EditReservation: FC<EditReservationProp> = ({
 
 							{remainingAmount > 0 && (
 								<p className="error-label mb-4">
-									{t('Total Amount Missing')}: {remainingAmount.toFixed(2)}
+									{`Total Amount Missing: \$${remainingAmount.toFixed(2)}`}
 								</p>
 							)}
 
@@ -988,20 +941,23 @@ const EditReservation: FC<EditReservationProp> = ({
 								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
-							<div className="customer-optional-div">
-								<span className="customer-optional-title">
+							<div className="flex flex-col border-t-2 border-black p-2">
+								<span className="font-bold mb-2 flex flex-col">
 									{t('Customer (Optional)')}:
 									{customerIdInput !== null && (
-										<span className="current-customer-span">
-											<span>{t('Current Customer')}:</span>
-
-											<span>{currentPhoneNumberText}</span>
-
-											<span>{currentVipSerialText}</span>
+										<span className="flex flex-col text-green-500 font-medium text-sm">
+											<span className="text-green-500">
+												{t('Current Customer')}:
+											</span>
+											<span className="text-green-500">
+												{currentPhoneNumberText}
+											</span>
+											<span className="text-green-500">
+												{currentVipSerialText}
+											</span>
 										</span>
 									)}
 								</span>
-
 								<EditablePhoneNumber
 									originalPhoneNumber={
 										reservation.customer?.phone_number || null
@@ -1088,7 +1044,6 @@ const EditReservation: FC<EditReservationProp> = ({
 					</div>
 				</div>
 			</div>
-
 			<EditBottom
 				onCancel={() => setOpen(false)}
 				disabledEdit={
@@ -1122,14 +1077,6 @@ const EditReservation: FC<EditReservationProp> = ({
 				deleteMissingPermissionMessage={ERRORS.reservation.permissions.delete}
 				onDelete={() => setOpenDeleteModal(true)}
 			/>
-
-			<ReservationAddOnModal
-				open={openAddModal}
-				setOpen={setOpenAddModal}
-				reservation={reservation}
-				onAddReservation={onAdd}
-			/>
-
 			<DeleteReservationModal
 				open={openDeleteModal}
 				setOpen={setOpenDeleteModal}
@@ -1137,14 +1084,12 @@ const EditReservation: FC<EditReservationProp> = ({
 				deletable={deletable}
 				onDeleteReservation={onDelete}
 			/>
-
 			<WarningModal
 				open={openGenderMismatchWarningModel}
 				setOpen={setOpenGenderMismatchWarningModal}
 				title={ERRORS.warnings.gender_mismatch.title}
 				message={ERRORS.warnings.gender_mismatch.message}
 			/>
-
 			<WarningModal
 				open={openBedWarningModal}
 				setOpen={setOpenBedWarningModal}
@@ -1154,7 +1099,6 @@ const EditReservation: FC<EditReservationProp> = ({
 					ERRORS.warnings.no_beds.message.value
 				)}
 			/>
-
 			<WarningModal
 				open={openConflictWarningModal}
 				setOpen={setOpenConflictWarningModal}

@@ -69,25 +69,3 @@ export function errorToast(toastId: Id, title: string, message: string) {
 		theme: 'light',
 	});
 }
-
-/**
- * Displays a success toast notification with the provided message.
- *
- * @param message - The success message to display in the toast notification.
- *
- * The function uses the `toast` method from the `react-toastify` library to show a success message
- * with various display options configured, such as position, auto-close timing, and interactivity options.
- * This toast notification does not require any subsequent updates and is displayed immediately.
- */
-export function pusherToast(message: string) {
-	toast.success(message, {
-		position: 'top-right',
-		autoClose: 5000,
-		hideProgressBar: false,
-		closeOnClick: true,
-		pauseOnHover: true,
-		pauseOnFocusLoss: true,
-		draggable: true,
-		theme: 'light',
-	});
-}

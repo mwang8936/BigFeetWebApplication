@@ -56,17 +56,13 @@ export async function signProfileSchedule(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
-	date: Date,
-	socket_id?: string
+	date: Date
 ) {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
 		`${profilePath}/sign/${date.toISOString()}`,
-		'patch',
-		undefined,
-		undefined,
-		socket_id
+		'patch'
 	);
 }

@@ -1,33 +1,26 @@
 import { FC, useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-
 import { Dialog } from '@headlessui/react';
-import { PlusCircleIcon } from '@heroicons/react/20/solid';
-
-import AddBottom from '../../AddBottom.Component';
-
-import AddDropDown from '../../../add/AddDropDown.Component';
 import AddTime from '../../../add/AddTime.Component';
+import { AddScheduleRequest } from '../../../../../../../models/requests/Schedule.Request.Model';
 import AddToggleSwitch, {
 	ToggleColor,
 } from '../../../add/AddToggleSwitch.Component';
-
+import LABELS from '../../../../../../../constants/label.constants';
+import NAMES from '../../../../../../../constants/name.constants';
+import ERRORS from '../../../../../../../constants/error.constants';
+import STORES from '../../../../../../../constants/store.constants';
+import { PlusCircleIcon } from '@heroicons/react/20/solid';
+import AddBottom from '../../AddBottom.Component';
+import { useTranslation } from 'react-i18next';
+import AddDropDown from '../../../add/AddDropDown.Component';
+import { Permissions, Role } from '../../../../../../../models/enums';
+import Employee from '../../../../../../../models/Employee.Model';
+import Schedule from '../../../../../../../models/Schedule.Model';
+import { getPriorityDropDownItems } from '../../../../../../../constants/drop-down.constants';
+import User from '../../../../../../../models/User.Model';
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
-
-import { getPriorityDropDownItems } from '../../../../../../../constants/drop-down.constants';
-import ERRORS from '../../../../../../../constants/error.constants';
-import LABELS from '../../../../../../../constants/label.constants';
-import NAMES from '../../../../../../../constants/name.constants';
-import STORES from '../../../../../../../constants/store.constants';
-
-import Employee from '../../../../../../../models/Employee.Model';
-import { Permissions, Role } from '../../../../../../../models/enums';
-import Schedule from '../../../../../../../models/Schedule.Model';
-import User from '../../../../../../../models/User.Model';
-
-import { AddScheduleRequest } from '../../../../../../../models/requests/Schedule.Request.Model';
 
 interface AddScheduleProp {
 	setOpen(open: boolean): void;
@@ -74,7 +67,7 @@ const AddSchedule: FC<AddScheduleProp> = ({
 		staleTime: Infinity,
 	});
 	const employees: Employee[] = (
-		(employeeQuery.data as Employee[]) || [user]
+		(employeeQuery.data as Employee[]) || []
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	const scheduleQuery = useSchedulesQuery({
@@ -92,7 +85,7 @@ const AddSchedule: FC<AddScheduleProp> = ({
 		const missingRequiredInput = !isWorkingInput;
 
 		setMissingRequiredInput(missingRequiredInput);
-	}, [isWorkingInput]);
+	}, [startInput, endInput, isWorkingInput]);
 
 	useEffect(() => {
 		const invalidInput = invalidStart || invalidEnd;
@@ -123,7 +116,6 @@ const AddSchedule: FC<AddScheduleProp> = ({
 			is_working,
 			on_call,
 		};
-
 		onAddSchedule(addScheduleRequest);
 		setOpen(false);
 	};
@@ -138,14 +130,12 @@ const AddSchedule: FC<AddScheduleProp> = ({
 							aria-hidden="true"
 						/>
 					</div>
-
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
 							{t('Add Schedule')}
 						</Dialog.Title>
-
 						<div className="mt-2">
 							<AddDropDown
 								option={
@@ -164,7 +154,6 @@ const AddSchedule: FC<AddScheduleProp> = ({
 									required: false,
 								}}
 							/>
-
 							<AddTime
 								time={startInput}
 								setTime={setStartInput}
@@ -179,7 +168,6 @@ const AddSchedule: FC<AddScheduleProp> = ({
 									invalidMessage: ERRORS.schedule.start.invalid,
 								}}
 							/>
-
 							{startInput && !invalidStart && (
 								<AddTime
 									time={endInput}
@@ -224,7 +212,6 @@ const AddSchedule: FC<AddScheduleProp> = ({
 					</div>
 				</div>
 			</div>
-
 			<AddBottom
 				onCancel={() => setOpen(false)}
 				disabledAdd={!creatable || missingRequiredInput || invalidInput}

@@ -1,7 +1,6 @@
-import { FC } from 'react';
-
 import Employee from '../../../../../models/Employee.Model';
 
+import { FC } from 'react';
 import { getListOfTimes } from '../../../../../utils/calendar.utils';
 import CalendarFixedColumn from './components/CalendarFixedColumn.Component';
 import CalendarEmployeeColumn from './components/CalendarEmployeeColumn.Component';

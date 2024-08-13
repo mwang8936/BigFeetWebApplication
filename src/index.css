@@ -131,11 +131,6 @@
     bg-blue-500 hover:bg-blue-700 disabled:bg-blue-300 transition ease-in-out duration-150 disabled:cursor-not-allowed
   } 
 
-  .filled-button {
-    @apply relative inline-flex w-full justify-center text-white font-bold py-2 px-4 mt-4 mb-8 rounded-md
-    bg-blue-500 hover:bg-blue-700 disabled:bg-blue-300 transition ease-in-out duration-150 disabled:cursor-not-allowed
-  } 
-
   .modal-button {
     @apply relative inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm 
     bg-blue-600 hover:bg-blue-500 disabled:bg-blue-300 sm:ml-3 sm:w-auto disabled:cursor-not-allowed
@@ -146,7 +141,7 @@
   }
 
   .button-tip {
-    @apply absolute w-[200px] p-2 rounded-md shadow-md text-white z-20
+    @apply absolute w-[200px] p-2 rounded-md shadow-md text-white bottom-[100%] right-[0%]
     bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom-right
   }
 
@@ -220,26 +215,6 @@
 
   .drop-down-span {
     @apply ml-3 block truncate
-  }
-
-  .customer-optional-div {
-    @apply flex flex-col border-t-2 border-black p-2
-  }
-
-  .customer-optional-title {
-    @apply font-bold mb-2 flex flex-col
-  }
-
-  .current-customer-span {
-    @apply flex flex-col text-green-500 font-medium text-sm
-  }
-
-  .zoom-overlay-div {
-    @apply absolute flex flex-row justify-between h-auto w-auto p-2 right-[5%] bottom-0 mb-10 z-[4] border border-black bg-gray-200 bg-opacity-50 cursor-move
-  }
-
-  .opacity-icon {
-    @apply flex w-12 h-12 p-2 mx-2 bg-gray-400 text-black hover:bg-gray-500 focus:outline-none bg-opacity-50 justify-center
   }
 
   .reservation-tip-above {

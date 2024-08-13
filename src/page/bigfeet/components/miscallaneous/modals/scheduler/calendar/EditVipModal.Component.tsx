@@ -1,12 +1,8 @@
 import { FC } from 'react';
-
-import EditVip from './EditVip.Component';
-
 import BaseModal from '../../BaseModal.Component';
-
 import VipPackage from '../../../../../../../models/Vip-Package.Model';
-
 import { UpdateVipPackageRequest } from '../../../../../../../models/requests/Vip-Package.Request.Model';
+import EditVip from './EditVip.Component';
 
 interface EditVipModalProp {
 	open: boolean;

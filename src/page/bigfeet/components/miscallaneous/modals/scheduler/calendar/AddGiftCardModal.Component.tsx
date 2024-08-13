@@ -1,10 +1,7 @@
 import { FC } from 'react';
-
-import AddGiftCard from './AddGiftCard.Component';
-
 import BaseModal from '../../BaseModal.Component';
-
 import { AddGiftCardRequest } from '../../../../../../../models/requests/GIft-Card.Request';
+import AddGiftCard from './AddGiftCard.Component';
 
 interface AddGiftCardModalProp {
 	open: boolean;

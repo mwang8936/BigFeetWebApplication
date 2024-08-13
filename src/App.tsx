@@ -36,10 +36,9 @@ const App: FC = () => {
 		};
 
 		if (isMounted) {
-			authenticate(setAuthentication).catch((error) => {
-				if (import.meta.env.VITE_ENV === 'development')
-					console.error('Error during authentication:', error.message);
-			});
+			authenticate(setAuthentication).catch((error) =>
+				console.error('Error during authentication:', error.message)
+			);
 		}
 
 		return cleanup;
@@ -65,9 +64,7 @@ const App: FC = () => {
 					</Routes>
 				</AuthenticationContext.Provider>
 			</BrowserRouter>
-			{import.meta.env.VITE_ENV === 'development' && (
-				<ReactQueryDevtools initialIsOpen={false} />
-			)}
+			<ReactQueryDevtools initialIsOpen={false} />
 		</QueryClientProvider>
 	);
 };

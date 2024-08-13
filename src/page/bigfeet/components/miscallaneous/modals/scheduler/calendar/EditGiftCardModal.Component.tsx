@@ -1,12 +1,8 @@
 import { FC } from 'react';
-
-import EditGiftCard from './EditGiftCard.Component';
-
 import BaseModal from '../../BaseModal.Component';
-
 import GiftCard from '../../../../../../../models/Gift-Card.Model';
-
 import { UpdateGiftCardRequest } from '../../../../../../../models/requests/GIft-Card.Request';
+import EditGiftCard from './EditGiftCard.Component';
 
 interface EditGiftCardModalProp {
 	open: boolean;
