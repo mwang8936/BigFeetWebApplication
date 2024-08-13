@@ -28,6 +28,7 @@ import User from '../../../../../../models/User.Model';
 import { useEmployeesQuery } from '../../../../../hooks/employee.hooks';
 import { useSchedulesQuery } from '../../../../../hooks/schedule.hooks';
 import { useUserQuery } from '../../../../../hooks/profile.hooks';
+import { getReservationOverlappingOrder } from '../../../../../../utils/reservation.utils';
 
 interface ReservationTagProp {
 	reservation: Reservation;
@@ -133,6 +134,14 @@ const ReservationTag: FC<ReservationTagProp> = ({
 
 	const time = reservation.service.time;
 	const height = ((time / 60) * 100).toString() + '%';
+
+	const left = `${
+		30 *
+		getReservationOverlappingOrder(
+			reservation,
+			schedules.flatMap((schedule) => schedule.reservations)
+		)
+	}px`;
 
 	const tipLocation =
 		startHour <= 12
@@ -307,8 +316,9 @@ const ReservationTag: FC<ReservationTagProp> = ({
 					gridRowStart: rowStart,
 					marginTop: topMargin,
 					height: height,
+					left: left,
 				}}
-				className={`row-span-2 ${completionColour} border-4 rounded-lg mx-1 p-1 flex flex-row cursor-move overflow-visible z-[2] hover:z-[3] group`}>
+				className={`row-span-2 ${completionColour} border-4 rounded-lg mx-1 p-1 flex flex-row cursor-move overflow-visible z-[2] hover:z-[3] group relative`}>
 				<span className={tipLocation}>
 					{serviceText}
 					<br />

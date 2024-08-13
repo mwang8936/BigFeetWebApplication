@@ -168,8 +168,6 @@
     "B": "B",
     "F": "F",
     "A": "A",
-    "Can Overlap": "Can Overlap",
-    "Cannot Overlap": "Cannot Overlap",
     "Delete Service": "刪除服務項目: {{service}}",
     "Are you sure you want to delete this service? This action cannot be reversed.": "請確認是否要刪除？",
 

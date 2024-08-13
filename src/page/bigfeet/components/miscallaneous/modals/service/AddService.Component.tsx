@@ -12,9 +12,6 @@ import AddInput from '../../add/AddInput.Component';
 import AddMinute from '../../add/AddMinute.Component';
 import AddNumber from '../../add/AddNumber.Component';
 import AddPayRate from '../../add/AddPayRate.Component';
-import AddToggleSwitch, {
-	ToggleColor,
-} from '../../add/AddToggleSwitch.Component';
 
 import AddBodyFeetAcupunctureService from '../../../services/components/AddBodyFeetAcupunctureService.Component';
 
@@ -53,7 +50,6 @@ const AddService: FC<AddServiceProp> = ({
 	const [feetInput, setFeetInput] = useState<number | null>(0);
 	const [acupunctureInput, setAcupunctureInput] = useState<number | null>(0);
 	const [bedsRequiredInput, setBedsRequiredInput] = useState<number | null>(0);
-	const [canOverlapInput, setCanOverlapInput] = useState<boolean>(false);
 	const [colorInput, setColorInput] = useState<ServiceColor | null>(null);
 
 	const [invalidServiceName, setInvalidServiceName] = useState<boolean>(false);
@@ -129,7 +125,6 @@ const AddService: FC<AddServiceProp> = ({
 		const feet: number = feetInput as number;
 		const acupuncture: number = acupunctureInput as number;
 		const beds_required: number = bedsRequiredInput as number;
-		const can_overlap: boolean = canOverlapInput as boolean;
 		const color: ServiceColor = colorInput as ServiceColor;
 
 		const addServiceRequest: AddServiceRequest = {
@@ -141,7 +136,6 @@ const AddService: FC<AddServiceProp> = ({
 			feet,
 			acupuncture,
 			beds_required,
-			can_overlap,
 			color,
 		};
 
@@ -279,17 +273,6 @@ const AddService: FC<AddServiceProp> = ({
 									requiredMessage: ERRORS.service.beds_required.required,
 								}}
 								placeholder={PLACEHOLDERS.service.beds_required}
-							/>
-
-							<AddToggleSwitch
-								setChecked={setCanOverlapInput}
-								checked={canOverlapInput}
-								falseText={t('Cannot Overlap')}
-								trueText={t('Can Overlap')}
-								toggleColour={ToggleColor.GREEN}
-								label={LABELS.service.can_overlap}
-								name={NAMES.service.can_overlap}
-								disabled={false}
 							/>
 
 							<AddDropDown

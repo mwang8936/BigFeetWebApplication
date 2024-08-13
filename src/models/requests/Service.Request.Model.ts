@@ -9,7 +9,6 @@ export interface UpdateServiceRequest {
 	feet?: number;
 	acupuncture?: number;
 	beds_required?: number;
-	can_overlap?: boolean;
 	color?: ServiceColor;
 }
 
@@ -22,6 +21,5 @@ export interface AddServiceRequest {
 	feet?: number;
 	acupuncture?: number;
 	beds_required: number;
-	can_overlap?: boolean;
 	color: ServiceColor;
 }
