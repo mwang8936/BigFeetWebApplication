@@ -31,10 +31,6 @@ rolePermissions.set(Role.RECEPTIONIST, [
 	Permissions.PERMISSION_ADD_VIP_PACKAGE,
 	Permissions.PERMISSION_DELETE_VIP_PACKAGE,
 ]);
-rolePermissions.set(Role.STORE_EMPLOYEE, [
-	Permissions.PERMISSION_GET_CUSTOMER,
-	Permissions.PERMISSION_GET_SERVICE,
-	Permissions.PERMISSION_GET_VIP_PACKAGE,
-]);
+rolePermissions.set(Role.STORE_EMPLOYEE, []);
 
 export default rolePermissions;
