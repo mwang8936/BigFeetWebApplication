@@ -89,16 +89,38 @@ const AddSchedule: FC<AddScheduleProp> = ({
 	const priorityDropDownItems = getPriorityDropDownItems(employees, schedules);
 
 	useEffect(() => {
-		const missingRequiredInput = !isWorkingInput;
+		const missingRequiredInput = !isWorkingInput && !onCallInput;
 
 		setMissingRequiredInput(missingRequiredInput);
-	}, [isWorkingInput]);
+	}, [isWorkingInput, onCallInput]);
 
 	useEffect(() => {
 		const invalidInput = invalidStart || invalidEnd;
 
 		setInvalidInput(invalidInput);
 	}, [invalidStart, invalidEnd]);
+
+	useEffect(() => {
+		if (isWorkingInput) {
+			setOnCallInput(false);
+		} else {
+			setStartInput(null);
+			setEndInput(null);
+			setPriorityInput(null);
+		}
+	}, [isWorkingInput]);
+
+	useEffect(() => {
+		if (onCallInput) {
+			setIsWorkingInput(false);
+		}
+	}, [onCallInput]);
+
+	useEffect(() => {
+		if (startInput !== null || endInput !== null || priorityInput !== null) {
+			setIsWorkingInput(true);
+		}
+	}, [startInput, endInput, priorityInput]);
 
 	useEffect(() => {
 		if (startInput === null || invalidStart) {

@@ -137,6 +137,40 @@ const EditSchedule: FC<EditScheduleProp> = ({
 	}, [invalidStart, invalidEnd]);
 
 	useEffect(() => {
+		if (isWorkingInput) {
+			if (startInput === null) {
+				setStartInput(schedule.start);
+			}
+
+			if (endInput === null) {
+				setEndInput(schedule.end);
+			}
+
+			if (priorityInput === null) {
+				setPriorityInput(schedule.priority);
+			}
+
+			setOnCallInput(false);
+		} else {
+			setStartInput(null);
+			setEndInput(null);
+			setPriorityInput(null);
+		}
+	}, [isWorkingInput]);
+
+	useEffect(() => {
+		if (onCallInput) {
+			setIsWorkingInput(false);
+		}
+	}, [onCallInput]);
+
+	useEffect(() => {
+		if (startInput !== null || endInput !== null || priorityInput !== null) {
+			setIsWorkingInput(true);
+		}
+	}, [startInput, endInput, priorityInput]);
+
+	useEffect(() => {
 		if (startInput === null || invalidStart) {
 			setEndInput(null);
 			setInvalidEnd(false);
