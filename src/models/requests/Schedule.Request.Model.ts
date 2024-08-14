@@ -4,7 +4,7 @@ export interface UpdateScheduleRequest {
 	start?: Date | null;
 	end?: Date | null;
 	priority?: number | null;
-	signed?: boolean;
+	add_award?: boolean;
 }
 
 export interface SignScheduleRequest {
@@ -19,5 +19,5 @@ export interface AddScheduleRequest {
 	start?: Date | null;
 	end?: Date | null;
 	priority?: number | null;
-	signed?: boolean;
+	add_award?: boolean;
 }

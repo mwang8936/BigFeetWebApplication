@@ -115,9 +115,14 @@ const Scheduler: FC = () => {
 		.map((giftCard) => giftCard.payment_amount)
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
 
-	const totalReservations = schedules.flatMap(
-		(schedule) => schedule.reservations
-	);
+	const totalReservations = schedules
+		.flatMap((schedule) => schedule.reservations)
+		.filter((reservation) => {
+			const endDate =
+				reservation.reserved_date.getTime() + reservation.service.time * 60000;
+
+			return endDate <= new Date().getTime();
+		});
 
 	const totalSessions = totalReservations
 		.flatMap((reservation) => [

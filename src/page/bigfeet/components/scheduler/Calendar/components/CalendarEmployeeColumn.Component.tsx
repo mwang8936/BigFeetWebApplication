@@ -120,6 +120,7 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 			<PayoutGrid
 				row={timeArr.length + 5}
 				colNum={colNum}
+				addAward={schedule?.add_award ?? false}
 				reservations={schedule?.reservations || []}
 				vipPackages={schedule?.vip_packages || []}
 			/>
