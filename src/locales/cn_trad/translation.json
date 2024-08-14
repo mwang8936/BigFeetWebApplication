@@ -100,6 +100,7 @@
     "Deleting Vip Package...": "刪除套票中",
     "Vip Package Deleted Successfully": "套票刪除成功",
     "Failed to Delete Vip Package": "套票刪除失敗",
+    "No Vip Packages Created": "沒有該VIP卡信息",
     "Today": "當天",
     "Add Reservation": "添加預約",
     "10 Minutes": "10 分鐘",
@@ -135,6 +136,7 @@
     "Not Requested": "無指定",
     "Requested": "指定",
     "Requested Pay": "约钟",
+    "Requested Reservations": "约钟",
     "Customer (Optional)": "顧客 (非強制的)",
     "Add Schedule": "添加當班技師",
     "Not Working": "不當班",
@@ -331,8 +333,10 @@
 
     "No beds available!": "沒有床位!",
     "Bed Conflict": "{{max}}張床位已占滿。",
-    "Conflicting Schedule!": "時間衝突",
+    "Conflicting Schedule!": "時間衝突！",
     "There is another reservation at this time for this employee.": "該技師同一時段已有約",
+    "Gender Mismatch!": "性别不符！",
+    "This employee does not have the requested gender. Please choose another employee.": "該技師性別不符合客人要求。",
 
     "You are missing a required input.": "尚有空白",
     "An input is invalid.": "有項輸入錯誤",

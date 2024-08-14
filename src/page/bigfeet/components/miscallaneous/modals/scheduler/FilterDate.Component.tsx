@@ -109,7 +109,10 @@ const FilterDate: FC<FilterDateProp> = ({
 						? ERRORS.schedule.permissions.get
 						: 'Current date already selected.'
 				}
-				onEdit={() => setSelectedDate(new Date())}
+				onEdit={() => {
+					onDateSelected(selectedDate as Date);
+					setOpen(false);
+				}}
 			/>
 		</>
 	);

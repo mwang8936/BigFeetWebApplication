@@ -17,9 +17,16 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 
 	const { date } = useScheduleDateContext();
 
-	const bodyReservations = reservations.filter(
-		(reservation) => reservation.service.body > 0
-	);
+	const bodyReservations = reservations.filter((reservation) => {
+		const isBodyReservation = reservation.service.body > 0;
+		if (!isBodyReservation) return false;
+
+		const endDate =
+			reservation.reserved_date.getTime() + reservation.service.time * 60000;
+
+		const isCompleted = endDate >= new Date().getTime();
+		return isCompleted;
+	});
 	bodyReservations.sort(
 		(a, b) => a.reserved_date.getTime() - b.reserved_date.getTime()
 	);
@@ -38,9 +45,16 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 		);
 	});
 
-	const feetReservations = reservations.filter(
-		(reservation) => reservation.service.feet > 0
-	);
+	const feetReservations = reservations.filter((reservation) => {
+		const isFeetReservation = reservation.service.feet > 0;
+		if (!isFeetReservation) return false;
+
+		const endDate =
+			reservation.reserved_date.getTime() + reservation.service.time * 60000;
+
+		const isCompleted = endDate >= new Date().getTime();
+		return isCompleted;
+	});
 	feetReservations.sort(
 		(a, b) => a.reserved_date.getTime() - b.reserved_date.getTime()
 	);
@@ -59,9 +73,16 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 		);
 	});
 
-	const acupunctureReservations = reservations.filter(
-		(reservation) => reservation.service.acupuncture > 0
-	);
+	const acupunctureReservations = reservations.filter((reservation) => {
+		const isAcupunctureReservation = reservation.service.acupuncture > 0;
+		if (!isAcupunctureReservation) return false;
+
+		const endDate =
+			reservation.reserved_date.getTime() + reservation.service.time * 60000;
+
+		const isCompleted = endDate >= new Date().getTime();
+		return isCompleted;
+	});
 	acupunctureReservations.sort(
 		(a, b) => a.reserved_date.getTime() - b.reserved_date.getTime()
 	);

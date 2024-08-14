@@ -55,6 +55,7 @@ const AddNumber: FC<AddNumberProp> = ({
 					min={0}
 					max={validationProp.max}
 					step={1}
+					onWheel={(event) => event.currentTarget.blur()}
 					required={validationProp.required}
 					placeholder={placeholder}
 				/>

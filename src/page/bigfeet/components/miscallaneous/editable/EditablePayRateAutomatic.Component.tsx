@@ -87,6 +87,7 @@ const EditablePayRateAutomatic: FC<EditablePayRateAutomaticProp> = ({
 					min={validationProp.required ? 0.01 : 0}
 					max={validationProp.max}
 					step={0.01}
+					onWheel={(event) => event.currentTarget.blur()}
 					required={validationProp.required}
 					disabled={disabled}
 					placeholder={placeholder}

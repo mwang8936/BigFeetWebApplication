@@ -57,6 +57,7 @@ const AddMinute: FC<AddMinuteProp> = ({
 					min={validationProp.required ? 1 : 0}
 					max={validationProp.max}
 					step={1}
+					onWheel={(event) => event.currentTarget.blur()}
 					required={validationProp.required}
 					placeholder={PLACEHOLDERS.service.time}
 				/>

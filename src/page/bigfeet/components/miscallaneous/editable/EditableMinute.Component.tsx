@@ -79,6 +79,7 @@ const EditableMinute: FC<EditableMinuteProp> = ({
 					min={validationProp.required ? 1 : 0}
 					max={validationProp.max}
 					step={1}
+					onWheel={(event) => event.currentTarget.blur()}
 					required={validationProp.required}
 					disabled={disabled}
 					placeholder={PLACEHOLDERS.service.time}

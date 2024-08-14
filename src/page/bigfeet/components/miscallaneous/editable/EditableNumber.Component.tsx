@@ -77,6 +77,7 @@ const EditableNumber: FC<EditableNumberProp> = ({
 					min={0}
 					max={validationProp.max}
 					step={1}
+					onWheel={(event) => event.currentTarget.blur()}
 					required={validationProp.required}
 					disabled={disabled}
 					placeholder={placeholder}
