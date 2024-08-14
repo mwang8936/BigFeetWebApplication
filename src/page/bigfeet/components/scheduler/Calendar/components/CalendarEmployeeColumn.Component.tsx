@@ -88,17 +88,19 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 			gridDate.setHours(timeHourToNumber(timeArr[i - 2]));
 			gridDate.setMinutes(timeMinuteToNumber(timeArr[i - 2]));
 
-			const overlappingReservation = schedule?.reservations.find(
-				(reservation) => {
+			const overlappingReservations = schedule?.reservations
+				?.filter((reservation) => {
 					const startDate = reservation.reserved_date;
 					const endDate = new Date(
 						startDate.getTime() + reservation.service.time * 60000
 					);
-					return doesDateOverlap(gridDate, startDate, endDate);
-				}
-			);
+					return doesDateOverlap(gridDate, startDate, endDate, 30);
+				})
+				?.sort((a, b) => b.reserved_date.getTime() - a.reserved_date.getTime());
 
-			if (overlappingReservation) {
+			if (overlappingReservations?.length) {
+				const overlappingReservation = overlappingReservations[0];
+
 				const startDate = new Date(
 					overlappingReservation.reserved_date.getTime() +
 						overlappingReservation.service.time * 60000

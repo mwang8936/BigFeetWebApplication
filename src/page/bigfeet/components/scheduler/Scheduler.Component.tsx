@@ -322,6 +322,16 @@ const Scheduler: FC = () => {
 		])
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
 
+	const total10MinuteSessions = totalReservations.filter(
+		(reservation) => reservation.service.time === 10
+	).length;
+	const total15MinuteSessions = totalReservations.filter(
+		(reservation) => reservation.service.time === 15
+	).length;
+	const total30MinuteSessions = totalReservations.filter(
+		(reservation) => reservation.service.time === 30
+	).length;
+
 	const totalCash =
 		totalReservations
 			.map((reservation) => reservation.cash || 0)
@@ -404,20 +414,17 @@ const Scheduler: FC = () => {
 							onClick={() => setOpenGiftCardModal(true)}
 						/>
 					</div>
-					<div className="vertical-center flex text-gray-600 text-xl">
-						{t('Total Cash')}:
-						<span className="font-bold ms-2">${moneyToString(totalCash)}</span>
-					</div>
-					<div className="vertical-center flex flex-col">
-						<h1 className="my-auto mx-auto text-gray-600 text-3xl">
-							{t('Scheduler')}
-						</h1>
-						<h1 className="mx-auto text-gray-600 text-xl">{displayDate()}</h1>
-					</div>
+
 					<div className="vertical-center flex flex-col text-gray-600 text-xl">
 						<div className="flex">
 							{t('Total Reservations')}:
 							<span className="font-bold ms-2">{totalSessions}</span>
+						</div>
+						<div className="flex">
+							{t('Total Cash')}:
+							<span className="font-bold ms-2">
+								${moneyToString(totalCash)}
+							</span>
 						</div>
 						<div className="flex">
 							{t('Total Gift Cards')}:
@@ -427,14 +434,40 @@ const Scheduler: FC = () => {
 						</div>
 					</div>
 
-					<AdjustmentsHorizontalIcon
-						className={`h-16 w-16 ${
-							filtered ? 'text-blue-600' : 'text-gray-600'
-						} my-auto me-10 cursor-pointer`}
-						onClick={() => {
-							setOpenFilterDialog(true);
-						}}
-					/>
+					<div className="vertical-center flex flex-col">
+						<h1 className="my-auto mx-auto text-gray-600 text-3xl">
+							{t('Scheduler')}
+						</h1>
+						<h1 className="mx-auto text-gray-600 text-xl">{displayDate()}</h1>
+					</div>
+
+					<div className="vertical-center flex flex-col text-gray-600 text-xl">
+						<div className="flex">
+							{t('10 Minutes')}:
+							<span className="font-bold ms-2">{total10MinuteSessions}</span>
+						</div>
+						<div className="flex">
+							{t('15 Minutes')}:
+							<span className="font-bold ms-2">{total15MinuteSessions}</span>
+						</div>
+						<div className="flex">
+							{t('30 Minutes')}:
+							<span className="font-bold ms-2">{total30MinuteSessions}</span>
+						</div>
+					</div>
+
+					<div className="vertical-center ms-10 flex flex-row ">
+						<AdjustmentsHorizontalIcon
+							className={`h-16 w-16 ${
+								filtered
+									? 'text-blue-600 hover:text-blue-400'
+									: 'text-gray-600 hover:text-gray-400'
+							} my-auto me-10 cursor-pointer transition-colors duration-200 hover:scale-110`}
+							onClick={() => {
+								setOpenFilterDialog(true);
+							}}
+						/>
+					</div>
 
 					<FilterDateModal
 						open={openFilterDialog}
