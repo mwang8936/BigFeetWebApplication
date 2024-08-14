@@ -92,48 +92,6 @@ const EditableBodyFeetAcupunctureService: FC<
 		setDisabledAcupuncture(true);
 	}, [originalAcupuncture]);
 
-	useEffect(() => {
-		if (body?.toString() && parseFloat(body.toString())) {
-			if (feet?.toString() && parseFloat(feet.toString())) {
-				setFeet(0);
-				setDisabledFeet(false);
-			}
-
-			if (acupuncture?.toString() && parseFloat(acupuncture.toString())) {
-				setAcupuncture(0);
-				setDisabledAcupuncture(false);
-			}
-		}
-	}, [body]);
-
-	useEffect(() => {
-		if (feet?.toString() && parseFloat(feet.toString())) {
-			if (body?.toString() && parseFloat(body.toString())) {
-				setBody(0);
-				setDisabledBody(false);
-			}
-
-			if (acupuncture?.toString() && parseFloat(acupuncture.toString())) {
-				setAcupuncture(0);
-				setDisabledAcupuncture(false);
-			}
-		}
-	}, [feet]);
-
-	useEffect(() => {
-		if (acupuncture?.toString() && parseFloat(acupuncture.toString())) {
-			if (body?.toString() && parseFloat(body.toString())) {
-				setBody(0);
-				setDisabledBody(false);
-			}
-
-			if (feet?.toString() && parseFloat(feet.toString())) {
-				setFeet(0);
-				setDisabledFeet(false);
-			}
-		}
-	}, [acupuncture]);
-
 	const handleDisableBodyBtnClick = () => {
 		if (!disabledBody) {
 			setBody(originalBody);
@@ -200,7 +158,10 @@ const EditableBodyFeetAcupunctureService: FC<
 				</div>
 
 				{bodyValidationProp.required && body === null ? (
-					<p className="error-label">{bodyValidationProp.requiredMessage}</p>
+					<p className="error-label">
+						{bodyValidationProp.requiredMessage &&
+							t(bodyValidationProp.requiredMessage)}
+					</p>
 				) : (
 					bodyValidationProp.invalid && (
 						<p className="error-label">
@@ -253,7 +214,10 @@ const EditableBodyFeetAcupunctureService: FC<
 				</div>
 
 				{feetValidationProp.required && feet === null ? (
-					<p className="error-label">{feetValidationProp.requiredMessage}</p>
+					<p className="error-label">
+						{feetValidationProp.requiredMessage &&
+							t(feetValidationProp.requiredMessage)}
+					</p>
 				) : (
 					feetValidationProp.invalid && (
 						<p className="error-label">
@@ -311,7 +275,8 @@ const EditableBodyFeetAcupunctureService: FC<
 
 				{acupunctureValidationProp.required && acupuncture === null ? (
 					<p className="error-label">
-						{acupunctureValidationProp.requiredMessage}
+						{acupunctureValidationProp.requiredMessage &&
+							t(acupunctureValidationProp.requiredMessage)}
 					</p>
 				) : (
 					acupunctureValidationProp.invalid && (

@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import LABELS from '../../../../../constants/label.constants';
@@ -60,26 +60,6 @@ const AddBodyFeetAcupunctureService: FC<AddBodyFeetAcupunctureServiceProp> = ({
 }) => {
 	const { t } = useTranslation();
 
-	useEffect(() => {
-		if (body) {
-			setFeet(0);
-			setAcupuncture(0);
-		}
-	}, [body]);
-
-	useEffect(() => {
-		if (feet) {
-			setBody(0);
-			setAcupuncture(0);
-		}
-	}, [feet]);
-
-	useEffect(() => {
-		if (acupuncture) {
-			setBody(0);
-			setFeet(0);
-		}
-	}, [acupuncture]);
 	return (
 		<>
 			<div>
@@ -112,7 +92,10 @@ const AddBodyFeetAcupunctureService: FC<AddBodyFeetAcupunctureServiceProp> = ({
 				</div>
 
 				{bodyValidationProp.required && body === null ? (
-					<p className="error-label">{bodyValidationProp.requiredMessage}</p>
+					<p className="error-label">
+						{bodyValidationProp.requiredMessage &&
+							t(bodyValidationProp.requiredMessage)}
+					</p>
 				) : (
 					bodyValidationProp.invalid && (
 						<p className="error-label">
@@ -155,7 +138,10 @@ const AddBodyFeetAcupunctureService: FC<AddBodyFeetAcupunctureServiceProp> = ({
 				</div>
 
 				{feetValidationProp.required && feet === null ? (
-					<p className="error-label">{feetValidationProp.requiredMessage}</p>
+					<p className="error-label">
+						{feetValidationProp.requiredMessage &&
+							t(feetValidationProp.requiredMessage)}
+					</p>
 				) : (
 					feetValidationProp.invalid && (
 						<p className="error-label">
@@ -201,7 +187,8 @@ const AddBodyFeetAcupunctureService: FC<AddBodyFeetAcupunctureServiceProp> = ({
 
 				{acupunctureValidationProp.required && acupuncture === null ? (
 					<p className="error-label">
-						{acupunctureValidationProp.requiredMessage}
+						{acupunctureValidationProp.requiredMessage &&
+							t(acupunctureValidationProp.requiredMessage)}
 					</p>
 				) : (
 					acupunctureValidationProp.invalid && (
