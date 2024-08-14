@@ -17,16 +17,16 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 
 	const { date } = useScheduleDateContext();
 
-	const bodyReservations = reservations.filter((reservation) => {
-		const isBodyReservation = reservation.service.body > 0;
-		if (!isBodyReservation) return false;
-
+	const completedReservations = reservations.filter((reservation) => {
 		const endDate =
 			reservation.reserved_date.getTime() + reservation.service.time * 60000;
 
-		const isCompleted = endDate >= new Date().getTime();
-		return isCompleted;
+		return endDate <= new Date().getTime();
 	});
+
+	const bodyReservations = completedReservations.filter(
+		(reservation) => reservation.service.body > 0
+	);
 	bodyReservations.sort(
 		(a, b) => a.reserved_date.getTime() - b.reserved_date.getTime()
 	);
@@ -45,16 +45,9 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 		);
 	});
 
-	const feetReservations = reservations.filter((reservation) => {
-		const isFeetReservation = reservation.service.feet > 0;
-		if (!isFeetReservation) return false;
-
-		const endDate =
-			reservation.reserved_date.getTime() + reservation.service.time * 60000;
-
-		const isCompleted = endDate >= new Date().getTime();
-		return isCompleted;
-	});
+	const feetReservations = completedReservations.filter(
+		(reservation) => reservation.service.feet > 0
+	);
 	feetReservations.sort(
 		(a, b) => a.reserved_date.getTime() - b.reserved_date.getTime()
 	);
@@ -73,16 +66,9 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 		);
 	});
 
-	const acupunctureReservations = reservations.filter((reservation) => {
-		const isAcupunctureReservation = reservation.service.acupuncture > 0;
-		if (!isAcupunctureReservation) return false;
-
-		const endDate =
-			reservation.reserved_date.getTime() + reservation.service.time * 60000;
-
-		const isCompleted = endDate >= new Date().getTime();
-		return isCompleted;
-	});
+	const acupunctureReservations = completedReservations.filter(
+		(reservation) => reservation.service.acupuncture > 0
+	);
 	acupunctureReservations.sort(
 		(a, b) => a.reserved_date.getTime() - b.reserved_date.getTime()
 	);
@@ -101,13 +87,21 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 		);
 	});
 
-	const requestedReservations = reservations.filter(
-		(reservation) =>
+	const requestedReservations = reservations.filter((reservation) => {
+		const isRequestedReservation =
 			reservation.requested_employee &&
 			(reservation.service.body > 0 ||
 				reservation.service.feet > 0 ||
-				reservation.service.acupuncture > 0)
-	);
+				reservation.service.acupuncture > 0);
+
+		if (!isRequestedReservation) return false;
+
+		const endDate =
+			reservation.reserved_date.getTime() + reservation.service.time * 60000;
+
+		const isCompleted = endDate <= new Date().getTime();
+		return isCompleted;
+	});
 	requestedReservations.sort(
 		(a, b) => a.reserved_date.getTime() - b.reserved_date.getTime()
 	);

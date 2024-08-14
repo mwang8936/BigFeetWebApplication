@@ -24,7 +24,13 @@ const PayoutGrid: FC<PayoutGridProp> = ({
 
 	const { date } = useScheduleDateContext();
 
-	const reservationSessions = reservations.filter(
+	const completedReservations = reservations.filter((reservation) => {
+		const endDate =
+			reservation.reserved_date.getTime() + reservation.service.time * 60000;
+
+		return endDate <= new Date().getTime();
+	});
+	const reservationSessions = completedReservations.filter(
 		(reservation) =>
 			reservation.service.body > 0 ||
 			reservation.service.feet > 0 ||
