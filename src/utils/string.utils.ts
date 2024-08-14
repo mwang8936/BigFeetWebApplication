@@ -9,20 +9,27 @@
  * the first part of the number, and the second part of the number.
  * If the phone number does not have exactly 10 digits, it returns the original string.
  */
-export function formatPhoneNumber(phoneNumber: string): string {
-	// Check if the phone number has exactly 10 digits
-	if (phoneNumber.length != 10) {
-		return phoneNumber; // Return the original phone number if it does not have 10 digits
-	} else {
-		// Extract different parts of the phone number
-		const areaCode = phoneNumber.slice(0, 3); // Extract the area code (first 3 digits)
-		const firstPart = phoneNumber.slice(3, 6); // Extract the first part (next 3 digits)
-		const secondPart = phoneNumber.slice(6); // Extract the second part (last 4 digits)
+export const formatPhoneNumber = (phoneNumber: string) => {
+	// Remove all non-digit characters
+	const cleaned = phoneNumber.replace(/\D/g, '');
 
-		// Format the phone number into (XXX) XXX-XXXX format
-		return `(${areaCode}) ${firstPart}-${secondPart}`;
+	// Handle different lengths of digits and apply formatting
+	if (cleaned.length <= 3) {
+		return `${cleaned}`;
+	} else if (cleaned.length <= 6) {
+		return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3)}`;
+	} else if (cleaned.length <= 10) {
+		return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(
+			6,
+			10
+		)}`;
+	} else {
+		return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(
+			6,
+			10
+		)}`;
 	}
-}
+};
 
 /**
  * Formats a Date object into a 12-hour time string with AM/PM notation.

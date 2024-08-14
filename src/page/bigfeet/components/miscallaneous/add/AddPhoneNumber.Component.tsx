@@ -5,6 +5,8 @@ import LENGTHS from '../../../../../constants/lengths.constants';
 import PATTERNS from '../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 
+import { formatPhoneNumber } from '../../../../../utils/string.utils';
+
 interface InvalidMessage {
 	key: string;
 	value: Record<string, string | number>;
@@ -34,18 +36,6 @@ const AddPhoneNumber: FC<AddPhoneNumberProp> = ({
 	validationProp,
 }) => {
 	const { t } = useTranslation();
-
-	const formatPhoneNumber = (number: string): string => {
-		const cleanedNumber = number.replace(/\D/g, ''); // Remove non-numeric characters
-		if (cleanedNumber.length > 6) {
-			return `(${cleanedNumber.slice(0, 3)}) ${cleanedNumber.slice(
-				3,
-				6
-			)}-${cleanedNumber.slice(6, 10)}`;
-		} else {
-			return cleanedNumber;
-		}
-	};
 
 	return (
 		<div className="mb-4">
