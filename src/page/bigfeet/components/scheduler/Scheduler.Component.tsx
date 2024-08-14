@@ -379,14 +379,16 @@ const Scheduler: FC = () => {
 			localeDateFormat = undefined;
 		}
 
+		const dateString = date.toLocaleDateString(localeDateFormat, {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+			weekday: 'short',
+		});
+
 		return sameDate(new Date(), date)
-			? `${t('Today')} - ${date.toLocaleDateString(localeDateFormat, {
-					year: 'numeric',
-					month: 'long',
-					day: 'numeric',
-					weekday: 'short',
-			  })}`
-			: date.toLocaleDateString(localeDateFormat);
+			? `${t('Today')} - ${dateString}`
+			: dateString;
 	};
 
 	return (
