@@ -84,9 +84,9 @@ const EditableNumber: FC<EditableNumberProp> = ({
 
 				<div className="ms-3">
 					<PermissionsButton
-						btnTitle={disabled ? t('Change') : t('Cancel')}
+						btnTitle={disabled ? 'Change' : 'Cancel'}
 						disabled={!editable}
-						missingPermissionMessage={t(missingPermissionMessage)}
+						missingPermissionMessage={missingPermissionMessage}
 						onClick={handleDisableBtnClick}
 					/>
 				</div>

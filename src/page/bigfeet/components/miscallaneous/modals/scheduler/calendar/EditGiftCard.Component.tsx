@@ -224,18 +224,18 @@ const EditGiftCard: FC<EditGiftCardProp> = ({
 				}
 				editMissingPermissionMessage={
 					!editable
-						? t(ERRORS.gift_card.permissions.edit)
+						? ERRORS.gift_card.permissions.edit
 						: !changesMade
-						? t(ERRORS.no_changes)
+						? ERRORS.no_changes
 						: missingRequiredInput
-						? t(ERRORS.required)
+						? ERRORS.required
 						: invalidInput
-						? t(ERRORS.invalid)
+						? ERRORS.invalid
 						: ''
 				}
 				onEdit={onEdit}
 				disabledDelete={!deletable}
-				deleteMissingPermissionMessage={t(ERRORS.gift_card.permissions.delete)}
+				deleteMissingPermissionMessage={ERRORS.gift_card.permissions.delete}
 				onDelete={() => setOpenDeleteModal(true)}
 			/>
 

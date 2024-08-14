@@ -108,9 +108,7 @@ const DeleteVip: FC<DeleteVipProp> = ({
 			<DeleteBottom
 				onCancel={() => setOpen(false)}
 				disabledDelete={!deletable}
-				deleteMissingPermissionMessage={t(
-					ERRORS.vip_package.permissions.delete
-				)}
+				deleteMissingPermissionMessage={ERRORS.vip_package.permissions.delete}
 				onDelete={onDelete}
 			/>
 		</>

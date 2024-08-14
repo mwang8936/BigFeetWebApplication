@@ -1,5 +1,4 @@
 import { FC, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
 
@@ -25,8 +24,6 @@ interface SettingsProp {
 }
 
 const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
-	const { t } = useTranslation();
-
 	const [languageInput, setLanguageInput] = useState<Language | null>(
 		originalLanguage
 	);
@@ -110,8 +107,8 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 				originalChecked={originalDarkMode}
 				checked={darkModeInput}
 				setChecked={setDarkModeInput}
-				falseText={t('Light')}
-				trueText={t('Dark')}
+				falseText={'Light'}
+				trueText={'Dark'}
 				toggleColour={ToggleColor.BLACK}
 				label={LABELS.profile.dark_mode}
 				name={NAMES.profile.dark_mode}
@@ -121,14 +118,14 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 
 			<div className="bottom-bar">
 				<PermissionsButton
-					btnTitle={t('Save Changes')}
+					btnTitle={'Save Changes'}
 					right={false}
 					disabled={!changesMade || missingRequiredInput}
 					missingPermissionMessage={
 						!changesMade
-							? t(ERRORS.no_changes)
+							? ERRORS.no_changes
 							: missingRequiredInput
-							? t(ERRORS.required)
+							? ERRORS.required
 							: ''
 					}
 					onClick={onSave}

@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ButtonType } from './PermissionsButton.Component';
 
@@ -21,6 +22,8 @@ const FilledPermissionsButton: FC<FilledPermissionsButtonProp> = ({
 	missingPermissionMessage,
 	onClick,
 }) => {
+	const { t } = useTranslation();
+
 	const btnColorCss =
 		btnType === ButtonType.ADD
 			? 'green-button-color'
@@ -51,9 +54,10 @@ const FilledPermissionsButton: FC<FilledPermissionsButtonProp> = ({
 						: 'top left',
 				}}
 				className={`button-tip group-hover:group-disabled:scale-100`}>
-				{missingPermissionMessage}
+				{t(missingPermissionMessage)}
 			</span>
-			{btnTitle}
+
+			{t(btnTitle)}
 		</button>
 	);
 };

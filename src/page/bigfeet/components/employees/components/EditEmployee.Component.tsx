@@ -1,5 +1,4 @@
 import { FC, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import DatesDisplay from '../../miscallaneous/DatesDisplay.Component';
 import PermissionsButton, {
@@ -51,8 +50,6 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 	deletable,
 	employee,
 }) => {
-	const { t } = useTranslation();
-
 	const [usernameInput, setUsernameInput] = useState<string | null>(
 		employee.username
 	);
@@ -492,30 +489,30 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 
 			<div className="bottom-bar">
 				<PermissionsButton
-					btnTitle={t('Save Changes')}
+					btnTitle={'Save Changes'}
 					right={false}
 					disabled={
 						!editable || !changesMade || missingRequiredInput || invalidInput
 					}
 					missingPermissionMessage={
 						!editable
-							? t(ERRORS.employee.permissions.edit)
+							? ERRORS.employee.permissions.edit
 							: !changesMade
-							? t(ERRORS.no_changes)
+							? ERRORS.no_changes
 							: missingRequiredInput
-							? t(ERRORS.required)
+							? ERRORS.required
 							: invalidInput
-							? t(ERRORS.invalid)
+							? ERRORS.invalid
 							: ''
 					}
 					onClick={onSave}
 				/>
 
 				<PermissionsButton
-					btnTitle={t('Delete')}
+					btnTitle={'Delete'}
 					btnType={ButtonType.DELETE}
 					disabled={!deletable}
-					missingPermissionMessage={t(ERRORS.employee.permissions.delete)}
+					missingPermissionMessage={ERRORS.employee.permissions.delete}
 					onClick={() => {
 						setOpenDeleteModal(true);
 					}}

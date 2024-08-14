@@ -151,11 +151,11 @@ const Employees: FC = () => {
 
 					<div className="vertical-center">
 						<PermissionsButton
-							btnTitle={t('Add Employee')}
+							btnTitle={'Add Employee'}
 							btnType={ButtonType.ADD}
 							top={false}
 							disabled={!creatable}
-							missingPermissionMessage={t(ERRORS.employee.permissions.add)}
+							missingPermissionMessage={ERRORS.employee.permissions.add}
 							onClick={() => {
 								setOpenAddModal(true);
 							}}

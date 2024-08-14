@@ -161,11 +161,11 @@ const AddCustomer: FC<AddCustomerProp> = ({
 				disabledAdd={!creatable || missingRequiredInput || invalidInput}
 				addMissingPermissionMessage={
 					!creatable
-						? t(ERRORS.customer.permissions.add)
+						? ERRORS.customer.permissions.add
 						: missingRequiredInput
-						? t(ERRORS.required)
+						? ERRORS.required
 						: invalidInput
-						? t(ERRORS.invalid)
+						? ERRORS.invalid
 						: ''
 				}
 				onAdd={onAdd}

@@ -395,22 +395,22 @@ const Scheduler: FC = () => {
 				<div className="h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
 					<div className="vertical-center ms-10 flex flex-col">
 						<PermissionsButton
-							btnTitle={t('Add Reservation')}
+							btnTitle={'Add Reservation'}
 							btnType={ButtonType.ADD}
 							top={false}
 							right={false}
 							disabled={!scheduleCreatable}
-							missingPermissionMessage={t(ERRORS.reservation.permissions.add)}
+							missingPermissionMessage={ERRORS.reservation.permissions.add}
 							onClick={() => setOpenAddReservationModal(true)}
 						/>
 
 						<PermissionsButton
-							btnTitle={t('Add Gift Card')}
+							btnTitle={'Add Gift Card'}
 							btnType={ButtonType.ADD}
 							top={false}
 							right={false}
 							disabled={!giftCardCreatable}
-							missingPermissionMessage={t(ERRORS.gift_card.permissions.add)}
+							missingPermissionMessage={ERRORS.gift_card.permissions.add}
 							onClick={() => setOpenGiftCardModal(true)}
 						/>
 					</div>

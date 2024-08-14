@@ -103,9 +103,9 @@ const EditableToggleSwitch: FC<EditableToggleSwitchProp> = ({
 
 				<div className="ms-auto">
 					<PermissionsButton
-						btnTitle={disabled ? t('Change') : t('Cancel')}
+						btnTitle={disabled ? 'Change' : 'Cancel'}
 						disabled={!editable}
-						missingPermissionMessage={t(missingPermissionMessage)}
+						missingPermissionMessage={missingPermissionMessage}
 						onClick={handleDisableBtnClick}
 					/>
 				</div>

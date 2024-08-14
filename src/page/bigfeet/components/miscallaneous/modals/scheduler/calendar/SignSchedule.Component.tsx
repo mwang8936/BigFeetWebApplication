@@ -58,9 +58,9 @@ const SignSchedule: FC<SignScheduleProp> = ({
 
 			<EditBottom
 				onCancel={() => setOpen(false)}
-				editText={t('Sign')}
+				editText={'Sign'}
 				disabledEdit={!signable}
-				editMissingPermissionMessage={t(ERRORS.schedule.permissions.signed)}
+				editMissingPermissionMessage={ERRORS.schedule.permissions.signed}
 				onEdit={onSign}
 			/>
 		</>

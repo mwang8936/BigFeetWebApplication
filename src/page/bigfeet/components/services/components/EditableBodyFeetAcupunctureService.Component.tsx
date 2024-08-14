@@ -191,7 +191,7 @@ const EditableBodyFeetAcupunctureService: FC<
 
 					<div className="ms-3">
 						<PermissionsButton
-							btnTitle={disabledBody ? t('Change') : t('Cancel')}
+							btnTitle={disabledBody ? 'Change' : 'Cancel'}
 							disabled={!editable}
 							missingPermissionMessage={missingPermissionMessage}
 							onClick={handleDisableBodyBtnClick}
@@ -244,7 +244,7 @@ const EditableBodyFeetAcupunctureService: FC<
 
 					<div className="ms-3">
 						<PermissionsButton
-							btnTitle={disabledFeet ? t('Change') : t('Cancel')}
+							btnTitle={disabledFeet ? 'Change' : 'Cancel'}
 							disabled={!editable}
 							missingPermissionMessage={missingPermissionMessage}
 							onClick={handleDisableFeetBtnClick}
@@ -301,7 +301,7 @@ const EditableBodyFeetAcupunctureService: FC<
 
 					<div className="ms-3">
 						<PermissionsButton
-							btnTitle={disabledAcupuncture ? t('Change') : t('Cancel')}
+							btnTitle={disabledAcupuncture ? 'Change' : 'Cancel'}
 							disabled={!editable}
 							missingPermissionMessage={missingPermissionMessage}
 							onClick={handleDisableAcupunctureBtnClick}

@@ -301,8 +301,8 @@ const EditSchedule: FC<EditScheduleProp> = ({
 								originalChecked={schedule.is_working}
 								checked={isWorkingInput}
 								setChecked={setIsWorkingInput}
-								falseText={t('Not Working')}
-								trueText={t('Working')}
+								falseText={'Not Working'}
+								trueText={'Working'}
 								toggleColour={ToggleColor.BLUE}
 								label={LABELS.schedule.is_working}
 								name={NAMES.schedule.is_working}
@@ -314,8 +314,8 @@ const EditSchedule: FC<EditScheduleProp> = ({
 								originalChecked={schedule.on_call}
 								checked={onCallInput}
 								setChecked={setOnCallInput}
-								falseText={t('Not On Call')}
-								trueText={t('On Call')}
+								falseText={'Not On Call'}
+								trueText={'On Call'}
 								toggleColour={ToggleColor.BLUE}
 								label={LABELS.schedule.on_call}
 								name={NAMES.schedule.on_call}
@@ -332,11 +332,11 @@ const EditSchedule: FC<EditScheduleProp> = ({
 				disabledEdit={!editable || !changesMade || invalidInput}
 				editMissingPermissionMessage={
 					!editable
-						? t(ERRORS.schedule.permissions.edit)
+						? ERRORS.schedule.permissions.edit
 						: !changesMade
-						? t(ERRORS.no_changes)
+						? ERRORS.no_changes
 						: invalidInput
-						? t(ERRORS.invalid)
+						? ERRORS.invalid
 						: ''
 				}
 				onEdit={onEdit}

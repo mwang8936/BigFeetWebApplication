@@ -1,5 +1,4 @@
 import { FC, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import EditableBodyFeetAcupunctureService from './EditableBodyFeetAcupunctureService.Component.tsx';
 
@@ -43,8 +42,6 @@ interface EditServiceProp {
 }
 
 const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
-	const { t } = useTranslation();
-
 	const [serviceNameInput, setServiceNameInput] = useState<string | null>(
 		service.service_name
 	);
@@ -412,30 +409,30 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 
 			<div className="bottom-bar">
 				<PermissionsButton
-					btnTitle={t('Save Changes')}
+					btnTitle={'Save Changes'}
 					right={false}
 					disabled={
 						!editable || !changesMade || missingRequiredInput || invalidInput
 					}
 					missingPermissionMessage={
 						!editable
-							? t(ERRORS.service.permissions.edit)
+							? ERRORS.service.permissions.edit
 							: !changesMade
-							? t(ERRORS.no_changes)
+							? ERRORS.no_changes
 							: missingRequiredInput
-							? t(ERRORS.required)
+							? ERRORS.required
 							: invalidInput
-							? t(ERRORS.invalid)
+							? ERRORS.invalid
 							: ''
 					}
 					onClick={onSave}
 				/>
 
 				<PermissionsButton
-					btnTitle={t('Delete')}
+					btnTitle={'Delete'}
 					btnType={ButtonType.DELETE}
 					disabled={!deletable}
-					missingPermissionMessage={t(ERRORS.service.permissions.delete)}
+					missingPermissionMessage={ERRORS.service.permissions.delete}
 					onClick={() => {
 						setOpenDeleteModal(true);
 					}}

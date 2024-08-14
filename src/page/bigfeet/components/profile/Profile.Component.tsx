@@ -80,11 +80,11 @@ const Profile: FC = () => {
 
 				<div className="vertical-center">
 					<PermissionsButton
-						btnTitle={t('Delete')}
+						btnTitle={'Delete'}
 						btnType={ButtonType.DELETE}
 						top={false}
 						disabled={!deletable}
-						missingPermissionMessage={t(ERRORS.employee.permissions.delete)}
+						missingPermissionMessage={ERRORS.employee.permissions.delete}
 						onClick={() => {
 							setOpenDeleteModal(true);
 						}}

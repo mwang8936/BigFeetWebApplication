@@ -98,13 +98,11 @@ const EditablePayRateAutomatic: FC<EditablePayRateAutomaticProp> = ({
 
 				<div className="ms-3">
 					<PermissionsButton
-						btnTitle={t('Fill')}
+						btnTitle={'Fill'}
 						btnType={ButtonType.ADD}
 						disabled={!editable || remainingAmount <= 0}
 						missingPermissionMessage={
-							!editable
-								? t(missingPermissionMessage)
-								: t('No remaining amount left.')
+							!editable ? missingPermissionMessage : 'No remaining amount left.'
 						}
 						onClick={fillBtnClick}
 					/>
@@ -112,9 +110,9 @@ const EditablePayRateAutomatic: FC<EditablePayRateAutomaticProp> = ({
 
 				<div className="ms-3">
 					<PermissionsButton
-						btnTitle={disabled ? t('Change') : t('Cancel')}
+						btnTitle={disabled ? 'Change' : 'Cancel'}
 						disabled={!editable}
-						missingPermissionMessage={t(missingPermissionMessage)}
+						missingPermissionMessage={missingPermissionMessage}
 						onClick={handleDisableBtnClick}
 					/>
 				</div>

@@ -91,7 +91,7 @@ const GiftCards: FC<GiftCardProp> = ({
 			<AddBottom
 				onCancel={() => setOpen(false)}
 				disabledAdd={!creatable}
-				addMissingPermissionMessage={t(ERRORS.gift_card.permissions.add)}
+				addMissingPermissionMessage={ERRORS.gift_card.permissions.add}
 				onAdd={() => setOpenAddGiftCardModal(true)}
 			/>
 

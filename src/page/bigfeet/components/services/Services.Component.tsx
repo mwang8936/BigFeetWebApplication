@@ -144,11 +144,11 @@ const Services: FC = () => {
 
 					<div className="vertical-center">
 						<PermissionsButton
-							btnTitle={t('Add Service')}
+							btnTitle={'Add Service'}
 							btnType={ButtonType.ADD}
 							top={false}
 							disabled={!creatable}
-							missingPermissionMessage={t(ERRORS.service.permissions.add)}
+							missingPermissionMessage={ERRORS.service.permissions.add}
 							onClick={() => {
 								setOpenAddModal(true);
 							}}

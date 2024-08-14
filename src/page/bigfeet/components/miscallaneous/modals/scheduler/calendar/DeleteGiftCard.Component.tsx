@@ -58,7 +58,7 @@ const DeleteGiftCard: FC<DeleteGiftCardProp> = ({
 			<DeleteBottom
 				onCancel={() => setOpen(false)}
 				disabledDelete={!deletable}
-				deleteMissingPermissionMessage={t(ERRORS.gift_card.permissions.delete)}
+				deleteMissingPermissionMessage={ERRORS.gift_card.permissions.delete}
 				onDelete={onDelete}
 			/>
 		</>

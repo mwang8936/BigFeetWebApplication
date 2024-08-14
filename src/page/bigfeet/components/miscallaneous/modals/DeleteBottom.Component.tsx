@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import ModalPermissionsButton from './ModalPermissionsButton.Component';
 
@@ -26,12 +25,10 @@ const DeleteBottom: FC<DeleteBottomProp> = ({
 	deleteMissingPermissionMessage = '',
 	onDelete,
 }) => {
-	const { t } = useTranslation();
-
 	return (
 		<div className="modal-bottom">
 			<ModalPermissionsButton
-				btnTitle={cancelText || t('Cancel')}
+				btnTitle={cancelText || 'Cancel'}
 				btnType={ButtonType.CANCEL}
 				disabled={disabledCancel}
 				missingPermissionMessage={cancelMissingPermissionMessage}
@@ -39,7 +36,7 @@ const DeleteBottom: FC<DeleteBottomProp> = ({
 			/>
 
 			<ModalPermissionsButton
-				btnTitle={deleteText || t('Delete')}
+				btnTitle={deleteText || 'Delete'}
 				btnType={ButtonType.DELETE}
 				disabled={disabledDelete}
 				missingPermissionMessage={deleteMissingPermissionMessage}

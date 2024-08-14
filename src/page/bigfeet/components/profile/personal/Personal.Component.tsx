@@ -1,5 +1,4 @@
 import { FC, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
 
@@ -39,8 +38,6 @@ const Personal: FC<PersonalProp> = ({
 	originalLastName,
 	originalGender,
 }) => {
-	const { t } = useTranslation();
-
 	const [usernameInput, setUsernameInput] = useState<string | null>(
 		originalUsername
 	);
@@ -237,20 +234,20 @@ const Personal: FC<PersonalProp> = ({
 
 			<div className="bottom-bar">
 				<PermissionsButton
-					btnTitle={t('Save Changes')}
+					btnTitle={'Save Changes'}
 					right={false}
 					disabled={
 						!editable || !changesMade || missingRequiredInput || invalidInput
 					}
 					missingPermissionMessage={
 						!editable
-							? t(ERRORS.employee.permissions.edit)
+							? ERRORS.employee.permissions.edit
 							: !changesMade
-							? t(ERRORS.no_changes)
+							? ERRORS.no_changes
 							: missingRequiredInput
-							? t(ERRORS.required)
+							? ERRORS.required
 							: invalidInput
-							? t(ERRORS.invalid)
+							? ERRORS.invalid
 							: ''
 					}
 					onClick={onSave}

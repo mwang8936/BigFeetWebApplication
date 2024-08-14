@@ -224,8 +224,8 @@ const AddSchedule: FC<AddScheduleProp> = ({
 							<AddToggleSwitch
 								checked={isWorkingInput}
 								setChecked={setIsWorkingInput}
-								falseText={t('Not Working')}
-								trueText={t('Working')}
+								falseText={'Not Working'}
+								trueText={'Working'}
 								toggleColour={ToggleColor.GREEN}
 								label={LABELS.schedule.is_working}
 								name={NAMES.schedule.is_working}
@@ -235,8 +235,8 @@ const AddSchedule: FC<AddScheduleProp> = ({
 							<AddToggleSwitch
 								checked={onCallInput}
 								setChecked={setOnCallInput}
-								falseText={t('Not On Call')}
-								trueText={t('On Call')}
+								falseText={'Not On Call'}
+								trueText={'On Call'}
 								toggleColour={ToggleColor.GREEN}
 								label={LABELS.schedule.on_call}
 								name={NAMES.schedule.on_call}
@@ -252,11 +252,11 @@ const AddSchedule: FC<AddScheduleProp> = ({
 				disabledAdd={!creatable || missingRequiredInput || invalidInput}
 				addMissingPermissionMessage={
 					!creatable
-						? t(ERRORS.schedule.permissions.add)
+						? ERRORS.schedule.permissions.add
 						: missingRequiredInput
-						? t(ERRORS.required)
+						? ERRORS.required
 						: invalidInput
-						? t(ERRORS.invalid)
+						? ERRORS.invalid
 						: ''
 				}
 				onAdd={onAdd}

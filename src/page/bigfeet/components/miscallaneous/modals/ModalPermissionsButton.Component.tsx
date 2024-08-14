@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ButtonType } from '../PermissionsButton.Component';
 
@@ -21,6 +22,8 @@ const ModalPermissionsButton: FC<ModalPermissionsButtonProp> = ({
 	missingPermissionMessage,
 	onClick,
 }) => {
+	const { t } = useTranslation();
+
 	const btnColorCss =
 		btnType === ButtonType.ADD
 			? 'bg-green-600 hover:bg-green-500 disabled:bg-green-300'
@@ -51,10 +54,10 @@ const ModalPermissionsButton: FC<ModalPermissionsButtonProp> = ({
 						: 'top left',
 				}}
 				className={`button-tip group-hover:group-disabled:scale-100`}>
-				{missingPermissionMessage}
+				{t(missingPermissionMessage)}
 			</span>
 
-			{btnTitle}
+			{t(btnTitle)}
 		</button>
 	);
 };

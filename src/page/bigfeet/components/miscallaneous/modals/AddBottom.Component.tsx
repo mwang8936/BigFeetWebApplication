@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import ModalPermissionsButton from './ModalPermissionsButton.Component';
 
@@ -34,12 +33,10 @@ const AddBottom: FC<AddBottomProp> = ({
 	editMissingPermissionMessage = '',
 	onEdit,
 }) => {
-	const { t } = useTranslation();
-
 	return (
 		<div className="modal-bottom">
 			<ModalPermissionsButton
-				btnTitle={addText || t('Add')}
+				btnTitle={addText || 'Add'}
 				btnType={ButtonType.ADD}
 				disabled={disabledAdd}
 				missingPermissionMessage={addMissingPermissionMessage}
@@ -47,7 +44,7 @@ const AddBottom: FC<AddBottomProp> = ({
 			/>
 
 			<ModalPermissionsButton
-				btnTitle={cancelText || t('Cancel')}
+				btnTitle={cancelText || 'Cancel'}
 				btnType={ButtonType.CANCEL}
 				disabled={disabledCancel}
 				missingPermissionMessage={cancelMissingPermissionMessage}
@@ -57,7 +54,7 @@ const AddBottom: FC<AddBottomProp> = ({
 			{onEdit && (
 				<div className="me-auto">
 					<ModalPermissionsButton
-						btnTitle={editText || t('Edit')}
+						btnTitle={editText || 'Edit'}
 						right={false}
 						disabled={disabledEdit}
 						missingPermissionMessage={editMissingPermissionMessage}

@@ -578,15 +578,15 @@ const AddReservation: FC<AddReservationProp> = ({
 				}
 				addMissingPermissionMessage={
 					!creatable
-						? t(ERRORS.reservation.permissions.add)
+						? ERRORS.reservation.permissions.add
 						: missingRequiredInput
-						? t(ERRORS.required)
+						? ERRORS.required
 						: invalidInput
-						? t(ERRORS.invalid)
+						? ERRORS.invalid
 						: noBeds
-						? t(ERRORS.warnings.no_beds.title)
+						? ERRORS.warnings.no_beds.title
 						: genderMismatch
-						? t(ERRORS.warnings.gender_mismatch.title)
+						? ERRORS.warnings.gender_mismatch.title
 						: ''
 				}
 				onAdd={onAdd}
@@ -595,14 +595,14 @@ const AddReservation: FC<AddReservationProp> = ({
 			<WarningModal
 				open={openGenderMismatchWarningModel}
 				setOpen={setOpenGenderMismatchWarningModal}
-				title={t(ERRORS.warnings.gender_mismatch.title)}
-				message={t(ERRORS.warnings.gender_mismatch.message)}
+				title={ERRORS.warnings.gender_mismatch.title}
+				message={ERRORS.warnings.gender_mismatch.message}
 			/>
 
 			<WarningModal
 				open={openBedWarningModal}
 				setOpen={setOpenBedWarningModal}
-				title={t(ERRORS.warnings.no_beds.title)}
+				title={ERRORS.warnings.no_beds.title}
 				message={t(
 					ERRORS.warnings.no_beds.message.key,
 					ERRORS.warnings.no_beds.message.value
@@ -612,8 +612,8 @@ const AddReservation: FC<AddReservationProp> = ({
 			<WarningModal
 				open={openConflictWarningModal}
 				setOpen={setOpenConflictWarningModal}
-				title={t(ERRORS.warnings.conflicts.title)}
-				message={t(ERRORS.warnings.conflicts.message)}
+				title={ERRORS.warnings.conflicts.title}
+				message={ERRORS.warnings.conflicts.message}
 			/>
 		</>
 	);

@@ -77,7 +77,7 @@ const FilterDate: FC<FilterDateProp> = ({
 
 			<AddBottom
 				onCancel={() => setOpen(false)}
-				addText={t('Filter')}
+				addText={'Filter'}
 				disabledAdd={
 					!editable ||
 					(selectedDate && sameDate(date, selectedDate)) ||
@@ -86,28 +86,28 @@ const FilterDate: FC<FilterDateProp> = ({
 				}
 				addMissingPermissionMessage={
 					!editable
-						? t(ERRORS.schedule.permissions.get)
+						? ERRORS.schedule.permissions.get
 						: selectedDate && sameDate(date, selectedDate)
-						? t(ERRORS.no_changes)
+						? ERRORS.no_changes
 						: date === null
-						? t(ERRORS.required)
+						? ERRORS.required
 						: invalidDate
-						? t(ERRORS.invalid)
+						? ERRORS.invalid
 						: ''
 				}
 				onAdd={() => {
 					onDateSelected(selectedDate as Date);
 					setOpen(false);
 				}}
-				editText={t('Reset Filter')}
+				editText={'Reset Filter'}
 				disabledEdit={
 					!editable ||
 					(selectedDate !== null && sameDate(selectedDate, new Date()))
 				}
 				editMissingPermissionMessage={
 					!editable
-						? t(ERRORS.schedule.permissions.get)
-						: t('Current date already selected.')
+						? ERRORS.schedule.permissions.get
+						: 'Current date already selected.'
 				}
 				onEdit={() => setSelectedDate(new Date())}
 			/>

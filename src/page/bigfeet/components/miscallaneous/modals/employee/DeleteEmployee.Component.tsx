@@ -60,7 +60,7 @@ const DeleteEmployee: FC<DeleteEmployeeProp> = ({
 			<DeleteBottom
 				onCancel={() => setOpen(false)}
 				disabledDelete={!deletable}
-				deleteMissingPermissionMessage={t(ERRORS.employee.permissions.delete)}
+				deleteMissingPermissionMessage={ERRORS.employee.permissions.delete}
 				onDelete={onDelete}
 			/>
 		</>

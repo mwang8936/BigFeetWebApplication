@@ -66,7 +66,7 @@ const DeleteCustomer: FC<DeleteCustomerProp> = ({
 			<DeleteBottom
 				onCancel={() => setOpen(false)}
 				disabledDelete={!deletable}
-				deleteMissingPermissionMessage={t(ERRORS.customer.permissions.delete)}
+				deleteMissingPermissionMessage={ERRORS.customer.permissions.delete}
 				onDelete={onDelete}
 			/>
 		</>

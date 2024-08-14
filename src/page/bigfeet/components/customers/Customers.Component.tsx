@@ -193,11 +193,11 @@ const Customers: FC = () => {
 
 					<div className="vertical-center">
 						<PermissionsButton
-							btnTitle={t('Add Customer')}
+							btnTitle={'Add Customer'}
 							btnType={ButtonType.ADD}
 							top={false}
 							disabled={!creatable}
-							missingPermissionMessage={t(ERRORS.customer.permissions.add)}
+							missingPermissionMessage={ERRORS.customer.permissions.add}
 							onClick={() => {
 								setOpenAddCustomerModal(true);
 							}}

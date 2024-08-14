@@ -56,7 +56,7 @@ const DeleteService: FC<DeleteServiceProp> = ({
 			<DeleteBottom
 				onCancel={() => setOpen(false)}
 				disabledDelete={!deletable}
-				deleteMissingPermissionMessage={t(ERRORS.service.permissions.delete)}
+				deleteMissingPermissionMessage={ERRORS.service.permissions.delete}
 				onDelete={() => {
 					onDeleteService(serviceId);
 					setOpen(false);

@@ -261,11 +261,11 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 				disabledAdd={!creatable || missingRequiredInput || noBeds}
 				addMissingPermissionMessage={
 					!creatable
-						? t(ERRORS.reservation.permissions.add)
+						? ERRORS.reservation.permissions.add
 						: missingRequiredInput
-						? t(ERRORS.required)
+						? ERRORS.required
 						: noBeds
-						? t(ERRORS.warnings.no_beds.title)
+						? ERRORS.warnings.no_beds.title
 						: ''
 				}
 				onAdd={onAdd}
@@ -274,7 +274,7 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 			<WarningModal
 				open={openBedWarningModal}
 				setOpen={setOpenBedWarningModal}
-				title={t(ERRORS.warnings.no_beds.title)}
+				title={ERRORS.warnings.no_beds.title}
 				message={t(
 					ERRORS.warnings.no_beds.message.key,
 					ERRORS.warnings.no_beds.message.value
@@ -284,8 +284,8 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 			<WarningModal
 				open={openConflictWarningModal}
 				setOpen={setOpenConflictWarningModal}
-				title={t(ERRORS.warnings.conflicts.title)}
-				message={t(ERRORS.warnings.conflicts.message)}
+				title={ERRORS.warnings.conflicts.title}
+				message={ERRORS.warnings.conflicts.message}
 			/>
 		</>
 	);

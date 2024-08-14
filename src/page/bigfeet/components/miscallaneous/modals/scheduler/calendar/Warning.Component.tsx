@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Dialog } from '@headlessui/react';
 
@@ -15,6 +16,8 @@ interface WarningProp {
 }
 
 const Warning: FC<WarningProp> = ({ setOpen, title, message }) => {
+	const { t } = useTranslation();
+
 	return (
 		<>
 			<div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
@@ -30,10 +33,10 @@ const Warning: FC<WarningProp> = ({ setOpen, title, message }) => {
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
-							{title}
+							{t(title)}
 						</Dialog.Title>
 
-						<div className="mt-2">{message}</div>
+						<div className="mt-2">{t(message)}</div>
 					</div>
 				</div>
 			</div>

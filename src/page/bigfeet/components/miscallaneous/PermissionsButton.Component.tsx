@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export enum ButtonType {
 	ADD = 'ADD',
@@ -26,6 +27,8 @@ const PermissionsButton: FC<PermissionsButtonProp> = ({
 	missingPermissionMessage,
 	onClick,
 }) => {
+	const { t } = useTranslation();
+
 	const btnColorCss =
 		btnType === ButtonType.ADD
 			? 'green-button-color'
@@ -56,9 +59,10 @@ const PermissionsButton: FC<PermissionsButtonProp> = ({
 						: 'top left',
 				}}
 				className={`button-tip group-hover:group-disabled:scale-100`}>
-				{missingPermissionMessage}
+				{t(missingPermissionMessage)}
 			</span>
-			{btnTitle}
+
+			{t(btnTitle)}
 		</button>
 	);
 };
