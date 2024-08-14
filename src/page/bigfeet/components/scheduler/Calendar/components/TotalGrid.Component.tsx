@@ -69,23 +69,52 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 	const acupunctureReservations = completedReservations.filter(
 		(reservation) => reservation.service.acupuncture > 0
 	);
-	acupunctureReservations.sort(
+
+	const normalAcupunctureReservations = acupunctureReservations.filter(
+		(reservation) => !reservation.insurance
+	);
+	normalAcupunctureReservations.sort(
 		(a, b) => a.reserved_date.getTime() - b.reserved_date.getTime()
 	);
-	const acupunctureTotal = acupunctureReservations
+	const normalAcupunctureTotal = normalAcupunctureReservations
 		.map((reservation) => reservation.service.acupuncture)
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
-	const acupunctureTexts = acupunctureReservations.map((reservation) => {
-		const startTimeText = formatTimeFromDate(reservation.reserved_date);
-		const endTime =
-			new Date(reservation.reserved_date).getTime() +
-			reservation.service.time * 60 * 1000;
-		const endTimeText = formatTimeFromDate(new Date(endTime));
-		return (
-			<span
-				key={`acupuncture-${reservation.reservation_id}`}>{`${startTimeText} - ${endTimeText} (${reservation.service.shorthand})`}</span>
-		);
-	});
+	const normalAcupunctureTexts = normalAcupunctureReservations.map(
+		(reservation) => {
+			const startTimeText = formatTimeFromDate(reservation.reserved_date);
+			const endTime =
+				new Date(reservation.reserved_date).getTime() +
+				reservation.service.time * 60 * 1000;
+			const endTimeText = formatTimeFromDate(new Date(endTime));
+			return (
+				<span
+					key={`acupuncture-${reservation.reservation_id}`}>{`${startTimeText} - ${endTimeText} (${reservation.service.shorthand})`}</span>
+			);
+		}
+	);
+
+	const insuranceAcupunctureReservations = acupunctureReservations.filter(
+		(reservation) => reservation.insurance
+	);
+	insuranceAcupunctureReservations.sort(
+		(a, b) => a.reserved_date.getTime() - b.reserved_date.getTime()
+	);
+	const insuranceAcupunctureTotal = insuranceAcupunctureReservations
+		.map((reservation) => reservation.service.acupuncture)
+		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+	const insuranceAcupunctureTexts = insuranceAcupunctureReservations.map(
+		(reservation) => {
+			const startTimeText = formatTimeFromDate(reservation.reserved_date);
+			const endTime =
+				new Date(reservation.reserved_date).getTime() +
+				reservation.service.time * 60 * 1000;
+			const endTimeText = formatTimeFromDate(new Date(endTime));
+			return (
+				<span
+					key={`acupuncture-${reservation.reservation_id}`}>{`${startTimeText} - ${endTimeText} (${reservation.service.shorthand})`}</span>
+			);
+		}
+	);
 
 	const requestedReservations = reservations.filter((reservation) => {
 		const isRequestedReservation =
@@ -138,8 +167,14 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 					{t('F')}: <span className="font-bold">{feetTotal}</span>
 				</span>
 				<span>
-					{t('A')}: <span className="font-bold">{acupunctureTotal}</span>
+					{t('A')}: <span className="font-bold">{normalAcupunctureTotal}</span>
 				</span>
+				{insuranceAcupunctureTotal > 0 && (
+					<span>
+						{t('A (I)')}:{' '}
+						<span className="font-bold">{insuranceAcupunctureTotal}</span>
+					</span>
+				)}
 				<span>
 					{t('Requested Pay')}:{' '}
 					<span className="font-bold">{`${requestedTotal} X \$1 = \$${moneyToString(
@@ -154,13 +189,26 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 							{bodyTotal > 0 && feetTotal > 0 && ' + '}
 							{feetTotal > 0 && `${feetTotal}${t('F')}`}
 							{(bodyTotal > 0 || feetTotal > 0) &&
-								acupunctureTotal > 0 &&
+								normalAcupunctureTotal > 0 &&
 								' + '}
-							{acupunctureTotal > 0 && `${acupunctureTotal}${t('A')}`}
+							{normalAcupunctureTotal > 0 &&
+								`${normalAcupunctureTotal}${t('A')}`}
+							{(bodyTotal > 0 || feetTotal > 0 || normalAcupunctureTotal > 0) &&
+								insuranceAcupunctureTotal > 0 &&
+								' + '}
+							{insuranceAcupunctureTotal > 0 &&
+								`${insuranceAcupunctureTotal}${t('A (I)')}`}
 							{` = ${
-								bodyTotal + feetTotal + acupunctureTotal
+								bodyTotal +
+								feetTotal +
+								normalAcupunctureTotal +
+								insuranceAcupunctureTotal
 							} X $2 = $${moneyToString(
-								(bodyTotal + feetTotal + acupunctureTotal) * 2
+								(bodyTotal +
+									feetTotal +
+									normalAcupunctureTotal +
+									insuranceAcupunctureTotal) *
+									2
 							)}`}
 						</span>
 					</span>
@@ -173,20 +221,29 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 							<span className="flex flex-col">
 								{t('Body Services')}:{bodyTexts}
 								{(feetReservations.length > 0 ||
-									acupunctureReservations.length > 0 ||
+									normalAcupunctureReservations.length > 0 ||
+									insuranceAcupunctureReservations.length > 0 ||
 									requestedReservations.length > 0) && <br />}
 							</span>
 						)}
 						{feetReservations.length > 0 && (
 							<span className="flex flex-col">
 								{t('Feet Services')}:{feetTexts}
-								{(acupunctureReservations.length > 0 ||
+								{(normalAcupunctureReservations.length > 0 ||
+									insuranceAcupunctureReservations.length > 0 ||
 									requestedReservations.length > 0) && <br />}
 							</span>
 						)}
-						{acupunctureReservations.length > 0 && (
+						{normalAcupunctureReservations.length > 0 && (
 							<span className="flex flex-col">
-								{t('Acupuncture Services')}:{acupunctureTexts}
+								{t('Acupuncture Services')}:{normalAcupunctureTexts}
+								{(insuranceAcupunctureReservations.length > 0 ||
+									requestedReservations.length > 0) && <br />}
+							</span>
+						)}
+						{insuranceAcupunctureReservations.length > 0 && (
+							<span className="flex flex-col">
+								{t('Acupuncture Services (I)')}:{insuranceAcupunctureTexts}
 								{requestedReservations.length > 0 && <br />}
 							</span>
 						)}
