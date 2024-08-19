@@ -102,7 +102,8 @@ const FilterDate: FC<FilterDateProp> = ({
 				editText={'Reset Filter'}
 				disabledEdit={
 					!editable ||
-					(selectedDate !== null && sameDate(selectedDate, new Date()))
+					(selectedDate !== null &&
+						(sameDate(selectedDate, new Date()) || sameDate(date, new Date())))
 				}
 				editMissingPermissionMessage={
 					!editable
@@ -110,7 +111,7 @@ const FilterDate: FC<FilterDateProp> = ({
 						: 'Current date already selected.'
 				}
 				onEdit={() => {
-					onDateSelected(selectedDate as Date);
+					onDateSelected(new Date());
 					setOpen(false);
 				}}
 			/>
