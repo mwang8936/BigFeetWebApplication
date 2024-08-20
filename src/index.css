@@ -42,6 +42,14 @@
   }
 
   /* BigFeet Page */
+  .fill-horizontal {
+    @apply flex min-h-screen
+  }
+
+  .content-fill {
+    @apply grid landscape:grow landscape:h-screen landscape:ml-[9%] portrait:w-screen portrait:mt-[20%] portrait:sm:mt-[12%]
+  }
+
   .retry-div {
     @apply m-auto text-gray-700 text-xl font-bold flex flex-col items-center justify-center
   }
@@ -71,6 +79,10 @@
   .sidebar-tip {
     @apply absolute w-auto p-2 m-2 min-w-max landscape:left-[100%] portrait:top-[100%] rounded-md shadow-md text-white 
     bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-left
+  }
+
+  .sidebar-login {
+    @apply landscape:mt-auto landscape:py-5 portrait:ml-auto portrait:px-5 text-center
   }
 
   /* Non-SideBar */

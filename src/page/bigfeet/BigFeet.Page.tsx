@@ -1,4 +1,11 @@
-import { createContext, FC, useContext, useEffect, useState } from 'react';
+import {
+	createContext,
+	FC,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -102,6 +109,12 @@ export function useSocketIdContext() {
 }
 
 const BigFeet: FC = () => {
+	const { i18n, t } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const pusherRef = useRef<Pusher | null>(null);
+	const subscribedChannelsRef = useRef<Channel[]>([]);
+
 	const [socketId, setSocketId] = useState<string>('');
 
 	const [retryingUserQuery, setRetryingUserQuery] = useState(false);
@@ -114,225 +127,299 @@ const BigFeet: FC = () => {
 
 	const [selectedIndex, setSelectedIndex] = useState(1);
 
-	const { i18n, t } = useTranslation();
-	const queryClient = useQueryClient();
-
 	const userQuery = useUserQuery({
 		gettable: true,
 	});
 	const user: User = userQuery.data;
 
 	useEffect(() => {
-		if (user) {
-			i18n.changeLanguage(getLanguageFile(user.language));
+		if (!user) return;
 
-			const permissions = user.permissions;
+		i18n.changeLanguage(getLanguageFile(user.language));
+	}, [user]);
 
-			if (
-				permissions.includes(Permissions.PERMISSION_GET_EMPLOYEE) ||
-				permissions.includes(Permissions.PERMISSION_ADD_EMPLOYEE) ||
-				permissions.includes(Permissions.PERMISSION_UPDATE_EMPLOYEE) ||
-				permissions.includes(Permissions.PERMISSION_DELETE_EMPLOYEE)
-			)
-				sideBarItems.push(SideBarItems.Employees);
+	useEffect(() => {
+		if (!user) return;
 
-			if (
-				permissions.includes(Permissions.PERMISSION_GET_SERVICE) ||
-				permissions.includes(Permissions.PERMISSION_ADD_SERVICE) ||
-				permissions.includes(Permissions.PERMISSION_UPDATE_SERVICE) ||
-				permissions.includes(Permissions.PERMISSION_DELETE_SERVICE)
-			)
-				sideBarItems.push(SideBarItems.Services);
+		const permissions = user.permissions;
 
-			if (
-				permissions.includes(Permissions.PERMISSION_GET_CUSTOMER) ||
-				permissions.includes(Permissions.PERMISSION_ADD_CUSTOMER) ||
-				permissions.includes(Permissions.PERMISSION_UPDATE_CUSTOMER) ||
-				permissions.includes(Permissions.PERMISSION_DELETE_CUSTOMER)
-			)
-				sideBarItems.push(SideBarItems.Customers);
+		if (
+			permissions.includes(Permissions.PERMISSION_GET_EMPLOYEE) ||
+			permissions.includes(Permissions.PERMISSION_ADD_EMPLOYEE) ||
+			permissions.includes(Permissions.PERMISSION_UPDATE_EMPLOYEE) ||
+			permissions.includes(Permissions.PERMISSION_DELETE_EMPLOYEE)
+		)
+			sideBarItems.push(SideBarItems.Employees);
 
-			const pusher = new Pusher(import.meta.env.VITE_PUSHER_KEY, {
-				cluster: import.meta.env.VITE_PUSHER_CLUSTER,
-				channelAuthorization: {
-					endpoint: `${API_BASE_URL}/${authenticatePath}/pusher`,
-					transport: 'ajax',
-				},
-			});
+		if (
+			permissions.includes(Permissions.PERMISSION_GET_SERVICE) ||
+			permissions.includes(Permissions.PERMISSION_ADD_SERVICE) ||
+			permissions.includes(Permissions.PERMISSION_UPDATE_SERVICE) ||
+			permissions.includes(Permissions.PERMISSION_DELETE_SERVICE)
+		)
+			sideBarItems.push(SideBarItems.Services);
 
-			pusher.connection.bind('connected', () => {
-				setSocketId(pusher.connection.socket_id);
-			});
+		if (
+			permissions.includes(Permissions.PERMISSION_GET_CUSTOMER) ||
+			permissions.includes(Permissions.PERMISSION_ADD_CUSTOMER) ||
+			permissions.includes(Permissions.PERMISSION_UPDATE_CUSTOMER) ||
+			permissions.includes(Permissions.PERMISSION_DELETE_CUSTOMER)
+		)
+			sideBarItems.push(SideBarItems.Customers);
+	}, [user]);
 
-			const subscribedChannels: Channel[] = [];
+	useEffect(() => {
+		if (!user) return;
 
-			if (permissions.includes(Permissions.PERMISSION_GET_CUSTOMER)) {
-				const channel = pusher.subscribe(customers_channel);
+		if (!pusherRef.current) {
+			try {
+				pusherRef.current = new Pusher(import.meta.env.VITE_PUSHER_KEY, {
+					cluster: import.meta.env.VITE_PUSHER_CLUSTER,
+					channelAuthorization: {
+						endpoint: `${API_BASE_URL}/${authenticatePath}/pusher`,
+						transport: 'ajax',
+					},
+				});
 
-				const onCustomerEvent = (
-					customerEventMessage: CustomerEventMessage,
-					event: string
-				) => {
-					const phoneNumber = customerEventMessage.phone_number;
-					const vipSerial = customerEventMessage.vip_serial;
-
-					let message: string = '';
-					if (event === add_customer_event) {
-						message = phoneNumber
-							? t('Customer Added Phone Number', {
-									phone_number: formatPhoneNumber(phoneNumber),
-							  })
-							: t('Customer Added VIP Serial', { vip_serial: vipSerial });
-					} else if (event === update_customer_event) {
-						message = phoneNumber
-							? t('Customer Updated Phone Number', {
-									phone_number: formatPhoneNumber(phoneNumber),
-							  })
-							: t('Customer Updated VIP Serial', { vip_serial: vipSerial });
-					} else if (event === delete_customer_event) {
-						message = phoneNumber
-							? t('Customer Deleted Phone Number', {
-									phone_number: formatPhoneNumber(phoneNumber),
-							  })
-							: t('Customer Deleted VIP Serial', { vip_serial: vipSerial });
-					}
-					pusherToast(message);
-
-					queryClient.invalidateQueries({ queryKey: [customersQueryKey] });
-				};
-
-				channel.bind(
-					add_customer_event,
-					(customerEventMessage: CustomerEventMessage) =>
-						onCustomerEvent(customerEventMessage, add_customer_event)
-				);
-				channel.bind(
-					update_customer_event,
-					(customerEventMessage: CustomerEventMessage) =>
-						onCustomerEvent(customerEventMessage, update_customer_event)
-				);
-				channel.bind(
-					delete_customer_event,
-					(customerEventMessage: CustomerEventMessage) =>
-						onCustomerEvent(customerEventMessage, delete_customer_event)
-				);
-
-				subscribedChannels.push(channel);
+				pusherRef.current.connection.bind('connected', () => {
+					setSocketId(pusherRef.current!.connection.socket_id);
+				});
+			} catch (error) {
+				console.error('Failed to initialize Pusher:', error);
+				return;
 			}
+		}
 
-			if (permissions.includes(Permissions.PERMISSION_GET_EMPLOYEE)) {
-				const channel = pusher.subscribe(employees_channel);
+		const permissions = user.permissions;
 
-				const onEmployeeEvent = (
-					employeeEventMessage: EmployeeEventMessage,
-					event: string
-				) => {
-					const username = employeeEventMessage.username;
+		const getCustomersPermission = permissions.includes(
+			Permissions.PERMISSION_GET_CUSTOMER
+		);
+		const customersChannel = subscribedChannelsRef.current.find(
+			(channel) => channel.name === customers_channel
+		);
 
-					let message: string = '';
-					if (event === add_employee_event) {
-						message = t('Employee Added', { username });
-					} else if (event === update_employee_event) {
-						message = t('Employee Updated', { username });
-					} else if (event === delete_employee_event) {
-						message = t('Employee Deleted', { username });
-					}
-					pusherToast(message);
+		if (getCustomersPermission && !customersChannel) {
+			const channel = pusherRef.current.subscribe(customers_channel);
 
-					queryClient.invalidateQueries({ queryKey: [employeesQueryKey] });
-				};
+			const onCustomerEvent = (
+				customerEventMessage: CustomerEventMessage,
+				event: string
+			) => {
+				const phoneNumber = customerEventMessage.phone_number;
+				const vipSerial = customerEventMessage.vip_serial;
 
-				channel.bind(
-					add_employee_event,
-					(employeeEventMessage: EmployeeEventMessage) =>
-						onEmployeeEvent(employeeEventMessage, add_employee_event)
-				);
-				channel.bind(
-					update_employee_event,
-					(employeeEventMessage: EmployeeEventMessage) =>
-						onEmployeeEvent(employeeEventMessage, update_employee_event)
-				);
-				channel.bind(
-					delete_employee_event,
-					(employeeEventMessage: EmployeeEventMessage) =>
-						onEmployeeEvent(employeeEventMessage, delete_employee_event)
-				);
+				let message: string = '';
+				if (event === add_customer_event) {
+					message = phoneNumber
+						? t('Customer Added Phone Number', {
+								phone_number: formatPhoneNumber(phoneNumber),
+						  })
+						: t('Customer Added VIP Serial', { vip_serial: vipSerial });
+				} else if (event === update_customer_event) {
+					message = phoneNumber
+						? t('Customer Updated Phone Number', {
+								phone_number: formatPhoneNumber(phoneNumber),
+						  })
+						: t('Customer Updated VIP Serial', { vip_serial: vipSerial });
+				} else if (event === delete_customer_event) {
+					message = phoneNumber
+						? t('Customer Deleted Phone Number', {
+								phone_number: formatPhoneNumber(phoneNumber),
+						  })
+						: t('Customer Deleted VIP Serial', { vip_serial: vipSerial });
+				}
+				pusherToast(message);
 
-				subscribedChannels.push(channel);
-			}
+				queryClient.invalidateQueries({ queryKey: [customersQueryKey] });
+			};
 
-			if (permissions.includes(Permissions.PERMISSION_GET_GIFT_CARD)) {
-				const channel = pusher.subscribe(gift_cards_channel);
+			channel.bind(
+				add_customer_event,
+				(customerEventMessage: CustomerEventMessage) =>
+					onCustomerEvent(customerEventMessage, add_customer_event)
+			);
+			channel.bind(
+				update_customer_event,
+				(customerEventMessage: CustomerEventMessage) =>
+					onCustomerEvent(customerEventMessage, update_customer_event)
+			);
+			channel.bind(
+				delete_customer_event,
+				(customerEventMessage: CustomerEventMessage) =>
+					onCustomerEvent(customerEventMessage, delete_customer_event)
+			);
 
-				const onGiftCardEvent = (_data: any, event: string) => {
-					let message: string = '';
-					if (event === add_gift_card_event) {
-						message = t('Gift Card Added');
-					} else if (event === update_gift_card_event) {
-						message = t('Gift Card Updated');
-					} else if (event === delete_gift_card_event) {
-						message = t('Gift Card Deleted');
-					}
-					pusherToast(message);
+			subscribedChannelsRef.current.push(channel);
+		} else if (!getCustomersPermission && customersChannel) {
+			customersChannel.unbind_all();
+			pusherRef.current.unsubscribe(customersChannel.name);
 
-					queryClient.invalidateQueries({ queryKey: [giftCardsQueryKey] });
-				};
+			subscribedChannelsRef.current = subscribedChannelsRef.current.filter(
+				(channel) => channel.name === customersChannel.name
+			);
+		}
 
-				channel.bind(add_gift_card_event, () =>
-					onGiftCardEvent(undefined, add_gift_card_event)
-				);
-				channel.bind(update_gift_card_event, () =>
-					onGiftCardEvent(undefined, update_gift_card_event)
-				);
-				channel.bind(delete_gift_card_event, () =>
-					onGiftCardEvent(undefined, delete_gift_card_event)
-				);
+		const getEmployeesPermission = permissions.includes(
+			Permissions.PERMISSION_GET_EMPLOYEE
+		);
+		const employeesChannel = subscribedChannelsRef.current.find(
+			(channel) => channel.name === employees_channel
+		);
 
-				subscribedChannels.push(channel);
-			}
+		if (getEmployeesPermission && !employeesChannel) {
+			const channel = pusherRef.current.subscribe(employees_channel);
 
-			if (permissions.includes(Permissions.PERMISSION_GET_SERVICE)) {
-				const channel = pusher.subscribe(services_channel);
+			const onEmployeeEvent = (
+				employeeEventMessage: EmployeeEventMessage,
+				event: string
+			) => {
+				const username = employeeEventMessage.username;
 
-				const onServiceEvent = (
-					serviceEventMessage: ServiceEventMessage,
-					event: string
-				) => {
-					const serviceName = serviceEventMessage.service_name;
+				let message: string = '';
+				if (event === add_employee_event) {
+					message = t('Employee Added', { username });
+				} else if (event === update_employee_event) {
+					message = t('Employee Updated', { username });
+				} else if (event === delete_employee_event) {
+					message = t('Employee Deleted', { username });
+				}
+				pusherToast(message);
 
-					let message: string = '';
-					if (event === add_service_event) {
-						message = t('Service Added', { service_name: serviceName });
-					} else if (event === update_service_event) {
-						message = t('Service Updated', { service_name: serviceName });
-					} else if (event === delete_service_event) {
-						message = t('Service Deleted', { service_name: serviceName });
-					}
-					pusherToast(message);
+				queryClient.invalidateQueries({ queryKey: [employeesQueryKey] });
+			};
 
-					queryClient.invalidateQueries({ queryKey: [servicesQueryKey] });
-				};
+			channel.bind(
+				add_employee_event,
+				(employeeEventMessage: EmployeeEventMessage) =>
+					onEmployeeEvent(employeeEventMessage, add_employee_event)
+			);
+			channel.bind(
+				update_employee_event,
+				(employeeEventMessage: EmployeeEventMessage) =>
+					onEmployeeEvent(employeeEventMessage, update_employee_event)
+			);
+			channel.bind(
+				delete_employee_event,
+				(employeeEventMessage: EmployeeEventMessage) =>
+					onEmployeeEvent(employeeEventMessage, delete_employee_event)
+			);
 
-				channel.bind(
-					add_service_event,
-					(serviceEventMessage: ServiceEventMessage) =>
-						onServiceEvent(serviceEventMessage, add_service_event)
-				);
-				channel.bind(
-					update_service_event,
-					(serviceEventMessage: ServiceEventMessage) =>
-						onServiceEvent(serviceEventMessage, update_service_event)
-				);
-				channel.bind(
-					delete_service_event,
-					(serviceEventMessage: ServiceEventMessage) =>
-						onServiceEvent(serviceEventMessage, delete_service_event)
-				);
+			subscribedChannelsRef.current.push(channel);
+		} else if (!getEmployeesPermission && employeesChannel) {
+			employeesChannel.unbind_all();
+			pusherRef.current.unsubscribe(employeesChannel.name);
 
-				subscribedChannels.push(channel);
-			}
+			subscribedChannelsRef.current = subscribedChannelsRef.current.filter(
+				(channel) => channel.name === employeesChannel.name
+			);
+		}
 
-			const channel = pusher.subscribe(schedules_channel);
+		const getGiftCardsPermission = permissions.includes(
+			Permissions.PERMISSION_GET_GIFT_CARD
+		);
+		const giftCardsChannel = subscribedChannelsRef.current.find(
+			(channel) => channel.name === gift_cards_channel
+		);
+
+		if (getGiftCardsPermission && !giftCardsChannel) {
+			const channel = pusherRef.current.subscribe(gift_cards_channel);
+
+			const onGiftCardEvent = (_data: any, event: string) => {
+				let message: string = '';
+				if (event === add_gift_card_event) {
+					message = t('Gift Card Added');
+				} else if (event === update_gift_card_event) {
+					message = t('Gift Card Updated');
+				} else if (event === delete_gift_card_event) {
+					message = t('Gift Card Deleted');
+				}
+				pusherToast(message);
+
+				queryClient.invalidateQueries({ queryKey: [giftCardsQueryKey] });
+			};
+
+			channel.bind(add_gift_card_event, () =>
+				onGiftCardEvent(undefined, add_gift_card_event)
+			);
+			channel.bind(update_gift_card_event, () =>
+				onGiftCardEvent(undefined, update_gift_card_event)
+			);
+			channel.bind(delete_gift_card_event, () =>
+				onGiftCardEvent(undefined, delete_gift_card_event)
+			);
+
+			subscribedChannelsRef.current.push(channel);
+		} else if (!getGiftCardsPermission && giftCardsChannel) {
+			giftCardsChannel.unbind_all();
+			pusherRef.current.unsubscribe(giftCardsChannel.name);
+
+			subscribedChannelsRef.current = subscribedChannelsRef.current.filter(
+				(channel) => channel.name === giftCardsChannel.name
+			);
+		}
+
+		const getServicesPermission = permissions.includes(
+			Permissions.PERMISSION_GET_SERVICE
+		);
+		const servicesChannel = subscribedChannelsRef.current.find(
+			(channel) => channel.name === services_channel
+		);
+
+		if (getServicesPermission && !servicesChannel) {
+			const channel = pusherRef.current.subscribe(services_channel);
+
+			const onServiceEvent = (
+				serviceEventMessage: ServiceEventMessage,
+				event: string
+			) => {
+				const serviceName = serviceEventMessage.service_name;
+
+				let message: string = '';
+				if (event === add_service_event) {
+					message = t('Service Added', { service_name: serviceName });
+				} else if (event === update_service_event) {
+					message = t('Service Updated', { service_name: serviceName });
+				} else if (event === delete_service_event) {
+					message = t('Service Deleted', { service_name: serviceName });
+				}
+				pusherToast(message);
+
+				queryClient.invalidateQueries({ queryKey: [servicesQueryKey] });
+			};
+
+			channel.bind(
+				add_service_event,
+				(serviceEventMessage: ServiceEventMessage) =>
+					onServiceEvent(serviceEventMessage, add_service_event)
+			);
+			channel.bind(
+				update_service_event,
+				(serviceEventMessage: ServiceEventMessage) =>
+					onServiceEvent(serviceEventMessage, update_service_event)
+			);
+			channel.bind(
+				delete_service_event,
+				(serviceEventMessage: ServiceEventMessage) =>
+					onServiceEvent(serviceEventMessage, delete_service_event)
+			);
+
+			subscribedChannelsRef.current.push(channel);
+		} else if (!getServicesPermission && servicesChannel) {
+			servicesChannel.unbind_all();
+			pusherRef.current.unsubscribe(servicesChannel.name);
+
+			subscribedChannelsRef.current = subscribedChannelsRef.current.filter(
+				(channel) => channel.name === servicesChannel.name
+			);
+		}
+
+		const schedulesChannel = subscribedChannelsRef.current.find(
+			(channel) => channel.name === schedules_channel
+		);
+
+		if (!schedulesChannel) {
+			const channel = pusherRef.current.subscribe(schedules_channel);
 
 			const onReservationEvent = (
 				reservationEventMessage: ReservationEventMessage,
@@ -483,16 +570,18 @@ const BigFeet: FC = () => {
 					onVipPackageEvent(vipPackageEventMessage, delete_vip_package_event)
 			);
 
-			subscribedChannels.push(channel);
-
-			return () => {
-				subscribedChannels.forEach((channel) => {
-					channel.unbind_all();
-					pusher.unsubscribe(channel.name);
-				});
-				pusher.disconnect();
-			};
+			subscribedChannelsRef.current.push(channel);
 		}
+
+		return () => {
+			if (pusherRef.current) {
+				subscribedChannelsRef.current.forEach((channel) => {
+					channel.unbind_all();
+					pusherRef.current?.unsubscribe(channel.name);
+				});
+				pusherRef.current?.disconnect();
+			}
+		};
 	}, [user]);
 
 	const isUserLoading = userQuery.isLoading;
@@ -544,18 +633,17 @@ const BigFeet: FC = () => {
 
 	return (
 		<SocketIdContext.Provider value={{ socketId, setSocketId }}>
-			<div className="flex min-h-screen">
+			<div className="fill-horizontal">
 				<SideBar
 					selectedIndex={selectedIndex}
 					onIndexSelected={setSelectedIndex}
 					sideBarItems={sideBarItems}
 				/>
 
-				<div className="grid landscape:grow landscape:h-screen landscape:ml-[9%] portrait:w-screen portrait:mt-[20%] portrait:sm:mt-[12%]">
-					{isLoadingElement}
-					<ToastContainer limit={5} />
-				</div>
+				<div className="content-fill">{isLoadingElement}</div>
 			</div>
+
+			<ToastContainer limit={5} />
 		</SocketIdContext.Provider>
 	);
 };

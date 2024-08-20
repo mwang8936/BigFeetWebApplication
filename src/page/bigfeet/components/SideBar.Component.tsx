@@ -1,16 +1,19 @@
-import SchedulerIcon from '../../../assets/Scheduler_Icon.svg';
-import PayRollIcon from '../../../assets/Payroll_Icon.svg';
-import EmployeesIcon from '../../../assets/Employees_Icon.svg';
-import ProfileIcon from '../../../assets/Profile_Icon.svg';
-import ServicesIcon from '../../../assets/Services_Icon.svg';
-import CustomersIcon from '../../../assets/Customers_Icon.svg';
-import { SideBarItems } from '../BigFeet.Page';
-import { useLogout } from '../../hooks/authentication.hooks';
-import { useTranslation } from 'react-i18next';
 import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { SideBarItems } from '../BigFeet.Page';
+
+import { useLogout } from '../../hooks/authentication.hooks';
 import { usePrefetchCustomersQuery } from '../../hooks/customer.hooks';
-import { usePrefetchServicesQuery } from '../../hooks/service.hooks';
 import { usePrefetchEmployeesQuery } from '../../hooks/employee.hooks';
+import { usePrefetchServicesQuery } from '../../hooks/service.hooks';
+
+import CustomersIcon from '../../../assets/Customers_Icon.svg';
+import EmployeesIcon from '../../../assets/Employees_Icon.svg';
+import PayRollIcon from '../../../assets/Payroll_Icon.svg';
+import ProfileIcon from '../../../assets/Profile_Icon.svg';
+import SchedulerIcon from '../../../assets/Scheduler_Icon.svg';
+import ServicesIcon from '../../../assets/Services_Icon.svg';
 
 interface SideBarProp {
 	selectedIndex: number;
@@ -44,6 +47,7 @@ const SideBar: FC<SideBarProp> = ({
 						onIndexSelected(SideBarItems.Profile);
 					}}>
 					<img src={ProfileIcon} className="h-16 w-16" />
+
 					<span className="sidebar-tip group-hover:scale-100">
 						{t('Profile')}
 					</span>
@@ -61,6 +65,7 @@ const SideBar: FC<SideBarProp> = ({
 						onIndexSelected(SideBarItems.Scheduler);
 					}}>
 					<img src={SchedulerIcon} className="h-16 w-16" />
+
 					<span className="sidebar-tip group-hover:scale-100">
 						{t('Schedule')}
 					</span>
@@ -78,6 +83,7 @@ const SideBar: FC<SideBarProp> = ({
 						onIndexSelected(SideBarItems.PayRoll);
 					}}>
 					<img src={PayRollIcon} className="h-16 w-16" />
+
 					<span className="sidebar-tip group-hover:scale-100">
 						{t('Pay Roll')}
 					</span>
@@ -96,6 +102,7 @@ const SideBar: FC<SideBarProp> = ({
 						onIndexSelected(SideBarItems.Employees);
 					}}>
 					<img src={EmployeesIcon} className="h-16 w-16" />
+
 					<span className="sidebar-tip group-hover:scale-100">
 						{t('Employees')}
 					</span>
@@ -114,6 +121,7 @@ const SideBar: FC<SideBarProp> = ({
 						onIndexSelected(SideBarItems.Services);
 					}}>
 					<img src={ServicesIcon} className="h-16 w-16" />
+
 					<span className="sidebar-tip group-hover:scale-100">
 						{t('Services')}
 					</span>
@@ -132,15 +140,14 @@ const SideBar: FC<SideBarProp> = ({
 						onIndexSelected(SideBarItems.Customers);
 					}}>
 					<img src={CustomersIcon} className="h-16 w-16" />
+
 					<span className="sidebar-tip group-hover:scale-100">
 						{t('Customers')}
 					</span>
 				</div>
 			)}
 
-			<div
-				className="sidebar-icon landscape:mt-auto landscape:py-5 portrait:ml-auto portrait:px-5 text-center"
-				onClick={logout}>
+			<div className="sidebar-icon sidebar-login" onClick={logout}>
 				{t('Log Out')}
 			</div>
 		</div>
