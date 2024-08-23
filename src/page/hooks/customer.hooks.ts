@@ -65,6 +65,7 @@ export const useCustomersQuery = ({
 export const useUpdateCustomerMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -94,6 +95,8 @@ export const useUpdateCustomerMutation = ({
 		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: [customersQueryKey] });
 
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Customer Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -115,6 +118,7 @@ export const useUpdateCustomerMutation = ({
 export const useAddCustomerMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -134,6 +138,8 @@ export const useAddCustomerMutation = ({
 		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: [customersQueryKey] });
 
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Customer Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -151,6 +157,7 @@ export const useAddCustomerMutation = ({
 export const useDeleteCustomerMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -175,6 +182,8 @@ export const useDeleteCustomerMutation = ({
 		},
 		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: [customersQueryKey] });
+
+			if (onSuccess) onSuccess();
 
 			successToast(context.toastId, t('Customer Deleted Successfully'));
 		},

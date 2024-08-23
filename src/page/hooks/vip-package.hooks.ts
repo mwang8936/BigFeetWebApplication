@@ -28,6 +28,7 @@ import {
 export const useUpdateVipPackageMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -72,6 +73,8 @@ export const useUpdateVipPackageMutation = ({
 				});
 			}
 
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Vip Package Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -93,6 +96,7 @@ export const useUpdateVipPackageMutation = ({
 export const useAddVipPackageMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -123,6 +127,8 @@ export const useAddVipPackageMutation = ({
 				],
 			});
 
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Vip Package Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -144,6 +150,7 @@ export const useAddVipPackageMutation = ({
 export const useDeleteVipPackageMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -170,6 +177,9 @@ export const useDeleteVipPackageMutation = ({
 			queryClient.invalidateQueries({
 				queryKey: [schedulesQueryKey, formatDateToQueryKey(variables.date)],
 			});
+
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Vip Package Deleted Successfully'));
 		},
 		onError: (error, _variables, context) => {

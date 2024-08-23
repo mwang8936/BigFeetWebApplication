@@ -29,6 +29,7 @@ import {
 export const useUpdateReservationMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -80,6 +81,8 @@ export const useUpdateReservationMutation = ({
 				queryClient.invalidateQueries({ queryKey: [customersQueryKey] });
 			}
 
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Reservation Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -101,6 +104,7 @@ export const useUpdateReservationMutation = ({
 export const useAddReservationMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -138,6 +142,8 @@ export const useAddReservationMutation = ({
 				queryClient.invalidateQueries({ queryKey: [customersQueryKey] });
 			}
 
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Reservation Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -159,6 +165,7 @@ export const useAddReservationMutation = ({
 export const useDeleteReservationMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -185,6 +192,8 @@ export const useDeleteReservationMutation = ({
 			queryClient.invalidateQueries({
 				queryKey: [schedulesQueryKey, formatDateToQueryKey(variables.date)],
 			});
+
+			if (onSuccess) onSuccess();
 
 			successToast(context.toastId, t('Reservation Deleted Successfully'));
 		},

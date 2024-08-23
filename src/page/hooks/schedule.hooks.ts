@@ -71,6 +71,7 @@ export const useSchedulesQuery = ({
 export const useUpdateScheduleMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -104,6 +105,8 @@ export const useUpdateScheduleMutation = ({
 				queryKey: [schedulesQueryKey, formatDateToQueryKey(variables.date)],
 			});
 
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Schedule Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -125,6 +128,7 @@ export const useUpdateScheduleMutation = ({
 export const useAddScheduleMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -149,6 +153,8 @@ export const useAddScheduleMutation = ({
 				],
 			});
 
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Schedule Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -166,6 +172,7 @@ export const useAddScheduleMutation = ({
 export const useSignProfileScheduleMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -192,6 +199,8 @@ export const useSignProfileScheduleMutation = ({
 			queryClient.invalidateQueries({
 				queryKey: [schedulesQueryKey, formatDateToQueryKey(variables.date)],
 			});
+
+			if (onSuccess) onSuccess();
 
 			successToast(context.toastId, t('Schedule Signed Successfully'));
 		},

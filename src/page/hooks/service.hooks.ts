@@ -65,6 +65,7 @@ export const useServicesQuery = ({
 export const useUpdateServiceMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -91,6 +92,8 @@ export const useUpdateServiceMutation = ({
 		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: [servicesQueryKey] });
 
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Service Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -112,6 +115,7 @@ export const useUpdateServiceMutation = ({
 export const useAddServiceMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -123,13 +127,16 @@ export const useAddServiceMutation = ({
 		mutationFn: (data: { request: AddServiceRequest }) =>
 			addService(i18n, queryClient, setAuthentication, data.request, socketId),
 		onMutate: async () => {
+			if (setLoading) setLoading(true);
+
 			const toastId = createLoadingToast(t('Adding Service...'));
 			return { toastId };
 		},
 		onSuccess: (_data, _variables, context) => {
-			if (setLoading) setLoading(true);
-
 			queryClient.invalidateQueries({ queryKey: [servicesQueryKey] });
+
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Service Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -147,6 +154,7 @@ export const useAddServiceMutation = ({
 export const useDeleteServiceMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -171,6 +179,9 @@ export const useDeleteServiceMutation = ({
 		},
 		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: [servicesQueryKey] });
+
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Service Deleted Successfully'));
 		},
 		onError: (error, _variables, context) => {

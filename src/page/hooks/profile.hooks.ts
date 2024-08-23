@@ -47,6 +47,7 @@ export const useUserQuery = ({
 export const useUpdateProfileMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -77,6 +78,8 @@ export const useUpdateProfileMutation = ({
 			queryClient.invalidateQueries({ queryKey: [employeesQueryKey] });
 			queryClient.invalidateQueries({ queryKey: [userQueryKey] });
 
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Profile Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -98,6 +101,7 @@ export const useUpdateProfileMutation = ({
 export const useUpdateProfileSettingsMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -121,6 +125,8 @@ export const useUpdateProfileSettingsMutation = ({
 			if (updatedLanguage)
 				i18n.changeLanguage(getLanguageFile(updatedLanguage));
 
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Profile Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -142,6 +148,7 @@ export const useUpdateProfileSettingsMutation = ({
 export const useDeleteProfileMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -168,6 +175,8 @@ export const useDeleteProfileMutation = ({
 		},
 		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: [userQueryKey] });
+
+			if (onSuccess) onSuccess();
 
 			successToast(context.toastId, t('Profile Deleted Successfully'));
 

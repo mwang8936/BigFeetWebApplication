@@ -65,6 +65,7 @@ export const useGiftCardsQuery = ({
 export const useUpdateGiftCardMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -109,6 +110,8 @@ export const useUpdateGiftCardMutation = ({
 				});
 			}
 
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Gift Card Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -130,6 +133,7 @@ export const useUpdateGiftCardMutation = ({
 export const useAddGiftCardMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -154,6 +158,8 @@ export const useAddGiftCardMutation = ({
 				],
 			});
 
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Gift Card Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -175,6 +181,7 @@ export const useAddGiftCardMutation = ({
 export const useDeleteGiftCardMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -201,6 +208,8 @@ export const useDeleteGiftCardMutation = ({
 			queryClient.invalidateQueries({
 				queryKey: [giftCardsQueryKey, formatDateToQueryKey(variables.date)],
 			});
+
+			if (onSuccess) onSuccess();
 
 			successToast(context.toastId, t('Gift Card Deleted Successfully'));
 		},

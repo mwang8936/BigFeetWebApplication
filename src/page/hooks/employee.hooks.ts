@@ -67,6 +67,7 @@ export const useEmployeesQuery = ({
 export const useUpdateEmployeeMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -100,6 +101,8 @@ export const useUpdateEmployeeMutation = ({
 			if (variables.employeeId === variables.userId)
 				queryClient.invalidateQueries({ queryKey: [userQueryKey] });
 
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Employee Updated Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -121,6 +124,7 @@ export const useUpdateEmployeeMutation = ({
 export const useAddEmployeeMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -140,6 +144,8 @@ export const useAddEmployeeMutation = ({
 		onSuccess: (_data, _variables, context) => {
 			queryClient.invalidateQueries({ queryKey: [employeesQueryKey] });
 
+			if (onSuccess) onSuccess();
+
 			successToast(context.toastId, t('Employee Added Successfully'));
 		},
 		onError: (error, _variables, context) => {
@@ -157,6 +163,7 @@ export const useAddEmployeeMutation = ({
 export const useDeleteEmployeeMutation = ({
 	setLoading,
 	setError,
+	onSuccess,
 }: MutationProp) => {
 	const { i18n, t } = useTranslation();
 	const queryClient = useQueryClient();
@@ -183,6 +190,8 @@ export const useDeleteEmployeeMutation = ({
 		},
 		onSuccess: (_data, variables, context) => {
 			queryClient.invalidateQueries({ queryKey: [employeesQueryKey] });
+
+			if (onSuccess) onSuccess();
 
 			successToast(context.toastId, t('Employee Deleted Successfully'));
 

@@ -23,7 +23,11 @@ import { login } from '../../service/auth.service';
 
 import { getLanguageFile } from '../../utils/i18n.utils';
 
-export const useLoginMutation = ({ setLoading, setError }: MutationProp) => {
+export const useLoginMutation = ({
+	setLoading,
+	setError,
+	onSuccess,
+}: MutationProp) => {
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
@@ -63,6 +67,8 @@ export const useLoginMutation = ({ setLoading, setError }: MutationProp) => {
 
 			// Store the user
 			queryClient.setQueryData([userQueryKey], user);
+
+			if (onSuccess) onSuccess();
 		},
 		onError: (error) => {
 			if (setError) setError(error.message);
