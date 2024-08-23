@@ -82,6 +82,7 @@ const AddBodyFeetAcupunctureService: FC<AddBodyFeetAcupunctureServiceProp> = ({
 						min={0}
 						max={NUMBERS.service.body}
 						step={0.5}
+						onWheel={(event) => event.currentTarget.blur()}
 						required={true}
 						placeholder={PLACEHOLDERS.service.body}
 					/>
@@ -128,6 +129,7 @@ const AddBodyFeetAcupunctureService: FC<AddBodyFeetAcupunctureServiceProp> = ({
 						min={0}
 						max={NUMBERS.service.feet}
 						step={0.5}
+						onWheel={(event) => event.currentTarget.blur()}
 						required={true}
 						placeholder={PLACEHOLDERS.service.feet}
 					/>
@@ -176,6 +178,7 @@ const AddBodyFeetAcupunctureService: FC<AddBodyFeetAcupunctureServiceProp> = ({
 						min={0}
 						max={NUMBERS.service.acupuncture}
 						step={0.5}
+						onWheel={(event) => event.currentTarget.blur()}
 						required={true}
 						placeholder={PLACEHOLDERS.service.acupuncture}
 					/>

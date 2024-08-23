@@ -138,6 +138,7 @@ const EditableBodyFeetAcupunctureService: FC<
 						min={0}
 						max={NUMBERS.service.body}
 						step={0.5}
+						onWheel={(event) => event.currentTarget.blur()}
 						required={true}
 						disabled={disabledBody}
 						placeholder={PLACEHOLDERS.service.body}
@@ -194,6 +195,7 @@ const EditableBodyFeetAcupunctureService: FC<
 						min={0}
 						max={NUMBERS.service.feet}
 						step={0.5}
+						onWheel={(event) => event.currentTarget.blur()}
 						required={true}
 						disabled={disabledFeet}
 						placeholder={PLACEHOLDERS.service.feet}
@@ -254,6 +256,7 @@ const EditableBodyFeetAcupunctureService: FC<
 						min={0}
 						max={NUMBERS.service.acupuncture}
 						step={0.5}
+						onWheel={(event) => event.currentTarget.blur()}
 						required={true}
 						disabled={disabledAcupuncture}
 						placeholder={PLACEHOLDERS.service.acupuncture}
