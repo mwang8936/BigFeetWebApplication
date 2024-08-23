@@ -323,13 +323,25 @@ const Scheduler: FC = () => {
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
 
 	const total10MinuteSessions = totalReservations.filter(
-		(reservation) => reservation.service.time === 10
+		(reservation) =>
+			reservation.service.time === 10 &&
+			!reservation.service.body &&
+			!reservation.service.feet &&
+			!reservation.service.acupuncture
 	).length;
 	const total15MinuteSessions = totalReservations.filter(
-		(reservation) => reservation.service.time === 15
+		(reservation) =>
+			reservation.service.time === 15 &&
+			!reservation.service.body &&
+			!reservation.service.feet &&
+			!reservation.service.acupuncture
 	).length;
 	const total30MinuteSessions = totalReservations.filter(
-		(reservation) => reservation.service.time === 30
+		(reservation) =>
+			reservation.service.time === 30 &&
+			!reservation.service.body &&
+			!reservation.service.feet &&
+			!reservation.service.acupuncture
 	).length;
 
 	const totalCash =
