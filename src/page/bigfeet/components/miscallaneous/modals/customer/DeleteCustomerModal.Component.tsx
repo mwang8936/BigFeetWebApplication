@@ -10,29 +10,18 @@ interface DeleteCustomerModalProp {
 	open: boolean;
 	setOpen(open: boolean): void;
 	customer: Customer;
-	deletable: boolean;
-	onDeleteCustomer(customerId: number): Promise<void>;
 }
 
 const DeleteCustomerModal: FC<DeleteCustomerModalProp> = ({
 	open,
 	setOpen,
 	customer,
-	deletable,
-	onDeleteCustomer,
 }) => {
 	return (
 		<BaseModal
 			open={open}
 			setOpen={setOpen}
-			contentElement={
-				<DeleteCustomer
-					setOpen={setOpen}
-					customer={customer}
-					deletable={deletable}
-					onDeleteCustomer={onDeleteCustomer}
-				/>
-			}
+			contentElement={<DeleteCustomer setOpen={setOpen} customer={customer} />}
 		/>
 	);
 };

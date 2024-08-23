@@ -14,12 +14,7 @@ import AddInput from '../miscallaneous/add/AddInput.Component';
 
 import AddCustomerModal from '../miscallaneous/modals/customer/AddCustomerModal.Component';
 
-import {
-	useCustomersQuery,
-	useAddCustomerMutation,
-	useDeleteCustomerMutation,
-	useUpdateCustomerMutation,
-} from '../../../hooks/customer.hooks';
+import { useCustomersQuery } from '../../../hooks/customer.hooks';
 import { useUserQuery } from '../../../hooks/profile.hooks';
 
 import ERRORS from '../../../../constants/error.constants';
@@ -30,11 +25,6 @@ import PLACEHOLDERS from '../../../../constants/placeholder.constants';
 import Customer from '../../../../models/Customer.Model';
 import { Permissions } from '../../../../models/enums';
 import User from '../../../../models/User.Model';
-
-import {
-	AddCustomerRequest,
-	UpdateCustomerRequest,
-} from '../../../../models/requests/Customer.Request.Model';
 
 const Customers: FC = () => {
 	const { t } = useTranslation();
@@ -55,12 +45,6 @@ const Customers: FC = () => {
 	);
 	const creatable = user.permissions.includes(
 		Permissions.PERMISSION_ADD_CUSTOMER
-	);
-	const editable = user.permissions.includes(
-		Permissions.PERMISSION_UPDATE_CUSTOMER
-	);
-	const deletable = user.permissions.includes(
-		Permissions.PERMISSION_DELETE_CUSTOMER
 	);
 
 	const customerQuery = useCustomersQuery({ gettable });
@@ -98,33 +82,9 @@ const Customers: FC = () => {
 			: customers;
 	}
 
-	const addCustomerMutation = useAddCustomerMutation({});
-	const onAddCustomer = async (request: AddCustomerRequest) => {
-		addCustomerMutation.mutate({ request });
-	};
-
-	const updateCustomerMutation = useUpdateCustomerMutation({});
-	const onEditCustomer = async (
-		customerId: number,
-		request: UpdateCustomerRequest
-	) => {
-		updateCustomerMutation.mutate({ customerId, request });
-	};
-
-	const deleteCustomerMutation = useDeleteCustomerMutation({});
-	const onDeleteCustomer = async (customerId: number) => {
-		deleteCustomerMutation.mutate({ customerId });
-	};
-
 	const customersElement =
 		customers.length !== 0 ? (
-			<CustomerList
-				customers={filteredCustomers}
-				editable={editable}
-				onEditCustomer={onEditCustomer}
-				deletable={deletable}
-				onDeleteCustomer={onDeleteCustomer}
-			/>
+			<CustomerList customers={filteredCustomers} />
 		) : (
 			<h1 className="large-centered-text">{t('No Customers Created')}</h1>
 		);
@@ -211,8 +171,6 @@ const Customers: FC = () => {
 			<AddCustomerModal
 				open={openAddCustomerModal}
 				setOpen={setOpenAddCustomerModal}
-				creatable={creatable}
-				onAddCustomer={onAddCustomer}
 			/>
 		</>
 	);

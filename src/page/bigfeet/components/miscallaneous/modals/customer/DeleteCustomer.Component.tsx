@@ -6,30 +6,39 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 import DeleteBottom from '../DeleteBottom.Component';
 
+import { useDeleteCustomerMutation } from '../../../../../hooks/customer.hooks';
+import { useUserQuery } from '../../../../../hooks/profile.hooks';
+
 import ERRORS from '../../../../../../constants/error.constants';
 
 import Customer from '../../../../../../models/Customer.Model';
+import { Permissions } from '../../../../../../models/enums';
+import User from '../../../../../../models/User.Model';
 
 import { formatPhoneNumber } from '../../../../../../utils/string.utils';
 
 interface DeleteCustomerProp {
 	setOpen(open: boolean): void;
 	customer: Customer;
-	deletable: boolean;
-	onDeleteCustomer(customerId: number): Promise<void>;
 }
 
-const DeleteCustomer: FC<DeleteCustomerProp> = ({
-	setOpen,
-	customer,
-	deletable,
-	onDeleteCustomer,
-}) => {
+const DeleteCustomer: FC<DeleteCustomerProp> = ({ setOpen, customer }) => {
 	const { t } = useTranslation();
 
-	const onDelete = () => {
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const deletable = user.permissions.includes(
+		Permissions.PERMISSION_DELETE_CUSTOMER
+	);
+
+	const deleteCustomerMutation = useDeleteCustomerMutation({});
+	const onDeleteCustomer = async (customerId: number) => {
+		deleteCustomerMutation.mutate({ customerId });
+	};
+
+	const onDelete = async () => {
 		onDeleteCustomer(customer.customer_id);
-		setOpen(false);
 	};
 
 	return (

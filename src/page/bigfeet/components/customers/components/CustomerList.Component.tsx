@@ -5,39 +5,17 @@ import CustomerItem from './CustomerItem.Component';
 
 import Customer from '../../../../../models/Customer.Model';
 
-import { UpdateCustomerRequest } from '../../../../../models/requests/Customer.Request.Model';
-
 interface CustomerListProp {
 	customers: Customer[];
-	editable: boolean;
-	onEditCustomer(
-		customerId: number,
-		request: UpdateCustomerRequest
-	): Promise<void>;
-	deletable: boolean;
-	onDeleteCustomer(customerId: number): Promise<void>;
 }
 
-const CustomerList: FC<CustomerListProp> = ({
-	customers,
-	editable,
-	onEditCustomer,
-	deletable,
-	onDeleteCustomer,
-}) => {
+const CustomerList: FC<CustomerListProp> = ({ customers }) => {
 	const { t } = useTranslation();
 
 	const customersElement =
 		customers.length !== 0 ? (
 			customers.map((customer) => (
-				<CustomerItem
-					key={customer.customer_id}
-					customer={customer}
-					editable={editable}
-					onEditCustomer={onEditCustomer}
-					deletable={deletable}
-					onDeleteCustomer={onDeleteCustomer}
-				/>
+				<CustomerItem key={customer.customer_id} customer={customer} />
 			))
 		) : (
 			<h1 className="large-centered-text">{t('No Customers Found')}</h1>

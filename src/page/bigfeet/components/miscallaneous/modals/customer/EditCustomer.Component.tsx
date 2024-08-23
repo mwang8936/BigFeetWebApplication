@@ -13,6 +13,9 @@ import EditableInput from '../../editable/EditableInput.Component';
 import EditablePhoneNumber from '../../editable/EditablePhoneNumber.Component';
 import EditableTextArea from '../../editable/EditableTextArea.Component';
 
+import { useUpdateCustomerMutation } from '../../../../../hooks/customer.hooks';
+import { useUserQuery } from '../../../../../hooks/profile.hooks';
+
 import ERRORS from '../../../../../../constants/error.constants';
 import LABELS from '../../../../../../constants/label.constants';
 import LENGTHS from '../../../../../../constants/lengths.constants';
@@ -21,6 +24,8 @@ import PATTERNS from '../../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../../constants/placeholder.constants';
 
 import Customer from '../../../../../../models/Customer.Model';
+import { Permissions } from '../../../../../../models/enums';
+import User from '../../../../../../models/User.Model';
 
 import { UpdateCustomerRequest } from '../../../../../../models/requests/Customer.Request.Model';
 
@@ -29,23 +34,9 @@ import { formatPhoneNumber } from '../../../../../../utils/string.utils';
 interface EditCustomerProp {
 	setOpen(open: boolean): void;
 	customer: Customer;
-	editable: boolean;
-	onEditCustomer(
-		customerId: number,
-		request: UpdateCustomerRequest
-	): Promise<void>;
-	deletable: boolean;
-	onDeleteCustomer(customerId: number): Promise<void>;
 }
 
-const EditCustomer: FC<EditCustomerProp> = ({
-	setOpen,
-	customer,
-	editable,
-	onEditCustomer,
-	deletable,
-	onDeleteCustomer,
-}) => {
+const EditCustomer: FC<EditCustomerProp> = ({ setOpen, customer }) => {
 	const { t } = useTranslation();
 
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -69,6 +60,16 @@ const EditCustomer: FC<EditCustomerProp> = ({
 	const [missingRequiredInput, setMissingRequiredInput] =
 		useState<boolean>(false);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
+
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const editable = user.permissions.includes(
+		Permissions.PERMISSION_UPDATE_CUSTOMER
+	);
+	const deletable = user.permissions.includes(
+		Permissions.PERMISSION_DELETE_CUSTOMER
+	);
 
 	useEffect(() => {
 		const trimmedPhoneNumber = phoneNumberInput
@@ -112,6 +113,16 @@ const EditCustomer: FC<EditCustomerProp> = ({
 		setInvalidInput(invalidInput);
 	}, [invalidPhoneNumber, invalidVipSerial, invalidName]);
 
+	const updateCustomerMutation = useUpdateCustomerMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onEditCustomer = async (
+		customerId: number,
+		request: UpdateCustomerRequest
+	) => {
+		updateCustomerMutation.mutate({ customerId, request });
+	};
+
 	const onEdit = () => {
 		const trimmedPhoneNumber = phoneNumberInput
 			? phoneNumberInput.trim()
@@ -140,12 +151,6 @@ const EditCustomer: FC<EditCustomerProp> = ({
 		};
 
 		onEditCustomer(customer.customer_id, updateCustomerRequest);
-		setOpen(false);
-	};
-
-	const onDelete = async (customerId: number) => {
-		onDeleteCustomer(customerId);
-		setOpen(false);
 	};
 
 	return (
@@ -270,8 +275,6 @@ const EditCustomer: FC<EditCustomerProp> = ({
 				open={openDeleteModal}
 				setOpen={setOpenDeleteModal}
 				customer={customer}
-				deletable={deletable}
-				onDeleteCustomer={onDelete}
 			/>
 		</>
 	);

@@ -4,28 +4,14 @@ import { useTranslation } from 'react-i18next';
 import EditCustomerModal from '../../miscallaneous/modals/customer/EditCustomerModal.Component';
 
 import Customer from '../../../../../models/Customer.Model';
-import { UpdateCustomerRequest } from '../../../../../models/requests/Customer.Request.Model';
 
 import { formatPhoneNumber } from '../../../../../utils/string.utils';
 
 interface CustomerItemProp {
 	customer: Customer;
-	editable: boolean;
-	onEditCustomer(
-		customerId: number,
-		request: UpdateCustomerRequest
-	): Promise<void>;
-	deletable: boolean;
-	onDeleteCustomer(customerId: number): Promise<void>;
 }
 
-const CustomerItem: FC<CustomerItemProp> = ({
-	customer,
-	editable,
-	onEditCustomer,
-	deletable,
-	onDeleteCustomer,
-}) => {
+const CustomerItem: FC<CustomerItemProp> = ({ customer }) => {
 	const { t } = useTranslation();
 
 	const [open, setOpen] = useState(false);
@@ -62,15 +48,7 @@ const CustomerItem: FC<CustomerItemProp> = ({
 				)}
 			</div>
 
-			<EditCustomerModal
-				open={open}
-				setOpen={setOpen}
-				customer={customer}
-				editable={editable}
-				onEditCustomer={onEditCustomer}
-				deletable={deletable}
-				onDeleteCustomer={onDeleteCustomer}
-			/>
+			<EditCustomerModal open={open} setOpen={setOpen} customer={customer} />
 		</>
 	);
 };

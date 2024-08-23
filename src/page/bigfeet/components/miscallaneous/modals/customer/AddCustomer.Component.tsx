@@ -10,6 +10,12 @@ import AddInput from '../../add/AddInput.Component';
 import AddPhoneNumber from '../../add/AddPhoneNumber.Component';
 import AddTextArea from '../../add/AddTextArea.Component';
 
+import { useAddCustomerMutation } from '../../../../../hooks/customer.hooks';
+import { useUserQuery } from '../../../../../hooks/profile.hooks';
+
+import { Permissions } from '../../../../../../models/enums';
+import User from '../../../../../../models/User.Model';
+
 import { AddCustomerRequest } from '../../../../../../models/requests/Customer.Request.Model';
 
 import ERRORS from '../../../../../../constants/error.constants';
@@ -21,15 +27,9 @@ import PLACEHOLDERS from '../../../../../../constants/placeholder.constants';
 
 interface AddCustomerProp {
 	setOpen(open: boolean): void;
-	creatable: boolean;
-	onAddCustomer(addCustomerRequest: AddCustomerRequest): Promise<void>;
 }
 
-const AddCustomer: FC<AddCustomerProp> = ({
-	setOpen,
-	creatable,
-	onAddCustomer,
-}) => {
+const AddCustomer: FC<AddCustomerProp> = ({ setOpen }) => {
 	const { t } = useTranslation();
 
 	const [phoneNumberInput, setPhoneNumberInput] = useState<string | null>(null);
@@ -45,6 +45,13 @@ const AddCustomer: FC<AddCustomerProp> = ({
 		useState<boolean>(true);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const creatable = user.permissions.includes(
+		Permissions.PERMISSION_ADD_CUSTOMER
+	);
+
 	useEffect(() => {
 		const missingRequiredInput =
 			phoneNumberInput === null && vipSerialInput === null;
@@ -57,6 +64,13 @@ const AddCustomer: FC<AddCustomerProp> = ({
 
 		setInvalidInput(invalidInput);
 	}, [invalidPhoneNumber, invalidVipSerial, invalidName]);
+
+	const addCustomerMutation = useAddCustomerMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onAddCustomer = async (request: AddCustomerRequest) => {
+		addCustomerMutation.mutate({ request });
+	};
 
 	const onAdd = async () => {
 		const phone_number = phoneNumberInput?.trim();
@@ -71,7 +85,6 @@ const AddCustomer: FC<AddCustomerProp> = ({
 			notes,
 		};
 		onAddCustomer(addCustomerRequest);
-		setOpen(false);
 	};
 
 	return (
