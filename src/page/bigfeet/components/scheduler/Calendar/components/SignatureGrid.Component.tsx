@@ -1,26 +1,25 @@
 import { FC, useState } from 'react';
+
 import AddToggleSwitch, {
 	ToggleColor,
 } from '../../../miscallaneous/add/AddToggleSwitch.Component';
+
 import SignScheduleModal from '../../../miscallaneous/modals/scheduler/calendar/SignScheduleModal.Component';
+
 import NAMES from '../../../../../../constants/name.constants';
 
 interface SignatureGridProp {
 	row: number;
 	colNum: number;
-	date: Date;
+	employeeId: number;
 	signedOff: boolean;
-	signable: boolean;
-	onScheduleSigned(date: Date): Promise<void>;
 }
 
 const SignatureGrid: FC<SignatureGridProp> = ({
 	row,
 	colNum,
-	date,
+	employeeId,
 	signedOff,
-	signable,
-	onScheduleSigned,
 }) => {
 	const [open, setOpen] = useState(false);
 
@@ -48,12 +47,11 @@ const SignatureGrid: FC<SignatureGridProp> = ({
 					/>
 				</div>
 			</div>
+
 			<SignScheduleModal
 				open={open}
 				setOpen={setOpen}
-				date={date}
-				signable={signable}
-				onScheduleSigned={onScheduleSigned}
+				employeeId={employeeId}
 			/>
 		</>
 	);

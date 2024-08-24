@@ -7,29 +7,20 @@ import BaseModal from '../../BaseModal.Component';
 interface SignScheduleModalProp {
 	open: boolean;
 	setOpen(open: boolean): void;
-	date: Date;
-	signable: boolean;
-	onScheduleSigned(date: Date): Promise<void>;
+	employeeId: number;
 }
 
 const SignScheduleModal: FC<SignScheduleModalProp> = ({
 	open,
 	setOpen,
-	date,
-	signable,
-	onScheduleSigned,
+	employeeId,
 }) => {
 	return (
 		<BaseModal
 			open={open}
 			setOpen={setOpen}
 			contentElement={
-				<SignSchedule
-					setOpen={setOpen}
-					date={date}
-					signable={signable}
-					onScheduleSigned={onScheduleSigned}
-				/>
+				<SignSchedule setOpen={setOpen} employeeId={employeeId} />
 			}
 		/>
 	);

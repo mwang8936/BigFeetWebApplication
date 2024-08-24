@@ -1,58 +1,48 @@
 import { FC, useState, useEffect } from 'react';
-import Reservation from '../../../../../../models/Reservation.Model';
+import { useTranslation } from 'react-i18next';
+import Draggable from 'react-draggable';
+
+import {
+	useCalendarScaleContext,
+	useScheduleDateContext,
+} from '../../Scheduler.Component';
+
+import EditReservationModal from '../../../miscallaneous/modals/scheduler/calendar/EditReservationModal.Component';
+import MoveReservationModal from '../../../miscallaneous/modals/scheduler/calendar/MoveReservationModal.Component';
+
+import { useEmployeesQuery } from '../../../../../hooks/employee.hooks';
+import { useUserQuery } from '../../../../../hooks/profile.hooks';
+import { useSchedulesQuery } from '../../../../../hooks/schedule.hooks';
+
+import STORES from '../../../../../../constants/store.constants';
+
+import Employee from '../../../../../../models/Employee.Model';
 import {
 	Gender,
+	Language,
 	Permissions,
 	Role,
 	ServiceColor,
 	TipMethod,
 } from '../../../../../../models/enums';
-import { formatPhoneNumber } from '../../../../../../utils/string.utils';
-import {
-	AddReservationRequest,
-	UpdateReservationRequest,
-} from '../../../../../../models/requests/Reservation.Request.Model';
-import EditReservationModal from '../../../miscallaneous/modals/scheduler/calendar/EditReservationModal.Component';
-import Employee from '../../../../../../models/Employee.Model';
-import Draggable from 'react-draggable';
-import MoveReservationModal from '../../../miscallaneous/modals/scheduler/calendar/MoveReservationModal.Component';
-import STORES from '../../../../../../constants/store.constants';
-import { sortEmployees } from '../../../../../../utils/employee.utils';
-import {
-	useCalendarScaleContext,
-	useScheduleDateContext,
-} from '../../Scheduler.Component';
-import { useTranslation } from 'react-i18next';
+import Reservation from '../../../../../../models/Reservation.Model';
 import Schedule from '../../../../../../models/Schedule.Model';
 import User from '../../../../../../models/User.Model';
-import { useEmployeesQuery } from '../../../../../hooks/employee.hooks';
-import { useSchedulesQuery } from '../../../../../hooks/schedule.hooks';
-import { useUserQuery } from '../../../../../hooks/profile.hooks';
+
+import { sortEmployees } from '../../../../../../utils/employee.utils';
 import { getReservationOverlappingOrder } from '../../../../../../utils/reservation.utils';
+import { formatPhoneNumber } from '../../../../../../utils/string.utils';
 
 interface ReservationTagProp {
 	reservation: Reservation;
 	colNum: number;
-	onAddReservation(request: AddReservationRequest): Promise<void>;
-	editable: boolean;
-	onEditReservation(
-		reservationId: number,
-		request: UpdateReservationRequest
-	): Promise<void>;
-	deletable: boolean;
-	onDeleteReservation(reservationId: number): Promise<void>;
 }
 
-const ReservationTag: FC<ReservationTagProp> = ({
-	reservation,
-	colNum,
-	onAddReservation,
-	editable,
-	onEditReservation,
-	deletable,
-	onDeleteReservation,
-}) => {
+const ReservationTag: FC<ReservationTagProp> = ({ reservation, colNum }) => {
 	const { t } = useTranslation();
+
+	const { date } = useScheduleDateContext();
+	const { scale } = useCalendarScaleContext();
 
 	const [openEdit, setOpenEdit] = useState(false);
 	const [openMove, setOpenMove] = useState(false);
@@ -65,8 +55,9 @@ const ReservationTag: FC<ReservationTagProp> = ({
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
 
-	const { date } = useScheduleDateContext();
-	const { scale } = useCalendarScaleContext();
+	const editable = user.permissions.includes(
+		Permissions.PERMISSION_UPDATE_RESERVATION
+	);
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -74,6 +65,14 @@ const ReservationTag: FC<ReservationTagProp> = ({
 	const scheduleGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_SCHEDULE
 	);
+
+	const employeeQuery = useEmployeesQuery({
+		gettable: employeeGettable,
+		staleTime: Infinity,
+	});
+	const employees: Employee[] = (
+		(employeeQuery.data as Employee[]) || [user]
+	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	const scheduleQuery = useSchedulesQuery({
 		date,
@@ -83,14 +82,6 @@ const ReservationTag: FC<ReservationTagProp> = ({
 	const schedules: Schedule[] = (
 		(scheduleQuery.data as Schedule[]) || []
 	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
-
-	const employeeQuery = useEmployeesQuery({
-		gettable: employeeGettable,
-		staleTime: Infinity,
-	});
-	const employees: Employee[] = (
-		(employeeQuery.data as Employee[]) || [user]
-	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	sortEmployees(employees, schedules, date);
 
@@ -264,9 +255,28 @@ const ReservationTag: FC<ReservationTagProp> = ({
 		</span>
 	);
 
+	const language = user.language;
+
+	let localeDateFormat;
+	if (language === Language.SIMPLIFIED_CHINESE) {
+		localeDateFormat = 'zh-CN';
+	} else if (language === Language.TRADITIONAL_CHINESE) {
+		localeDateFormat = 'zh-TW';
+	} else {
+		localeDateFormat = undefined;
+	}
+
+	const updatedAtString = reservation.updated_at.toLocaleDateString(
+		localeDateFormat,
+		{
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+		}
+	);
 	const lastUpdatedText = (
 		<span className="font-medium italic">
-			{t('Last Updated: ') + reservation.updated_at.toLocaleDateString()}
+			{t('Last Updated: ') + updatedAtString}
 		</span>
 	);
 
@@ -276,9 +286,17 @@ const ReservationTag: FC<ReservationTagProp> = ({
 		</span>
 	);
 
+	const createdAtString = reservation.created_at.toLocaleDateString(
+		localeDateFormat,
+		{
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+		}
+	);
 	const createdAtText = (
 		<span className="font-medium italic">
-			{t('Created: ') + reservation.created_at.toLocaleDateString()}
+			{t('Created: ') + createdAtString}
 		</span>
 	);
 
@@ -374,25 +392,19 @@ const ReservationTag: FC<ReservationTagProp> = ({
 
 					{timeText}
 				</div>
+
 				<EditReservationModal
 					open={openEdit}
 					setOpen={setOpenEdit}
 					reservation={reservation}
-					employeeId={reservation.employee_id}
-					onAddReservation={onAddReservation}
-					editable={editable}
-					onEditReservation={onEditReservation}
-					deletable={deletable}
-					onDeleteReservation={onDeleteReservation}
 				/>
+
 				<MoveReservationModal
 					open={openMove}
 					setOpen={setOpenMove}
 					reservation={reservation}
 					newEmployeeId={newEmployeeId}
 					newTime={newTime}
-					editable={editable}
-					onEditReservation={onEditReservation}
 					onCancel={() => {
 						setPosition({ x: 0, y: 0 });
 					}}

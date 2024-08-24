@@ -14,8 +14,9 @@ import EditBottom from '../../EditBottom.Component';
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
 
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
-import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+import { useUpdateReservationMutation } from '../../../../../../hooks/reservation.hooks';
+import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
 
 import ERRORS from '../../../../../../../constants/error.constants';
 
@@ -35,26 +36,17 @@ import { formatTimeFromDate } from '../../../../../../../utils/string.utils';
 
 interface MoveReservationProp {
 	setOpen(open: boolean): void;
-	updatedBy: string;
 	reservation: Reservation;
 	newEmployeeId?: number;
 	newTime?: Date;
-	editable: boolean;
-	onEditReservation(
-		reservationId: number,
-		request: UpdateReservationRequest
-	): Promise<void>;
 	onCancel(): void;
 }
 
 const MoveReservation: FC<MoveReservationProp> = ({
 	setOpen,
-	updatedBy,
 	reservation,
 	newEmployeeId,
 	newTime,
-	editable,
-	onEditReservation,
 	onCancel,
 }) => {
 	const { t } = useTranslation();
@@ -73,6 +65,12 @@ const MoveReservation: FC<MoveReservationProp> = ({
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
+
+	const updatedBy = user.username;
+
+	const editable = user.permissions.includes(
+		Permissions.PERMISSION_UPDATE_RESERVATION
+	);
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -169,6 +167,23 @@ const MoveReservation: FC<MoveReservationProp> = ({
 		}
 	}, []);
 
+	const updateReservationMutation = useUpdateReservationMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onEditReservation = async (
+		reservationId: number,
+		request: UpdateReservationRequest,
+		originalDate: Date,
+		newDate?: Date
+	) => {
+		updateReservationMutation.mutate({
+			reservationId,
+			request,
+			originalDate,
+			newDate,
+		});
+	};
+
 	const onEdit = () => {
 		if (
 			newTime ||
@@ -180,8 +195,12 @@ const MoveReservation: FC<MoveReservationProp> = ({
 				updated_by: updatedBy,
 			};
 
-			onEditReservation(reservation.reservation_id, updateReservationRequest);
-			setOpen(false);
+			onEditReservation(
+				reservation.reservation_id,
+				updateReservationRequest,
+				reservation.reserved_date,
+				newTime
+			);
 		}
 	};
 

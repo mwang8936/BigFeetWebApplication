@@ -7,26 +7,60 @@ import { PencilSquareIcon } from '@heroicons/react/24/outline';
 
 import EditBottom from '../../EditBottom.Component';
 
+import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
+
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+import { useSignProfileScheduleMutation } from '../../../../../../hooks/schedule.hooks';
+
 import ERRORS from '../../../../../../../constants/error.constants';
+
+import { Language, Role } from '../../../../../../../models/enums';
+import User from '../../../../../../../models/User.Model';
 
 interface SignScheduleProp {
 	setOpen(open: boolean): void;
-	date: Date;
-	signable: boolean;
-	onScheduleSigned(date: Date): Promise<void>;
+	employeeId: number;
 }
 
-const SignSchedule: FC<SignScheduleProp> = ({
-	setOpen,
-	date,
-	signable,
-	onScheduleSigned,
-}) => {
+const SignSchedule: FC<SignScheduleProp> = ({ setOpen, employeeId }) => {
 	const { t } = useTranslation();
+
+	const { date } = useScheduleDateContext();
+
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const signable =
+		user.employee_id === employeeId ||
+		[Role.DEVELOPER, Role.MANAGER, Role.RECEPTIONIST].includes(user.role);
+
+	const language = user.language;
+
+	let localeDateFormat;
+	if (language === Language.SIMPLIFIED_CHINESE) {
+		localeDateFormat = 'zh-CN';
+	} else if (language === Language.TRADITIONAL_CHINESE) {
+		localeDateFormat = 'zh-TW';
+	} else {
+		localeDateFormat = undefined;
+	}
+
+	const dateString = date.toLocaleDateString(localeDateFormat, {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+		weekday: 'short',
+	});
+
+	const signProfileScheduleMutation = useSignProfileScheduleMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onScheduleSigned = async (date: Date) => {
+		signProfileScheduleMutation.mutate({ date });
+	};
 
 	const onSign = () => {
 		onScheduleSigned(date);
-		setOpen(false);
 	};
 
 	return (
@@ -49,7 +83,7 @@ const SignSchedule: FC<SignScheduleProp> = ({
 
 						<div className="mt-2">
 							{signable
-								? t('Sign Off Message', { date: date.toDateString() })
+								? t('Sign Off Message', { date: dateString })
 								: t(ERRORS.schedule.permissions.signed)}
 						</div>
 					</div>

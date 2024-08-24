@@ -6,26 +6,43 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 import DeleteBottom from '../../DeleteBottom.Component';
 
+import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
+
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+import { useDeleteReservationMutation } from '../../../../../../hooks/reservation.hooks';
+
 import ERRORS from '../../../../../../../constants/error.constants';
+
+import { Permissions } from '../../../../../../../models/enums';
+import User from '../../../../../../../models/User.Model';
 
 interface DeleteReservationProp {
 	setOpen(open: boolean): void;
 	reservationId: number;
-	deletable: boolean;
-	onDeleteReservation(reservationId: number): Promise<void>;
 }
 
 const DeleteReservation: FC<DeleteReservationProp> = ({
 	setOpen,
 	reservationId,
-	deletable,
-	onDeleteReservation,
 }) => {
 	const { t } = useTranslation();
 
+	const { date } = useScheduleDateContext();
+
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const deletable = user.permissions.includes(
+		Permissions.PERMISSION_DELETE_RESERVATION
+	);
+
+	const deleteReservationMutation = useDeleteReservationMutation({});
+	const onDeleteReservation = async (reservationId: number) => {
+		deleteReservationMutation.mutate({ reservationId, date });
+	};
+
 	const onDelete = () => {
 		onDeleteReservation(reservationId);
-		setOpen(false);
 	};
 
 	return (

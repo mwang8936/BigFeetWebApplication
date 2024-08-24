@@ -4,12 +4,7 @@ import MoveReservation from './MoveReservation.Component';
 
 import BaseModal from '../../BaseModal.Component';
 
-import { useUserQuery } from '../../../../../../hooks/profile.hooks';
-
 import Reservation from '../../../../../../../models/Reservation.Model';
-import User from '../../../../../../../models/User.Model';
-
-import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
 
 interface MoveReservationModalProp {
 	open: boolean;
@@ -17,11 +12,6 @@ interface MoveReservationModalProp {
 	reservation: Reservation;
 	newEmployeeId?: number;
 	newTime?: Date;
-	editable: boolean;
-	onEditReservation(
-		reservationId: number,
-		request: UpdateReservationRequest
-	): Promise<void>;
 	onCancel(): void;
 }
 
@@ -31,13 +21,8 @@ const MoveReservationModal: FC<MoveReservationModalProp> = ({
 	reservation,
 	newEmployeeId,
 	newTime,
-	editable,
-	onEditReservation,
 	onCancel,
 }) => {
-	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
-	const user: User = userQuery.data;
-
 	return (
 		<BaseModal
 			open={open}
@@ -48,12 +33,9 @@ const MoveReservationModal: FC<MoveReservationModalProp> = ({
 			contentElement={
 				<MoveReservation
 					setOpen={setOpen}
-					updatedBy={user.username}
 					reservation={reservation}
 					newEmployeeId={newEmployeeId}
 					newTime={newTime}
-					editable={editable}
-					onEditReservation={onEditReservation}
 					onCancel={onCancel}
 				/>
 			}

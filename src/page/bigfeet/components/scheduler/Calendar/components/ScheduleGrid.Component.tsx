@@ -1,40 +1,21 @@
 import { FC, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import AddScheduleModal from '../../../miscallaneous/modals/scheduler/calendar/AddScheduleModal.Component';
+import EditScheduleModal from '../../../miscallaneous/modals/scheduler/calendar/EditScheduleModal.Component';
+
 import Employee from '../../../../../../models/Employee.Model';
 import Schedule from '../../../../../../models/Schedule.Model';
-import {
-	AddScheduleRequest,
-	UpdateScheduleRequest,
-} from '../../../../../../models/requests/Schedule.Request.Model';
+
 import { formatTimeFromDate } from '../../../../../../utils/string.utils';
-import EditScheduleModal from '../../../miscallaneous/modals/scheduler/calendar/EditScheduleModal.Component';
-import AddScheduleModal from '../../../miscallaneous/modals/scheduler/calendar/AddScheduleModal.Component';
-import { useTranslation } from 'react-i18next';
 
 interface ScheduleGridProp {
 	colNum: number;
 	employee: Employee;
-	date: Date;
 	schedule?: Schedule;
-	creatable: boolean;
-	onAddSchedule(request: AddScheduleRequest): Promise<void>;
-	editable: boolean;
-	onEditSchedule(
-		date: Date,
-		employeeId: number,
-		request: UpdateScheduleRequest
-	): Promise<void>;
 }
 
-const ScheduleGrid: FC<ScheduleGridProp> = ({
-	colNum,
-	employee,
-	date,
-	schedule,
-	creatable,
-	onAddSchedule,
-	editable,
-	onEditSchedule,
-}) => {
+const ScheduleGrid: FC<ScheduleGridProp> = ({ colNum, employee, schedule }) => {
 	const { t } = useTranslation();
 
 	const [open, setOpen] = useState(false);
@@ -66,24 +47,16 @@ const ScheduleGrid: FC<ScheduleGridProp> = ({
 					{employee.username +
 						(schedule?.priority ? `(${schedule.priority})` : '')}{' '}
 				</h1>
+
 				<h1>{underText}</h1>
 			</div>
 			{schedule ? (
-				<EditScheduleModal
-					open={open}
-					setOpen={setOpen}
-					schedule={schedule}
-					editable={editable}
-					onEditSchedule={onEditSchedule}
-				/>
+				<EditScheduleModal open={open} setOpen={setOpen} schedule={schedule} />
 			) : (
 				<AddScheduleModal
 					open={open}
 					setOpen={setOpen}
 					employeeId={employee.employee_id}
-					date={date}
-					creatable={creatable}
-					onAddSchedule={onAddSchedule}
 				/>
 			)}
 		</>
