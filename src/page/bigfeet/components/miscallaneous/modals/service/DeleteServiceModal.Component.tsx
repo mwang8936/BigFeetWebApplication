@@ -4,36 +4,24 @@ import DeleteService from './DeleteService.Component';
 
 import BaseModal from '../BaseModal.Component';
 
+import Service from '../../../../../../models/Service.Model';
+
 interface DeleteServiceModalProp {
 	open: boolean;
 	setOpen(open: boolean): void;
-	serviceId: number;
-	serviceName: string;
-	deletable: boolean;
-	onDeleteService(serviceId: number): Promise<void>;
+	service: Service;
 }
 
 const DeleteServiceModal: FC<DeleteServiceModalProp> = ({
 	open,
 	setOpen,
-	serviceId,
-	serviceName,
-	deletable,
-	onDeleteService,
+	service,
 }) => {
 	return (
 		<BaseModal
 			open={open}
 			setOpen={setOpen}
-			contentElement={
-				<DeleteService
-					setOpen={setOpen}
-					serviceId={serviceId}
-					serviceName={serviceName}
-					deletable={deletable}
-					onDeleteService={onDeleteService}
-				/>
-			}
+			contentElement={<DeleteService setOpen={setOpen} service={service} />}
 		/>
 	);
 };

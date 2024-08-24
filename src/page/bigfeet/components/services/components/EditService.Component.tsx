@@ -15,10 +15,8 @@ import EditablePayRate from '../../miscallaneous/editable/EditablePayRate.Compon
 
 import DeleteServiceModal from '../../miscallaneous/modals/service/DeleteServiceModal.Component.tsx';
 
-import {
-	useDeleteServiceMutation,
-	useUpdateServiceMutation,
-} from '../../../../hooks/service.hooks.ts';
+import { useUserQuery } from '../../../../hooks/profile.hooks.ts';
+import { useUpdateServiceMutation } from '../../../../hooks/service.hooks.ts';
 
 import { colorDropDownItems } from '../../../../../constants/drop-down.constants.ts';
 import ERRORS from '../../../../../constants/error.constants.ts';
@@ -30,18 +28,17 @@ import PATTERNS from '../../../../../constants/patterns.constants.ts';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants.ts';
 import STORES from '../../../../../constants/store.constants.ts';
 
-import { ServiceColor } from '../../../../../models/enums.ts';
+import { Permissions, ServiceColor } from '../../../../../models/enums.ts';
 import Service from '../../../../../models/Service.Model.ts';
+import User from '../../../../../models/User.Model.ts';
 
 import { UpdateServiceRequest } from '../../../../../models/requests/Service.Request.Model.ts';
 
 interface EditServiceProp {
-	editable: boolean;
-	deletable: boolean;
 	service: Service;
 }
 
-const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
+const EditService: FC<EditServiceProp> = ({ service }) => {
 	const [serviceNameInput, setServiceNameInput] = useState<string | null>(
 		service.service_name
 	);
@@ -78,6 +75,16 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
 	const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const editable = user.permissions.includes(
+		Permissions.PERMISSION_UPDATE_SERVICE
+	);
+	const deletable = user.permissions.includes(
+		Permissions.PERMISSION_DELETE_SERVICE
+	);
 
 	useEffect(() => {
 		setServiceNameInput(service.service_name);
@@ -193,7 +200,6 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 	]);
 
 	const updateServiceMutation = useUpdateServiceMutation({});
-
 	const onSave = async () => {
 		const service_name: string | undefined =
 			(serviceNameInput as string).trim() === service.service_name
@@ -236,12 +242,6 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 		};
 
 		updateServiceMutation.mutate({ serviceId, request });
-	};
-
-	const deleteServiceMutation = useDeleteServiceMutation({});
-
-	const onDelete = async (serviceId: number) => {
-		deleteServiceMutation.mutate({ serviceId });
 	};
 
 	return (
@@ -447,10 +447,7 @@ const EditService: FC<EditServiceProp> = ({ editable, deletable, service }) => {
 			<DeleteServiceModal
 				open={openDeleteModal}
 				setOpen={setOpenDeleteModal}
-				serviceId={service.service_id}
-				serviceName={service.service_name}
-				deletable={deletable}
-				onDeleteService={onDelete}
+				service={service}
 			/>
 		</>
 	);

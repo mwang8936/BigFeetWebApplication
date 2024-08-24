@@ -13,10 +13,7 @@ import Tabs from '../miscallaneous/Tabs.Component.tsx';
 
 import AddServiceModal from '../miscallaneous/modals/service/AddServiceModal.Component.tsx';
 
-import {
-	useServicesQuery,
-	useAddServiceMutation,
-} from '../../../hooks/service.hooks.ts';
+import { useServicesQuery } from '../../../hooks/service.hooks.ts';
 import { useUserQuery } from '../../../hooks/profile.hooks.ts';
 
 import ERRORS from '../../../../constants/error.constants.ts';
@@ -24,8 +21,6 @@ import ERRORS from '../../../../constants/error.constants.ts';
 import { Permissions } from '../../../../models/enums.ts';
 import Service from '../../../../models/Service.Model.ts';
 import User from '../../../../models/User.Model.ts';
-
-import { AddServiceRequest } from '../../../../models/requests/Service.Request.Model.ts';
 
 const Services: FC = () => {
 	const { t } = useTranslation();
@@ -46,12 +41,6 @@ const Services: FC = () => {
 	const creatable = user.permissions.includes(
 		Permissions.PERMISSION_ADD_SERVICE
 	);
-	const editable = user.permissions.includes(
-		Permissions.PERMISSION_UPDATE_SERVICE
-	);
-	const deletable = user.permissions.includes(
-		Permissions.PERMISSION_DELETE_SERVICE
-	);
 
 	const serviceQuery = useServicesQuery({ gettable });
 
@@ -70,23 +59,16 @@ const Services: FC = () => {
 		tabs = services.map((service) => service.service_name);
 	}
 
-	const addServiceMutation = useAddServiceMutation({});
+	let service = services[selectedTab];
 
-	const onAdd = async (request: AddServiceRequest) => {
-		addServiceMutation.mutate({ request });
-	};
+	if (services.length > 0 && !service) {
+		setSelectedTab(0);
+		service = services[selectedTab];
+	}
 
 	const servicesElement =
 		services.length !== 0 ? (
-			<>
-				{services[selectedTab] && (
-					<EditService
-						editable={editable}
-						deletable={deletable}
-						service={services[selectedTab]}
-					/>
-				)}
-			</>
+			<>{service && <EditService service={service} />}</>
 		) : (
 			<h1 className="large-centered-text">{t('No Services Created')}</h1>
 		);
@@ -117,7 +99,7 @@ const Services: FC = () => {
 	const errorsElement = isServiceError ? (
 		<Retry
 			retrying={retryingServiceQuery}
-			error={serviceError?.message as string}
+			error={serviceError?.message ?? ''}
 			onRetry={() => {
 				setRetryingServiceQuery(true);
 				retryServiceQuery().finally(() => setRetryingServiceQuery(false));
@@ -149,9 +131,7 @@ const Services: FC = () => {
 							top={false}
 							disabled={!creatable}
 							missingPermissionMessage={ERRORS.service.permissions.add}
-							onClick={() => {
-								setOpenAddModal(true);
-							}}
+							onClick={() => setOpenAddModal(true)}
 						/>
 					</div>
 				</div>
@@ -159,12 +139,7 @@ const Services: FC = () => {
 				{isLoadingElement}
 			</div>
 
-			<AddServiceModal
-				open={openAddModal}
-				setOpen={setOpenAddModal}
-				creatable={creatable}
-				onAddService={onAdd}
-			/>
+			<AddServiceModal open={openAddModal} setOpen={setOpenAddModal} />
 		</>
 	);
 };

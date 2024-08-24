@@ -15,6 +15,9 @@ import AddPayRate from '../../add/AddPayRate.Component';
 
 import AddBodyFeetAcupunctureService from '../../../services/components/AddBodyFeetAcupunctureService.Component';
 
+import { useUserQuery } from '../../../../../hooks/profile.hooks';
+import { useAddServiceMutation } from '../../../../../hooks/service.hooks';
+
 import { colorDropDownItems } from '../../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../../constants/error.constants';
 import LABELS from '../../../../../../constants/label.constants';
@@ -25,21 +28,16 @@ import PATTERNS from '../../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../../constants/placeholder.constants';
 import STORES from '../../../../../../constants/store.constants';
 
-import { ServiceColor } from '../../../../../../models/enums';
+import { Permissions, ServiceColor } from '../../../../../../models/enums';
+import User from '../../../../../../models/User.Model';
 
 import { AddServiceRequest } from '../../../../../../models/requests/Service.Request.Model';
 
 interface AddServiceProp {
 	setOpen(open: boolean): void;
-	creatable: boolean;
-	onAddService(addServiceRequest: AddServiceRequest): Promise<void>;
 }
 
-const AddService: FC<AddServiceProp> = ({
-	setOpen,
-	creatable,
-	onAddService,
-}) => {
+const AddService: FC<AddServiceProp> = ({ setOpen }) => {
 	const { t } = useTranslation();
 
 	const [serviceNameInput, setServiceNameInput] = useState<string | null>(null);
@@ -65,6 +63,13 @@ const AddService: FC<AddServiceProp> = ({
 	const [missingRequiredInput, setMissingRequiredInput] =
 		useState<boolean>(true);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
+
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const creatable = user.permissions.includes(
+		Permissions.PERMISSION_ADD_SERVICE
+	);
 
 	useEffect(() => {
 		const missingRequiredInput =
@@ -116,6 +121,13 @@ const AddService: FC<AddServiceProp> = ({
 		invalidBedsRequired,
 	]);
 
+	const addServiceMutation = useAddServiceMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onAddService = async (request: AddServiceRequest) => {
+		addServiceMutation.mutate({ request });
+	};
+
 	const onAdd = async () => {
 		const service_name: string = (serviceNameInput as string).trim();
 		const shorthand: string = (shorthandInput as string).trim();
@@ -138,9 +150,7 @@ const AddService: FC<AddServiceProp> = ({
 			beds_required,
 			color,
 		};
-
 		onAddService(addServiceRequest);
-		setOpen(false);
 	};
 
 	return (

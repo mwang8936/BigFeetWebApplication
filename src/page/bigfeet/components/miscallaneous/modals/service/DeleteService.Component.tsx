@@ -7,24 +7,40 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 import DeleteBottom from '../DeleteBottom.Component';
 
+import { useUserQuery } from '../../../../../hooks/profile.hooks';
+import { useDeleteServiceMutation } from '../../../../../hooks/service.hooks';
+
 import ERRORS from '../../../../../../constants/error.constants';
+
+import { Permissions } from '../../../../../../models/enums';
+import Service from '../../../../../../models/Service.Model';
+import User from '../../../../../../models/User.Model';
 
 interface DeleteServiceProp {
 	setOpen(open: boolean): void;
-	serviceId: number;
-	serviceName: string;
-	deletable: boolean;
-	onDeleteService(serviceId: number): Promise<void>;
+	service: Service;
 }
 
-const DeleteService: FC<DeleteServiceProp> = ({
-	setOpen,
-	serviceId,
-	serviceName,
-	deletable,
-	onDeleteService,
-}) => {
+const DeleteService: FC<DeleteServiceProp> = ({ setOpen, service }) => {
 	const { t } = useTranslation();
+
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const deletable = user.permissions.includes(
+		Permissions.PERMISSION_DELETE_SERVICE
+	);
+
+	const deleteServiceMutation = useDeleteServiceMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onDeleteService = async (serviceId: number) => {
+		deleteServiceMutation.mutate({ serviceId });
+	};
+
+	const onDelete = async () => {
+		onDeleteService(service.service_id);
+	};
 
 	return (
 		<>
@@ -41,7 +57,7 @@ const DeleteService: FC<DeleteServiceProp> = ({
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
-							{t('Delete Service', { service: serviceName })}
+							{t('Delete Service', { service: service.service_name })}
 						</Dialog.Title>
 
 						<div className="mt-2">
@@ -57,10 +73,7 @@ const DeleteService: FC<DeleteServiceProp> = ({
 				onCancel={() => setOpen(false)}
 				disabledDelete={!deletable}
 				deleteMissingPermissionMessage={ERRORS.service.permissions.delete}
-				onDelete={() => {
-					onDeleteService(serviceId);
-					setOpen(false);
-				}}
+				onDelete={onDelete}
 			/>
 		</>
 	);
