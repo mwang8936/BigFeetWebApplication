@@ -187,12 +187,6 @@ const Scheduler: FC = () => {
 		addScheduleMutation.mutate({ request });
 	};
 
-	const addVipPackageMutation = useAddVipPackageMutation({});
-
-	const onAddVipPackage = async (request: AddVipPackageRequest) => {
-		addVipPackageMutation.mutate({ request });
-	};
-
 	const scheduleEditable = [
 		Permissions.PERMISSION_UPDATE_RESERVATION,
 		Permissions.PERMISSION_UPDATE_SCHEDULE,
@@ -225,18 +219,6 @@ const Scheduler: FC = () => {
 		updateScheduleMutation.mutate({ date, employeeId, request });
 	};
 
-	const updateVipPackageMutation = useUpdateVipPackageMutation({});
-
-	const onEditVipPackage = async (
-		serial: string,
-		request: UpdateVipPackageRequest
-	) => {
-		const originalDate = date;
-		const newDate = request.date;
-
-		updateVipPackageMutation.mutate({ serial, request, originalDate, newDate });
-	};
-
 	const deletable = [
 		Permissions.PERMISSION_DELETE_RESERVATION,
 		Permissions.PERMISSION_DELETE_SCHEDULE,
@@ -246,12 +228,6 @@ const Scheduler: FC = () => {
 
 	const onDeleteReservation = async (reservationId: number) => {
 		deleteReservationMutation.mutate({ reservationId, date });
-	};
-
-	const deleteVipPackageMutation = useDeleteVipPackageMutation({});
-
-	const onDeleteVipPackage = async (serial: string) => {
-		deleteVipPackageMutation.mutate({ serial, date });
 	};
 
 	const signProfileScheduleMutation = useSignProfileScheduleMutation({});
@@ -444,14 +420,11 @@ const Scheduler: FC = () => {
 						creatable={scheduleCreatable}
 						onAddReservation={onAddReservation}
 						onAddSchedule={onAddSchedule}
-						onAddVipPackage={onAddVipPackage}
 						editable={scheduleEditable}
 						onEditReservation={onEditReservation}
 						onEditSchedule={onEditSchedule}
-						onEditVipPackage={onEditVipPackage}
 						deletable={deletable}
 						onDeleteReservation={onDeleteReservation}
-						onDeleteVipPackage={onDeleteVipPackage}
 						onScheduleSigned={onScheduleSigned}
 					/>
 				</div>

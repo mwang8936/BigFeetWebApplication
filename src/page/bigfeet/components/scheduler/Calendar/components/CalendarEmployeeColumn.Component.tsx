@@ -20,10 +20,6 @@ import SignatureGrid from './SignatureGrid.Component';
 import TotalGrid from './TotalGrid.Component';
 import TipGrid from './TipGrid.Component';
 import VipGrid from './VipGrid.Component';
-import {
-	AddVipPackageRequest,
-	UpdateVipPackageRequest,
-} from '../../../../../../models/requests/Vip-Package.Request.Model';
 import { doesDateOverlap } from '../../../../../../utils/date.utils';
 import PayoutGrid from './PayoutGrid.Component';
 import User from '../../../../../../models/User.Model';
@@ -38,7 +34,6 @@ interface CalendarEmployeeColumnProp {
 	creatable: boolean;
 	onAddReservation(request: AddReservationRequest): Promise<void>;
 	onAddSchedule(request: AddScheduleRequest): Promise<void>;
-	onAddVipPackage(request: AddVipPackageRequest): Promise<void>;
 	editable: boolean;
 	onEditReservation(
 		reservationId: number,
@@ -49,13 +44,8 @@ interface CalendarEmployeeColumnProp {
 		employeeId: number,
 		request: UpdateScheduleRequest
 	): Promise<void>;
-	onEditVipPackage(
-		serial: string,
-		request: UpdateVipPackageRequest
-	): Promise<void>;
 	deletable: boolean;
 	onDeleteReservation(reservationId: number): Promise<void>;
-	onDeleteVipPackage(serial: string): Promise<void>;
 	onScheduleSigned(date: Date): Promise<void>;
 }
 
@@ -68,14 +58,11 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 	creatable,
 	onAddReservation,
 	onAddSchedule,
-	onAddVipPackage,
 	editable,
 	onEditReservation,
 	onEditSchedule,
-	onEditVipPackage,
 	deletable,
 	onDeleteReservation,
-	onDeleteVipPackage,
 	onScheduleSigned,
 }) => {
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
@@ -170,12 +157,6 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 				colNum={colNum}
 				defaultEmployeeId={employee.employee_id}
 				vipPackages={schedule?.vip_packages || []}
-				creatable={creatable}
-				onAddVipPackage={onAddVipPackage}
-				editable={editable}
-				onEditVipPackage={onEditVipPackage}
-				deletable={deletable}
-				onDeleteVipPackage={onDeleteVipPackage}
 			/>
 			<PayoutGrid
 				row={timeArr.length + 5}

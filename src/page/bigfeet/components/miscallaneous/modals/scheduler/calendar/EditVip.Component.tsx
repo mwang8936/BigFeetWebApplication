@@ -15,6 +15,7 @@ import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Componen
 
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+import { useUpdateVipPackageMutation } from '../../../../../../hooks/vip-package.hooks';
 
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
@@ -34,23 +35,9 @@ import { arraysHaveSameContent } from '../../../../../../../utils/array.utils';
 interface EditVipProp {
 	setOpen(open: boolean): void;
 	vipPackage: VipPackage;
-	editable: boolean;
-	onEditVipPackage(
-		serial: string,
-		request: UpdateVipPackageRequest
-	): Promise<void>;
-	deletable: boolean;
-	onDeleteVipPackage(serial: string): Promise<void>;
 }
 
-const EditVip: FC<EditVipProp> = ({
-	setOpen,
-	vipPackage,
-	editable,
-	onEditVipPackage,
-	deletable,
-	onDeleteVipPackage,
-}) => {
+const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 	const { t } = useTranslation();
 
 	const { date } = useScheduleDateContext();
@@ -78,6 +65,13 @@ const EditVip: FC<EditVipProp> = ({
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
+
+	const editable = user.permissions.includes(
+		Permissions.PERMISSION_UPDATE_VIP_PACKAGE
+	);
+	const deletable = user.permissions.includes(
+		Permissions.PERMISSION_DELETE_VIP_PACKAGE
+	);
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -125,6 +119,18 @@ const EditVip: FC<EditVipProp> = ({
 		setInvalidInput(invalidInput);
 	}, [invalidSoldAmount, invalidCommissionAmount]);
 
+	const updateVipPackageMutation = useUpdateVipPackageMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onEditVipPackage = async (
+		serial: string,
+		request: UpdateVipPackageRequest,
+		originalDate: Date,
+		newDate?: Date
+	) => {
+		updateVipPackageMutation.mutate({ serial, request, originalDate, newDate });
+	};
+
 	const onEdit = () => {
 		const sold_amount: number | undefined =
 			soldAmountInput === vipPackage.sold_amount
@@ -148,13 +154,7 @@ const EditVip: FC<EditVipProp> = ({
 			...(commission_amount !== undefined && { commission_amount }),
 		};
 
-		onEditVipPackage(vipPackage.serial, editVipPackageRequest);
-		setOpen(false);
-	};
-
-	const onDelete = async (serial: string) => {
-		onDeleteVipPackage(serial);
-		setOpen(false);
+		onEditVipPackage(vipPackage.serial, editVipPackageRequest, date, undefined);
 	};
 
 	return (
@@ -274,8 +274,6 @@ const EditVip: FC<EditVipProp> = ({
 				open={openDeleteModal}
 				setOpen={setOpenDeleteModal}
 				vipPackage={vipPackage}
-				deletable={deletable}
-				onDeleteVipPackage={onDelete}
 			/>
 		</>
 	);

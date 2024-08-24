@@ -1,27 +1,17 @@
 import { FC, useState } from 'react';
-import VipPackage from '../../../../../../models/Vip-Package.Model';
-import VipsModal from '../../../miscallaneous/modals/scheduler/calendar/VipModal.Component';
-import {
-	AddVipPackageRequest,
-	UpdateVipPackageRequest,
-} from '../../../../../../models/requests/Vip-Package.Request.Model';
-import { moneyToString } from '../../../../../../utils/number.utils';
 import { useTranslation } from 'react-i18next';
+
+import VipsModal from '../../../miscallaneous/modals/scheduler/calendar/VipModal.Component';
+
+import VipPackage from '../../../../../../models/Vip-Package.Model';
+
+import { moneyToString } from '../../../../../../utils/number.utils';
 
 interface VipGridProp {
 	row: number;
 	colNum: number;
 	defaultEmployeeId?: number;
 	vipPackages: VipPackage[];
-	creatable: boolean;
-	onAddVipPackage(request: AddVipPackageRequest): Promise<void>;
-	editable: boolean;
-	onEditVipPackage(
-		serial: string,
-		request: UpdateVipPackageRequest
-	): Promise<void>;
-	deletable: boolean;
-	onDeleteVipPackage(serial: string): Promise<void>;
 }
 
 const VipGrid: FC<VipGridProp> = ({
@@ -29,12 +19,6 @@ const VipGrid: FC<VipGridProp> = ({
 	colNum,
 	defaultEmployeeId,
 	vipPackages,
-	creatable,
-	onAddVipPackage,
-	editable,
-	onEditVipPackage,
-	deletable,
-	onDeleteVipPackage,
 }) => {
 	const { t } = useTranslation();
 
@@ -65,6 +49,7 @@ const VipGrid: FC<VipGridProp> = ({
 						</strong>
 					))}
 				</div>
+
 				{vipPackages.length > 0 && (
 					<span className="grid-tip group-hover:scale-100 z-[3]">
 						{vipPackages.map((vipPackage) => (
@@ -77,6 +62,7 @@ const VipGrid: FC<VipGridProp> = ({
 						))}
 					</span>
 				)}
+
 				<span>
 					{t('Total')}{' '}
 					<span className="font-bold">{`= \$${moneyToString(
@@ -84,17 +70,12 @@ const VipGrid: FC<VipGridProp> = ({
 					)}`}</span>
 				</span>
 			</div>
+
 			<VipsModal
 				open={open}
 				setOpen={setOpen}
 				defaultEmployeeId={defaultEmployeeId}
 				vipPackages={vipPackages}
-				creatable={creatable}
-				onAddVipPackage={onAddVipPackage}
-				editable={editable}
-				onEditVipPackage={onEditVipPackage}
-				deletable={deletable}
-				onDeleteVipPackage={onDeleteVipPackage}
 			/>
 		</>
 	);

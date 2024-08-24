@@ -15,10 +15,6 @@ import {
 	AddScheduleRequest,
 	UpdateScheduleRequest,
 } from '../../../../../models/requests/Schedule.Request.Model';
-import {
-	AddVipPackageRequest,
-	UpdateVipPackageRequest,
-} from '../../../../../models/requests/Vip-Package.Request.Model';
 
 interface CalendarProp {
 	date: Date;
@@ -29,7 +25,6 @@ interface CalendarProp {
 	creatable: boolean;
 	onAddReservation(request: AddReservationRequest): Promise<void>;
 	onAddSchedule(request: AddScheduleRequest): Promise<void>;
-	onAddVipPackage(request: AddVipPackageRequest): Promise<void>;
 	editable: boolean;
 	onEditReservation(
 		reservationId: number,
@@ -40,13 +35,8 @@ interface CalendarProp {
 		employeeId: number,
 		request: UpdateScheduleRequest
 	): Promise<void>;
-	onEditVipPackage(
-		serial: string,
-		request: UpdateVipPackageRequest
-	): Promise<void>;
 	deletable: boolean;
 	onDeleteReservation(reservationId: number): Promise<void>;
-	onDeleteVipPackage(serial: string): Promise<void>;
 	onScheduleSigned(date: Date): Promise<void>;
 }
 
@@ -59,14 +49,11 @@ const Calendar: FC<CalendarProp> = ({
 	creatable,
 	onAddReservation,
 	onAddSchedule,
-	onAddVipPackage,
 	editable,
 	onEditReservation,
 	onEditSchedule,
-	onEditVipPackage,
 	deletable,
 	onDeleteReservation,
-	onDeleteVipPackage,
 	onScheduleSigned,
 }) => {
 	const timeArr = getListOfTimes(start, end);
@@ -93,14 +80,11 @@ const Calendar: FC<CalendarProp> = ({
 					creatable={creatable}
 					onAddReservation={onAddReservation}
 					onAddSchedule={onAddSchedule}
-					onAddVipPackage={onAddVipPackage}
 					editable={editable}
 					onEditReservation={onEditReservation}
 					onEditSchedule={onEditSchedule}
-					onEditVipPackage={onEditVipPackage}
 					deletable={deletable}
 					onDeleteReservation={onDeleteReservation}
-					onDeleteVipPackage={onDeleteVipPackage}
 					onScheduleSigned={onScheduleSigned}
 				/>
 			))}
