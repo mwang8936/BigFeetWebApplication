@@ -16,12 +16,7 @@ import GiftCardsModal from '../miscallaneous/modals/scheduler/calendar/GiftCardM
 
 import { useCustomersQuery } from '../../../hooks/customer.hooks';
 import { useEmployeesQuery } from '../../../hooks/employee.hooks';
-import {
-	useAddGiftCardMutation,
-	useDeleteGiftCardMutation,
-	useGiftCardsQuery,
-	useUpdateGiftCardMutation,
-} from '../../../hooks/gift-card.hooks';
+import { useGiftCardsQuery } from '../../../hooks/gift-card.hooks';
 import { useUserQuery } from '../../../hooks/profile.hooks';
 import {
 	useAddReservationMutation,
@@ -55,10 +50,6 @@ import GiftCard from '../../../../models/Gift-Card.Model';
 import Schedule from '../../../../models/Schedule.Model';
 import User from '../../../../models/User.Model';
 
-import {
-	AddGiftCardRequest,
-	UpdateGiftCardRequest,
-} from '../../../../models/requests/GIft-Card.Request';
 import {
 	AddReservationRequest,
 	UpdateReservationRequest,
@@ -184,12 +175,6 @@ const Scheduler: FC = () => {
 		Permissions.PERMISSION_ADD_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
 
-	const addGiftCardMutation = useAddGiftCardMutation({});
-
-	const onAddGiftCard = async (request: AddGiftCardRequest) => {
-		addGiftCardMutation.mutate({ request });
-	};
-
 	const addReservationMutation = useAddReservationMutation({});
 
 	const onAddReservation = async (request: AddReservationRequest) => {
@@ -208,30 +193,10 @@ const Scheduler: FC = () => {
 		addVipPackageMutation.mutate({ request });
 	};
 
-	const giftCardEditable = user.permissions.includes(
-		Permissions.PERMISSION_UPDATE_GIFT_CARD
-	);
 	const scheduleEditable = [
 		Permissions.PERMISSION_UPDATE_RESERVATION,
 		Permissions.PERMISSION_UPDATE_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
-
-	const updateGiftCardMutation = useUpdateGiftCardMutation({});
-
-	const onEditGiftCard = async (
-		giftCardId: string,
-		request: UpdateGiftCardRequest
-	) => {
-		const originalDate = date;
-		const newDate = request.date;
-
-		updateGiftCardMutation.mutate({
-			giftCardId,
-			request,
-			originalDate,
-			newDate,
-		});
-	};
 
 	const updateReservationMutation = useUpdateReservationMutation({});
 
@@ -272,19 +237,10 @@ const Scheduler: FC = () => {
 		updateVipPackageMutation.mutate({ serial, request, originalDate, newDate });
 	};
 
-	const giftCardDeletable = user.permissions.includes(
-		Permissions.PERMISSION_DELETE_GIFT_CARD
-	);
 	const deletable = [
 		Permissions.PERMISSION_DELETE_RESERVATION,
 		Permissions.PERMISSION_DELETE_SCHEDULE,
 	].every((permission) => user.permissions.includes(permission));
-
-	const deleteGiftCardMutation = useDeleteGiftCardMutation({});
-
-	const onDeleteGiftCard = async (giftCardId: string) => {
-		deleteGiftCardMutation.mutate({ giftCardId, date });
-	};
 
 	const deleteReservationMutation = useDeleteReservationMutation({});
 
@@ -510,12 +466,6 @@ const Scheduler: FC = () => {
 					open={openGiftCardModal}
 					setOpen={setOpenGiftCardModal}
 					giftCards={giftCards}
-					creatable={scheduleCreatable}
-					onAddGiftCard={onAddGiftCard}
-					editable={giftCardEditable}
-					onEditGiftCard={onEditGiftCard}
-					deletable={giftCardDeletable}
-					onDeleteGiftCard={onDeleteGiftCard}
 				/>
 			</CalendarScaleContext.Provider>
 		</ScheduleDateContext.Provider>

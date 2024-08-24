@@ -12,6 +12,9 @@ import EditableDate from '../../../editable/EditableDate.Component';
 import EditableDropDown from '../../../editable/EditableDropDown.Component';
 import EditablePayRate from '../../../editable/EditablePayRate.Component';
 
+import { useUpdateGiftCardMutation } from '../../../../../../hooks/gift-card.hooks';
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+
 import { paymentMethodDropDownItems } from '../../../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
@@ -19,33 +22,20 @@ import NAMES from '../../../../../../../constants/name.constants';
 import NUMBERS from '../../../../../../../constants/numbers.constants';
 import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
 
-import { PaymentMethod } from '../../../../../../../models/enums';
+import { PaymentMethod, Permissions } from '../../../../../../../models/enums';
 import GiftCard from '../../../../../../../models/Gift-Card.Model';
+import User from '../../../../../../../models/User.Model';
 
-import { UpdateGiftCardRequest } from '../../../../../../../models/requests/GIft-Card.Request';
+import { UpdateGiftCardRequest } from '../../../../../../../models/requests/Gift-Card.Request';
 
 import { sameDate } from '../../../../../../../utils/date.utils';
 
 interface EditGiftCardProp {
 	setOpen(open: boolean): void;
 	giftCard: GiftCard;
-	editable: boolean;
-	onEditGiftCard(
-		giftCardId: string,
-		request: UpdateGiftCardRequest
-	): Promise<void>;
-	deletable: boolean;
-	onDeleteGiftCard(giftCardId: string): Promise<void>;
 }
 
-const EditGiftCard: FC<EditGiftCardProp> = ({
-	setOpen,
-	giftCard,
-	editable,
-	onEditGiftCard,
-	deletable,
-	onDeleteGiftCard,
-}) => {
+const EditGiftCard: FC<EditGiftCardProp> = ({ setOpen, giftCard }) => {
 	const { t } = useTranslation();
 
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -65,6 +55,16 @@ const EditGiftCard: FC<EditGiftCardProp> = ({
 	const [missingRequiredInput, setMissingRequiredInput] =
 		useState<boolean>(false);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
+
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const editable = user.permissions.includes(
+		Permissions.PERMISSION_UPDATE_GIFT_CARD
+	);
+	const deletable = user.permissions.includes(
+		Permissions.PERMISSION_DELETE_GIFT_CARD
+	);
 
 	useEffect(() => {
 		const date: Date | null | undefined =
@@ -100,6 +100,23 @@ const EditGiftCard: FC<EditGiftCardProp> = ({
 		setInvalidInput(invalidInput);
 	}, [invalidDate, invalidPaymentAmount]);
 
+	const updateGiftCardMutation = useUpdateGiftCardMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onEditGiftCard = async (
+		giftCardId: string,
+		request: UpdateGiftCardRequest,
+		originalDate: Date,
+		newDate?: Date
+	) => {
+		updateGiftCardMutation.mutate({
+			giftCardId,
+			request,
+			originalDate,
+			newDate,
+		});
+	};
+
 	const onEdit = () => {
 		const date: Date | undefined =
 			dateInput !== null && sameDate(dateInput, giftCard.date)
@@ -120,13 +137,12 @@ const EditGiftCard: FC<EditGiftCardProp> = ({
 			...(payment_amount !== undefined && { payment_amount }),
 		};
 
-		onEditGiftCard(giftCard.gift_card_id, editGiftCardRequest);
-		setOpen(false);
-	};
-
-	const onDelete = async (giftCardId: string) => {
-		onDeleteGiftCard(giftCardId);
-		setOpen(false);
+		onEditGiftCard(
+			giftCard.gift_card_id,
+			editGiftCardRequest,
+			giftCard.date,
+			date
+		);
 	};
 
 	return (
@@ -242,9 +258,7 @@ const EditGiftCard: FC<EditGiftCardProp> = ({
 			<DeleteGiftCardModal
 				open={openDeleteModal}
 				setOpen={setOpenDeleteModal}
-				giftCardId={giftCard.gift_card_id}
-				deletable={deletable}
-				onDeleteGiftCard={onDelete}
+				giftCard={giftCard}
 			/>
 		</>
 	);

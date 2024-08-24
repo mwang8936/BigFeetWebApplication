@@ -4,32 +4,17 @@ import AddGiftCard from './AddGiftCard.Component';
 
 import BaseModal from '../../BaseModal.Component';
 
-import { AddGiftCardRequest } from '../../../../../../../models/requests/GIft-Card.Request';
-
 interface AddGiftCardModalProp {
 	open: boolean;
 	setOpen(open: boolean): void;
-	creatable: boolean;
-	onAddGiftCard(request: AddGiftCardRequest): Promise<void>;
 }
 
-const AddGiftCardModal: FC<AddGiftCardModalProp> = ({
-	open,
-	setOpen,
-	creatable,
-	onAddGiftCard,
-}) => {
+const AddGiftCardModal: FC<AddGiftCardModalProp> = ({ open, setOpen }) => {
 	return (
 		<BaseModal
 			open={open}
 			setOpen={setOpen}
-			contentElement={
-				<AddGiftCard
-					setOpen={setOpen}
-					creatable={creatable}
-					onAddGiftCard={onAddGiftCard}
-				/>
-			}
+			contentElement={<AddGiftCard setOpen={setOpen} />}
 		/>
 	);
 };

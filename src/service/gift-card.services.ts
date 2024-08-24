@@ -11,7 +11,7 @@ import { GetGiftCardsParam } from '../models/params/Gift-Card.Param';
 import {
 	AddGiftCardRequest,
 	UpdateGiftCardRequest,
-} from '../models/requests/GIft-Card.Request';
+} from '../models/requests/Gift-Card.Request';
 
 export async function getGiftCards(
 	i18n: i18n,
