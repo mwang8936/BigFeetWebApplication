@@ -19,7 +19,7 @@ import MoveReservationModal from '../../../miscallaneous/modals/scheduler/calend
 import STORES from '../../../../../../constants/store.constants';
 import { sortEmployees } from '../../../../../../utils/employee.utils';
 import {
-	useScaleContext,
+	useCalendarScaleContext,
 	useScheduleDateContext,
 } from '../../Scheduler.Component';
 import { useTranslation } from 'react-i18next';
@@ -66,7 +66,7 @@ const ReservationTag: FC<ReservationTagProp> = ({
 	const user: User = userQuery.data;
 
 	const { date } = useScheduleDateContext();
-	const { scale } = useScaleContext();
+	const { scale } = useCalendarScaleContext();
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -318,7 +318,7 @@ const ReservationTag: FC<ReservationTagProp> = ({
 					height: height,
 					left: left,
 				}}
-				className={`row-span-2 ${completionColour} border-4 rounded-lg mx-1 p-1 flex flex-row cursor-move overflow-visible z-[2] hover:z-[3] group relative`}>
+				className={`row-span-2 ${completionColour} border-4 rounded-lg mx-1 p-1 flex flex-row cursor-move overflow-visible z-[2] transition-colors ease-in-out duration-200 hover:z-[3] group relative`}>
 				<span className={tipLocation}>
 					{serviceText}
 					<br />

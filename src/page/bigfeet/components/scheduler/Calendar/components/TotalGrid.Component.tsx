@@ -159,7 +159,7 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 					gridColumnStart: colNum,
 					gridRowStart: row,
 				}}
-				className="relative border-slate-500 border-b border-r border-t-2 p-2 z-[2] bg-white hover:bg-slate-300 flex flex-col group overflow-visible">
+				className="relative border-slate-500 border-b border-r border-t-2 p-2 z-[2] bg-white hover:bg-slate-300 transition-colors ease-in-out duration-200 flex flex-col group overflow-visible">
 				<span>
 					{t('B')}: <span className="font-bold">{bodyTotal}</span>
 				</span>

@@ -61,7 +61,7 @@ const ScheduleGrid: FC<ScheduleGridProp> = ({
 				onClick={() => {
 					setOpen(true);
 				}}
-				className="row-start-[1] flex flex-col sticky top-0 z-[5] bg-white border-slate-300 bg-clip-padding text-slate-900 border-b text-sm text-ellipsis font-medium py-2 text-center hover:border-r hover:border-l hover:border-black cursor-pointer">
+				className="row-start-[1] flex flex-col sticky top-0 z-[5] bg-white border-slate-300 bg-clip-padding text-slate-900 border-b text-sm text-ellipsis font-medium py-2 text-center hover:border-r hover:border-l hover:border-black transition-colors ease-in-out duration-200 cursor-pointer">
 				<h1 className={textColour}>
 					{employee.username +
 						(schedule?.priority ? `(${schedule.priority})` : '')}{' '}

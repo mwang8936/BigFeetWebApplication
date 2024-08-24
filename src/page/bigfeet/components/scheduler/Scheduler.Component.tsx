@@ -1,6 +1,5 @@
 import { useState, createContext, useContext, FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from '@tanstack/react-query';
 
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 
@@ -77,7 +76,6 @@ import {
 import { sameDate } from '../../../../utils/date.utils';
 import { sortEmployees } from '../../../../utils/employee.utils';
 import { moneyToString } from '../../../../utils/number.utils';
-import { formatDateToQueryKey } from '../../../../utils/string.utils';
 
 const ScheduleDateContext = createContext<
 	{ date: Date; setDate(date: Date): void } | undefined
@@ -94,15 +92,17 @@ export function useScheduleDateContext() {
 	return context;
 }
 
-const ScaleContext = createContext<
+const CalendarScaleContext = createContext<
 	{ scale: number; setScale(scale: number): void } | undefined
 >(undefined);
 
-export function useScaleContext() {
-	const context = useContext(ScaleContext);
+export function useCalendarScaleContext() {
+	const context = useContext(CalendarScaleContext);
 
 	if (context === undefined) {
-		throw new Error('useScaleContext must be within ScaleProvider.');
+		throw new Error(
+			'useCalendarScaleContext must be within CalendarScaleProvider.'
+		);
 	}
 
 	return context;
@@ -110,13 +110,11 @@ export function useScaleContext() {
 
 const Scheduler: FC = () => {
 	const { t } = useTranslation();
-	const queryClient = useQueryClient();
 
 	const [openAddReservationModal, setOpenAddReservationModal] = useState(false);
 	const [openGiftCardModal, setOpenGiftCardModal] = useState(false);
 
 	const [date, setDate] = useState<Date>(new Date());
-	const [filtered, setFiltered] = useState(false);
 	const [openFilterDialog, setOpenFilterDialog] = useState(false);
 
 	const [scale, setScale] = useState(1);
@@ -144,7 +142,7 @@ const Scheduler: FC = () => {
 
 	useCustomersQuery({
 		gettable: customerGettable,
-		refetchInterval: 1000 * 60 * 5,
+		staleTime: Infinity,
 	});
 
 	const employeeQuery = useEmployeesQuery({
@@ -173,7 +171,7 @@ const Scheduler: FC = () => {
 
 	useServicesQuery({
 		gettable: serviceGettable,
-		refetchInterval: 1000 * 60 * 5,
+		staleTime: Infinity,
 	});
 
 	sortEmployees(employees, schedules, date);
@@ -353,21 +351,7 @@ const Scheduler: FC = () => {
 			.map((giftCard) => giftCard.payment_amount)
 			.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
 
-	const onDateFiltered = (selectedDate: Date) => {
-		const currentDate = new Date();
-		setFiltered(
-			selectedDate.getFullYear != currentDate.getFullYear ||
-				selectedDate.getMonth() != currentDate.getMonth() ||
-				selectedDate.getDate() != currentDate.getDate()
-		);
-		setDate(selectedDate);
-
-		if (scheduleGettable && !sameDate(date, selectedDate)) {
-			queryClient.invalidateQueries({
-				queryKey: ['schedules', formatDateToQueryKey(selectedDate)],
-			});
-		}
-	};
+	const filtered = !sameDate(date, new Date());
 
 	const zoomIn = () => {
 		setScale((prevScale) => prevScale + 0.1);
@@ -405,7 +389,7 @@ const Scheduler: FC = () => {
 
 	return (
 		<ScheduleDateContext.Provider value={{ date, setDate }}>
-			<ScaleContext.Provider value={{ scale, setScale }}>
+			<CalendarScaleContext.Provider value={{ scale, setScale }}>
 				<div className="h-28 bg-blue border-b-2 border-gray-400 flex flex-row justify-between">
 					<div className="vertical-center ms-10 flex flex-col">
 						<PermissionsButton
@@ -477,20 +461,13 @@ const Scheduler: FC = () => {
 									? 'text-blue-600 hover:text-blue-400'
 									: 'text-gray-600 hover:text-gray-400'
 							} my-auto me-10 cursor-pointer transition-colors duration-200 hover:scale-110`}
-							onClick={() => {
-								setOpenFilterDialog(true);
-							}}
+							onClick={() => setOpenFilterDialog(true)}
 						/>
 					</div>
 
 					<FilterDateModal
 						open={openFilterDialog}
 						setOpen={setOpenFilterDialog}
-						date={date}
-						onDateSelected={onDateFiltered}
-						editable={true}
-						selectPast={true}
-						selectFuture={true}
 					/>
 				</div>
 				<ZoomOverlay zoomIn={zoomIn} zoomOut={zoomOut} zoomReset={zoomReset} />
@@ -540,7 +517,7 @@ const Scheduler: FC = () => {
 					deletable={giftCardDeletable}
 					onDeleteGiftCard={onDeleteGiftCard}
 				/>
-			</ScaleContext.Provider>
+			</CalendarScaleContext.Provider>
 		</ScheduleDateContext.Provider>
 	);
 };

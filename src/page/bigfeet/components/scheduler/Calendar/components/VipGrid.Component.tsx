@@ -53,7 +53,7 @@ const VipGrid: FC<VipGridProp> = ({
 					gridColumnStart: colNum,
 					gridRowStart: row,
 				}}
-				className="relative border-slate-500 border-b border-r border-t-2 p-2 z-[2] bg-white hover:bg-slate-300 group overflow-visible cursor-pointer"
+				className="relative border-slate-500 border-b border-r border-t-2 p-2 z-[2] bg-white hover:bg-slate-300 transition-colors ease-in-out duration-200 overflow-visible cursor-pointer group"
 				onClick={() => setOpen(true)}>
 				<div className="grid grid-cols-2 gap-1 text-xs truncate">
 					{vipPackages.map((vipPackage) => (
