@@ -4,36 +4,24 @@ import DeleteEmployee from './DeleteEmployee.Component';
 
 import BaseModal from '../BaseModal.Component';
 
+import Employee from '../../../../../../models/Employee.Model';
+
 interface DeleteEmployeeModalProp {
 	open: boolean;
 	setOpen(open: boolean): void;
-	employeeId: number;
-	employeeName: string;
-	deletable: boolean;
-	onDeleteEmployee(employeeId: number): Promise<void>;
+	employee: Employee;
 }
 
 const DeleteEmployeeModal: FC<DeleteEmployeeModalProp> = ({
 	open,
 	setOpen,
-	employeeId,
-	employeeName,
-	deletable,
-	onDeleteEmployee,
+	employee,
 }) => {
 	return (
 		<BaseModal
 			open={open}
 			setOpen={setOpen}
-			contentElement={
-				<DeleteEmployee
-					setOpen={setOpen}
-					employeeId={employeeId}
-					employeeName={employeeName}
-					deletable={deletable}
-					onDeleteEmployee={onDeleteEmployee}
-				/>
-			}
+			contentElement={<DeleteEmployee setOpen={setOpen} employee={employee} />}
 		/>
 	);
 };

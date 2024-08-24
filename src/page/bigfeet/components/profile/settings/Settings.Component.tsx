@@ -58,7 +58,6 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 	}, [languageInput, darkModeInput]);
 
 	const updateProfileSettingsMutation = useUpdateProfileSettingsMutation({});
-
 	const onSave = async () => {
 		const language: Language | undefined =
 			languageInput === originalLanguage

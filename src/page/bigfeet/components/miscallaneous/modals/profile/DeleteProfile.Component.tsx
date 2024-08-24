@@ -7,28 +7,39 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 import DeleteBottom from '../DeleteBottom.Component';
 
+import {
+	useDeleteProfileMutation,
+	useUserQuery,
+} from '../../../../../hooks/profile.hooks';
+
 import ERRORS from '../../../../../../constants/error.constants';
+
+import { Permissions } from '../../../../../../models/enums';
+import User from '../../../../../../models/User.Model';
 
 interface DeleteProfileProp {
 	setOpen(open: boolean): void;
-	userId: number;
-	username: string;
-	deletable: boolean;
-	onDeleteUser(userId: number): Promise<void>;
 }
 
-const DeleteProfile: FC<DeleteProfileProp> = ({
-	setOpen,
-	userId,
-	username,
-	deletable,
-	onDeleteUser,
-}) => {
+const DeleteProfile: FC<DeleteProfileProp> = ({ setOpen }) => {
 	const { t } = useTranslation();
 
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const deletable = user.permissions.includes(
+		Permissions.PERMISSION_DELETE_EMPLOYEE
+	);
+
+	const deleteProfileMutation = useDeleteProfileMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onDeleteUser = async (userId: number) => {
+		deleteProfileMutation.mutate({ userId });
+	};
+
 	const onDelete = () => {
-		onDeleteUser(userId);
-		setOpen(false);
+		onDeleteUser(user.employee_id);
 	};
 
 	return (
@@ -46,7 +57,7 @@ const DeleteProfile: FC<DeleteProfileProp> = ({
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
-							{t('Delete Profile', { username: username })}
+							{t('Delete Profile', { username: user.username })}
 						</Dialog.Title>
 
 						<div className="mt-2">

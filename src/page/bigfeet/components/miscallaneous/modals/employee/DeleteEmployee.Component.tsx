@@ -6,28 +6,41 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 import DeleteBottom from '../DeleteBottom.Component';
 
+import { useDeleteEmployeeMutation } from '../../../../../hooks/employee.hooks';
+import { useUserQuery } from '../../../../../hooks/profile.hooks';
+
 import ERRORS from '../../../../../../constants/error.constants';
+
+import Employee from '../../../../../../models/Employee.Model';
+import { Permissions } from '../../../../../../models/enums';
+import User from '../../../../../../models/User.Model';
 
 interface DeleteEmployeeProp {
 	setOpen(open: boolean): void;
-	employeeId: number;
-	employeeName: string;
-	deletable: boolean;
-	onDeleteEmployee(employeeId: number): Promise<void>;
+	employee: Employee;
 }
 
-const DeleteEmployee: FC<DeleteEmployeeProp> = ({
-	setOpen,
-	employeeId,
-	employeeName,
-	deletable,
-	onDeleteEmployee,
-}) => {
+const DeleteEmployee: FC<DeleteEmployeeProp> = ({ setOpen, employee }) => {
 	const { t } = useTranslation();
 
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const deletable = user.permissions.includes(
+		Permissions.PERMISSION_DELETE_EMPLOYEE
+	);
+
+	const deleteEmployeeMutation = useDeleteEmployeeMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onDeleteEmployee = async (employeeId: number) => {
+		const userId = user.employee_id;
+
+		deleteEmployeeMutation.mutate({ employeeId, userId });
+	};
+
 	const onDelete = () => {
-		onDeleteEmployee(employeeId);
-		setOpen(false);
+		onDeleteEmployee(employee.employee_id);
 	};
 
 	return (
@@ -45,7 +58,7 @@ const DeleteEmployee: FC<DeleteEmployeeProp> = ({
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
-							{t('Delete Employee', { employee: employeeName })}
+							{t('Delete Employee', { employee: employee.username })}
 						</Dialog.Title>
 
 						<div className="mt-2">

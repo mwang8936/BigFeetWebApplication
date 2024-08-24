@@ -13,10 +13,7 @@ import Tabs from '../miscallaneous/Tabs.Component';
 
 import AddEmployeeModal from '../miscallaneous/modals/employee/AddEmployeeModal.Component';
 
-import {
-	useEmployeesQuery,
-	useAddEmployeeMutation,
-} from '../../../hooks/employee.hooks';
+import { useEmployeesQuery } from '../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../hooks/profile.hooks';
 
 import ERRORS from '../../../../constants/error.constants';
@@ -24,8 +21,6 @@ import ERRORS from '../../../../constants/error.constants';
 import Employee from '../../../../models/Employee.Model';
 import { Permissions } from '../../../../models/enums';
 import User from '../../../../models/User.Model';
-
-import { AddEmployeeRequest } from '../../../../models/requests/Employee.Request.Model';
 
 const Employees: FC = () => {
 	const { t } = useTranslation();
@@ -45,12 +40,6 @@ const Employees: FC = () => {
 	);
 	const creatable = user.permissions.includes(
 		Permissions.PERMISSION_ADD_EMPLOYEE
-	);
-	const editable = user.permissions.includes(
-		Permissions.PERMISSION_UPDATE_EMPLOYEE
-	);
-	const deletable = user.permissions.includes(
-		Permissions.PERMISSION_DELETE_EMPLOYEE
 	);
 
 	const employeeQuery = useEmployeesQuery({ gettable });
@@ -75,23 +64,16 @@ const Employees: FC = () => {
 		tabs = employees.map((employee) => employee.username);
 	}
 
-	const addEmployeeMutation = useAddEmployeeMutation({});
+	let employee = employees[selectedTab];
 
-	const onAdd = async (request: AddEmployeeRequest) => {
-		addEmployeeMutation.mutate({ request });
-	};
+	if (employees.length > 0 && !employee) {
+		setSelectedTab(0);
+		employee = employees[selectedTab];
+	}
 
 	const employeesElement =
 		employees.length !== 0 ? (
-			<>
-				{employees[selectedTab] && (
-					<EditEmployee
-						editable={editable}
-						deletable={deletable}
-						employee={employees[selectedTab]}
-					/>
-				)}
-			</>
+			<>{employee && <EditEmployee employee={employee} />}</>
 		) : (
 			<h1 className="large-centered-text">{t('No Employees Created')}</h1>
 		);
@@ -156,9 +138,7 @@ const Employees: FC = () => {
 							top={false}
 							disabled={!creatable}
 							missingPermissionMessage={ERRORS.employee.permissions.add}
-							onClick={() => {
-								setOpenAddModal(true);
-							}}
+							onClick={() => setOpenAddModal(true)}
 						/>
 					</div>
 				</div>
@@ -166,12 +146,7 @@ const Employees: FC = () => {
 				{isLoadingElement}
 			</div>
 
-			<AddEmployeeModal
-				open={openAddModal}
-				setOpen={setOpenAddModal}
-				creatable={creatable}
-				onAddEmployee={onAdd}
-			/>
+			<AddEmployeeModal open={openAddModal} setOpen={setOpenAddModal} />
 		</>
 	);
 };

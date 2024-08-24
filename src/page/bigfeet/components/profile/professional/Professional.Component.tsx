@@ -17,13 +17,12 @@ import NAMES from '../../../../../constants/name.constants';
 import NUMBERS from '../../../../../constants/numbers.constants';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 
-import { Role } from '../../../../../models/enums';
+import { Permissions, Role } from '../../../../../models/enums';
 import User from '../../../../../models/User.Model';
 
 import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
 
 interface ProfessionalProp {
-	editable: boolean;
 	originalRole: Role;
 	originalFeetRate: number | null;
 	originalBodyRate: number | null;
@@ -32,7 +31,6 @@ interface ProfessionalProp {
 }
 
 const Professional: FC<ProfessionalProp> = ({
-	editable,
 	originalRole,
 	originalFeetRate,
 	originalBodyRate,
@@ -63,6 +61,13 @@ const Professional: FC<ProfessionalProp> = ({
 	const [missingRequiredInput, setMissingRequiredInput] =
 		useState<boolean>(false);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
+
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const editable = user.permissions.includes(
+		Permissions.PERMISSION_UPDATE_EMPLOYEE
+	);
 
 	useEffect(() => {
 		setRoleInput(originalRole);
@@ -137,11 +142,7 @@ const Professional: FC<ProfessionalProp> = ({
 		invalidPerHour,
 	]);
 
-	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
-	const user: User = userQuery.data;
-
 	const updateProfileMutation = useUpdateProfileMutation({});
-
 	const onSave = async () => {
 		const role: Role | undefined =
 			roleInput === originalRole ? undefined : (roleInput as Role);

@@ -13,6 +13,9 @@ import AddMultiSelect from '../../add/AddMultiSelect.Component';
 import AddPassword from '../../add/AddPassword.Component';
 import AddPayRate from '../../add/AddPayRate.Component';
 
+import { useAddEmployeeMutation } from '../../../../../hooks/employee.hooks';
+import { useUserQuery } from '../../../../../hooks/profile.hooks';
+
 import {
 	genderDropDownItems,
 	roleDropDownItems,
@@ -30,19 +33,15 @@ import rolePermissions, {
 
 import { Gender, Permissions, Role } from '../../../../../../models/enums';
 
+import User from '../../../../../../models/User.Model';
+
 import { AddEmployeeRequest } from '../../../../../../models/requests/Employee.Request.Model';
 
 interface AddEmployeeProp {
 	setOpen(open: boolean): void;
-	creatable: boolean;
-	onAddEmployee(addEmployeeRequest: AddEmployeeRequest): Promise<void>;
 }
 
-const AddEmployee: FC<AddEmployeeProp> = ({
-	setOpen,
-	creatable,
-	onAddEmployee,
-}) => {
+const AddEmployee: FC<AddEmployeeProp> = ({ setOpen }) => {
 	const { t } = useTranslation();
 
 	const [usernameInput, setUsernameInput] = useState<string | null>(null);
@@ -73,6 +72,13 @@ const AddEmployee: FC<AddEmployeeProp> = ({
 	const [missingRequiredInput, setMissingRequiredInput] =
 		useState<boolean>(true);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
+
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const creatable = user.permissions.includes(
+		Permissions.PERMISSION_ADD_EMPLOYEE
+	);
 
 	useEffect(() => {
 		const missingRequiredInput =
@@ -129,6 +135,13 @@ const AddEmployee: FC<AddEmployeeProp> = ({
 		}
 	}, [roleInput]);
 
+	const addEmployeeMutation = useAddEmployeeMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onAddEmployee = async (request: AddEmployeeRequest) => {
+		addEmployeeMutation.mutate({ request });
+	};
+
 	const onAdd = async () => {
 		const username = (usernameInput as string).trim();
 		const password = (passwordInput as string).trim();
@@ -158,7 +171,6 @@ const AddEmployee: FC<AddEmployeeProp> = ({
 		};
 
 		onAddEmployee(addEmployeeRequest);
-		setOpen(false);
 	};
 
 	return (

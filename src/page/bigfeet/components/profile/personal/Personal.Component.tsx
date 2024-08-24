@@ -18,13 +18,12 @@ import NAMES from '../../../../../constants/name.constants';
 import PATTERNS from '../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
 
-import { Gender } from '../../../../../models/enums';
+import { Gender, Permissions } from '../../../../../models/enums';
 import User from '../../../../../models/User.Model';
 
 import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
 
 interface PersonalProp {
-	editable: boolean;
 	originalUsername: string;
 	originalFirstName: string;
 	originalLastName: string;
@@ -32,7 +31,6 @@ interface PersonalProp {
 }
 
 const Personal: FC<PersonalProp> = ({
-	editable,
 	originalUsername,
 	originalFirstName,
 	originalLastName,
@@ -57,6 +55,13 @@ const Personal: FC<PersonalProp> = ({
 	const [missingRequiredInput, setMissingRequiredInput] =
 		useState<boolean>(false);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
+
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const editable = user.permissions.includes(
+		Permissions.PERMISSION_UPDATE_EMPLOYEE
+	);
 
 	useEffect(() => {
 		setUsernameInput(originalUsername);
@@ -110,11 +115,7 @@ const Personal: FC<PersonalProp> = ({
 		setInvalidInput(invalidInput);
 	}, [invalidUsername, invalidFirstName, invalidLastName]);
 
-	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
-	const user: User = userQuery.data;
-
 	const updateProfileMutation = useUpdateProfileMutation({});
-
 	const onSave = async () => {
 		const username: string | undefined =
 			(usernameInput as string).trim() === originalUsername

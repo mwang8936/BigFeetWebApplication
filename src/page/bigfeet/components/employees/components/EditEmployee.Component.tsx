@@ -12,10 +12,7 @@ import EditablePayRate from '../../miscallaneous/editable/EditablePayRate.Compon
 
 import DeleteEmployeeModal from '../../miscallaneous/modals/employee/DeleteEmployeeModal.Component';
 
-import {
-	useDeleteEmployeeMutation,
-	useUpdateEmployeeMutation,
-} from '../../../../hooks/employee.hooks';
+import { useUpdateEmployeeMutation } from '../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../hooks/profile.hooks';
 
 import {
@@ -40,16 +37,10 @@ import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.R
 import { arraysHaveSameContent } from '../../../../../utils/array.utils';
 
 interface EditEmployeeProp {
-	editable: boolean;
-	deletable: boolean;
 	employee: Employee;
 }
 
-const EditEmployee: FC<EditEmployeeProp> = ({
-	editable,
-	deletable,
-	employee,
-}) => {
+const EditEmployee: FC<EditEmployeeProp> = ({ employee }) => {
 	const [usernameInput, setUsernameInput] = useState<string | null>(
 		employee.username
 	);
@@ -94,6 +85,16 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
 	const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const editable = user.permissions.includes(
+		Permissions.PERMISSION_UPDATE_EMPLOYEE
+	);
+	const deletable = user.permissions.includes(
+		Permissions.PERMISSION_DELETE_EMPLOYEE
+	);
 
 	useEffect(() => {
 		setUsernameInput(employee.username);
@@ -209,11 +210,7 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 		invalidPerHour,
 	]);
 
-	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
-	const user: User = userQuery.data;
-
 	const updateEmployeeMutation = useUpdateEmployeeMutation({});
-
 	const onSave = async () => {
 		const username: string | undefined =
 			(usernameInput as string).trim() === employee.username
@@ -264,14 +261,6 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 		const userId = user.employee_id;
 
 		updateEmployeeMutation.mutate({ employeeId, request, userId });
-	};
-
-	const deleteEmployeeMutation = useDeleteEmployeeMutation({});
-
-	const onDelete = async (employeeId: number) => {
-		const userId = user.employee_id;
-
-		deleteEmployeeMutation.mutate({ employeeId, userId });
 	};
 
 	return (
@@ -513,9 +502,7 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 					btnType={ButtonType.DELETE}
 					disabled={!deletable}
 					missingPermissionMessage={ERRORS.employee.permissions.delete}
-					onClick={() => {
-						setOpenDeleteModal(true);
-					}}
+					onClick={() => setOpenDeleteModal(true)}
 				/>
 			</div>
 
@@ -527,10 +514,7 @@ const EditEmployee: FC<EditEmployeeProp> = ({
 			<DeleteEmployeeModal
 				open={openDeleteModal}
 				setOpen={setOpenDeleteModal}
-				employeeId={employee.employee_id}
-				employeeName={employee.username}
-				deletable={deletable}
-				onDeleteEmployee={onDelete}
+				employee={employee}
 			/>
 		</>
 	);

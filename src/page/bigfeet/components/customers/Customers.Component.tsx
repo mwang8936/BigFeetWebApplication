@@ -158,9 +158,7 @@ const Customers: FC = () => {
 							top={false}
 							disabled={!creatable}
 							missingPermissionMessage={ERRORS.customer.permissions.add}
-							onClick={() => {
-								setOpenAddCustomerModal(true);
-							}}
+							onClick={() => setOpenAddCustomerModal(true)}
 						/>
 					</div>
 				</div>

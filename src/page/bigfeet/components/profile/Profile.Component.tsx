@@ -13,10 +13,7 @@ import Tabs from '../miscallaneous/Tabs.Component.tsx';
 
 import DeleteProfileModal from '../miscallaneous/modals/profile/DeleteProfileModal.Component.tsx';
 
-import {
-	useUserQuery,
-	useDeleteProfileMutation,
-} from '../../../hooks/profile.hooks.ts';
+import { useUserQuery } from '../../../hooks/profile.hooks.ts';
 
 import ERRORS from '../../../../constants/error.constants.ts';
 
@@ -33,25 +30,15 @@ const Profile: FC = () => {
 	const userQuery = useUserQuery({ gettable: true });
 	const user: User = userQuery.data;
 
-	const editable = user.permissions.includes(
-		Permissions.PERMISSION_UPDATE_EMPLOYEE
-	);
 	const deletable = user.permissions.includes(
 		Permissions.PERMISSION_DELETE_EMPLOYEE
 	);
-
-	const deleteProfileMutation = useDeleteProfileMutation({});
-
-	const onDelete = async (userId: number) => {
-		deleteProfileMutation.mutate({ userId });
-	};
 
 	const tabs = [t('Personal'), t('Professional'), t('Settings')];
 
 	const profileElement =
 		selectedTab === 0 ? (
 			<Personal
-				editable={editable}
 				originalUsername={user.username}
 				originalFirstName={user.first_name}
 				originalLastName={user.last_name}
@@ -59,7 +46,6 @@ const Profile: FC = () => {
 			/>
 		) : selectedTab === 1 ? (
 			<Professional
-				editable={editable}
 				originalRole={user.role}
 				originalFeetRate={user.feet_rate}
 				originalBodyRate={user.body_rate}
@@ -85,9 +71,7 @@ const Profile: FC = () => {
 						top={false}
 						disabled={!deletable}
 						missingPermissionMessage={ERRORS.employee.permissions.delete}
-						onClick={() => {
-							setOpenDeleteModal(true);
-						}}
+						onClick={() => setOpenDeleteModal(true)}
 					/>
 				</div>
 			</div>
@@ -102,14 +86,7 @@ const Profile: FC = () => {
 
 			<DatesDisplay updatedAt={user.updated_at} createdAt={user.created_at} />
 
-			<DeleteProfileModal
-				open={openDeleteModal}
-				setOpen={setOpenDeleteModal}
-				userId={user.employee_id}
-				username={user.username}
-				deletable={deletable}
-				onDeleteUser={onDelete}
-			/>
+			<DeleteProfileModal open={openDeleteModal} setOpen={setOpenDeleteModal} />
 		</div>
 	);
 };
