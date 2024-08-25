@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import LENGTHS from '../../../../../constants/lengths.constants';
@@ -37,6 +37,16 @@ const AddPhoneNumber: FC<AddPhoneNumberProp> = ({
 }) => {
 	const { t } = useTranslation();
 
+	useEffect(() => {
+		if (phoneNumber) {
+			validationProp.setInvalid(
+				!new RegExp(PATTERNS.customer.phone_number).test(
+					formatPhoneNumber(phoneNumber)
+				)
+			);
+		}
+	}, [phoneNumber, validationProp]);
+
 	return (
 		<div className="mb-4">
 			<label className="label" htmlFor={name}>
@@ -53,7 +63,6 @@ const AddPhoneNumber: FC<AddPhoneNumberProp> = ({
 						const text = event.target.value.replace(/\D/g, '');
 
 						setPhoneNumber(text.length === 0 ? null : text);
-						validationProp.setInvalid(!event.target.validity.valid);
 					}}
 					pattern={PATTERNS.customer.phone_number}
 					maxLength={LENGTHS.customer.phone_number}
