@@ -7,6 +7,10 @@ export interface UpdateScheduleRequest {
 	signed?: boolean;
 }
 
+export interface SignScheduleRequest {
+	password: string;
+}
+
 export interface AddScheduleRequest {
 	date: Date;
 	employee_id: number;

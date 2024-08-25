@@ -119,7 +119,7 @@
   }
 
   .list-item-div {
-    @apply w-full h-fit p-2 border-2 border-black flex flex-col hover:bg-slate-300 cursor-pointer
+    @apply w-full h-fit p-2 border-2 border-black flex flex-col hover:bg-slate-300 transition-colors ease-in-out duration-200 cursor-pointer
   }
 
   .list-item-field {
@@ -251,7 +251,7 @@
   }
 
   .opacity-icon {
-    @apply flex w-12 h-12 p-2 mx-2 bg-gray-400 text-black hover:bg-gray-500 focus:outline-none bg-opacity-50 justify-center
+    @apply flex w-12 h-12 p-2 mx-2 bg-gray-400 text-black hover:bg-gray-500 focus:outline-none bg-opacity-50 justify-center transition-colors transition ease-in-out duration-200 hover:scale-110
   }
 
   .reservation-tip-above {

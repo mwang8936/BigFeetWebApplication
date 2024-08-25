@@ -4,33 +4,24 @@ import DeleteGiftCard from './DeleteGiftCard.Component';
 
 import BaseModal from '../../BaseModal.Component';
 
+import GiftCard from '../../../../../../../models/Gift-Card.Model';
+
 interface DeleteGiftCardModalProp {
 	open: boolean;
 	setOpen(open: boolean): void;
-	giftCardId: string;
-	deletable: boolean;
-	onDeleteGiftCard(reservationId: string): Promise<void>;
+	giftCard: GiftCard;
 }
 
 const DeleteGiftCardModal: FC<DeleteGiftCardModalProp> = ({
 	open,
 	setOpen,
-	giftCardId,
-	deletable,
-	onDeleteGiftCard,
+	giftCard,
 }) => {
 	return (
 		<BaseModal
 			open={open}
 			setOpen={setOpen}
-			contentElement={
-				<DeleteGiftCard
-					setOpen={setOpen}
-					giftCardId={giftCardId}
-					deletable={deletable}
-					onDeleteGiftCard={onDeleteGiftCard}
-				/>
-			}
+			contentElement={<DeleteGiftCard setOpen={setOpen} giftCard={giftCard} />}
 		/>
 	);
 };

@@ -12,8 +12,13 @@ import AddToggleSwitch, {
 	ToggleColor,
 } from '../../../add/AddToggleSwitch.Component';
 
+import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
+
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
-import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
+import {
+	useAddScheduleMutation,
+	useSchedulesQuery,
+} from '../../../../../../hooks/schedule.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 import { getPriorityDropDownItems } from '../../../../../../../constants/drop-down.constants';
@@ -32,19 +37,12 @@ import { AddScheduleRequest } from '../../../../../../../models/requests/Schedul
 interface AddScheduleProp {
 	setOpen(open: boolean): void;
 	employeeId: number;
-	date: Date;
-	creatable: boolean;
-	onAddSchedule(request: AddScheduleRequest): Promise<void>;
 }
 
-const AddSchedule: FC<AddScheduleProp> = ({
-	setOpen,
-	employeeId,
-	date,
-	creatable,
-	onAddSchedule,
-}) => {
+const AddSchedule: FC<AddScheduleProp> = ({ setOpen, employeeId }) => {
 	const { t } = useTranslation();
+
+	const { date } = useScheduleDateContext();
 
 	const [priorityInput, setPriorityInput] = useState<number | null>(null);
 	const [startInput, setStartInput] = useState<Date | null>(null);
@@ -61,6 +59,10 @@ const AddSchedule: FC<AddScheduleProp> = ({
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
+
+	const creatable = user.permissions.includes(
+		Permissions.PERMISSION_ADD_SCHEDULE
+	);
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -129,6 +131,13 @@ const AddSchedule: FC<AddScheduleProp> = ({
 		}
 	}, [startInput, invalidStart]);
 
+	const addScheduleMutation = useAddScheduleMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onAddSchedule = async (request: AddScheduleRequest) => {
+		addScheduleMutation.mutate({ request });
+	};
+
 	const onAdd = () => {
 		const start: Date | undefined = startInput ?? undefined;
 		const end: Date | undefined = endInput ?? undefined;
@@ -147,7 +156,6 @@ const AddSchedule: FC<AddScheduleProp> = ({
 		};
 
 		onAddSchedule(addScheduleRequest);
-		setOpen(false);
 	};
 
 	return (

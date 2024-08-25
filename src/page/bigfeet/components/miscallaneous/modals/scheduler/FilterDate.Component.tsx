@@ -1,5 +1,6 @@
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Dialog } from '@headlessui/react';
 
@@ -9,33 +10,50 @@ import AddBottom from '../AddBottom.Component';
 
 import AddDate from '../../add/AddDate.Component';
 
+import { useScheduleDateContext } from '../../../scheduler/Scheduler.Component';
+
+import { useUserQuery } from '../../../../../hooks/profile.hooks';
+
 import ERRORS from '../../../../../../constants/error.constants';
 import LABELS from '../../../../../../constants/label.constants';
 
+import { Permissions } from '../../../../../../models/enums';
+import User from '../../../../../../models/User.Model';
+
 import { sameDate } from '../../../../../../utils/date.utils';
+import { formatDateToQueryKey } from '../../../../../../utils/string.utils';
 
 interface FilterDateProp {
 	setOpen(open: boolean): void;
-	date: Date;
-	onDateSelected(date: Date): void;
-	editable: boolean;
-	selectPast: boolean;
-	selectFuture: boolean;
 }
 
-const FilterDate: FC<FilterDateProp> = ({
-	setOpen,
-	date,
-	onDateSelected,
-	editable,
-	selectPast,
-	selectFuture,
-}) => {
+const FilterDate: FC<FilterDateProp> = ({ setOpen }) => {
 	const { t } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { date, setDate } = useScheduleDateContext();
 
 	const [selectedDate, setSelectedDate] = useState<Date | null>(date);
 
 	const [invalidDate, setInvalidDate] = useState<boolean>(false);
+
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const scheduleGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_SCHEDULE
+	);
+
+	const onDateFiltered = (updatedDate: Date) => {
+		if (scheduleGettable && !sameDate(date, updatedDate)) {
+			queryClient.invalidateQueries({
+				queryKey: ['schedules', formatDateToQueryKey(updatedDate)],
+			});
+		}
+
+		setDate(updatedDate);
+		setOpen(false);
+	};
 
 	return (
 		<>
@@ -61,8 +79,8 @@ const FilterDate: FC<FilterDateProp> = ({
 								setDate={setSelectedDate}
 								label={LABELS.schedule.filter}
 								validationProp={{
-									minDate: selectPast ? undefined : new Date(),
-									maxDate: selectFuture ? undefined : new Date(),
+									minDate: undefined,
+									maxDate: undefined,
 									required: true,
 									requiredMessage: ERRORS.schedule.filter.required,
 									invalid: invalidDate,
@@ -79,15 +97,12 @@ const FilterDate: FC<FilterDateProp> = ({
 				onCancel={() => setOpen(false)}
 				addText={'Filter'}
 				disabledAdd={
-					!editable ||
 					(selectedDate && sameDate(date, selectedDate)) ||
 					date === null ||
 					invalidDate
 				}
 				addMissingPermissionMessage={
-					!editable
-						? ERRORS.schedule.permissions.get
-						: selectedDate && sameDate(date, selectedDate)
+					selectedDate && sameDate(date, selectedDate)
 						? ERRORS.no_changes
 						: date === null
 						? ERRORS.required
@@ -95,25 +110,14 @@ const FilterDate: FC<FilterDateProp> = ({
 						? ERRORS.invalid
 						: ''
 				}
-				onAdd={() => {
-					onDateSelected(selectedDate as Date);
-					setOpen(false);
-				}}
+				onAdd={() => onDateFiltered(selectedDate as Date)}
 				editText={'Reset Filter'}
 				disabledEdit={
-					!editable ||
-					(selectedDate !== null &&
-						(sameDate(selectedDate, new Date()) || sameDate(date, new Date())))
+					selectedDate !== null &&
+					(sameDate(selectedDate, new Date()) || sameDate(date, new Date()))
 				}
-				editMissingPermissionMessage={
-					!editable
-						? ERRORS.schedule.permissions.get
-						: 'Current date already selected.'
-				}
-				onEdit={() => {
-					onDateSelected(new Date());
-					setOpen(false);
-				}}
+				editMissingPermissionMessage={'Current date already selected.'}
+				onEdit={() => onDateFiltered(new Date())}
 			/>
 		</>
 	);

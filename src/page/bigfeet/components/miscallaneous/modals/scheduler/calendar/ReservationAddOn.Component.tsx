@@ -14,6 +14,7 @@ import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Componen
 
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+import { useAddReservationMutation } from '../../../../../../hooks/reservation.hooks';
 import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
 import { useServicesQuery } from '../../../../../../hooks/service.hooks';
 
@@ -38,13 +39,11 @@ import {
 interface ReservationAddOnProp {
 	setOpen(open: boolean): void;
 	reservation: Reservation;
-	onAddReservation(request: AddReservationRequest): Promise<void>;
 }
 
 const ReservationAddOn: FC<ReservationAddOnProp> = ({
 	setOpen,
 	reservation,
-	onAddReservation,
 }) => {
 	const { t } = useTranslation();
 
@@ -159,6 +158,13 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 		}
 	}, [serviceIdInput]);
 
+	const addReservationMutation = useAddReservationMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onAddReservation = async (request: AddReservationRequest) => {
+		addReservationMutation.mutate({ request });
+	};
+
 	const onAdd = () => {
 		const reserved_date = new Date(
 			reservation.reserved_date.getTime() + reservation.service.time * 60000
@@ -190,7 +196,6 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 		};
 
 		onAddReservation(addReservationRequest);
-		setOpen(false);
 	};
 
 	return (

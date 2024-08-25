@@ -9,47 +9,34 @@ import AddVipModal from './AddVipModal.Component';
 
 import AddBottom from '../../AddBottom.Component';
 
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+
 import VipItem from '../../../../scheduler/Calendar/components/VipItem.Component';
 
 import ERRORS from '../../../../../../../constants/error.constants';
 
+import { Permissions } from '../../../../../../../models/enums';
+import User from '../../../../../../../models/User.Model';
 import VipPackage from '../../../../../../../models/Vip-Package.Model';
-
-import {
-	AddVipPackageRequest,
-	UpdateVipPackageRequest,
-} from '../../../../../../../models/requests/Vip-Package.Request.Model';
 
 interface VipsProp {
 	setOpen(open: boolean): void;
 	defaultEmployeeId?: number;
 	vipPackages: VipPackage[];
-	creatable: boolean;
-	onAddVipPackage(request: AddVipPackageRequest): Promise<void>;
-	editable: boolean;
-	onEditVipPackage(
-		serial: string,
-		request: UpdateVipPackageRequest
-	): Promise<void>;
-	deletable: boolean;
-	onDeleteVipPackage(serial: string): Promise<void>;
 }
 
-const Vips: FC<VipsProp> = ({
-	setOpen,
-	defaultEmployeeId,
-	vipPackages,
-	creatable,
-	onAddVipPackage,
-	editable,
-	onEditVipPackage,
-	deletable,
-	onDeleteVipPackage,
-}) => {
+const Vips: FC<VipsProp> = ({ setOpen, defaultEmployeeId, vipPackages }) => {
 	const { t } = useTranslation();
 
 	const [openAddVipPackageModal, setOpenAddVipPackageModal] =
 		useState<boolean>(false);
+
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const creatable = user.permissions.includes(
+		Permissions.PERMISSION_ADD_VIP_PACKAGE
+	);
 
 	return (
 		<>
@@ -72,14 +59,7 @@ const Vips: FC<VipsProp> = ({
 						<div className="list-div">
 							{vipPackages.length !== 0 ? (
 								vipPackages.map((vipPackage) => (
-									<VipItem
-										key={vipPackage.serial}
-										vipPackage={vipPackage}
-										editable={editable}
-										onEditVipPackage={onEditVipPackage}
-										deletable={deletable}
-										onDeleteVipPackage={onDeleteVipPackage}
-									/>
+									<VipItem key={vipPackage.serial} vipPackage={vipPackage} />
 								))
 							) : (
 								<h1 className="large-centered-text">
@@ -102,8 +82,6 @@ const Vips: FC<VipsProp> = ({
 				open={openAddVipPackageModal}
 				setOpen={setOpenAddVipPackageModal}
 				defaultEmployeeId={defaultEmployeeId}
-				creatable={creatable}
-				onAddVipPackage={onAddVipPackage}
 			/>
 		</>
 	);

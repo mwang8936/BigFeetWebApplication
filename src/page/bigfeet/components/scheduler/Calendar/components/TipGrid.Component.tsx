@@ -56,7 +56,7 @@ const TipGrid: FC<TipGridProp> = ({ row, colNum, reservations }) => {
 					gridColumnStart: colNum,
 					gridRowStart: row,
 				}}
-				className="relative border-slate-500 border-b border-r border-t-2 p-2 z-[2] bg-white hover:bg-slate-300 group overflow-visible">
+				className="relative border-slate-500 border-b border-r border-t-2 p-2 z-[2] bg-white hover:bg-slate-300 transition-colors ease-in-out duration-200 overflow-visible group">
 				<span>
 					{tipsText}
 					<span className="font-bold">{tipsTotalText}</span>

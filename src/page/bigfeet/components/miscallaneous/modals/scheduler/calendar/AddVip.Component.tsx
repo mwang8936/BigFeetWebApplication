@@ -14,6 +14,7 @@ import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Componen
 
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+import { useAddVipPackageMutation } from '../../../../../../hooks/vip-package.hooks';
 
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
@@ -32,16 +33,9 @@ import { AddVipPackageRequest } from '../../../../../../../models/requests/Vip-P
 interface AddVipProp {
 	setOpen(open: boolean): void;
 	defaultEmployeeId?: number;
-	creatable: boolean;
-	onAddVipPackage(request: AddVipPackageRequest): Promise<void>;
 }
 
-const AddVip: FC<AddVipProp> = ({
-	setOpen,
-	defaultEmployeeId,
-	creatable,
-	onAddVipPackage,
-}) => {
+const AddVip: FC<AddVipProp> = ({ setOpen, defaultEmployeeId }) => {
 	const { t } = useTranslation();
 
 	const { date } = useScheduleDateContext();
@@ -66,6 +60,10 @@ const AddVip: FC<AddVipProp> = ({
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
+
+	const creatable = user.permissions.includes(
+		Permissions.PERMISSION_ADD_VIP_PACKAGE
+	);
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -101,6 +99,13 @@ const AddVip: FC<AddVipProp> = ({
 		setInvalidInput(invalidInput);
 	}, [invalidSerial, invalidSoldAmount, invalidCommissionAmount]);
 
+	const addVipPackageMutation = useAddVipPackageMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onAddVipPackage = async (request: AddVipPackageRequest) => {
+		addVipPackageMutation.mutate({ request });
+	};
+
 	const onAdd = () => {
 		const serial = serialInput as string;
 		const sold_amount = soldAmountInput as number;
@@ -116,7 +121,6 @@ const AddVip: FC<AddVipProp> = ({
 		};
 
 		onAddVipPackage(addVipPackageRequest);
-		setOpen(false);
 	};
 
 	return (

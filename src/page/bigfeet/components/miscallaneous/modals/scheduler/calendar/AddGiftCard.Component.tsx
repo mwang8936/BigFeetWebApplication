@@ -13,6 +13,9 @@ import AddPayRate from '../../../add/AddPayRate.Component';
 
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
 
+import { useAddGiftCardMutation } from '../../../../../../hooks/gift-card.hooks';
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+
 import { paymentMethodDropDownItems } from '../../../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
@@ -22,21 +25,16 @@ import NUMBERS from '../../../../../../../constants/numbers.constants';
 import PATTERNS from '../../../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
 
-import { PaymentMethod } from '../../../../../../../models/enums';
+import { PaymentMethod, Permissions } from '../../../../../../../models/enums';
+import User from '../../../../../../../models/User.Model';
 
-import { AddGiftCardRequest } from '../../../../../../../models/requests/GIft-Card.Request';
+import { AddGiftCardRequest } from '../../../../../../../models/requests/Gift-Card.Request';
 
 interface AddGiftCardProp {
 	setOpen(open: boolean): void;
-	creatable: boolean;
-	onAddGiftCard(request: AddGiftCardRequest): Promise<void>;
 }
 
-const AddGiftCard: FC<AddGiftCardProp> = ({
-	setOpen,
-	creatable,
-	onAddGiftCard,
-}) => {
+const AddGiftCard: FC<AddGiftCardProp> = ({ setOpen }) => {
 	const { t } = useTranslation();
 
 	const { date } = useScheduleDateContext();
@@ -58,6 +56,13 @@ const AddGiftCard: FC<AddGiftCardProp> = ({
 		useState<boolean>(true);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const creatable = user.permissions.includes(
+		Permissions.PERMISSION_ADD_GIFT_CARD
+	);
+
 	useEffect(() => {
 		const missingRequiredInput =
 			giftCardIdInput === null ||
@@ -75,6 +80,13 @@ const AddGiftCard: FC<AddGiftCardProp> = ({
 		setInvalidInput(invalidInput);
 	}, [invalidGiftCardId, invalidDate, invalidPaymentAmount]);
 
+	const addGiftCardMutation = useAddGiftCardMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onAddGiftCard = async (request: AddGiftCardRequest) => {
+		addGiftCardMutation.mutate({ request });
+	};
+
 	const onAdd = () => {
 		const gift_card_id = giftCardIdInput as string;
 		const date = dateInput as Date;
@@ -89,7 +101,6 @@ const AddGiftCard: FC<AddGiftCardProp> = ({
 		};
 
 		onAddGiftCard(addGiftCardRequest);
-		setOpen(false);
 	};
 
 	return (

@@ -10,29 +10,18 @@ interface DeleteVipModalProp {
 	open: boolean;
 	setOpen(open: boolean): void;
 	vipPackage: VipPackage;
-	deletable: boolean;
-	onDeleteVipPackage(serial: string): Promise<void>;
 }
 
 const DeleteVipModal: FC<DeleteVipModalProp> = ({
 	open,
 	setOpen,
 	vipPackage,
-	deletable,
-	onDeleteVipPackage,
 }) => {
 	return (
 		<BaseModal
 			open={open}
 			setOpen={setOpen}
-			contentElement={
-				<DeleteVip
-					setOpen={setOpen}
-					vipPackage={vipPackage}
-					deletable={deletable}
-					onDeleteVipPackage={onDeleteVipPackage}
-				/>
-			}
+			contentElement={<DeleteVip setOpen={setOpen} vipPackage={vipPackage} />}
 		/>
 	);
 };

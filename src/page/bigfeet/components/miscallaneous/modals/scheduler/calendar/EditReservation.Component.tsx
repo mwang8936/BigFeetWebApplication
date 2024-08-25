@@ -29,6 +29,7 @@ import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Componen
 
 import { useCustomersQuery } from '../../../../../../hooks/customer.hooks';
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
+import { useUpdateReservationMutation } from '../../../../../../hooks/reservation.hooks';
 import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
 import { useServicesQuery } from '../../../../../../hooks/service.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
@@ -75,30 +76,10 @@ import { formatPhoneNumber } from '../../../../../../../utils/string.utils';
 
 interface EditReservationProp {
 	setOpen(open: boolean): void;
-	updatedBy: string;
 	reservation: Reservation;
-	reservationEmployeeId: number;
-	onAddReservation(addReservationRequest: AddReservationRequest): Promise<void>;
-	editable: boolean;
-	onEditReservation(
-		reservationId: number,
-		request: UpdateReservationRequest
-	): Promise<void>;
-	deletable: boolean;
-	onDeleteReservation(reservationId: number): Promise<void>;
 }
 
-const EditReservation: FC<EditReservationProp> = ({
-	setOpen,
-	updatedBy,
-	reservation,
-	reservationEmployeeId,
-	onAddReservation,
-	editable,
-	onEditReservation,
-	deletable,
-	onDeleteReservation,
-}) => {
+const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 	const { t } = useTranslation();
 
 	const { date } = useScheduleDateContext();
@@ -107,7 +88,7 @@ const EditReservation: FC<EditReservationProp> = ({
 		reservation.reserved_date
 	);
 	const [employeeIdInput, setEmployeeIdInput] = useState<number | null>(
-		reservationEmployeeId
+		reservation.employee_id
 	);
 	const [serviceIdInput, setServiceIdInput] = useState<number | null>(
 		reservation.service.service_id
@@ -187,8 +168,16 @@ const EditReservation: FC<EditReservationProp> = ({
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
 
-	const reservationCreatable = user.permissions.includes(
+	const updatedBy = user.username;
+
+	const creatable = user.permissions.includes(
 		Permissions.PERMISSION_ADD_RESERVATION
+	);
+	const editable = user.permissions.includes(
+		Permissions.PERMISSION_UPDATE_RESERVATION
+	);
+	const deletable = user.permissions.includes(
+		Permissions.PERMISSION_DELETE_RESERVATION
 	);
 
 	const customerGettable = user.permissions.includes(
@@ -510,6 +499,23 @@ const EditReservation: FC<EditReservationProp> = ({
 		}
 	}, [employeeIdInput, genderInput]);
 
+	const updateReservationMutation = useUpdateReservationMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onEditReservation = async (
+		reservationId: number,
+		request: UpdateReservationRequest,
+		originalDate: Date,
+		newDate?: Date
+	) => {
+		updateReservationMutation.mutate({
+			reservationId,
+			request,
+			originalDate,
+			newDate,
+		});
+	};
+
 	const onEdit = async () => {
 		const reserved_date: Date | undefined =
 			dateInput !== null &&
@@ -607,18 +613,12 @@ const EditReservation: FC<EditReservationProp> = ({
 			updated_by: updatedBy,
 		};
 
-		onEditReservation(reservation.reservation_id, updateReservationRequest);
-		setOpen(false);
-	};
-
-	const onAdd = async (addReservationRequest: AddReservationRequest) => {
-		onAddReservation(addReservationRequest);
-		setOpen(false);
-	};
-
-	const onDelete = async (reservationId: number) => {
-		onDeleteReservation(reservationId);
-		setOpen(false);
+		onEditReservation(
+			reservation.reservation_id,
+			updateReservationRequest,
+			reservation.reserved_date,
+			reserved_date
+		);
 	};
 
 	const remainingAmount = Number(
@@ -669,7 +669,7 @@ const EditReservation: FC<EditReservationProp> = ({
 								btnType={ButtonType.ADD}
 								top={false}
 								right={false}
-								disabled={!reservationCreatable}
+								disabled={!creatable}
 								missingPermissionMessage={ERRORS.reservation.permissions.add}
 								onClick={() => {
 									setOpenAddModal(true);
@@ -1117,15 +1117,12 @@ const EditReservation: FC<EditReservationProp> = ({
 				open={openAddModal}
 				setOpen={setOpenAddModal}
 				reservation={reservation}
-				onAddReservation={onAdd}
 			/>
 
 			<DeleteReservationModal
 				open={openDeleteModal}
 				setOpen={setOpenDeleteModal}
 				reservationId={reservation.reservation_id}
-				deletable={deletable}
-				onDeleteReservation={onDelete}
 			/>
 
 			<WarningModal

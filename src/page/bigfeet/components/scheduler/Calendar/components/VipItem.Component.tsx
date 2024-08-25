@@ -1,7 +1,6 @@
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import VipPackage from '../../../../../../models/Vip-Package.Model';
-import { UpdateVipPackageRequest } from '../../../../../../models/requests/Vip-Package.Request.Model';
 import EditVipModal from '../../../miscallaneous/modals/scheduler/calendar/EditVipModal.Component';
 import { moneyToString } from '../../../../../../utils/number.utils';
 import { Permissions, Role } from '../../../../../../models/enums';
@@ -12,22 +11,9 @@ import { useUserQuery } from '../../../../../hooks/profile.hooks';
 
 interface VipItemProp {
 	vipPackage: VipPackage;
-	editable: boolean;
-	onEditVipPackage(
-		serial: string,
-		request: UpdateVipPackageRequest
-	): Promise<void>;
-	deletable: boolean;
-	onDeleteVipPackage(serial: string): Promise<void>;
 }
 
-const VipItem: FC<VipItemProp> = ({
-	vipPackage,
-	editable,
-	onEditVipPackage,
-	deletable,
-	onDeleteVipPackage,
-}) => {
+const VipItem: FC<VipItemProp> = ({ vipPackage }) => {
 	const { t } = useTranslation();
 
 	const [open, setOpen] = useState(false);
@@ -73,15 +59,7 @@ const VipItem: FC<VipItemProp> = ({
 					</strong>
 				))}
 			</span>
-			<EditVipModal
-				open={open}
-				setOpen={setOpen}
-				vipPackage={vipPackage}
-				editable={editable}
-				onEditVipPackage={onEditVipPackage}
-				deletable={deletable}
-				onDeleteVipPackage={onDeleteVipPackage}
-			/>
+			<EditVipModal open={open} setOpen={setOpen} vipPackage={vipPackage} />
 		</div>
 	);
 };

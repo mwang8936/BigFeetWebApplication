@@ -10,6 +10,7 @@ import { GetSchedulesParam } from '../../models/params/Schedule.Param';
 
 import {
 	AddScheduleRequest,
+	SignScheduleRequest,
 	UpdateScheduleRequest,
 } from '../../models/requests/Schedule.Request.Model';
 
@@ -20,6 +21,7 @@ import {
 import {
 	addSchedule,
 	getSchedules,
+	signSchedule,
 	updateSchedule,
 } from '../../service/schedule.service';
 
@@ -116,6 +118,63 @@ export const useUpdateScheduleMutation = ({
 				errorToast(
 					context.toastId,
 					t('Failed to Update Schedule'),
+					error.message
+				);
+		},
+		onSettled: async () => {
+			if (setLoading) setLoading(false);
+		},
+	});
+};
+
+export const useSignScheduleMutation = ({
+	setLoading,
+	setError,
+	onSuccess,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
+	const { socketId } = useSocketIdContext();
+
+	return useMutation({
+		mutationFn: (data: {
+			date: Date;
+			employeeId: number;
+			request: SignScheduleRequest;
+		}) =>
+			signSchedule(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.date,
+				data.employeeId,
+				data.request,
+				socketId
+			),
+		onMutate: async () => {
+			if (setLoading) setLoading(true);
+
+			const toastId = createLoadingToast(t('Signing Schedule...'));
+			return { toastId };
+		},
+		onSuccess: (_data, variables, context) => {
+			queryClient.invalidateQueries({
+				queryKey: [schedulesQueryKey, formatDateToQueryKey(variables.date)],
+			});
+
+			if (onSuccess) onSuccess();
+
+			successToast(context.toastId, t('Schedule Signed Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Sign Schedule'),
 					error.message
 				);
 		},

@@ -7,8 +7,11 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 import DeleteBottom from '../../DeleteBottom.Component';
 
+import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
+
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+import { useDeleteVipPackageMutation } from '../../../../../../hooks/vip-package.hooks';
 
 import ERRORS from '../../../../../../../constants/error.constants';
 
@@ -20,20 +23,19 @@ import VipPackage from '../../../../../../../models/Vip-Package.Model';
 interface DeleteVipProp {
 	setOpen(open: boolean): void;
 	vipPackage: VipPackage;
-	deletable: boolean;
-	onDeleteVipPackage(serial: string): Promise<void>;
 }
 
-const DeleteVip: FC<DeleteVipProp> = ({
-	setOpen,
-	vipPackage,
-	deletable,
-	onDeleteVipPackage,
-}) => {
+const DeleteVip: FC<DeleteVipProp> = ({ setOpen, vipPackage }) => {
 	const { t } = useTranslation();
+
+	const { date } = useScheduleDateContext();
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
+
+	const deletable = user.permissions.includes(
+		Permissions.PERMISSION_DELETE_VIP_PACKAGE
+	);
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -47,9 +49,13 @@ const DeleteVip: FC<DeleteVipProp> = ({
 		(employeeQuery.data as Employee[]) || [user]
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
+	const deleteVipPackageMutation = useDeleteVipPackageMutation({});
+	const onDeleteVipPackage = async (serial: string) => {
+		deleteVipPackageMutation.mutate({ serial, date });
+	};
+
 	const onDelete = () => {
 		onDeleteVipPackage(vipPackage.serial);
-		setOpen(false);
 	};
 
 	return (

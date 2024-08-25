@@ -1,109 +1,103 @@
 import { FC } from 'react';
 
+import { useScheduleDateContext } from '../Scheduler.Component';
+
+import CalendarEmployeeColumn from './components/CalendarEmployeeColumn.Component';
+import CalendarFixedColumn from './components/CalendarFixedColumn.Component';
+
+import { useCustomersQuery } from '../../../../hooks/customer.hooks';
+import { useEmployeesQuery } from '../../../../hooks/employee.hooks';
+import { useUserQuery } from '../../../../hooks/profile.hooks';
+import { useSchedulesQuery } from '../../../../hooks/schedule.hooks';
+import { useServicesQuery } from '../../../../hooks/service.hooks';
+
+import STORES from '../../../../../constants/store.constants';
+
 import Employee from '../../../../../models/Employee.Model';
+import { Permissions, Role } from '../../../../../models/enums';
+import Schedule from '../../../../../models/Schedule.Model';
+import User from '../../../../../models/User.Model';
 
 import { getListOfTimes } from '../../../../../utils/calendar.utils';
-import CalendarFixedColumn from './components/CalendarFixedColumn.Component';
-import CalendarEmployeeColumn from './components/CalendarEmployeeColumn.Component';
-import Schedule from '../../../../../models/Schedule.Model';
 import { sameDate } from '../../../../../utils/date.utils';
-import {
-	AddReservationRequest,
-	UpdateReservationRequest,
-} from '../../../../../models/requests/Reservation.Request.Model';
-import {
-	AddScheduleRequest,
-	UpdateScheduleRequest,
-} from '../../../../../models/requests/Schedule.Request.Model';
-import {
-	AddVipPackageRequest,
-	UpdateVipPackageRequest,
-} from '../../../../../models/requests/Vip-Package.Request.Model';
+import { sortEmployees } from '../../../../../utils/employee.utils';
 
-interface CalendarProp {
-	date: Date;
-	start: number;
-	end: number;
-	employees: Employee[];
-	schedules: Schedule[];
-	creatable: boolean;
-	onAddReservation(request: AddReservationRequest): Promise<void>;
-	onAddSchedule(request: AddScheduleRequest): Promise<void>;
-	onAddVipPackage(request: AddVipPackageRequest): Promise<void>;
-	editable: boolean;
-	onEditReservation(
-		reservationId: number,
-		request: UpdateReservationRequest
-	): Promise<void>;
-	onEditSchedule(
-		date: Date,
-		employeeId: number,
-		request: UpdateScheduleRequest
-	): Promise<void>;
-	onEditVipPackage(
-		serial: string,
-		request: UpdateVipPackageRequest
-	): Promise<void>;
-	deletable: boolean;
-	onDeleteReservation(reservationId: number): Promise<void>;
-	onDeleteVipPackage(serial: string): Promise<void>;
-	onScheduleSigned(date: Date): Promise<void>;
-}
+const Calendar: FC = () => {
+	const { date } = useScheduleDateContext();
 
-const Calendar: FC<CalendarProp> = ({
-	date,
-	start,
-	end,
-	employees,
-	schedules,
-	creatable,
-	onAddReservation,
-	onAddSchedule,
-	onAddVipPackage,
-	editable,
-	onEditReservation,
-	onEditSchedule,
-	onEditVipPackage,
-	deletable,
-	onDeleteReservation,
-	onDeleteVipPackage,
-	onScheduleSigned,
-}) => {
-	const timeArr = getListOfTimes(start, end);
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const customerGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_CUSTOMER
+	);
+	const employeeGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_EMPLOYEE
+	);
+	const scheduleGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_SCHEDULE
+	);
+	const serviceGettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_SERVICE
+	);
+
+	useCustomersQuery({
+		gettable: customerGettable,
+		staleTime: Infinity,
+	});
+
+	const employeeQuery = useEmployeesQuery({
+		gettable: employeeGettable,
+		staleTime: Infinity,
+	});
+	const employees: Employee[] = (
+		(employeeQuery.data as Employee[]) || [user]
+	).filter((employee) => employee.role !== Role.DEVELOPER);
+
+	const scheduleQuery = useSchedulesQuery({
+		date,
+		gettable: scheduleGettable,
+		staleTime: Infinity,
+	});
+	const schedules: Schedule[] = (
+		(scheduleQuery.data as Schedule[]) || []
+	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
+
+	useServicesQuery({
+		gettable: serviceGettable,
+		staleTime: Infinity,
+	});
+
+	sortEmployees(employees, schedules, date);
+
+	const timeArr = getListOfTimes(STORES.start, STORES.end);
+
 	return (
 		<div
 			className="grid h-fit relative"
 			style={{
-				gridTemplateRows: `auto repeat(${timeArr.length},100px) auto auto auto auto auto`,
+				gridTemplateRows: `auto repeat(${timeArr.length},100px) repeat(5,auto)`,
 				gridTemplateColumns: `auto repeat(${employees.length},200px)`,
 			}}>
 			<CalendarFixedColumn timeArr={timeArr} />
-			{employees.map((employee, index) => (
-				<CalendarEmployeeColumn
-					key={employee.employee_id}
-					date={date}
-					employee={employee}
-					schedule={schedules.find(
-						(schedule) =>
-							schedule.employee?.employee_id === employee.employee_id &&
-							sameDate(date, schedule.date)
-					)}
-					timeArr={timeArr}
-					colNum={index + 2}
-					creatable={creatable}
-					onAddReservation={onAddReservation}
-					onAddSchedule={onAddSchedule}
-					onAddVipPackage={onAddVipPackage}
-					editable={editable}
-					onEditReservation={onEditReservation}
-					onEditSchedule={onEditSchedule}
-					onEditVipPackage={onEditVipPackage}
-					deletable={deletable}
-					onDeleteReservation={onDeleteReservation}
-					onDeleteVipPackage={onDeleteVipPackage}
-					onScheduleSigned={onScheduleSigned}
-				/>
-			))}
+
+			{employees.map((employee, index) => {
+				const schedule = schedules.find(
+					(schedule) =>
+						schedule.employee?.employee_id === employee.employee_id &&
+						sameDate(date, schedule.date)
+				);
+
+				return (
+					<CalendarEmployeeColumn
+						key={employee.employee_id}
+						employee={employee}
+						schedule={schedule}
+						timeArr={timeArr}
+						colNum={index + 2}
+					/>
+				);
+			})}
 		</div>
 	);
 };

@@ -22,9 +22,10 @@ import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Componen
 
 import { useCustomersQuery } from '../../../../../../hooks/customer.hooks';
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+import { useAddReservationMutation } from '../../../../../../hooks/reservation.hooks';
 import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
 import { useServicesQuery } from '../../../../../../hooks/service.hooks';
-import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 import {
 	genderDropDownItems,
@@ -56,28 +57,20 @@ import { formatPhoneNumber } from '../../../../../../../utils/string.utils';
 
 interface AddReservationProp {
 	setOpen(open: boolean): void;
-	createdBy: string;
 	defaultDate?: Date;
 	defaultEmployeeId?: number;
-	creatable: boolean;
-	onAddReservation(request: AddReservationRequest): Promise<void>;
 }
 
 const AddReservation: FC<AddReservationProp> = ({
 	setOpen,
-	createdBy,
 	defaultDate,
 	defaultEmployeeId,
-	creatable,
-	onAddReservation,
 }) => {
 	const { t } = useTranslation();
 
 	const { date } = useScheduleDateContext();
 
-	const [dateInput, setDateInput] = useState<Date | null>(
-		defaultDate || new Date()
-	);
+	const [dateInput, setDateInput] = useState<Date | null>(defaultDate || date);
 	const [employeeIdInput, setEmployeeIdInput] = useState<number | null>(
 		defaultEmployeeId || null
 	);
@@ -124,6 +117,12 @@ const AddReservation: FC<AddReservationProp> = ({
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
 
+	const createdBy = user.username;
+
+	const creatable = user.permissions.includes(
+		Permissions.PERMISSION_ADD_RESERVATION
+	);
+
 	const customerGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_CUSTOMER
 	);
@@ -158,7 +157,7 @@ const AddReservation: FC<AddReservationProp> = ({
 	const services: Service[] = serviceQuery.data || [];
 
 	const scheduleQuery = useSchedulesQuery({
-		date,
+		date: dateInput || date,
 		gettable: scheduleGettable,
 		staleTime: Infinity,
 	});
@@ -312,6 +311,13 @@ const AddReservation: FC<AddReservationProp> = ({
 		}
 	}, [employeeIdInput, genderInput]);
 
+	const addReservationMutation = useAddReservationMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onAddReservation = async (request: AddReservationRequest) => {
+		addReservationMutation.mutate({ request });
+	};
+
 	const onAdd = () => {
 		const reserved_date = dateInput as Date;
 		const employee_id = employeeIdInput as number;
@@ -341,7 +347,6 @@ const AddReservation: FC<AddReservationProp> = ({
 		};
 
 		onAddReservation(addReservationRequest);
-		setOpen(false);
 	};
 
 	const currentCustomer: Customer | undefined =

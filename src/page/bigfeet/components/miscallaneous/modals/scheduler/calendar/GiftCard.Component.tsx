@@ -10,43 +10,31 @@ import AddBottom from '../../AddBottom.Component';
 
 import GiftCardItem from '../../../../scheduler/Calendar/components/GiftCardItem.Component';
 
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+
 import ERRORS from '../../../../../../../constants/error.constants';
 
+import { Permissions } from '../../../../../../../models/enums';
 import GiftCard from '../../../../../../../models/Gift-Card.Model';
-
-import {
-	AddGiftCardRequest,
-	UpdateGiftCardRequest,
-} from '../../../../../../../models/requests/GIft-Card.Request';
+import User from '../../../../../../../models/User.Model';
 
 interface GiftCardProp {
 	setOpen(open: boolean): void;
 	giftCards: GiftCard[];
-	creatable: boolean;
-	onAddGiftCard(request: AddGiftCardRequest): Promise<void>;
-	editable: boolean;
-	onEditGiftCard(
-		gift_card_id: string,
-		request: UpdateGiftCardRequest
-	): Promise<void>;
-	deletable: boolean;
-	onDeleteGiftCard(gift_card_id: string): Promise<void>;
 }
 
-const GiftCards: FC<GiftCardProp> = ({
-	setOpen,
-	giftCards,
-	creatable,
-	onAddGiftCard,
-	editable,
-	onEditGiftCard,
-	deletable,
-	onDeleteGiftCard,
-}) => {
+const GiftCards: FC<GiftCardProp> = ({ setOpen, giftCards }) => {
 	const { t } = useTranslation();
 
 	const [openAddGiftCardModal, setOpenAddGiftCardModal] =
 		useState<boolean>(false);
+
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const creatable = user.permissions.includes(
+		Permissions.PERMISSION_ADD_GIFT_CARD
+	);
 
 	return (
 		<>
@@ -72,10 +60,6 @@ const GiftCards: FC<GiftCardProp> = ({
 									<GiftCardItem
 										key={giftCard.gift_card_id}
 										giftCard={giftCard}
-										editable={editable}
-										onEditGiftCard={onEditGiftCard}
-										deletable={deletable}
-										onDeleteGiftCard={onDeleteGiftCard}
 									/>
 								))
 							) : (
@@ -98,8 +82,6 @@ const GiftCards: FC<GiftCardProp> = ({
 			<AddGiftCardModal
 				open={openAddGiftCardModal}
 				setOpen={setOpenAddGiftCardModal}
-				creatable={creatable}
-				onAddGiftCard={onAddGiftCard}
 			/>
 		</>
 	);

@@ -6,26 +6,37 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 import DeleteBottom from '../../DeleteBottom.Component';
 
+import { useDeleteGiftCardMutation } from '../../../../../../hooks/gift-card.hooks';
+import { useUserQuery } from '../../../../../../hooks/profile.hooks';
+
 import ERRORS from '../../../../../../../constants/error.constants';
+
+import { Permissions } from '../../../../../../../models/enums';
+import GiftCard from '../../../../../../../models/Gift-Card.Model';
+import User from '../../../../../../../models/User.Model';
 
 interface DeleteGiftCardProp {
 	setOpen(open: boolean): void;
-	giftCardId: string;
-	deletable: boolean;
-	onDeleteGiftCard(giftCardId: string): Promise<void>;
+	giftCard: GiftCard;
 }
 
-const DeleteGiftCard: FC<DeleteGiftCardProp> = ({
-	setOpen,
-	giftCardId,
-	deletable,
-	onDeleteGiftCard,
-}) => {
+const DeleteGiftCard: FC<DeleteGiftCardProp> = ({ setOpen, giftCard }) => {
 	const { t } = useTranslation();
 
+	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
+	const user: User = userQuery.data;
+
+	const deletable = user.permissions.includes(
+		Permissions.PERMISSION_DELETE_GIFT_CARD
+	);
+
+	const deleteGiftCardMutation = useDeleteGiftCardMutation({});
+	const onDeleteGiftCard = async (giftCardId: string, date: Date) => {
+		deleteGiftCardMutation.mutate({ giftCardId, date });
+	};
+
 	const onDelete = () => {
-		onDeleteGiftCard(giftCardId);
-		setOpen(false);
+		onDeleteGiftCard(giftCard.gift_card_id, giftCard.date);
 	};
 
 	return (
@@ -43,7 +54,7 @@ const DeleteGiftCard: FC<DeleteGiftCardProp> = ({
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
-							{t('Delete Gift Card')}: {giftCardId}
+							{t('Delete Gift Card')}: {giftCard.gift_card_id}
 						</Dialog.Title>
 
 						<div className="mt-2">

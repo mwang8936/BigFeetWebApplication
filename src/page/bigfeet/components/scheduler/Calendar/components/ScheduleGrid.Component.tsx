@@ -1,40 +1,21 @@
 import { FC, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import AddScheduleModal from '../../../miscallaneous/modals/scheduler/calendar/AddScheduleModal.Component';
+import EditScheduleModal from '../../../miscallaneous/modals/scheduler/calendar/EditScheduleModal.Component';
+
 import Employee from '../../../../../../models/Employee.Model';
 import Schedule from '../../../../../../models/Schedule.Model';
-import {
-	AddScheduleRequest,
-	UpdateScheduleRequest,
-} from '../../../../../../models/requests/Schedule.Request.Model';
+
 import { formatTimeFromDate } from '../../../../../../utils/string.utils';
-import EditScheduleModal from '../../../miscallaneous/modals/scheduler/calendar/EditScheduleModal.Component';
-import AddScheduleModal from '../../../miscallaneous/modals/scheduler/calendar/AddScheduleModal.Component';
-import { useTranslation } from 'react-i18next';
 
 interface ScheduleGridProp {
 	colNum: number;
 	employee: Employee;
-	date: Date;
 	schedule?: Schedule;
-	creatable: boolean;
-	onAddSchedule(request: AddScheduleRequest): Promise<void>;
-	editable: boolean;
-	onEditSchedule(
-		date: Date,
-		employeeId: number,
-		request: UpdateScheduleRequest
-	): Promise<void>;
 }
 
-const ScheduleGrid: FC<ScheduleGridProp> = ({
-	colNum,
-	employee,
-	date,
-	schedule,
-	creatable,
-	onAddSchedule,
-	editable,
-	onEditSchedule,
-}) => {
+const ScheduleGrid: FC<ScheduleGridProp> = ({ colNum, employee, schedule }) => {
 	const { t } = useTranslation();
 
 	const [open, setOpen] = useState(false);
@@ -61,29 +42,21 @@ const ScheduleGrid: FC<ScheduleGridProp> = ({
 				onClick={() => {
 					setOpen(true);
 				}}
-				className="row-start-[1] flex flex-col sticky top-0 z-[5] bg-white border-slate-300 bg-clip-padding text-slate-900 border-b text-sm text-ellipsis font-medium py-2 text-center hover:border-r hover:border-l hover:border-black cursor-pointer">
+				className="row-start-[1] flex flex-col sticky top-0 z-[5] bg-white border-slate-300 bg-clip-padding text-slate-900 border-b text-sm text-ellipsis font-medium py-2 text-center hover:border-r hover:border-l hover:border-black transition-colors ease-in-out duration-200 cursor-pointer">
 				<h1 className={textColour}>
 					{employee.username +
 						(schedule?.priority ? `(${schedule.priority})` : '')}{' '}
 				</h1>
+
 				<h1>{underText}</h1>
 			</div>
 			{schedule ? (
-				<EditScheduleModal
-					open={open}
-					setOpen={setOpen}
-					schedule={schedule}
-					editable={editable}
-					onEditSchedule={onEditSchedule}
-				/>
+				<EditScheduleModal open={open} setOpen={setOpen} schedule={schedule} />
 			) : (
 				<AddScheduleModal
 					open={open}
 					setOpen={setOpen}
 					employeeId={employee.employee_id}
-					date={date}
-					creatable={creatable}
-					onAddSchedule={onAddSchedule}
 				/>
 			)}
 		</>

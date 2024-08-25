@@ -13,7 +13,10 @@ import EditableTime from '../../../editable/EditableTime.Component';
 import EditableToggleSwitch from '../../../editable/EditableToggleSwitch.Component';
 
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
-import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
+import {
+	useSchedulesQuery,
+	useUpdateScheduleMutation,
+} from '../../../../../../hooks/schedule.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 import { getPriorityDropDownItems } from '../../../../../../../constants/drop-down.constants';
@@ -34,20 +37,9 @@ import { sameTime } from '../../../../../../../utils/date.utils';
 interface EditScheduleProp {
 	setOpen(open: boolean): void;
 	schedule: Schedule;
-	editable: boolean;
-	onEditSchedule(
-		date: Date,
-		employeeId: number,
-		request: UpdateScheduleRequest
-	): Promise<void>;
 }
 
-const EditSchedule: FC<EditScheduleProp> = ({
-	setOpen,
-	schedule,
-	editable,
-	onEditSchedule,
-}) => {
+const EditSchedule: FC<EditScheduleProp> = ({ setOpen, schedule }) => {
 	const { t } = useTranslation();
 
 	const [priorityInput, setPriorityInput] = useState<number | null>(
@@ -68,6 +60,10 @@ const EditSchedule: FC<EditScheduleProp> = ({
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
+
+	const editable = user.permissions.includes(
+		Permissions.PERMISSION_UPDATE_SCHEDULE
+	);
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -177,6 +173,17 @@ const EditSchedule: FC<EditScheduleProp> = ({
 		}
 	}, [startInput, invalidStart]);
 
+	const updateScheduleMutation = useUpdateScheduleMutation({
+		onSuccess: () => setOpen(false),
+	});
+	const onEditSchedule = async (
+		date: Date,
+		employeeId: number,
+		request: UpdateScheduleRequest
+	) => {
+		updateScheduleMutation.mutate({ date, employeeId, request });
+	};
+
 	const onEdit = () => {
 		const start: Date | null | undefined =
 			startInput && schedule.start && sameTime(startInput, schedule.start)
@@ -210,7 +217,6 @@ const EditSchedule: FC<EditScheduleProp> = ({
 			schedule.employee.employee_id,
 			updateScheduleRequest
 		);
-		setOpen(false);
 	};
 
 	return (
