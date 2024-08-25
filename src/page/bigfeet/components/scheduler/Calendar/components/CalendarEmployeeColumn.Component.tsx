@@ -127,7 +127,7 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 			<SignatureGrid
 				row={timeArr.length + 6}
 				colNum={colNum}
-				employeeId={employee.employee_id}
+				employee={employee}
 				signedOff={schedule?.signed || false}
 			/>
 		</>

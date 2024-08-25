@@ -10,6 +10,7 @@ import { GetSchedulesParam } from '../models/params/Schedule.Param';
 
 import {
 	AddScheduleRequest,
+	SignScheduleRequest,
 	UpdateScheduleRequest,
 } from '../models/requests/Schedule.Request.Model';
 
@@ -60,6 +61,27 @@ export async function updateSchedule(
 		queryClient,
 		setAuthentication,
 		`${schedulePath}/${date.toISOString()}/employee/${employee_id}`,
+		'patch',
+		request,
+		undefined,
+		socket_id
+	);
+}
+
+export async function signSchedule(
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
+	date: Date,
+	employee_id: number,
+	request: SignScheduleRequest,
+	socket_id?: string
+) {
+	return authorizedRequest(
+		i18n,
+		queryClient,
+		setAuthentication,
+		`${schedulePath}/${date.toISOString()}/employee/${employee_id}/sign`,
 		'patch',
 		request,
 		undefined,

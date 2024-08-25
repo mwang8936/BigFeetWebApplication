@@ -8,17 +8,19 @@ import SignScheduleModal from '../../../miscallaneous/modals/scheduler/calendar/
 
 import NAMES from '../../../../../../constants/name.constants';
 
+import Employee from '../../../../../../models/Employee.Model';
+
 interface SignatureGridProp {
 	row: number;
 	colNum: number;
-	employeeId: number;
+	employee: Employee;
 	signedOff: boolean;
 }
 
 const SignatureGrid: FC<SignatureGridProp> = ({
 	row,
 	colNum,
-	employeeId,
+	employee,
 	signedOff,
 }) => {
 	const [open, setOpen] = useState(false);
@@ -48,11 +50,7 @@ const SignatureGrid: FC<SignatureGridProp> = ({
 				</div>
 			</div>
 
-			<SignScheduleModal
-				open={open}
-				setOpen={setOpen}
-				employeeId={employeeId}
-			/>
+			<SignScheduleModal open={open} setOpen={setOpen} employee={employee} />
 		</>
 	);
 };
