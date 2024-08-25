@@ -47,10 +47,7 @@ import Schedule from '../../../../../../../models/Schedule.Model';
 import Service from '../../../../../../../models/Service.Model';
 import User from '../../../../../../../models/User.Model';
 
-import {
-	AddReservationRequest,
-	UpdateReservationRequest,
-} from '../../../../../../../models/requests/Reservation.Request.Model';
+import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
 
 import {
 	genderDropDownItems,
