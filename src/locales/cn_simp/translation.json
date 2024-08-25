@@ -143,6 +143,7 @@
     "Not Working": "不当班",
     "Working": "当班",
     "Not On Call": "不 On Call", 
+    "Add Award": "添加奖励",
     "Delete Reservation": "删除预约",
     "Are you sure you want to delete this reservation? This action cannot be reversed.": "请确认是否要删除？",
     "Edit Reservation": "编辑",

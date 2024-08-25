@@ -143,6 +143,7 @@
     "Not Working": "Not Working",
     "Working": "Working",
     "Not On Call": "Not On Call", 
+    "Add Award": "Add Award",
     "Delete Reservation": "Delete Reservation",
     "Are you sure you want to delete this reservation? This action cannot be reversed.": "Are you sure you want to delete this reservation? This action cannot be reversed.",
     "Edit Reservation": "Edit Reservation",

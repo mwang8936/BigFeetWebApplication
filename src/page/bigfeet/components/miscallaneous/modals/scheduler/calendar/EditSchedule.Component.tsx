@@ -51,6 +51,9 @@ const EditSchedule: FC<EditScheduleProp> = ({ setOpen, schedule }) => {
 		schedule.is_working
 	);
 	const [onCallInput, setOnCallInput] = useState<boolean>(schedule.on_call);
+	const [addAwardInput, setAddAwardInput] = useState<boolean>(
+		schedule.add_award
+	);
 
 	const [invalidStart, setInvalidStart] = useState<boolean>(false);
 	const [invalidEnd, setInvalidEnd] = useState<boolean>(false);
@@ -115,16 +118,26 @@ const EditSchedule: FC<EditScheduleProp> = ({ setOpen, schedule }) => {
 			isWorkingInput === schedule.is_working ? undefined : isWorkingInput;
 		const on_call: boolean | undefined =
 			onCallInput === schedule.on_call ? undefined : onCallInput;
+		const add_award: boolean | undefined =
+			addAwardInput === schedule.add_award ? undefined : addAwardInput;
 
 		const changesMade =
 			start !== undefined ||
 			end !== undefined ||
 			priority !== undefined ||
 			is_working !== undefined ||
-			on_call !== undefined;
+			on_call !== undefined ||
+			add_award !== undefined;
 
 		setChangesMade(changesMade);
-	}, [startInput, endInput, priorityInput, isWorkingInput, onCallInput]);
+	}, [
+		startInput,
+		endInput,
+		priorityInput,
+		isWorkingInput,
+		onCallInput,
+		addAwardInput,
+	]);
 
 	useEffect(() => {
 		const invalidInput = invalidStart || invalidEnd;
@@ -203,6 +216,8 @@ const EditSchedule: FC<EditScheduleProp> = ({ setOpen, schedule }) => {
 			isWorkingInput === schedule.is_working ? undefined : isWorkingInput;
 		const on_call: boolean | undefined =
 			onCallInput === schedule.on_call ? undefined : onCallInput;
+		const add_award: boolean | undefined =
+			addAwardInput === schedule.add_award ? undefined : addAwardInput;
 
 		const updateScheduleRequest: UpdateScheduleRequest = {
 			...(start !== undefined && { start }),
@@ -210,6 +225,7 @@ const EditSchedule: FC<EditScheduleProp> = ({ setOpen, schedule }) => {
 			...(priority !== undefined && { priority }),
 			...(is_working !== undefined && { is_working }),
 			...(on_call !== undefined && { on_call }),
+			...(add_award !== undefined && { add_award }),
 		};
 
 		onEditSchedule(
@@ -328,6 +344,21 @@ const EditSchedule: FC<EditScheduleProp> = ({ setOpen, schedule }) => {
 								editable={editable}
 								missingPermissionMessage={ERRORS.schedule.permissions.edit}
 							/>
+
+							<div className="mt-16">
+								<EditableToggleSwitch
+									originalChecked={schedule.add_award}
+									checked={addAwardInput}
+									setChecked={setAddAwardInput}
+									falseText={''}
+									trueText={'Add Award'}
+									toggleColour={ToggleColor.BLUE}
+									label={LABELS.schedule.add_award}
+									name={NAMES.schedule.add_award}
+									editable={editable}
+									missingPermissionMessage={ERRORS.schedule.permissions.edit}
+								/>
+							</div>
 						</div>
 					</div>
 				</div>

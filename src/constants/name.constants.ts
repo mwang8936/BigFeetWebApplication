@@ -44,6 +44,7 @@ const NAMES = {
 		priority: 'priority',
 		is_working: 'is_working',
 		on_call: 'on_call',
+		add_award: 'add_award',
 		sign_off: 'sign_off',
 	},
 	service: {

@@ -52,6 +52,7 @@ const LABELS = {
 		priority: 'Select Priority',
 		is_working: 'Is Working',
 		on_call: 'On Call',
+		add_award: 'Add Award',
 		filter: 'Select Date',
 	},
 	service: {

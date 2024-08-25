@@ -49,6 +49,7 @@ const AddSchedule: FC<AddScheduleProp> = ({ setOpen, employeeId }) => {
 	const [endInput, setEndInput] = useState<Date | null>(null);
 	const [isWorkingInput, setIsWorkingInput] = useState<boolean>(true);
 	const [onCallInput, setOnCallInput] = useState<boolean>(false);
+	const [addAwardInput, setAddAwardInput] = useState<boolean>(false);
 
 	const [invalidStart, setInvalidStart] = useState<boolean>(false);
 	const [invalidEnd, setInvalidEnd] = useState<boolean>(false);
@@ -144,6 +145,7 @@ const AddSchedule: FC<AddScheduleProp> = ({ setOpen, employeeId }) => {
 		const priority: number | undefined = priorityInput ?? undefined;
 		const is_working: boolean = isWorkingInput;
 		const on_call: boolean = onCallInput;
+		const add_award: boolean = addAwardInput;
 
 		const addScheduleRequest: AddScheduleRequest = {
 			date,
@@ -153,6 +155,7 @@ const AddSchedule: FC<AddScheduleProp> = ({ setOpen, employeeId }) => {
 			...(priority !== undefined && { priority }),
 			is_working,
 			on_call,
+			add_award,
 		};
 
 		onAddSchedule(addScheduleRequest);
@@ -250,6 +253,19 @@ const AddSchedule: FC<AddScheduleProp> = ({ setOpen, employeeId }) => {
 								name={NAMES.schedule.on_call}
 								disabled={false}
 							/>
+
+							<div className="mt-16">
+								<AddToggleSwitch
+									checked={addAwardInput}
+									setChecked={setAddAwardInput}
+									falseText={''}
+									trueText={'Add Award'}
+									toggleColour={ToggleColor.GREEN}
+									label={LABELS.schedule.add_award}
+									name={NAMES.schedule.add_award}
+									disabled={false}
+								/>
+							</div>
 						</div>
 					</div>
 				</div>
