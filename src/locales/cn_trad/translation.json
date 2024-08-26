@@ -43,6 +43,10 @@
     "Delete": "刪除",
     "Delete Employee": "刪除員工: {{employee}}",
     "Are you sure you want to delete this employee? This action cannot be reversed.": "請確認是否要刪除？",
+    "Change Password": "修改密碼",
+    "Change Password Title": "為: {{Bob}} 修改密碼",
+    "Change Profile Password Message": "請輸入此帳戶的舊密碼和您想使用的新密碼。",
+    "Change Password Message": "請輸入該員工的新密碼。",
 
     "Adding Gift Card...": "添加禮品卡中",
     "Gift Card Added Successfully": "禮品卡添加成功",
@@ -261,6 +265,10 @@
     "You do not have permission to delete employees.": "你無此權限",
 
     "Language cannot be empty.": "不能為空",
+    "Old Password cannot be empty.": "不能為空",
+    "Old Password Invalid": "無效",
+    "New Password cannot be empty.": "不能為空",
+    "New Password Invalid": "無效",
 
     "Gift Cards": "禮品卡",
     "Gift Card ID": "禮品卡號",
@@ -367,6 +375,9 @@
 
     "Language": "語言",
     "Dark Mode": "暗黑模式",
+    "Old Password": "舊密碼",
+    "New Password": "新密碼",
+    "Retype New Password": "重新輸入新密碼",
 
     "Select Date": "選擇日期",
     "Select Time": "選擇時間",

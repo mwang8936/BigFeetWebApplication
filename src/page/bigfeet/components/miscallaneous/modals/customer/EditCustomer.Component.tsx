@@ -253,7 +253,9 @@ const EditCustomer: FC<EditCustomerProp> = ({ setOpen, customer }) => {
 
 			<EditBottom
 				onCancel={() => setOpen(false)}
-				disabledEdit={!editable || !changesMade || invalidInput}
+				disabledEdit={
+					!editable || !changesMade || missingRequiredInput || invalidInput
+				}
 				editMissingPermissionMessage={
 					!editable
 						? ERRORS.customer.permissions.edit

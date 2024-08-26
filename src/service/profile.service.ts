@@ -6,7 +6,10 @@ import authorizedRequest from './base.service';
 
 import { profilePath } from '../constants/api.constants';
 
-import { UpdateProfileRequest } from '../models/requests/Profile.Request.Model';
+import {
+	ChangeProfilePasswordRequest,
+	UpdateProfileRequest,
+} from '../models/requests/Profile.Request.Model';
 
 export async function getProfile(
 	i18n: i18n,
@@ -47,6 +50,22 @@ export async function updateProfile(
 		queryClient,
 		setAuthentication,
 		`${profilePath}`,
+		'patch',
+		request
+	);
+}
+
+export async function changeProfilePassword(
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
+	request: ChangeProfilePasswordRequest
+) {
+	return authorizedRequest(
+		i18n,
+		queryClient,
+		setAuthentication,
+		`${profilePath}/change_password`,
 		'patch',
 		request
 	);

@@ -35,6 +35,8 @@ import User from '../../../../../models/User.Model';
 import { UpdateEmployeeRequest } from '../../../../../models/requests/Employee.Request.Model';
 
 import { arraysHaveSameContent } from '../../../../../utils/array.utils';
+import FilledPermissionsButton from '../../miscallaneous/FilledPermissionsButton.Component';
+import ChangeEmployeePasswordModal from '../../miscallaneous/modals/employee/ChangeEmployeePasswordModal.Component';
 
 interface EditEmployeeProp {
 	employee: Employee;
@@ -84,6 +86,7 @@ const EditEmployee: FC<EditEmployeeProp> = ({ employee }) => {
 		useState<boolean>(false);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
 
+	const [openChangePasswordModal, setOpenChangePasswordModal] = useState(false);
 	const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
@@ -476,6 +479,15 @@ const EditEmployee: FC<EditEmployeeProp> = ({ employee }) => {
 				missingPermissionMessage={ERRORS.employee.permissions.edit}
 			/>
 
+			<FilledPermissionsButton
+				btnTitle={'Change Password'}
+				top={false}
+				right={false}
+				disabled={!editable}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
+				onClick={() => setOpenChangePasswordModal(true)}
+			/>
+
 			<div className="bottom-bar">
 				<PermissionsButton
 					btnTitle={'Save Changes'}
@@ -509,6 +521,12 @@ const EditEmployee: FC<EditEmployeeProp> = ({ employee }) => {
 			<DatesDisplay
 				updatedAt={employee.updated_at}
 				createdAt={employee.created_at}
+			/>
+
+			<ChangeEmployeePasswordModal
+				open={openChangePasswordModal}
+				setOpen={setOpenChangePasswordModal}
+				employee={employee}
 			/>
 
 			<DeleteEmployeeModal

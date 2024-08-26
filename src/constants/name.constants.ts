@@ -29,6 +29,9 @@ const NAMES = {
 	},
 	profile: {
 		dark_mode: 'dark_mode',
+		old_password: 'old_password',
+		new_password: 'new_password',
+		retype_new_password: 'retype_new_password',
 	},
 	reservation: {
 		requested_employee: 'employee_requested',

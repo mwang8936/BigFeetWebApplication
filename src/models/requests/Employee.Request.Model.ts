@@ -2,6 +2,7 @@ import { Gender, Permissions, Role } from '../enums';
 
 export interface UpdateEmployeeRequest {
 	username?: string;
+	password?: string;
 	first_name?: string;
 	last_name?: string;
 	gender?: Gender;

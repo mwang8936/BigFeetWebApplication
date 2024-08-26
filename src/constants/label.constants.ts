@@ -29,6 +29,9 @@ const LABELS = {
 	profile: {
 		language: 'Language',
 		dark_mode: 'Dark Mode',
+		old_password: 'Old Password',
+		new_password: 'New Password',
+		retype_new_password: 'Retype New Password',
 	},
 	reservation: {
 		date: 'Select Date',

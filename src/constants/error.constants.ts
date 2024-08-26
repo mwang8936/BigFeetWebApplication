@@ -168,13 +168,27 @@ const ERRORS = {
 			required: 'Password cannot be empty.',
 			invalid: {
 				key: 'Password Invalid',
-				value: { max: LENGTHS.login.password },
+				value: { length: LENGTHS.login.password },
 			},
 		},
 	},
 	profile: {
 		language: {
 			required: 'Language cannot be empty.',
+		},
+		old_password: {
+			required: 'Old Password cannot be empty.',
+			invalid: {
+				key: 'Old Password Invalid',
+				value: { length: LENGTHS.employee.password },
+			},
+		},
+		new_password: {
+			required: 'New Password cannot be empty.',
+			invalid: {
+				key: 'New Password Invalid',
+				value: { length: LENGTHS.employee.password },
+			},
 		},
 	},
 	reservation: {
