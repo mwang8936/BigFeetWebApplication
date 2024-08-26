@@ -32,7 +32,7 @@ import { servicesQueryKey } from '../hooks/service.hooks';
 
 import API_BASE_URL, { authenticatePath } from '../../constants/api.constants';
 
-import { Permissions } from '../../models/enums';
+import { Permissions, Role } from '../../models/enums';
 import User from '../../models/User.Model';
 
 import {
@@ -141,13 +141,15 @@ const BigFeet: FC = () => {
 	useEffect(() => {
 		if (!user) return;
 
+		const role = user.role;
 		const permissions = user.permissions;
 
 		if (
-			permissions.includes(Permissions.PERMISSION_GET_EMPLOYEE) ||
-			permissions.includes(Permissions.PERMISSION_ADD_EMPLOYEE) ||
-			permissions.includes(Permissions.PERMISSION_UPDATE_EMPLOYEE) ||
-			permissions.includes(Permissions.PERMISSION_DELETE_EMPLOYEE)
+			[Role.DEVELOPER, Role.MANAGER].includes(role) &&
+			(permissions.includes(Permissions.PERMISSION_GET_EMPLOYEE) ||
+				permissions.includes(Permissions.PERMISSION_ADD_EMPLOYEE) ||
+				permissions.includes(Permissions.PERMISSION_UPDATE_EMPLOYEE) ||
+				permissions.includes(Permissions.PERMISSION_DELETE_EMPLOYEE))
 		)
 			sideBarItems.push(SideBarItems.Employees);
 
@@ -599,18 +601,18 @@ const BigFeet: FC = () => {
 			onRetry={() => {}}
 			enabled={false}
 		/>
-	) : selectedIndex === 0 ? (
+	) : selectedIndex === SideBarItems.Profile ? (
 		<Profile />
-	) : selectedIndex == 1 ? (
+	) : selectedIndex == SideBarItems.Scheduler ? (
 		<Scheduler />
-	) : selectedIndex == 2 ? (
+	) : selectedIndex == SideBarItems.PayRoll ? (
 		<PayRoll />
-	) : selectedIndex == 3 ? (
+	) : selectedIndex == SideBarItems.Employees ? (
 		<Employees />
-	) : selectedIndex == 4 ? (
+	) : selectedIndex == SideBarItems.Services ? (
 		<Services />
 	) : (
-		selectedIndex == 5 && <Customers />
+		selectedIndex == SideBarItems.Customers && <Customers />
 	);
 
 	const errorsElement = isUserError ? (
