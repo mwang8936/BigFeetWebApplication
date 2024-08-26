@@ -18,6 +18,7 @@ import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
 import LENGTHS from '../../../../../../../constants/lengths.constants';
 import NAMES from '../../../../../../../constants/name.constants';
+import PATTERNS from '../../../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
 
 import Employee from '../../../../../../../models/Employee.Model';
@@ -133,6 +134,7 @@ const SignSchedule: FC<SignScheduleProp> = ({ setOpen, employee }) => {
 									name={NAMES.employee.password}
 									type="password"
 									validationProp={{
+										pattern: PATTERNS.employee.password,
 										maxLength: LENGTHS.employee.password,
 										required: true,
 										requiredMessage: ERRORS.employee.password.required,

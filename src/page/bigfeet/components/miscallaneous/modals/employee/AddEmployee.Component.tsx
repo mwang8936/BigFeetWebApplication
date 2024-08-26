@@ -213,8 +213,11 @@ const AddEmployee: FC<AddEmployeeProp> = ({ setOpen }) => {
 							<AddPassword
 								password={passwordInput}
 								setPassword={setPasswordInput}
+								label={LABELS.employee.password}
+								name={NAMES.employee.password}
+								retypeLabel={LABELS.employee.retype_password}
+								retypeName={LABELS.employee.retype_password}
 								validationProp={{
-									maxLength: LENGTHS.employee.password,
 									required: true,
 									requiredMessage: ERRORS.employee.password.required,
 									invalid: invalidPassword,

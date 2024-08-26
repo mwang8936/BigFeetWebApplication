@@ -8,7 +8,7 @@ const PATTERNS = {
 	},
 	employee: {
 		username: `^[A-Za-z0-9.]{1,${LENGTHS.employee.username}}$`,
-		password: `^[a-zA-Z0-9~\`!@#$%^&*()_-+={[}]|:;"'<,>.?/]{1,${LENGTHS.employee.password}}$`,
+		password: `^[a-zA-Z0-9~!@#$%^&*\\(\\)_\\-+=\\{\\}\\[\\]:;"'\`,<.>?]{1,${LENGTHS.employee.password}}$`,
 		first_name: `^[A-Za-z\\s'\\-]{1,${LENGTHS.employee.first_name}}$`,
 		last_name: `^[A-Za-z\\s'\\-]{1,${LENGTHS.employee.last_name}}$`,
 	},

@@ -9,10 +9,17 @@ import { useSocketIdContext } from '../bigfeet/BigFeet.Page';
 import { useAuthenticationContext } from '../../App';
 
 import { UpdateEmployeeRequest } from '../../models/requests/Employee.Request.Model';
-import { UpdateProfileRequest } from '../../models/requests/Profile.Request.Model';
+import {
+	ChangeProfilePasswordRequest,
+	UpdateProfileRequest,
+} from '../../models/requests/Profile.Request.Model';
 
 import { deleteEmployee, updateEmployee } from '../../service/employee.service';
-import { getProfile, updateProfile } from '../../service/profile.service';
+import {
+	changeProfilePassword,
+	getProfile,
+	updateProfile,
+} from '../../service/profile.service';
 
 import { getLanguageFile } from '../../utils/i18n.utils';
 import {
@@ -125,6 +132,46 @@ export const useUpdateProfileSettingsMutation = ({
 			if (updatedLanguage)
 				i18n.changeLanguage(getLanguageFile(updatedLanguage));
 
+			if (onSuccess) onSuccess();
+
+			successToast(context.toastId, t('Profile Updated Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Update Profile'),
+					error.message
+				);
+		},
+		onSettled: async () => {
+			if (setLoading) setLoading(false);
+		},
+	});
+};
+
+export const useChangeProfilePasswordMutation = ({
+	setLoading,
+	setError,
+	onSuccess,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
+
+	return useMutation({
+		mutationFn: (data: { request: ChangeProfilePasswordRequest }) =>
+			changeProfilePassword(i18n, queryClient, setAuthentication, data.request),
+		onMutate: async () => {
+			if (setLoading) setLoading(true);
+
+			const toastId = createLoadingToast(t('Updating Profile...'));
+			return { toastId };
+		},
+		onSuccess: (_data, _variables, context) => {
 			if (onSuccess) onSuccess();
 
 			successToast(context.toastId, t('Profile Updated Successfully'));

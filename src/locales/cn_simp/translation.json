@@ -43,6 +43,10 @@
     "Delete": "删除",
     "Delete Employee": "删除员工: {{employee}}",
     "Are you sure you want to delete this employee? This action cannot be reversed.": "请确认是否要删除？",
+    "Change Password": "修改密码",
+    "Change Password Title": "为: {{username}} 修改密码",
+    "Change Profile Password Message": "请输入此账户的旧密码和您想使用的新密码。",
+    "Change Password Message": "请输入该员工的新密码。",
 
     "Adding Gift Card...": "添加礼品卡中",
     "Gift Card Added Successfully": "礼品卡添加成功",
@@ -261,6 +265,10 @@
     "You do not have permission to delete employees.": "你无此权限",
 
     "Language cannot be empty.": "不能为空",
+    "Old Password cannot be empty.": "不能为空",
+    "Old Password Invalid": "无效",
+    "New Password cannot be empty.": "不能为空",
+    "New Password Invalid": "无效",
 
     "Gift Cards": "礼品卡",
     "Gift Card ID":"礼品卡号",
@@ -367,6 +375,9 @@
 
     "Language": "语言",
     "Dark Mode": "暗",
+    "Old Password": "旧密码",
+    "New Password": "新密码",
+    "Retype New Password": "重输新密码",
 
     "Select Date": "选择日期",
     "Select Time": "选择时间",

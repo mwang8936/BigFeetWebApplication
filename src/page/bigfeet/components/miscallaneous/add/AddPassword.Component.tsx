@@ -4,10 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 import ERRORS from '../../../../../constants/error.constants';
-import LABELS from '../../../../../constants/label.constants';
 import LENGTHS from '../../../../../constants/lengths.constants';
-import NAMES from '../../../../../constants/name.constants';
 import PLACEHOLDERS from '../../../../../constants/placeholder.constants';
+import PATTERNS from '../../../../../constants/patterns.constants';
 
 interface InvalidMessage {
 	key: string;
@@ -28,12 +27,20 @@ interface ValidationProp {
 interface AddPasswordProp {
 	password: string | null;
 	setPassword(password: string | null): void;
+	label: string;
+	name: string;
+	retypeLabel: string;
+	retypeName: string;
 	validationProp: ValidationProp;
 }
 
 const AddPassword: FC<AddPasswordProp> = ({
 	password,
 	setPassword,
+	label,
+	name,
+	retypeLabel,
+	retypeName,
 	validationProp,
 }) => {
 	const { t } = useTranslation();
@@ -45,14 +52,14 @@ const AddPassword: FC<AddPasswordProp> = ({
 	return (
 		<>
 			<div className="mb-4">
-				<label className="label" htmlFor={NAMES.employee.password}>
-					{t(LABELS.employee.password)}
+				<label className="label" htmlFor={name}>
+					{t(label)}
 				</label>
 
 				<div className="div-input">
 					<input
 						className="add-input pl-12"
-						id={NAMES.employee.password}
+						id={name}
 						type={showPassword ? 'text' : 'password'}
 						value={password ?? ''}
 						onChange={(event) => {
@@ -64,6 +71,7 @@ const AddPassword: FC<AddPasswordProp> = ({
 							validationProp.setInvalid(!event.target.validity.valid);
 						}}
 						maxLength={LENGTHS.employee.password}
+						pattern={PATTERNS.employee.password}
 						required={validationProp.required}
 						placeholder={PLACEHOLDERS.employee.password}
 					/>
@@ -104,14 +112,14 @@ const AddPassword: FC<AddPasswordProp> = ({
 			</div>
 
 			<div className="mb-4">
-				<label className="label" htmlFor={NAMES.employee.retype_password}>
-					{t(LABELS.employee.retype_password)}
+				<label className="label" htmlFor={retypeName}>
+					{t(retypeLabel)}
 				</label>
 
 				<div className="div-input">
 					<input
 						className="add-input pl-12"
-						id={NAMES.employee.retype_password}
+						id={retypeName}
 						type={showRetypePassword ? 'text' : 'password'}
 						value={retypePassword ?? ''}
 						onChange={(event) => {

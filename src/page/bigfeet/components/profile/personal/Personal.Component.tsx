@@ -1,9 +1,12 @@
 import { FC, useEffect, useState } from 'react';
 
+import FilledPermissionsButton from '../../miscallaneous/FilledPermissionsButton.Component';
 import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
 
 import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
 import EditableInput from '../../miscallaneous/editable/EditableInput.Component';
+
+import ChangeProfilePasswordModal from '../../miscallaneous/modals/profile/ChangeProfilePasswordModal.Component';
 
 import {
 	useUpdateProfileMutation,
@@ -55,6 +58,8 @@ const Personal: FC<PersonalProp> = ({
 	const [missingRequiredInput, setMissingRequiredInput] =
 		useState<boolean>(false);
 	const [invalidInput, setInvalidInput] = useState<boolean>(false);
+
+	const [openChangePasswordModal, setOpenChangePasswordModal] = useState(false);
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
@@ -233,6 +238,15 @@ const Personal: FC<PersonalProp> = ({
 				missingPermissionMessage={ERRORS.employee.permissions.edit}
 			/>
 
+			<FilledPermissionsButton
+				btnTitle={'Change Password'}
+				top={false}
+				right={false}
+				disabled={false}
+				missingPermissionMessage={ERRORS.employee.permissions.edit}
+				onClick={() => setOpenChangePasswordModal(true)}
+			/>
+
 			<div className="bottom-bar">
 				<PermissionsButton
 					btnTitle={'Save Changes'}
@@ -254,6 +268,11 @@ const Personal: FC<PersonalProp> = ({
 					onClick={onSave}
 				/>
 			</div>
+
+			<ChangeProfilePasswordModal
+				open={openChangePasswordModal}
+				setOpen={setOpenChangePasswordModal}
+			/>
 		</>
 	);
 };
