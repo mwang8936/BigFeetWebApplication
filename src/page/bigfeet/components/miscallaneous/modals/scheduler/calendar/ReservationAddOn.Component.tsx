@@ -4,11 +4,16 @@ import { useTranslation } from 'react-i18next';
 import { Dialog } from '@headlessui/react';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material';
+
 import WarningModal from './WarningModal.Component';
 
 import AddBottom from '../../AddBottom.Component';
 
 import AddDropDown from '../../../add/AddDropDown.Component';
+import AddMinute from '../../../add/AddMinute.Component';
+import AddNumber from '../../../add/AddNumber.Component';
 
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
 
@@ -21,6 +26,10 @@ import { useServicesQuery } from '../../../../../../hooks/service.hooks';
 import { getServiceDropDownItems } from '../../../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
+import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
+import NAMES from '../../../../../../../constants/name.constants';
+import NUMBERS from '../../../../../../../constants/numbers.constants';
+import STORES from '../../../../../../../constants/store.constants';
 
 import Employee from '../../../../../../../models/Employee.Model';
 import { Permissions, Role } from '../../../../../../../models/enums';
@@ -35,6 +44,7 @@ import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
 } from '../../../../../../../utils/reservation.utils';
+import { formatTimeFromDate } from '../../../../../../../utils/string.utils';
 
 interface ReservationAddOnProp {
 	setOpen(open: boolean): void;
@@ -50,11 +60,20 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 	const { date } = useScheduleDateContext();
 
 	const [serviceIdInput, setServiceIdInput] = useState<number | null>(null);
+	const [endTimeInput, setEndTimeInput] = useState<number | null>(null);
+	const [bedsRequiredInput, setBedsRequiredInput] = useState<number | null>(
+		null
+	);
 
-	const [noBeds, setNoBeds] = useState<boolean>(false);
+	const [invalidEndTime, setInvalidEndTime] = useState<boolean>(false);
+	const [invalidBedsRequired, setInvalidBedsRequired] =
+		useState<boolean>(false);
 
 	const [missingRequiredInput, setMissingRequiredInput] =
 		useState<boolean>(true);
+	const [invalidInput, setInvalidInput] = useState<boolean>(false);
+	const [noBeds, setNoBeds] = useState<boolean>(false);
+
 	const [openBedWarningModal, setOpenBedWarningModal] =
 		useState<boolean>(false);
 	const [openConflictWarningModal, setOpenConflictWarningModal] =
@@ -104,11 +123,45 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 
 	const serviceDropDownItems = getServiceDropDownItems(services);
 
+	const startDate = new Date(
+		reservation.reserved_date.getTime() +
+			(reservation.time ?? reservation.service.time) * (1000 * 60)
+	);
+
 	useEffect(() => {
 		const missingRequiredInput = serviceIdInput === null;
 
 		setMissingRequiredInput(missingRequiredInput);
 	}, [serviceIdInput]);
+
+	useEffect(() => {
+		const invalidInput = invalidEndTime || invalidBedsRequired;
+
+		setInvalidInput(invalidInput);
+	}, [invalidEndTime, invalidBedsRequired]);
+
+	useEffect(() => {
+		if (serviceIdInput === null) {
+			setEndTimeInput(null);
+			setBedsRequiredInput(null);
+
+			setInvalidEndTime(false);
+			setInvalidBedsRequired(false);
+		} else {
+			const service: Service | undefined = services.find(
+				(service) => service.service_id === serviceIdInput
+			);
+
+			if (service) {
+				setEndTimeInput(service.time);
+				setBedsRequiredInput(service.beds_required);
+			}
+		}
+	}, [serviceIdInput]);
+
+	useEffect(() => {
+		if (endTimeInput === 0) setEndTimeInput(null);
+	}, [endTimeInput]);
 
 	useEffect(() => {
 		if (serviceIdInput) {
@@ -117,9 +170,8 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 			);
 
 			if (service) {
-				const startDate = new Date(
-					reservation.reserved_date.getTime() + reservation.service.time * 60000
-				);
+				const time = endTimeInput ?? service.time;
+				const bedsRequired = bedsRequiredInput ?? service.beds_required;
 
 				const reservations = schedules.flatMap(
 					(schedule) => schedule.reservations
@@ -127,7 +179,8 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 
 				const bedsConflict = reservationBedConflict(
 					startDate,
-					service,
+					time,
+					bedsRequired,
 					reservations
 				);
 
@@ -143,7 +196,7 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 				const reservationConflict = reservationEmployeeConflict(
 					startDate,
 					employeeId,
-					service,
+					time,
 					reservations
 				);
 
@@ -156,7 +209,7 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 		} else {
 			setNoBeds(false);
 		}
-	}, [serviceIdInput]);
+	}, [serviceIdInput, endTimeInput, bedsRequiredInput]);
 
 	const addReservationMutation = useAddReservationMutation({
 		onSuccess: () => setOpen(false),
@@ -166,11 +219,11 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 	};
 
 	const onAdd = () => {
-		const reserved_date = new Date(
-			reservation.reserved_date.getTime() + reservation.service.time * 60000
-		);
+		const reserved_date = startDate;
 		const employee_id = reservation.employee_id;
 		const service_id = serviceIdInput as number;
+		const time = endTimeInput ?? undefined;
+		const beds_required = bedsRequiredInput ?? undefined;
 		const requested_gender = reservation.requested_gender ?? undefined;
 		const requested_employee = reservation.requested_employee;
 		const message = reservation.message?.trim();
@@ -184,6 +237,8 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 			reserved_date,
 			employee_id,
 			service_id,
+			time,
+			beds_required,
 			requested_gender,
 			requested_employee,
 			message,
@@ -197,6 +252,18 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 
 		onAddReservation(addReservationRequest);
 	};
+
+	const service = services.find(
+		(service) => service.service_id === serviceIdInput
+	);
+
+	const maxEndTime = service?.time ?? NUMBERS.service.time;
+
+	const time = endTimeInput ?? service?.time;
+	const endDate = time
+		? new Date(reservation.reserved_date.getTime() + time * (1000 * 60))
+		: undefined;
+	const endTimeText = endDate ? formatTimeFromDate(endDate) : undefined;
 
 	return (
 		<>
@@ -226,10 +293,7 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 
 								<span>
 									{t('Time')}:{' '}
-									{new Date(
-										reservation.reserved_date.getTime() +
-											reservation.service.time * 60000
-									).toLocaleTimeString('en-US', {
+									{startDate.toLocaleTimeString('en-US', {
 										timeZone: 'America/Los_Angeles',
 										hour12: true,
 										hour: '2-digit',
@@ -256,6 +320,59 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 									requiredMessage: ERRORS.reservation.service_id.required,
 								}}
 							/>
+
+							{serviceIdInput !== null && (
+								<div className="mb-4">
+									<Accordion>
+										<AccordionSummary
+											expandIcon={<ExpandMoreIcon />}
+											aria-controls="panel1-content"
+											id="panel1-header">
+											{t('Service Settings')}
+										</AccordionSummary>
+
+										<AccordionDetails>
+											<AddMinute
+												minutes={endTimeInput}
+												setMinutes={setEndTimeInput}
+												label={LABELS.service.time}
+												name={NAMES.service.time}
+												validationProp={{
+													max: maxEndTime,
+													required: false,
+													invalid: invalidEndTime,
+													setInvalid: setInvalidEndTime,
+													invalidMessage: {
+														key: 'Minute Invalid',
+														value: {
+															max: maxEndTime,
+														},
+													},
+												}}
+											/>
+
+											<AddNumber
+												input={bedsRequiredInput}
+												setInput={setBedsRequiredInput}
+												label={LABELS.service.beds_required}
+												name={NAMES.service.beds_required}
+												validationProp={{
+													max: STORES.beds,
+													required: false,
+													invalid: invalidBedsRequired,
+													setInvalid: setInvalidBedsRequired,
+													invalidMessage: ERRORS.service.beds_required.invalid,
+												}}
+												placeholder={PLACEHOLDERS.service.beds_required}
+											/>
+
+											<span className="font-bold text-lg text-gray-800">
+												{t('End Time', { time: endTimeText })}
+											</span>
+										</AccordionDetails>
+									</Accordion>
+								</div>
+							)}
 						</div>
 					</div>
 				</div>
@@ -263,12 +380,16 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 
 			<AddBottom
 				onCancel={() => setOpen(false)}
-				disabledAdd={!creatable || missingRequiredInput || noBeds}
+				disabledAdd={
+					!creatable || missingRequiredInput || invalidInput || noBeds
+				}
 				addMissingPermissionMessage={
 					!creatable
 						? ERRORS.reservation.permissions.add
 						: missingRequiredInput
 						? ERRORS.required
+						: invalidInput
+						? ERRORS.invalid
 						: noBeds
 						? ERRORS.warnings.no_beds.title
 						: ''

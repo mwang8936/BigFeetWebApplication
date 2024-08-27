@@ -18,8 +18,8 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 	const { date } = useScheduleDateContext();
 
 	const completedReservations = reservations.filter((reservation) => {
-		const endDate =
-			reservation.reserved_date.getTime() + reservation.service.time * 60000;
+		const time = reservation.time ?? reservation.service.time;
+		const endDate = reservation.reserved_date.getTime() + time * (1000 * 60);
 
 		return endDate <= new Date().getTime();
 	});
@@ -35,9 +35,9 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
 	const bodyTexts = bodyReservations.map((reservation) => {
 		const startTimeText = formatTimeFromDate(reservation.reserved_date);
-		const endTime =
-			new Date(reservation.reserved_date).getTime() +
-			reservation.service.time * 60 * 1000;
+
+		const time = reservation.time ?? reservation.service.time;
+		const endTime = reservation.reserved_date.getTime() + time * (1000 * 60);
 		const endTimeText = formatTimeFromDate(new Date(endTime));
 		return (
 			<span
@@ -56,9 +56,9 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
 	const feetTexts = feetReservations.map((reservation) => {
 		const startTimeText = formatTimeFromDate(reservation.reserved_date);
-		const endTime =
-			new Date(reservation.reserved_date).getTime() +
-			reservation.service.time * 60 * 1000;
+
+		const time = reservation.time ?? reservation.service.time;
+		const endTime = reservation.reserved_date.getTime() + time * (1000 * 60);
 		const endTimeText = formatTimeFromDate(new Date(endTime));
 		return (
 			<span
@@ -82,9 +82,9 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 	const normalAcupunctureTexts = normalAcupunctureReservations.map(
 		(reservation) => {
 			const startTimeText = formatTimeFromDate(reservation.reserved_date);
-			const endTime =
-				new Date(reservation.reserved_date).getTime() +
-				reservation.service.time * 60 * 1000;
+
+			const time = reservation.time ?? reservation.service.time;
+			const endTime = reservation.reserved_date.getTime() + time * (1000 * 60);
 			const endTimeText = formatTimeFromDate(new Date(endTime));
 			return (
 				<span
@@ -105,9 +105,9 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 	const insuranceAcupunctureTexts = insuranceAcupunctureReservations.map(
 		(reservation) => {
 			const startTimeText = formatTimeFromDate(reservation.reserved_date);
-			const endTime =
-				new Date(reservation.reserved_date).getTime() +
-				reservation.service.time * 60 * 1000;
+
+			const time = reservation.time ?? reservation.service.time;
+			const endTime = reservation.reserved_date.getTime() + time * (1000 * 60);
 			const endTimeText = formatTimeFromDate(new Date(endTime));
 			return (
 				<span
@@ -116,21 +116,13 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 		}
 	);
 
-	const requestedReservations = reservations.filter((reservation) => {
-		const isRequestedReservation =
+	const requestedReservations = completedReservations.filter(
+		(reservation) =>
 			reservation.requested_employee &&
 			(reservation.service.body > 0 ||
 				reservation.service.feet > 0 ||
-				reservation.service.acupuncture > 0);
-
-		if (!isRequestedReservation) return false;
-
-		const endDate =
-			reservation.reserved_date.getTime() + reservation.service.time * 60000;
-
-		const isCompleted = endDate <= new Date().getTime();
-		return isCompleted;
-	});
+				reservation.service.acupuncture > 0)
+	);
 	requestedReservations.sort(
 		(a, b) => a.reserved_date.getTime() - b.reserved_date.getTime()
 	);
@@ -143,9 +135,9 @@ const TotalGrid: FC<TotalGridProp> = ({ row, colNum, reservations }) => {
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
 	const requestedTexts = requestedReservations.map((reservation) => {
 		const startTimeText = formatTimeFromDate(reservation.reserved_date);
-		const endTime =
-			new Date(reservation.reserved_date).getTime() +
-			reservation.service.time * 60 * 1000;
+
+		const time = reservation.time ?? reservation.service.time;
+		const endTime = reservation.reserved_date.getTime() + time * (1000 * 60);
 		const endTimeText = formatTimeFromDate(new Date(endTime));
 		return (
 			<span

@@ -123,7 +123,7 @@ const ReservationTag: FC<ReservationTagProp> = ({ reservation, colNum }) => {
 		100 * ((STORES.end + 1 - STORES.start) * 2 - rowStart) -
 		(100 / 6) * (Math.floor(startMinute % 30) / 5);
 
-	const time = reservation.service.time;
+	const time = reservation.time ?? reservation.service.time;
 	const height = ((time / 60) * 100).toString() + '%';
 
 	const left = `${
@@ -152,9 +152,8 @@ const ReservationTag: FC<ReservationTagProp> = ({ reservation, colNum }) => {
 
 	const startDate = new Date(reservation.reserved_date);
 
-	const endDate = new Date(reservation.reserved_date);
-	endDate.setMinutes(
-		reservation.reserved_date.getMinutes() + reservation.service.time
+	const endDate = new Date(
+		reservation.reserved_date.getTime() + time * (1000 * 60)
 	);
 
 	const isActive = new Date() >= startDate && new Date() < endDate;
@@ -247,9 +246,7 @@ const ReservationTag: FC<ReservationTagProp> = ({ reservation, colNum }) => {
 				.toLocaleTimeString()
 				.replace(/(.*)\D\d+/, '$1')}{' '}
 			-{' '}
-			{new Date(
-				reservation.reserved_date.getTime() + reservation.service.time * 60000
-			)
+			{new Date(reservation.reserved_date.getTime() + time * (1000 * 60))
 				.toLocaleTimeString()
 				.replace(/(.*)\D\d+/, '$1')}
 		</span>

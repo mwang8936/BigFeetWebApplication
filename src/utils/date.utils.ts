@@ -103,7 +103,7 @@ export function doesDateOverlap(
 		// If minuteRange is provided, create a target date range
 		const targetStartDate = targetDateTrimmed;
 		const targetEndDate = new Date(
-			targetDateTrimmed.getTime() + minuteRange * 60000
+			targetDateTrimmed.getTime() + minuteRange * (1000 * 60)
 		);
 
 		// Check for overlap with the provided date range

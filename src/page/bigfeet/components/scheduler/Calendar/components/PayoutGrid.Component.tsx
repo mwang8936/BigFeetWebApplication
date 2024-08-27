@@ -50,8 +50,8 @@ const PayoutGrid: FC<PayoutGridProp> = ({
 	const totalReservations = schedules
 		.flatMap((schedule) => schedule.reservations)
 		.filter((reservation) => {
-			const endDate =
-				reservation.reserved_date.getTime() + reservation.service.time * 60000;
+			const time = reservation.time ?? reservation.service.time;
+			const endDate = reservation.reserved_date.getTime() + time * (1000 * 60);
 
 			return endDate <= new Date().getTime();
 		});
@@ -67,8 +67,8 @@ const PayoutGrid: FC<PayoutGridProp> = ({
 	const awardMoney = totalSessions - STORES.award_reservation_count;
 
 	const completedReservations = reservations.filter((reservation) => {
-		const endDate =
-			reservation.reserved_date.getTime() + reservation.service.time * 60000;
+		const time = reservation.time ?? reservation.service.time;
+		const endDate = reservation.reserved_date.getTime() + time * (1000 * 60);
 
 		return endDate <= new Date().getTime();
 	});

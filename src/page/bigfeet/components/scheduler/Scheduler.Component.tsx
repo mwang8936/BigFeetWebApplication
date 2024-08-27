@@ -118,8 +118,8 @@ const Scheduler: FC = () => {
 	const totalReservations = schedules
 		.flatMap((schedule) => schedule.reservations)
 		.filter((reservation) => {
-			const endDate =
-				reservation.reserved_date.getTime() + reservation.service.time * 60000;
+			const time = reservation.time ?? reservation.service.time;
+			const endDate = reservation.reserved_date.getTime() + time * (1000 * 60);
 
 			return endDate <= new Date().getTime();
 		});

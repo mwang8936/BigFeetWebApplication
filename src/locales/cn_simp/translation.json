@@ -151,6 +151,7 @@
     "Would you like to make the following changes to the reservation?": "确定要改变吗?",
     "Employee": "员工",
     "Time": "时间",
+    "End Time": "结束时间: {{time}}",
     "Sign Schedule": "工作表签名",
     "Sign": "签名",
     "Sign Off Message": "确定要签名 {{date}} 的工作表?",

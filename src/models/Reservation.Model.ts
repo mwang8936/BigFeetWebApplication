@@ -8,6 +8,8 @@ export default interface Reservation {
 	date: Date;
 	reserved_date: Date;
 	service: Service;
+	time: number | null;
+	beds_required: number | null;
 	customer: Customer | null;
 	requested_gender: Gender | null;
 	requested_employee: boolean;

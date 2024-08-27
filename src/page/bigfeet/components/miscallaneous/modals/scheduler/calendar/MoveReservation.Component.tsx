@@ -104,11 +104,11 @@ const MoveReservation: FC<MoveReservationProp> = ({
 	)?.username;
 
 	useEffect(() => {
-		const startDate = newTime
-			? new Date(newTime)
-			: new Date(reservation.reserved_date);
+		const startDate = newTime ?? reservation.reserved_date;
 
-		const service = reservation.service;
+		const time = reservation.time ?? reservation.service.time;
+		const bedsRequired =
+			reservation.beds_required ?? reservation.service.beds_required;
 
 		const reservationId = reservation.reservation_id;
 
@@ -116,7 +116,8 @@ const MoveReservation: FC<MoveReservationProp> = ({
 
 		const bedsConflict = reservationBedConflict(
 			startDate,
-			service,
+			time,
+			bedsRequired,
 			reservations,
 			reservationId
 		);
@@ -134,7 +135,7 @@ const MoveReservation: FC<MoveReservationProp> = ({
 		const reservationConflict = reservationEmployeeConflict(
 			startDate,
 			employeeId,
-			service,
+			time,
 			reservations,
 			reservationId
 		);

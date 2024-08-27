@@ -151,6 +151,7 @@
     "Would you like to make the following changes to the reservation?": "Would you like to make the following changes to the reservation?",
     "Employee": "Employee",
     "Time": "Time",
+    "End Time": "End Time: {{time}}",
     "Sign Schedule": "Sign Schedule",
     "Sign": "Sign",
     "Sign Off Message": "Are you sure you want to sign off on this schedule for: {{date}}? This action cannot be reversed.",
