@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { Dialog } from '@headlessui/react';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 
+import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
 import DeleteReservationModal from './DeleteReservationModal.Component';
 import ReservationAddOnModal from './ReservationAddOnModal.Component';
 import WarningModal from './WarningModal.Component';
@@ -18,6 +21,8 @@ import { ToggleColor } from '../../../add/AddToggleSwitch.Component';
 import EditableDate from '../../../editable/EditableDate.Component';
 import EditableDropDown from '../../../editable/EditableDropDown.Component';
 import EditableInput from '../../../editable/EditableInput.Component';
+import EditableMinute from '../../../editable/EditableMinute.Component';
+import EditableNumber from '../../../editable/EditableNumber.Component';
 import EditablePayRate from '../../../editable/EditablePayRate.Component';
 import EditablePayRateAutomatic from '../../../editable/EditablePayRateAutomatic.Component';
 import EditablePhoneNumber from '../../../editable/EditablePhoneNumber.Component';
@@ -69,7 +74,10 @@ import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
 } from '../../../../../../../utils/reservation.utils';
-import { formatPhoneNumber } from '../../../../../../../utils/string.utils';
+import {
+	formatPhoneNumber,
+	formatTimeFromDate,
+} from '../../../../../../../utils/string.utils';
 
 interface EditReservationProp {
 	setOpen(open: boolean): void;
@@ -89,6 +97,12 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 	);
 	const [serviceIdInput, setServiceIdInput] = useState<number | null>(
 		reservation.service.service_id
+	);
+	const [endTimeInput, setEndTimeInput] = useState<number | null>(
+		reservation.time
+	);
+	const [bedsRequiredInput, setBedsRequiredInput] = useState<number | null>(
+		reservation.beds_required
 	);
 	const [genderInput, setGenderInput] = useState<Gender | null>(
 		reservation.requested_gender
@@ -132,6 +146,9 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 
 	const [invalidDate, setInvalidDate] = useState<boolean>(false);
 	const [invalidTime, setInvalidTime] = useState<boolean>(false);
+	const [invalidEndTime, setInvalidEndTime] = useState<boolean>(false);
+	const [invalidBedsRequired, setInvalidBedsRequired] =
+		useState<boolean>(false);
 	const [invalidCash, setInvalidCash] = useState<boolean>(false);
 	const [invalidMachine, setInvalidMachine] = useState<boolean>(false);
 	const [invalidVip, setInvalidVip] = useState<boolean>(false);
@@ -236,6 +253,12 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			serviceIdInput === reservation.service.service_id
 				? undefined
 				: serviceIdInput;
+		const time: number | null | undefined =
+			endTimeInput === reservation.time ? undefined : endTimeInput;
+		const beds_required: number | null | undefined =
+			bedsRequiredInput === reservation.beds_required
+				? undefined
+				: bedsRequiredInput;
 		const requested_gender: Gender | null | undefined =
 			genderInput === reservation.requested_gender ? undefined : genderInput;
 		const requested_employee: boolean | undefined =
@@ -294,6 +317,8 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			reserved_date !== undefined ||
 			employee_id !== undefined ||
 			service_id !== undefined ||
+			time !== undefined ||
+			beds_required !== undefined ||
 			requested_gender !== undefined ||
 			requested_employee !== undefined ||
 			cash !== undefined ||
@@ -320,6 +345,8 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		dateInput,
 		employeeIdInput,
 		serviceIdInput,
+		endTimeInput,
+		bedsRequiredInput,
 		genderInput,
 		requestedInput,
 		cashInput,
@@ -348,6 +375,8 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		const invalidInput =
 			invalidDate ||
 			invalidTime ||
+			invalidEndTime ||
+			invalidBedsRequired ||
 			invalidCash ||
 			invalidMachine ||
 			invalidVip ||
@@ -360,6 +389,8 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 	}, [
 		invalidDate,
 		invalidTime,
+		invalidEndTime,
+		invalidBedsRequired,
 		invalidCash,
 		invalidMachine,
 		invalidVip,
@@ -371,6 +402,40 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		invalidCustomerName,
 		customerPhoneNumberInput,
 	]);
+
+	useEffect(() => {
+		if (
+			serviceIdInput === null ||
+			dateInput === null ||
+			invalidDate ||
+			invalidTime
+		) {
+			setEndTimeInput(null);
+			setBedsRequiredInput(null);
+
+			setInvalidEndTime(false);
+			setInvalidBedsRequired(false);
+		} else {
+			if (
+				serviceIdInput !== reservation.service.service_id ||
+				!sameDate(dateInput, reservation.reserved_date) ||
+				!sameTime(dateInput, reservation.reserved_date)
+			) {
+				const service: Service | undefined = services.find(
+					(service) => service.service_id === serviceIdInput
+				);
+
+				if (service) {
+					setEndTimeInput(service.time);
+					setBedsRequiredInput(service.beds_required);
+				}
+			}
+		}
+	}, [serviceIdInput, dateInput, invalidDate, invalidTime]);
+
+	useEffect(() => {
+		if (endTimeInput === 0) setEndTimeInput(null);
+	}, [endTimeInput]);
 
 	useEffect(() => {
 		if (
@@ -432,6 +497,9 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			if (service) {
 				const startDate = new Date(dateInput);
 
+				const time = endTimeInput ?? service.time;
+				const bedsRequired = bedsRequiredInput ?? service.beds_required;
+
 				const reservationId = reservation.reservation_id;
 
 				const reservations = schedules.flatMap(
@@ -440,7 +508,8 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 
 				const bedsConflict = reservationBedConflict(
 					startDate,
-					service,
+					time,
+					bedsRequired,
 					reservations,
 					reservationId
 				);
@@ -456,7 +525,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 					const reservationConflict = reservationEmployeeConflict(
 						startDate,
 						employeeIdInput,
-						service,
+						time,
 						reservations,
 						reservationId
 					);
@@ -471,7 +540,13 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		} else {
 			setNoBeds(false);
 		}
-	}, [dateInput, employeeIdInput, serviceIdInput]);
+	}, [
+		dateInput,
+		employeeIdInput,
+		serviceIdInput,
+		endTimeInput,
+		bedsRequiredInput,
+	]);
 
 	useEffect(() => {
 		if (employeeIdInput && genderInput) {
@@ -528,6 +603,12 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			serviceIdInput === reservation.service.service_id
 				? undefined
 				: (serviceIdInput as number);
+		const time: number | null | undefined =
+			endTimeInput === reservation.time ? undefined : endTimeInput;
+		const beds_required: number | null | undefined =
+			bedsRequiredInput === reservation.beds_required
+				? undefined
+				: bedsRequiredInput;
 		const requested_gender: Gender | null | undefined =
 			genderInput === reservation.requested_gender ? undefined : genderInput;
 		const requested_employee: boolean | undefined =
@@ -592,6 +673,8 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			...(reserved_date !== undefined && { reserved_date }),
 			...(employee_id !== undefined && { employee_id }),
 			...(service_id !== undefined && { service_id }),
+			...(time !== undefined && { time }),
+			...(beds_required !== undefined && { beds_required }),
 			...(requested_gender !== undefined && { requested_gender }),
 			...(requested_employee !== undefined && { requested_employee }),
 			...(cash !== undefined && { cash }),
@@ -628,6 +711,20 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			(insuranceInput ?? 0)
 		).toFixed(2)
 	);
+
+	const service: Service | undefined =
+		serviceIdInput !== null
+			? services.find((service) => service.service_id === serviceIdInput)
+			: undefined;
+
+	const maxEndTime = service?.time ?? NUMBERS.service.time;
+
+	const time = endTimeInput ?? service?.time;
+	const endDate =
+		dateInput && time
+			? new Date(dateInput.getTime() + time * (1000 * 60))
+			: undefined;
+	const endTimeText = endDate ? formatTimeFromDate(endDate) : undefined;
 
 	const currentCustomer: Customer | undefined =
 		customerIdInput !== null
@@ -764,6 +861,73 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 								editable={editable}
 								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
+
+							{dateInput !== null &&
+								serviceIdInput !== null &&
+								!invalidDate &&
+								!invalidTime && (
+									<div className="mb-4">
+										<Accordion>
+											<AccordionSummary
+												expandIcon={<ExpandMoreIcon />}
+												aria-controls="panel1-content"
+												id="panel1-header">
+												{t('Service Settings')}
+											</AccordionSummary>
+
+											<AccordionDetails>
+												<EditableMinute
+													originalMinutes={reservation.time}
+													minutes={endTimeInput}
+													setMinutes={setEndTimeInput}
+													label={LABELS.service.time}
+													name={NAMES.service.time}
+													validationProp={{
+														max: maxEndTime,
+														required: false,
+														invalid: invalidEndTime,
+														setInvalid: setInvalidEndTime,
+														invalidMessage: {
+															key: 'Minute Invalid',
+															value: {
+																max: maxEndTime,
+															},
+														},
+													}}
+													editable={editable}
+													missingPermissionMessage={
+														ERRORS.reservation.permissions.edit
+													}
+												/>
+
+												<EditableNumber
+													originalInput={reservation.beds_required}
+													input={bedsRequiredInput}
+													setInput={setBedsRequiredInput}
+													label={LABELS.service.beds_required}
+													name={NAMES.service.beds_required}
+													validationProp={{
+														max: STORES.beds,
+														required: false,
+														invalid: invalidBedsRequired,
+														setInvalid: setInvalidBedsRequired,
+														invalidMessage:
+															ERRORS.service.beds_required.invalid,
+													}}
+													placeholder={PLACEHOLDERS.service.beds_required}
+													editable={editable}
+													missingPermissionMessage={
+														ERRORS.reservation.permissions.edit
+													}
+												/>
+
+												<span className="font-bold text-lg text-gray-800">
+													{t('End Time', { time: endTimeText })}
+												</span>
+											</AccordionDetails>
+										</Accordion>
+									</div>
+								)}
 
 							<EditableDropDown
 								originalOption={

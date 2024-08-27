@@ -3,14 +3,13 @@ import { doesDateOverlap } from './date.utils';
 import STORES from '../constants/store.constants';
 
 import Reservation from '../models/Reservation.Model';
-import Service from '../models/Service.Model';
 
 /**
  * Checks if there is a conflict for an employee's reservation with other existing reservations.
  *
  * @param startDate - The start date and time of the new reservation.
  * @param employeeId - The ID of the employee to check for conflicts.
- * @param service - The service being reserved, including its duration and overlap rules.
+ * @param time - The time (in minutes) the reservation will be reserved.
  * @param reservations - The list of existing reservations to check against.
  * @param reservationId - Optional. The ID of the current reservation being checked, to exclude it from conflict checks.
  *
@@ -19,7 +18,7 @@ import Service from '../models/Service.Model';
 export const reservationEmployeeConflict = (
 	startDate: Date,
 	employeeId: number,
-	service: Service,
+	time: number,
 	reservations: Reservation[],
 	reservationId?: number
 ): boolean => {
@@ -29,14 +28,17 @@ export const reservationEmployeeConflict = (
 	);
 
 	// Calculate the end date and time for the new reservation based on the service duration.
-	const endDate = new Date(startDate.getTime() + service.time * 60000);
+	const endDate = new Date(startDate.getTime() + time * (1000 * 60));
 
 	// Further filter reservations to find those that overlap with the new reservation.
-	const conflictingReservations = reservationsForSameEmployee.filter(
-		(res) =>
+	const conflictingReservations = reservationsForSameEmployee.filter((res) => {
+		const resTime = res.time ?? res.service.time;
+
+		return (
 			res.reservation_id !== reservationId && // Exclude the current reservation from conflict checks.
-			doesDateOverlap(res.reserved_date, startDate, endDate, res.service.time) // Check for overlap in date and time.
-	);
+			doesDateOverlap(res.reserved_date, startDate, endDate, resTime) // Check for overlap in date and time.
+		);
+	});
 
 	// Return true if there are any conflicting reservations for the specified employee.
 	return conflictingReservations.length > 0;
@@ -63,7 +65,8 @@ interface Event {
  * Checks if a new reservation conflicts with existing reservations based on bed requirements.
  *
  * @param startDate - The start date and time of the new reservation.
- * @param service - The service being reserved, including its bed requirements.
+ * @param time - The time (in minutes) the reservation will be reserved.
+ * @param bedsRequired - The number of beds required for this reservation.
  * @param reservations - The list of existing reservations to check against.
  * @param reservationId - Optional. The ID of the current reservation being checked, to exclude it from conflict checks.
  *
@@ -71,44 +74,50 @@ interface Event {
  */
 export const reservationBedConflict = (
 	startDate: Date,
-	service: Service,
+	time: number,
+	bedsRequired: number,
 	reservations: Reservation[],
 	reservationId?: number
 ): boolean => {
 	// If the service does not require any beds, there cannot be a bed conflict.
-	if (service.beds_required <= 0) return false;
+	if (bedsRequired <= 0) return false;
 
 	// Calculate the end date and time for the new reservation based on the service duration.
-	const endDate = new Date(startDate.getTime() + service.time * 60000);
+	const endDate = new Date(startDate.getTime() + time * (1000 * 60));
 
 	// Define the interval for the new reservation.
 	const newInterval: Interval = {
 		start: startDate.getTime(),
 		end: endDate.getTime(),
-		beds_required: service.beds_required,
+		beds_required: bedsRequired,
 	};
 
 	// Get all existing reservations that overlap with the new reservation and require beds.
 	const intervals: Interval[] = reservations
-		.filter(
-			(res) =>
+		.filter((res) => {
+			const resBedsRequired = res.beds_required ?? res.service.beds_required;
+			const resTime = res.time ?? res.service.time;
+
+			return (
 				res.reservation_id !== reservationId && // Exclude the current reservation from conflict checks.
-				res.service.beds_required > 0 && // Consider only reservations that require beds.
-				doesDateOverlap(res.reserved_date, startDate, endDate, res.service.time) // Check for overlap in date and time.
-		)
+				resBedsRequired > 0 && // Consider only reservations that require beds.
+				doesDateOverlap(res.reserved_date, startDate, endDate, resTime) // Check for overlap in date and time.
+			);
+		})
 		.map((res) => {
-			const resService = res.service;
+			const resBedsRequired = res.beds_required ?? res.service.beds_required;
+			const resTime = res.time ?? res.service.time;
 
 			// Calculate the start and end date and time for each existing reservation.
 			const resStartDate = res.reserved_date;
 			const resEndDate = new Date(
-				resStartDate.getTime() + resService.time * 60000
+				resStartDate.getTime() + resTime * (1000 * 60)
 			);
 
 			return {
 				start: resStartDate.getTime(),
 				end: resEndDate.getTime(),
-				beds_required: resService.beds_required,
+				beds_required: resBedsRequired,
 			};
 		});
 
@@ -183,17 +192,17 @@ export const getReservationOverlappingOrder = (
 	);
 
 	const startDate = reservation.reserved_date;
-	const service = reservation.service;
+	const time = reservation.time ?? reservation.service.time;
 
 	// Calculate the end date and time for the current reservation based on the service duration.
-	const endDate = new Date(startDate.getTime() + service.time * 60000);
+	const endDate = new Date(startDate.getTime() + time * (1000 * 60));
 
 	// Further filter reservations to find those that the current reservation falls within.
 	const conflictingReservations = reservationsForSameEmployee.filter((res) => {
 		const resStartDate = res.reserved_date;
-		const resEndDate = new Date(
-			resStartDate.getTime() + res.service.time * 60000
-		);
+
+		const resTime = res.time ?? res.service.time;
+		const resEndDate = new Date(resStartDate.getTime() + resTime * (1000 * 60));
 
 		return (
 			doesDateOverlap(startDate, resStartDate, resEndDate) && // Check if start date falls within the reservation

@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "description": "The dedicated (React) frontend web application.",
   "engines": {
-		"node": "16.16.0",
-		"npm": "9.6.0"
+    "node": "16.16.0",
+    "npm": "9.6.0"
   },
   "type": "module",
   "scripts": {
@@ -19,6 +19,7 @@
     "@emotion/styled": "^11.11.0",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
+    "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.14.8",
     "@mui/x-date-pickers": "^6.13.0",
     "@tanstack/react-query": "^5.51.1",

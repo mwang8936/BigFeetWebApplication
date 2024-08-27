@@ -4,6 +4,8 @@ export interface UpdateReservationRequest {
 	reserved_date?: Date;
 	employee_id?: number;
 	service_id?: number;
+	time?: number | null;
+	beds_required?: number | null;
 	customer_id?: number | null;
 	phone_number?: string | null;
 	vip_serial?: string | null;
@@ -26,6 +28,8 @@ export interface AddReservationRequest {
 	reserved_date: Date;
 	employee_id: number;
 	service_id: number;
+	time?: number;
+	beds_required?: number;
 	created_by: string;
 	customer_id?: number;
 	phone_number?: string;

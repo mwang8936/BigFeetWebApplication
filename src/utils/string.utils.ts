@@ -77,13 +77,14 @@ export function formatTimeFromNumber(time: number): string {
 	const formattedHour = hour === 12 ? 12 : hour % 12;
 
 	// Format minutes, padding with a leading zero if necessary
-	const formattedMinute = minute <= 9 ? `0${minute}` : `${minute}`;
+	const formattedMinute =
+		minute <= 9 ? `0${minute.toFixed(0)}` : `${minute.toFixed(0)}`;
 
 	// Determine AM or PM based on the hour
 	const period = hour >= 12 ? 'PM' : 'AM';
 
 	// Return the formatted time string
-	return `${formattedHour}:${formattedMinute} ${period}`;
+	return `${formattedHour.toFixed(0)}:${formattedMinute} ${period}`;
 }
 
 /**

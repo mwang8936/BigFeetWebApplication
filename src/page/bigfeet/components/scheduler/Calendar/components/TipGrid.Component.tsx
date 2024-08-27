@@ -33,9 +33,9 @@ const TipGrid: FC<TipGridProp> = ({ row, colNum, reservations }) => {
 
 	const tipsTexts = tipReservations.map((reservation, index) => {
 		const startTimeText = formatTimeFromDate(reservation.reserved_date);
-		const endTime =
-			new Date(reservation.reserved_date).getTime() +
-			reservation.service.time * 60 * 1000;
+
+		const time = reservation.time ?? reservation.service.time;
+		const endTime = reservation.reserved_date.getTime() + time * (1000 * 60);
 		const endTimeText = formatTimeFromDate(new Date(endTime));
 		return (
 			<span className="flex flex-col" key={reservation.reservation_id}>
