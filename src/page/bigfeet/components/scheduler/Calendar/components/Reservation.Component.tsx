@@ -102,8 +102,9 @@ const ReservationTag: FC<ReservationTagProp> = ({ reservation, colNum }) => {
 			: employees[currEmployeeIndex + employeeOffset || 0].employee_id;
 
 	const newTime =
-		timeOffset === 0 ? undefined : new Date(reservation.reserved_date);
-	newTime?.setTime(reservation.reserved_date.getTime() + timeOffset * 300000);
+		timeOffset === 0
+			? undefined
+			: new Date(reservation.reserved_date.getTime() + timeOffset * 300000);
 
 	// mt-[x%] where x=1/3 to move down one square
 	// row-span-1 is 30 min, row-span-2 is 1 hour

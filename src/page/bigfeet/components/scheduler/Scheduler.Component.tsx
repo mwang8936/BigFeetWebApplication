@@ -1,4 +1,4 @@
-import { useState, createContext, useContext, FC } from 'react';
+import { useState, createContext, useContext, FC, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
@@ -87,6 +87,18 @@ const Scheduler: FC = () => {
 		Permissions.PERMISSION_GET_SCHEDULE
 	);
 
+	const filtered = !sameDate(date, new Date());
+
+	useEffect(() => {
+		if (!filtered) {
+			const interval = setInterval(() => {
+				setDate(new Date());
+			}, 1000 * 60);
+
+			return () => clearInterval(interval);
+		}
+	}, [filtered]);
+
 	const giftCardsQuery = useGiftCardsQuery({
 		date,
 		gettable: giftCardGettable,
@@ -162,8 +174,6 @@ const Scheduler: FC = () => {
 			.filter((giftCard) => giftCard.payment_method === PaymentMethod.CASH)
 			.map((giftCard) => giftCard.payment_amount)
 			.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
-
-	const filtered = !sameDate(date, new Date());
 
 	const zoomIn = () => {
 		setScale((prevScale) => prevScale + 0.1);
