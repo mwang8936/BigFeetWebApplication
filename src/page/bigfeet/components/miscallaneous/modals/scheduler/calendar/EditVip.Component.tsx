@@ -8,6 +8,7 @@ import DeleteVipModal from './DeleteVipModal.Component';
 
 import EditBottom from '../../EditBottom.Component';
 
+import EditableInput from '../../../editable/EditableInput.Component';
 import EditableMultiSelect from '../../../editable/EditableMultiSelect.Component';
 import EditablePayRate from '../../../editable/EditablePayRate.Component';
 
@@ -19,8 +20,10 @@ import { useUpdateVipPackageMutation } from '../../../../../../hooks/vip-package
 
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
+import LENGTHS from '../../../../../../../constants/lengths.constants';
 import NAMES from '../../../../../../../constants/name.constants';
 import NUMBERS from '../../../../../../../constants/numbers.constants';
+import PATTERNS from '../../../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
 
 import Employee from '../../../../../../../models/Employee.Model';
@@ -44,6 +47,9 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
+	const [serialInput, setSerialInput] = useState<string | null>(
+		vipPackage.serial
+	);
 	const [soldAmountInput, setSoldAmountInput] = useState<number | null>(
 		vipPackage.sold_amount
 	);
@@ -54,6 +60,7 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 		number | null
 	>(vipPackage.commission_amount);
 
+	const [invalidSerial, setInvalidSerial] = useState<boolean>(false);
 	const [invalidSoldAmount, setInvalidSoldAmount] = useState<boolean>(false);
 	const [invalidCommissionAmount, setInvalidCommissionAmount] =
 		useState<boolean>(false);
@@ -86,6 +93,8 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	useEffect(() => {
+		const serial: string | null | undefined =
+			serialInput === vipPackage.serial ? undefined : serialInput;
 		const sold_amount: number | null | undefined =
 			soldAmountInput === vipPackage.sold_amount ? undefined : soldAmountInput;
 		const employee_ids: number[] | undefined = arraysHaveSameContent(
@@ -100,6 +109,7 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 				: commissionAmountInput;
 
 		const changesMade =
+			serial !== undefined ||
 			sold_amount !== undefined ||
 			employee_ids !== undefined ||
 			commission_amount !== undefined;
@@ -107,31 +117,45 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 		setChangesMade(changesMade);
 
 		const missingRequiredInput =
+			serialInput === null ||
 			soldAmountInput === null ||
 			employeesInput.length === 0 ||
 			commissionAmountInput === null;
 
 		setMissingRequiredInput(missingRequiredInput);
-	}, [employeesInput.length, soldAmountInput, commissionAmountInput]);
+	}, [
+		serialInput,
+		employeesInput.length,
+		soldAmountInput,
+		commissionAmountInput,
+	]);
 
 	useEffect(() => {
-		const invalidInput = invalidSoldAmount || invalidCommissionAmount;
+		const invalidInput =
+			invalidSerial || invalidSoldAmount || invalidCommissionAmount;
 		setInvalidInput(invalidInput);
-	}, [invalidSoldAmount, invalidCommissionAmount]);
+	}, [invalidSerial, invalidSoldAmount, invalidCommissionAmount]);
 
 	const updateVipPackageMutation = useUpdateVipPackageMutation({
 		onSuccess: () => setOpen(false),
 	});
 	const onEditVipPackage = async (
-		serial: string,
+		vipPackageId: number,
 		request: UpdateVipPackageRequest,
 		originalDate: Date,
 		newDate?: Date
 	) => {
-		updateVipPackageMutation.mutate({ serial, request, originalDate, newDate });
+		updateVipPackageMutation.mutate({
+			vipPackageId,
+			request,
+			originalDate,
+			newDate,
+		});
 	};
 
 	const onEdit = () => {
+		const serial: string | undefined =
+			serialInput === vipPackage.serial ? undefined : (serialInput as string);
 		const sold_amount: number | undefined =
 			soldAmountInput === vipPackage.sold_amount
 				? undefined
@@ -148,13 +172,19 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 				: (commissionAmountInput as number);
 
 		const editVipPackageRequest: UpdateVipPackageRequest = {
+			...(serial !== undefined && { serial }),
 			...(sold_amount !== undefined && { sold_amount }),
 			...(employee_ids !== undefined && { date }),
 			...(employee_ids !== undefined && { employee_ids }),
 			...(commission_amount !== undefined && { commission_amount }),
 		};
 
-		onEditVipPackage(vipPackage.serial, editVipPackageRequest, date, undefined);
+		onEditVipPackage(
+			vipPackage.vip_package_id,
+			editVipPackageRequest,
+			date,
+			undefined
+		);
 	};
 
 	return (
@@ -176,6 +206,27 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 						</Dialog.Title>
 
 						<div className="mt-2">
+							<EditableInput
+								originalText={vipPackage.serial}
+								text={serialInput}
+								setText={setSerialInput}
+								label={LABELS.vip_package.serial}
+								name={NAMES.vip_package.serial}
+								type="text"
+								validationProp={{
+									maxLength: LENGTHS.vip_package.serial,
+									pattern: PATTERNS.vip_package.serial,
+									required: true,
+									requiredMessage: ERRORS.vip_package.serial.required,
+									invalid: invalidSerial,
+									setInvalid: setInvalidSerial,
+									invalidMessage: ERRORS.vip_package.serial.invalid,
+								}}
+								placeholder={PLACEHOLDERS.vip_package.serial}
+								editable={editable}
+								missingPermissionMessage={ERRORS.vip_package.permissions.edit}
+							/>
+
 							<EditablePayRate
 								originalAmount={vipPackage.sold_amount}
 								amount={soldAmountInput}
