@@ -38,7 +38,7 @@ export const useUpdateVipPackageMutation = ({
 
 	return useMutation({
 		mutationFn: (data: {
-			serial: string;
+			vipPackageId: number;
 			request: UpdateVipPackageRequest;
 			originalDate: Date;
 			newDate?: Date;
@@ -47,7 +47,7 @@ export const useUpdateVipPackageMutation = ({
 				i18n,
 				queryClient,
 				setAuthentication,
-				data.serial,
+				data.vipPackageId,
 				data.request,
 				socketId
 			),
@@ -159,12 +159,12 @@ export const useDeleteVipPackageMutation = ({
 	const { socketId } = useSocketIdContext();
 
 	return useMutation({
-		mutationFn: (data: { serial: string; date: Date }) =>
+		mutationFn: (data: { vipPackageId: number; date: Date }) =>
 			deleteVipPackage(
 				i18n,
 				queryClient,
 				setAuthentication,
-				data.serial,
+				data.vipPackageId,
 				socketId
 			),
 		onMutate: async () => {

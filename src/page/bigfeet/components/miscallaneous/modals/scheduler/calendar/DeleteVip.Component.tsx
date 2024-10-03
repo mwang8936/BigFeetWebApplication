@@ -50,12 +50,12 @@ const DeleteVip: FC<DeleteVipProp> = ({ setOpen, vipPackage }) => {
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
 	const deleteVipPackageMutation = useDeleteVipPackageMutation({});
-	const onDeleteVipPackage = async (serial: string) => {
-		deleteVipPackageMutation.mutate({ serial, date });
+	const onDeleteVipPackage = async (vipPackageId: number) => {
+		deleteVipPackageMutation.mutate({ vipPackageId, date });
 	};
 
 	const onDelete = () => {
-		onDeleteVipPackage(vipPackage.serial);
+		onDeleteVipPackage(vipPackage.vip_package_id);
 	};
 
 	return (
