@@ -150,3 +150,39 @@ export function isHoliday(date: Date): boolean {
 	// Return false if there are no holidays for the year or the date is not a holiday
 	return false;
 }
+
+export function getYearMonthString(
+	yearNumber: number,
+	monthNumber: number,
+	locale = 'en-US'
+): string {
+	if (monthNumber < 1 || monthNumber > 12) {
+		throw new Error(
+			'Invalid month number. Please provide a number between 1 and 12.'
+		);
+	}
+
+	const date = new Date(yearNumber, monthNumber - 1);
+
+	return date.toLocaleDateString(locale, {
+		year: 'numeric',
+		month: 'long',
+	});
+}
+
+export function getShortMonthString(
+	monthNumber: number,
+	locale = 'en-US'
+): string {
+	if (monthNumber < 1 || monthNumber > 12) {
+		throw new Error(
+			'Invalid month number. Please provide a number between 1 and 12.'
+		);
+	}
+
+	const date = new Date(2000, monthNumber - 1);
+
+	return date.toLocaleDateString(locale, {
+		month: 'short',
+	});
+}

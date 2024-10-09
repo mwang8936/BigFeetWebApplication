@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { payrollsQueryKey } from './payroll.hooks';
 import { MutationProp, QueryProp } from './props.hooks';
 
 import { useSocketIdContext } from '../bigfeet/BigFeet.Page';
@@ -53,15 +54,20 @@ export const useSchedulesQuery = ({
 	return useQuery({
 		queryKey: [schedulesQueryKey, formatDateToQueryKey(date)],
 		queryFn: () => {
-			if (gettable) {
-				const params: GetSchedulesParam = {
-					start: date,
-					end: date,
-				};
+			const params: GetSchedulesParam = {
+				start: date,
+				end: date,
+			};
 
+			if (gettable) {
 				return getSchedules(i18n, queryClient, setAuthentication, params);
 			} else {
-				return getProfileSchedules(i18n, queryClient, setAuthentication);
+				return getProfileSchedules(
+					i18n,
+					queryClient,
+					setAuthentication,
+					params
+				);
 			}
 		},
 		staleTime,
@@ -105,6 +111,14 @@ export const useUpdateScheduleMutation = ({
 		onSuccess: (_data, variables, context) => {
 			queryClient.invalidateQueries({
 				queryKey: [schedulesQueryKey, formatDateToQueryKey(variables.date)],
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: [
+					payrollsQueryKey,
+					variables.date.getFullYear(),
+					variables.date.getMonth() + 1,
+				],
 			});
 
 			if (onSuccess) onSuccess();
@@ -209,6 +223,14 @@ export const useAddScheduleMutation = ({
 				queryKey: [
 					schedulesQueryKey,
 					formatDateToQueryKey(variables.request.date),
+				],
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: [
+					payrollsQueryKey,
+					variables.request.date.getFullYear(),
+					variables.request.date.getMonth() + 1,
 				],
 			});
 

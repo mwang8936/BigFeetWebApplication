@@ -32,5 +32,6 @@ rolePermissions.set(Role.RECEPTIONIST, [
 	Permissions.PERMISSION_DELETE_VIP_PACKAGE,
 ]);
 rolePermissions.set(Role.STORE_EMPLOYEE, []);
+rolePermissions.set(Role.ACUPUNCTURIST, []);
 
 export default rolePermissions;

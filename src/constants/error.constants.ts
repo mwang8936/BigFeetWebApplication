@@ -59,7 +59,7 @@ const ERRORS = {
 			required: 'Password cannot be empty.',
 			invalid: {
 				key: 'Password Invalid',
-				value: { max: LENGTHS.employee.password },
+				value: { length: LENGTHS.employee.password },
 			},
 			match: 'Passwords must match.',
 		},
@@ -170,6 +170,33 @@ const ERRORS = {
 				key: 'Password Invalid',
 				value: { length: LENGTHS.login.password },
 			},
+		},
+	},
+	payroll: {
+		year: {
+			required: 'Year cannot be empty.',
+			invalid: {
+				key: 'Year Invalid',
+				value: { min: NUMBERS.payroll.year.min },
+			},
+		},
+		month: {
+			required: 'Month cannot be empty.',
+		},
+		option: {
+			required: 'Option cannot be empty.',
+		},
+		cheque_amount: {
+			invalid: {
+				key: 'Cheque Amount Invalid',
+				value: { max: NUMBERS.payroll.cheque_amount },
+			},
+		},
+		permissions: {
+			get: 'You do not have permissions to get payrolls.',
+			edit: 'You do not have permissions to edit payrolls.',
+			add: 'You do not have permissions to add payrolls.',
+			delete: 'You do not have permission to delete payrolls.',
 		},
 	},
 	profile: {

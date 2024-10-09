@@ -26,6 +26,12 @@ const LABELS = {
 		payment_method: 'Payment Method',
 		payment_amount: 'Payment Amount',
 	},
+	payroll: {
+		year: 'Year',
+		month: 'Month',
+		option: 'Option',
+		cheque_amount: 'Cheque Amount',
+	},
 	profile: {
 		language: 'Language',
 		dark_mode: 'Dark Mode',

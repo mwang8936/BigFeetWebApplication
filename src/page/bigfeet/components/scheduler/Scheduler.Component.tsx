@@ -10,7 +10,7 @@ import PermissionsButton, {
 	ButtonType,
 } from '../miscallaneous/PermissionsButton.Component';
 
-import FilterDateModal from '../miscallaneous/modals/scheduler/FilterDateModal.Component';
+import FilterSchedulesModal from '../miscallaneous/modals/scheduler/FilterSchedulesModal.Component';
 import AddReservationModal from '../miscallaneous/modals/scheduler/calendar/AddReservationModal.Component';
 import GiftCardsModal from '../miscallaneous/modals/scheduler/calendar/GiftCardModal.Component';
 
@@ -292,7 +292,7 @@ const Scheduler: FC = () => {
 						/>
 					</div>
 
-					<FilterDateModal
+					<FilterSchedulesModal
 						open={openFilterDialog}
 						setOpen={setOpenFilterDialog}
 					/>
