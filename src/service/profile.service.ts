@@ -6,6 +6,14 @@ import authorizedRequest from './base.service';
 
 import { profilePath } from '../constants/api.constants';
 
+import Payroll from '../models/Payroll.Model';
+import Schedule from '../models/Schedule.Model';
+
+import {
+	GetProfilePayrollsParam,
+	GetProfileSchedulesParam,
+} from '../models/params/Profile.Param';
+
 import {
 	ChangeProfilePasswordRequest,
 	UpdateProfileRequest,
@@ -28,14 +36,34 @@ export async function getProfile(
 export async function getProfileSchedules(
 	i18n: i18n,
 	queryClient: QueryClient,
-	setAuthentication: (authenticated: boolean) => void
-) {
+	setAuthentication: (authenticated: boolean) => void,
+	params?: GetProfileSchedulesParam
+): Promise<Schedule[]> {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
 		`${profilePath}/schedule`,
-		'get'
+		'get',
+		undefined,
+		params
+	);
+}
+
+export async function getProfilePayrolls(
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
+	params?: GetProfilePayrollsParam
+): Promise<Payroll[]> {
+	return authorizedRequest(
+		i18n,
+		queryClient,
+		setAuthentication,
+		`${profilePath}/payroll`,
+		'get',
+		undefined,
+		params
 	);
 }
 

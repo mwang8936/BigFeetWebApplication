@@ -8,6 +8,12 @@ const NUMBERS = {
 	gift_card: {
 		payment_amount: 999999.99,
 	},
+	payroll: {
+		year: {
+			min: 2020,
+		},
+		cheque_amount: 999999.99,
+	},
 	reservation: {
 		cash: 999.99,
 		machine: 999.99,

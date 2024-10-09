@@ -12,6 +12,7 @@ export const authenticatePath = 'authenticate';
 export const customerPath = 'customer';
 export const employeePath = 'employee';
 export const giftCardPath = 'gift-card';
+export const payrollPath = 'payroll';
 export const profilePath = 'profile';
 export const reservationPath = 'reservation';
 export const schedulePath = 'schedule';

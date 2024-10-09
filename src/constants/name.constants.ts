@@ -27,6 +27,12 @@ const NAMES = {
 		password: 'password',
 		remember_me: 'remember_me',
 	},
+	payroll: {
+		year: 'year',
+		month: 'month',
+		option: 'option',
+		cheque_amount: 'cheque_amount',
+	},
 	profile: {
 		dark_mode: 'dark_mode',
 		old_password: 'old_password',

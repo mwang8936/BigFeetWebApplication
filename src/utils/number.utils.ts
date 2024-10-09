@@ -16,3 +16,13 @@ export function moneyToString(money: number): string {
 		return money.toFixed(2);
 	}
 }
+
+export function sessionToString(money: number): string {
+	if (Number.isInteger(money)) {
+		// If the money amount is an integer, return it as a string without decimal places.
+		return money.toString();
+	} else {
+		// If the money amount has decimal places, format it to one decimal places.
+		return money.toFixed(1);
+	}
+}

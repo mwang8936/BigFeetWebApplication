@@ -85,7 +85,7 @@ const SideBar: FC<SideBarProp> = ({
 					<img src={PayRollIcon} className="h-16 w-16" />
 
 					<span className="sidebar-tip group-hover:scale-100">
-						{t('Pay Roll')}
+						{t('Payroll')}
 					</span>
 				</div>
 			)}

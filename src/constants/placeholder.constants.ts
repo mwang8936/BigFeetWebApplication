@@ -25,6 +25,10 @@ const PLACEHOLDERS = {
 		gift_card_id: 'T123456',
 		payment_amount: '50.00',
 	},
+	payroll: {
+		year: '2024',
+		cheque_amount: '1600.00',
+	},
 	reservation: {
 		cash: '0.00',
 		machine: '0.00',

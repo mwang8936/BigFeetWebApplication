@@ -23,11 +23,11 @@ import User from '../../../../../../models/User.Model';
 import { sameDate } from '../../../../../../utils/date.utils';
 import { formatDateToQueryKey } from '../../../../../../utils/string.utils';
 
-interface FilterDateProp {
+interface FilterSchedulesProp {
 	setOpen(open: boolean): void;
 }
 
-const FilterDate: FC<FilterDateProp> = ({ setOpen }) => {
+const FilterSchedules: FC<FilterSchedulesProp> = ({ setOpen }) => {
 	const { t } = useTranslation();
 	const queryClient = useQueryClient();
 
@@ -123,4 +123,4 @@ const FilterDate: FC<FilterDateProp> = ({ setOpen }) => {
 	);
 };
 
-export default FilterDate;
+export default FilterSchedules;
