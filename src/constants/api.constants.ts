@@ -9,6 +9,7 @@ export const tokenKey = 'accessToken';
 
 export const loginPath = 'login';
 export const authenticatePath = 'authenticate';
+export const acupunctureReportPath = 'acupuncture-report';
 export const customerPath = 'customer';
 export const employeePath = 'employee';
 export const giftCardPath = 'gift-card';

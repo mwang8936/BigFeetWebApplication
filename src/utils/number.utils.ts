@@ -17,12 +17,22 @@ export function moneyToString(money: number): string {
 	}
 }
 
-export function sessionToString(money: number): string {
-	if (Number.isInteger(money)) {
+export function sessionToString(sessionCount: number): string {
+	if (Number.isInteger(sessionCount)) {
 		// If the money amount is an integer, return it as a string without decimal places.
-		return money.toString();
+		return sessionCount.toString();
 	} else {
 		// If the money amount has decimal places, format it to one decimal places.
-		return money.toFixed(1);
+		return sessionCount.toFixed(1);
+	}
+}
+
+export function percentageToString(percentage: number): string {
+	const hundredPercentage = percentage * 100;
+
+	if (Number.isInteger(hundredPercentage)) {
+		return hundredPercentage.toString();
+	} else {
+		return hundredPercentage.toFixed(2);
 	}
 }

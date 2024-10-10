@@ -1,6 +1,7 @@
 import { FC } from 'react';
 
 import AcupuncturistPayrollTable from './AcupuncturistPayrollTable.Component';
+import GenerateAcupunctureReport from './GenerateAcupunctureReport.Component';
 import GeneratePayroll from './GeneratePayroll.Component';
 import ReceptionistPayrollTable from './ReceptionistPayrollTable.Component';
 import StoreEmployeePayrollTable from './StoreEmployeePayrollTable.Component';
@@ -22,6 +23,9 @@ import {
 } from '../../../../../models/enums';
 import Payroll from '../../../../../models/Payroll.Model';
 import User from '../../../../../models/User.Model';
+import { useAcupunctureReportsQuery } from '../../../../hooks/acupuncture-report.hooks';
+import AcupunctureReport from '../../../../../models/Acupuncture-Report.Model';
+import AcupunctureReportTable from './AcupunctureReportTable.Component';
 
 interface EmployeePayrollProp {
 	employee: Employee;
@@ -35,6 +39,19 @@ const EmployeePayroll: FC<EmployeePayrollProp> = ({ employee }) => {
 
 	const gettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_PAYROLL
+	);
+
+	const acupunctureReportQuery = useAcupunctureReportsQuery({
+		year: date.year,
+		month: date.month,
+		gettable,
+	});
+
+	const acupunctureReport: AcupunctureReport | undefined = (
+		acupunctureReportQuery.data || []
+	).find(
+		(acupunctureReport) =>
+			acupunctureReport.employee.employee_id === employee.employee_id
 	);
 
 	const payrollsQuery = usePayrollsQuery({
@@ -74,12 +91,12 @@ const EmployeePayroll: FC<EmployeePayrollProp> = ({ employee }) => {
 	});
 
 	if (employee.role === Role.ACUPUNCTURIST) {
-		if (true) {
-			// Check if acupuncture report exists
+		if (acupunctureReport) {
 			items.push(
-				<GeneratePayroll employee={employee} part={PayrollPart.PART_1} />
+				<AcupunctureReportTable acupunctureReport={acupunctureReport} />
 			);
 		} else {
+			items.push(<GenerateAcupunctureReport employee={employee} />);
 		}
 	}
 

@@ -1,4 +1,9 @@
 const PLACEHOLDERS = {
+	acupuncture_report: {
+		acupuncture_percentage: '70',
+		massage_percentage: '30',
+		insurance_percentage: '30',
+	},
 	customer: {
 		search_customer: 'Search by name or phone number',
 		phone_number: '(123) 456-7890',

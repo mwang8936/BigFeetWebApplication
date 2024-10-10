@@ -7,3 +7,8 @@ export interface GetProfilePayrollsParam {
 	start?: Date;
 	end?: Date;
 }
+
+export interface GetProfileAcupunctureReportsParam {
+	start?: Date;
+	end?: Date;
+}

@@ -6,10 +6,12 @@ import authorizedRequest from './base.service';
 
 import { profilePath } from '../constants/api.constants';
 
+import AcupunctureReport from '../models/Acupuncture-Report.Model';
 import Payroll from '../models/Payroll.Model';
 import Schedule from '../models/Schedule.Model';
 
 import {
+	GetProfileAcupunctureReportsParam,
 	GetProfilePayrollsParam,
 	GetProfileSchedulesParam,
 } from '../models/params/Profile.Param';
@@ -61,6 +63,23 @@ export async function getProfilePayrolls(
 		queryClient,
 		setAuthentication,
 		`${profilePath}/payroll`,
+		'get',
+		undefined,
+		params
+	);
+}
+
+export async function getProfileAcupunctureReports(
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
+	params?: GetProfileAcupunctureReportsParam
+): Promise<AcupunctureReport[]> {
+	return authorizedRequest(
+		i18n,
+		queryClient,
+		setAuthentication,
+		`${profilePath}/acupuncture-report`,
 		'get',
 		undefined,
 		params
