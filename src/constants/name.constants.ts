@@ -1,4 +1,9 @@
 const NAMES = {
+	acupuncture_report: {
+		acupuncture_percentage: 'acupuncture_percentage',
+		massage_percentage: 'massage_percentage',
+		insurance_percentage: 'insurance_percentage',
+	},
 	customer: {
 		search_customer: 'search_customer',
 		phone_number: 'phone_number',

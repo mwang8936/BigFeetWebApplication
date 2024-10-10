@@ -1,4 +1,9 @@
 const LABELS = {
+	acupuncture_report: {
+		acupuncture_percentage: 'Acupuncture Percentage',
+		massage_percentage: 'Massage Percentage',
+		insurance_percentage: 'Insurance Percentage',
+	},
 	customer: {
 		search_customer: 'Search Customer',
 		phone_number: 'Phone Number',

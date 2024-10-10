@@ -474,5 +474,40 @@
     "Vip Package Deleted": "Vip Package with Serial: {{serial}}, deleted.",
 
     "Reservation Add On": "Reservation Add On",
-    "Add on a reservation": "Add on a reservation"
+    "Add on a reservation": "Add on a reservation",
+
+    "Cash Out Invalid": "Cash Out must be between $0-{{max}} and limited to 2 decimal places.",
+    "Cash Out": "Cash Out",
+    "Half": "Half",
+    "Cash Out: ": "Cash Out: ",
+
+    "This employee is not scheduled to work at this time.": "This employee is not scheduled to work at this time.",
+
+    "Acupuncture Percentage": "Acupuncture Percentage",
+    "Acupuncture Percentage cannot be empty.": "Acupuncture Percentage cannot be empty.",
+    "Acupuncture Percentage Invalid": "Acupuncture Percentage must be between $0-{{max}} and limited to 2 decimal places.",
+    "Massage Percentage": "Massage Percentage",
+    "Massage Percentage cannot be empty.": "Massage Percentage cannot be empty.",
+    "Massage Percentage Invalid": "Massage Percentage must be between $0-{{max}} and limited to 2 decimal places.",
+    "Insurance Percentage": "Insurance Percentage",
+    "Insurance Percentage cannot be empty.": "Insurance Percentage cannot be empty.",
+    "Insurance Percentage Invalid": "Insurance Percentage must be between $0-{{max}} and limited to 2 decimal places.",
+    "Add Acupuncture Report": "Add Acupuncture Report",
+    "Edit Acupuncture Report": "Edit Acupuncture Report",
+    "Date": "Date",
+    "Add Payroll: Acupuncture Report": "Add Payroll: Acupuncture Report",
+    "Massage": "Massage",
+    "Insurance": "Insurance",
+    "SUM": "SUM",
+    "PERCENT": "PERCENT",
+    "TOTAL": "TOTAL",
+    "CHEQUE": "CHEQUE",
+    "Export Acupuncture Report": "Export Acupuncture Report",
+    "Exporting...": "Exporting...",
+    "Updating Acupuncture Report...": "Updating Acupuncture Report...",
+    "Acupuncture Report Updated Successfully": "Acupuncture Report Updated Successfully",
+    "Failed to Update Acupuncture Report": "Failed to Update Acupuncture Report",
+    "Generating Acupuncture Report...": "Generating Acupuncture Report...",
+    "Acupuncture Report Generated Successfully": "Acupuncture Report Generated Successfully",
+    "Failed to Generate Acupuncture Report": "Failed to Generate Acupuncture Report"
 }

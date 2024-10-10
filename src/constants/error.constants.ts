@@ -5,6 +5,29 @@ import STORES from './store.constants';
 import { formatTimeFromNumber } from '../utils/string.utils';
 
 const ERRORS = {
+	acupuncture_report: {
+		acupuncture_percentage: {
+			required: 'Acupuncture Percentage cannot be empty.',
+			invalid: {
+				key: 'Acupuncture Percentage Invalid',
+				value: { max: NUMBERS.acupuncture_report.acupuncture_percentage },
+			},
+		},
+		massage_percentage: {
+			required: 'Massage Percentage cannot be empty.',
+			invalid: {
+				key: 'Massage Percentage Invalid',
+				value: { max: NUMBERS.acupuncture_report.massage_percentage },
+			},
+		},
+		insurance_percentage: {
+			required: 'Insurance Percentage cannot be empty.',
+			invalid: {
+				key: 'Insurance Percentage Invalid',
+				value: { max: NUMBERS.acupuncture_report.insurance_percentage },
+			},
+		},
+	},
 	customer: {
 		search_customer: {
 			invalid: {

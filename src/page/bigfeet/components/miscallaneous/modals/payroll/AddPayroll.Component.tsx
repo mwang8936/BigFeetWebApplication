@@ -233,7 +233,7 @@ const AddPayroll: FC<AddPayrollProp> = ({ setOpen, payrollPart, employee }) => {
 				disabledAdd={!creatable || missingRequiredInput || invalidInput}
 				addMissingPermissionMessage={
 					!creatable
-						? ERRORS.employee.permissions.add
+						? ERRORS.payroll.permissions.add
 						: missingRequiredInput
 						? ERRORS.required
 						: invalidInput

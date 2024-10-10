@@ -466,5 +466,40 @@
     "Vip Package Deleted": "套票: {{serial}}，已刪除。",
 
     "Reservation Add On": "添加另一項預約",
-    "Add on a reservation": "添加另一項預約"
+    "Add on a reservation": "添加另一項預約",
+
+    "Cash Out must be between $0-{{max}} and limited to 2 decimal places.": "提現必須在 $0-{{max}} 之間，且限制為小數點後兩位。",
+    "Cash Out": "提現",
+    "Half": "一半",
+    "Cash Out: ": "提現：",
+
+    "This employee is not scheduled to work at this time.": "此員工目前不在上班時間。",
+
+    "Acupuncture Percentage": "針灸比例",
+    "Acupuncture Percentage cannot be empty.": "不能為空",
+    "Acupuncture Percentage Invalid": "無效",
+    "Massage Percentage": "按摩比例",
+    "Massage Percentage cannot be empty.": "不能為空",
+    "Massage Percentage Invalid": "無效",
+    "Insurance Percentage": "保險比例",
+    "Insurance Percentage cannot be empty.": "不能為空",
+    "Insurance Percentage Invalid": "無效",
+    "Add Acupuncture Report": "添加針灸報告",
+    "Edit Acupuncture Report": "編輯針灸報告",
+    "Date": "日期",
+    "Add Payroll: Acupuncture Report": "添加工資：針灸報告",
+    "Massage": "按摩",
+    "Insurance": "保險",
+    "SUM": "總和",
+    "PERCENT": "百分比",
+    "TOTAL": "總計",
+    "CHEQUE": "支票",
+    "Export Acupuncture Report": "導出針灸報告",
+    "Exporting...": "導出中",
+    "Updating Acupuncture Report...": "更新針灸報告中",
+    "Acupuncture Report Updated Successfully": "針灸報告更新成功",
+    "Failed to Update Acupuncture Report": "針灸報告更新失敗",
+    "Generating Acupuncture Report...": "添加針灸報告中",
+    "Acupuncture Report Generated Successfully": "針灸報告添加成功",
+    "Failed to Generate Acupuncture Report": "針灸報告添加失敗"
 }

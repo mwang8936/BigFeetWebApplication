@@ -1,4 +1,9 @@
 const NUMBERS = {
+	acupuncture_report: {
+		acupuncture_percentage: 100,
+		massage_percentage: 100,
+		insurance_percentage: 100,
+	},
 	employee: {
 		body_rate: 99.99,
 		feet_rate: 99.99,
