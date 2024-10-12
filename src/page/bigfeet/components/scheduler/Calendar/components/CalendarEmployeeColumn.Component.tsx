@@ -1,6 +1,7 @@
 import { FC } from 'react';
 
 import CalendarGrid from './CalendarGrid.Component';
+import CashOutGrid from './CashOutGrid.Component';
 import PayoutGrid from './PayoutGrid.Component';
 import ReservationTag from './Reservation.Component';
 import ScheduleGrid from './ScheduleGrid.Component';
@@ -105,21 +106,27 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 				reservations={schedule?.reservations || []}
 			/>
 
-			<TipGrid
+			<CashOutGrid
 				row={timeArr.length + 3}
 				colNum={colNum}
 				reservations={schedule?.reservations || []}
 			/>
 
-			<VipGrid
+			<TipGrid
 				row={timeArr.length + 4}
+				colNum={colNum}
+				reservations={schedule?.reservations || []}
+			/>
+
+			<VipGrid
+				row={timeArr.length + 5}
 				colNum={colNum}
 				defaultEmployeeId={employee.employee_id}
 				vipPackages={schedule?.vip_packages || []}
 			/>
 
 			<PayoutGrid
-				row={timeArr.length + 5}
+				row={timeArr.length + 6}
 				colNum={colNum}
 				addAward={schedule?.add_award ?? false}
 				reservations={schedule?.reservations || []}
@@ -127,7 +134,7 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 			/>
 
 			<SignatureGrid
-				row={timeArr.length + 6}
+				row={timeArr.length + 7}
 				colNum={colNum}
 				employee={employee}
 				signedOff={schedule?.signed || false}

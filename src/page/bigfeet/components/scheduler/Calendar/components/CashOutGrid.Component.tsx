@@ -1,37 +1,36 @@
 import { FC } from 'react';
-import Reservation from '../../../../../../models/Reservation.Model';
-import { TipMethod } from '../../../../../../models/enums';
-import { formatTimeFromDate } from '../../../../../../utils/string.utils';
-import { moneyToString } from '../../../../../../utils/number.utils';
 
-interface TipGridProp {
+import Reservation from '../../../../../../models/Reservation.Model';
+
+import { moneyToString } from '../../../../../../utils/number.utils';
+import { formatTimeFromDate } from '../../../../../../utils/string.utils';
+
+interface CashOutGridProp {
 	row: number;
 	colNum: number;
 	reservations: Reservation[];
 }
 
-const TipGrid: FC<TipGridProp> = ({ row, colNum, reservations }) => {
-	const tipReservations = reservations.filter(
-		(reservation) =>
-			(reservation.tip_method === TipMethod.HALF ||
-				reservation.tip_method === TipMethod.MACHINE) &&
-			reservation.tips
+const CashOutGrid: FC<CashOutGridProp> = ({ row, colNum, reservations }) => {
+	const cashOutReservations = reservations.filter(
+		(reservation) => reservation.cash_out
 	);
-	tipReservations.sort(
+	cashOutReservations.sort(
 		(a, b) => a.reserved_date.getTime() - b.reserved_date.getTime()
 	);
-	const tips = tipReservations.map((reservation) => reservation.tips as number);
-	const tipsTotal = tips.reduce(
+	const cashOuts = cashOutReservations.map(
+		(reservation) => reservation.cash_out as number
+	);
+	const cashOutTotal = cashOuts.reduce(
 		(acc, curr) => acc + parseFloat(curr.toString()),
 		0
 	);
-	const tipsPayout = tipsTotal * 0.9;
 
-	const tipsText = tips.map((tip) => moneyToString(tip)).join(' + ') + ' = ';
-	const tipsTotalText = '$' + moneyToString(tipsTotal);
-	const tipsPayoutText = '$' + tipsPayout.toFixed(2).toString();
+	const cashOutText =
+		cashOuts.map((cashOut) => moneyToString(cashOut)).join(' + ') + ' = ';
+	const cashOutTotalText = '$' + moneyToString(cashOutTotal);
 
-	const tipsTexts = tipReservations.map((reservation, index) => {
+	const cashOutTexts = cashOutReservations.map((reservation, index) => {
 		const startTimeText = formatTimeFromDate(reservation.reserved_date);
 
 		const time = reservation.time ?? reservation.service.time;
@@ -41,10 +40,10 @@ const TipGrid: FC<TipGridProp> = ({ row, colNum, reservations }) => {
 			<span className="flex flex-col" key={reservation.reservation_id}>
 				<span>
 					{`${startTimeText} - ${endTimeText} = (\$${
-						reservation.tips && moneyToString(reservation.tips)
+						reservation.cash_out && moneyToString(reservation.cash_out)
 					})`}
 					<br />
-					{index !== tipReservations.length - 1 && <br />}
+					{index !== cashOutReservations.length - 1 && <br />}
 				</span>
 			</span>
 		);
@@ -58,14 +57,12 @@ const TipGrid: FC<TipGridProp> = ({ row, colNum, reservations }) => {
 				}}
 				className="relative border-slate-500 border-b border-r border-t-2 p-2 z-[2] bg-white hover:bg-slate-300 transition-colors ease-in-out duration-200 overflow-visible group">
 				<span>
-					{tipsText}
-					<span className="font-bold">{tipsTotalText}</span>
+					{cashOutText}
+					<span className="font-bold">{cashOutTotalText}</span>
 				</span>
-				<br />
-				<span className="font-bold">{`${tipsTotalText} X 90% = ${tipsPayoutText}`}</span>
-				{tipReservations.length > 0 && (
+				{cashOutReservations.length > 0 && (
 					<span className="grid-tip group-hover:scale-100 z-[3]">
-						{tipsTexts}
+						{cashOutTexts}
 					</span>
 				)}
 			</div>
@@ -73,4 +70,4 @@ const TipGrid: FC<TipGridProp> = ({ row, colNum, reservations }) => {
 	);
 };
 
-export default TipGrid;
+export default CashOutGrid;

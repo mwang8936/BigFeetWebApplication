@@ -17,6 +17,7 @@ export interface UpdateReservationRequest {
 	machine?: number | null;
 	gift_card?: number | null;
 	insurance?: number | null;
+	cash_out?: number | null;
 	vip?: number | null;
 	tips?: number | null;
 	tip_method?: TipMethod | null;

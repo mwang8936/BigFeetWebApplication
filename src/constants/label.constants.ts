@@ -56,6 +56,7 @@ const LABELS = {
 		vip: 'VIP',
 		gift_card: 'Gift Card',
 		insurance: 'Acupuncture Insurance',
+		cash_out: 'Cash Out',
 		tip_method: 'Tip Method',
 		tips: 'Tips',
 		message: 'Message',

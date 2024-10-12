@@ -100,7 +100,11 @@ const StoreEmployeeWithCashAndTipsPayrollTable: FC<
 				? 2 * totalSessions
 				: 0;
 
-			const cash = requestedSessions + holidayPay + scheduleData.vip_amount;
+			const cash =
+				requestedSessions +
+				holidayPay +
+				scheduleData.vip_amount +
+				scheduleData.total_cash_out;
 
 			return {
 				day,

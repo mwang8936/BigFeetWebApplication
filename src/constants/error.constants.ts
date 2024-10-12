@@ -292,6 +292,12 @@ const ERRORS = {
 				value: { max: NUMBERS.reservation.insurance },
 			},
 		},
+		cash_out: {
+			invalid: {
+				key: 'Cash Out Invalid',
+				value: { max: NUMBERS.reservation.cash_out },
+			},
+		},
 		tips: {
 			invalid: {
 				key: 'Tips Invalid',

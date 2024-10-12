@@ -16,6 +16,7 @@ export interface DataRow {
 	total_vip: number;
 	total_gift_card: number;
 	total_insurance: number;
+	total_cash_out: number;
 	tips: number;
 	vip_amount: number;
 }

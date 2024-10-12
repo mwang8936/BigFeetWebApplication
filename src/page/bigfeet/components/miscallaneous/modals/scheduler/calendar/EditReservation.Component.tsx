@@ -25,6 +25,7 @@ import EditableMinute from '../../../editable/EditableMinute.Component';
 import EditableNumber from '../../../editable/EditableNumber.Component';
 import EditablePayRate from '../../../editable/EditablePayRate.Component';
 import EditablePayRateAutomatic from '../../../editable/EditablePayRateAutomatic.Component';
+import EditablePayRateHalf from '../../../editable/EditablePayRateHalf.Component';
 import EditablePhoneNumber from '../../../editable/EditablePhoneNumber.Component';
 import EditableTextArea from '../../../editable/EditableTextArea.Component';
 import EditableTime from '../../../editable/EditableTime.Component';
@@ -121,6 +122,9 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 	const [insuranceInput, setInsuranceInput] = useState<number | null>(
 		reservation.insurance
 	);
+	const [cashOutInput, setCashOutInput] = useState<number | null>(
+		reservation.cash_out
+	);
 	const [tipMethodInput, setTipMethodInput] = useState<TipMethod | null>(
 		reservation.tip_method
 	);
@@ -154,6 +158,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 	const [invalidVip, setInvalidVip] = useState<boolean>(false);
 	const [invalidGiftCard, setInvalidGiftCard] = useState<boolean>(false);
 	const [invalidInsurance, setInvalidInsurance] = useState<boolean>(false);
+	const [invalidCashOut, setInvalidCashOut] = useState<boolean>(false);
 	const [invalidTips, setInvalidTips] = useState<boolean>(false);
 	const [invalidCustomerPhoneNumber, setInvalidCustomerPhoneNumber] =
 		useState<boolean>(false);
@@ -275,6 +280,8 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			giftCardInput === reservation.gift_card ? undefined : giftCardInput;
 		const insurance: number | null | undefined =
 			insuranceInput === reservation.insurance ? undefined : insuranceInput;
+		const cash_out: number | null | undefined =
+			cashOutInput === reservation.cash_out ? undefined : cashOutInput;
 		const tip_method: TipMethod | null | undefined =
 			tipMethodInput === reservation.tip_method ? undefined : tipMethodInput;
 		const tips: number | null | undefined =
@@ -326,6 +333,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			vip !== undefined ||
 			gift_card !== undefined ||
 			insurance !== undefined ||
+			cash_out !== undefined ||
 			tip_method !== undefined ||
 			tips !== undefined ||
 			message !== undefined ||
@@ -354,6 +362,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		vipInput,
 		giftCardInput,
 		insuranceInput,
+		cashOutInput,
 		tipMethodInput,
 		tipsInput,
 		messageInput,
@@ -382,6 +391,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			invalidVip ||
 			invalidGiftCard ||
 			invalidInsurance ||
+			invalidCashOut ||
 			invalidTips ||
 			invalidCustomer;
 
@@ -396,6 +406,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		invalidVip,
 		invalidGiftCard,
 		invalidInsurance,
+		invalidCashOut,
 		invalidTips,
 		invalidCustomerPhoneNumber,
 		invalidCustomerVipSerial,
@@ -625,6 +636,8 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			giftCardInput === reservation.gift_card ? undefined : giftCardInput;
 		const insurance: number | null | undefined =
 			insuranceInput === reservation.insurance ? undefined : insuranceInput;
+		const cash_out: number | null | undefined =
+			cashOutInput === reservation.cash_out ? undefined : cashOutInput;
 		const tip_method: TipMethod | null | undefined =
 			tipMethodInput === reservation.tip_method ? undefined : tipMethodInput;
 		const tips: number | null | undefined =
@@ -682,6 +695,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			...(vip !== undefined && { vip }),
 			...(gift_card !== undefined && { gift_card }),
 			...(insurance !== undefined && { insurance }),
+			...(cash_out !== undefined && { cash_out }),
 			...(tip_method !== undefined && { tip_method }),
 			...(tips !== undefined && { tips }),
 			...(message !== undefined && { message }),
@@ -701,17 +715,6 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		);
 	};
 
-	const remainingAmount = Number(
-		(
-			reservation.service.money -
-			(cashInput ?? 0) -
-			(machineInput ?? 0) -
-			(vipInput ?? 0) -
-			(giftCardInput ?? 0) -
-			(insuranceInput ?? 0)
-		).toFixed(2)
-	);
-
 	const service: Service | undefined =
 		serviceIdInput !== null
 			? services.find((service) => service.service_id === serviceIdInput)
@@ -725,6 +728,19 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			? new Date(dateInput.getTime() + time * (1000 * 60))
 			: undefined;
 	const endTimeText = endDate ? formatTimeFromDate(endDate) : undefined;
+
+	const remainingAmount = Number(
+		(
+			(service?.money ?? 0) -
+			(cashInput ?? 0) -
+			(machineInput ?? 0) -
+			(vipInput ?? 0) -
+			(giftCardInput ?? 0) -
+			(insuranceInput ?? 0)
+		).toFixed(2)
+	);
+
+	const totalAmount = Number((service?.money ?? 0).toFixed(2));
 
 	const currentCustomer: Customer | undefined =
 		customerIdInput !== null
@@ -1074,6 +1090,26 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 									{t('Total Amount Missing')}: {remainingAmount.toFixed(2)}
 								</p>
 							)}
+
+							<EditablePayRateHalf
+								originalAmount={reservation.cash_out}
+								amount={cashOutInput}
+								totalAmount={totalAmount}
+								roundToTheNearestDollar={false}
+								setAmount={setCashOutInput}
+								label={LABELS.reservation.cash_out}
+								name={NAMES.reservation.cash_out}
+								validationProp={{
+									max: NUMBERS.reservation.cash_out,
+									required: false,
+									invalid: invalidCashOut,
+									setInvalid: setInvalidCashOut,
+									invalidMessage: ERRORS.reservation.cash_out.invalid,
+								}}
+								placeholder={PLACEHOLDERS.reservation.cash_out}
+								editable={editable}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+							/>
 
 							<EditableDropDown
 								originalOption={

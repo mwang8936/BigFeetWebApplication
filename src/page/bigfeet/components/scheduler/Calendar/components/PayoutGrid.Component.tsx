@@ -101,6 +101,10 @@ const PayoutGrid: FC<PayoutGridProp> = ({
 				.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0) * 2
 		: 0;
 
+	const cashOutTotal = reservations
+		.map((reservation) => reservation.cash_out ?? 0)
+		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+
 	const tipReservations = reservations.filter(
 		(reservation) =>
 			(reservation.tip_method === TipMethod.HALF ||
@@ -127,6 +131,7 @@ const PayoutGrid: FC<PayoutGridProp> = ({
 					{`= \$${moneyToString(
 						requestedTotal +
 							holidayTotal +
+							cashOutTotal +
 							tipsTotal +
 							vipPackagesCommissionTotal
 					)}`}
@@ -134,6 +139,7 @@ const PayoutGrid: FC<PayoutGridProp> = ({
 					<span className="text-red-500">{` + \$${awardMoney} = \$${moneyToString(
 						requestedTotal +
 							holidayTotal +
+							cashOutTotal +
 							tipsTotal +
 							vipPackagesCommissionTotal +
 							awardMoney
@@ -144,7 +150,11 @@ const PayoutGrid: FC<PayoutGridProp> = ({
 			<span>
 				{t('Payout')}{' '}
 				<span className="font-bold">{`= \$${moneyToString(
-					requestedTotal + holidayTotal + tipsTotal + vipPackagesCommissionTotal
+					requestedTotal +
+						holidayTotal +
+						cashOutTotal +
+						tipsTotal +
+						vipPackagesCommissionTotal
 				)}`}</span>
 			</span>
 		);
