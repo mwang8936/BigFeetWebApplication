@@ -16,6 +16,7 @@ import Employee from '../../../../../../models/Employee.Model';
 import Schedule from '../../../../../../models/Schedule.Model';
 
 import {
+	getTimeFromHoursAndMinutes,
 	timeHourToNumber,
 	timeMinuteToNumber,
 } from '../../../../../../utils/calendar.utils';
@@ -43,6 +44,71 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 			gridDate.setHours(timeHourToNumber(timeArr[i - 2]));
 			gridDate.setMinutes(timeMinuteToNumber(timeArr[i - 2]));
 
+			const start = schedule?.start
+				? getTimeFromHoursAndMinutes(schedule.start)
+				: undefined;
+			const end = schedule?.end
+				? getTimeFromHoursAndMinutes(schedule.end)
+				: undefined;
+
+			const getBlocked = (): { top: number; bottom: number } | undefined => {
+				const thirtyMinutes = 30 * 60 * 1000;
+
+				if (!start && !end) {
+					return undefined;
+				}
+
+				const gridStart = getTimeFromHoursAndMinutes(gridDate);
+
+				if (start && !end) {
+					let startPercent = ((start - gridStart) / thirtyMinutes) * 100;
+
+					if (startPercent > 100) {
+						return { top: 0, bottom: 100 };
+					}
+					return { top: 0, bottom: startPercent };
+				}
+
+				if (!start && end) {
+					const endPercent = ((end - gridStart) / thirtyMinutes) * 100;
+
+					if (endPercent < 0) {
+						return { top: 0, bottom: 100 };
+					}
+					return { top: endPercent, bottom: 100 };
+				}
+
+				let startPercent = ((start! - gridStart) / thirtyMinutes) * 100;
+				let endPercent = ((end! - gridStart) / thirtyMinutes) * 100;
+
+				if (startPercent > 100) {
+					return { top: 0, bottom: 100 };
+				}
+
+				if (endPercent < 0) {
+					return { top: 0, bottom: 100 };
+				}
+
+				if (startPercent > 0) {
+					return { top: 0, bottom: startPercent };
+				}
+
+				if (endPercent < 100) {
+					return { top: endPercent, bottom: 100 };
+				}
+			};
+
+			const blocked = getBlocked();
+
+			if (schedule?.start) {
+				if (
+					schedule.start.getHours() === gridDate.getHours() &&
+					schedule.start.getMinutes() > gridDate.getMinutes() &&
+					schedule.start.getMinutes() < gridDate.getMinutes() + 30
+				)
+					gridDate.setMinutes(schedule.start.getMinutes());
+			}
+
 			const overlappingReservations = schedule?.reservations
 				?.filter((reservation) => {
 					const startDate = reservation.reserved_date;
@@ -63,8 +129,9 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 					overlappingReservation.reserved_date.getTime() + time * (1000 * 60)
 				);
 
-				gridDate.setHours(startDate.getHours());
-				gridDate.setMinutes(startDate.getMinutes());
+				gridDate.setMinutes(
+					Math.max(gridDate.getMinutes(), startDate.getMinutes())
+				);
 			}
 
 			const grid = (
@@ -72,6 +139,7 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 					key={`row-${i} col-${colNum}`}
 					date={gridDate}
 					employee={employee}
+					blocked={blocked}
 					row={i}
 					col={colNum}
 				/>

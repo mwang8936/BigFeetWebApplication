@@ -457,6 +457,10 @@ const ERRORS = {
 			message:
 				'This employee does not have the requested gender. Please choose another employee.',
 		},
+		schedule: {
+			title: 'Conflicting Schedule!',
+			message: 'This employee is not scheduled to work at this time.',
+		},
 	},
 	required: 'You are missing a required input.',
 	invalid: 'An input is invalid.',

@@ -70,6 +70,7 @@ import PATTERNS from '../../../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
 import STORES from '../../../../../../../constants/store.constants';
 
+import { getTimeFromHoursAndMinutes } from '../../../../../../../utils/calendar.utils';
 import { sameDate, sameTime } from '../../../../../../../utils/date.utils';
 import {
 	reservationBedConflict,
@@ -182,6 +183,8 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 	const [openConflictWarningModal, setOpenConflictWarningModal] =
 		useState<boolean>(false);
 	const [openGenderMismatchWarningModel, setOpenGenderMismatchWarningModal] =
+		useState<boolean>(false);
+	const [openScheduleWarningModal, setOpenScheduleWarningModal] =
 		useState<boolean>(false);
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
@@ -581,6 +584,46 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			setGenderMismatch(false);
 		}
 	}, [employeeIdInput, genderInput]);
+
+	useEffect(() => {
+		if (dateInput && employeeIdInput) {
+			const schedule = schedules.find(
+				(schedule) => schedule.employee.employee_id === employeeIdInput
+			);
+
+			if (schedule) {
+				const startTime = schedule.start
+					? getTimeFromHoursAndMinutes(schedule.start)
+					: undefined;
+				const endTime = schedule.end
+					? getTimeFromHoursAndMinutes(schedule.end)
+					: undefined;
+
+				if (startTime && getTimeFromHoursAndMinutes(dateInput) < startTime) {
+					setOpenScheduleWarningModal(true);
+				} else if (endTime) {
+					if (getTimeFromHoursAndMinutes(dateInput) > endTime) {
+						setOpenScheduleWarningModal(true);
+					}
+
+					const service = services.find(
+						(service) => service.service_id === serviceIdInput
+					);
+
+					if (service) {
+						const time = endTimeInput ?? service.time;
+
+						if (
+							getTimeFromHoursAndMinutes(dateInput) + time * 60 * 1000 >
+							endTime
+						) {
+							setOpenScheduleWarningModal(true);
+						}
+					}
+				}
+			}
+		}
+	}, [dateInput, employeeIdInput, serviceIdInput, endTimeInput]);
 
 	const updateReservationMutation = useUpdateReservationMutation({
 		onSuccess: () => setOpen(false),
@@ -1344,6 +1387,13 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 				setOpen={setOpenConflictWarningModal}
 				title={ERRORS.warnings.conflicts.title}
 				message={ERRORS.warnings.conflicts.message}
+			/>
+
+			<WarningModal
+				open={openScheduleWarningModal}
+				setOpen={setOpenScheduleWarningModal}
+				title={ERRORS.warnings.schedule.title}
+				message={ERRORS.warnings.schedule.message}
 			/>
 		</>
 	);

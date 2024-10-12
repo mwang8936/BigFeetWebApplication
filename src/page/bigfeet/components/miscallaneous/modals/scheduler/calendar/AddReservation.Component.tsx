@@ -55,6 +55,7 @@ import User from '../../../../../../../models/User.Model';
 
 import { AddReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
 
+import { getTimeFromHoursAndMinutes } from '../../../../../../../utils/calendar.utils';
 import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
@@ -128,6 +129,8 @@ const AddReservation: FC<AddReservationProp> = ({
 	const [openConflictWarningModal, setOpenConflictWarningModal] =
 		useState<boolean>(false);
 	const [openGenderMismatchWarningModel, setOpenGenderMismatchWarningModal] =
+		useState<boolean>(false);
+	const [openScheduleWarningModal, setOpenScheduleWarningModal] =
 		useState<boolean>(false);
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
@@ -372,6 +375,46 @@ const AddReservation: FC<AddReservationProp> = ({
 			setGenderMismatch(false);
 		}
 	}, [employeeIdInput, genderInput]);
+
+	useEffect(() => {
+		if (dateInput && employeeIdInput) {
+			const schedule = schedules.find(
+				(schedule) => schedule.employee.employee_id === employeeIdInput
+			);
+
+			if (schedule) {
+				const startTime = schedule.start
+					? getTimeFromHoursAndMinutes(schedule.start)
+					: undefined;
+				const endTime = schedule.end
+					? getTimeFromHoursAndMinutes(schedule.end)
+					: undefined;
+
+				if (startTime && getTimeFromHoursAndMinutes(dateInput) < startTime) {
+					setOpenScheduleWarningModal(true);
+				} else if (endTime) {
+					if (getTimeFromHoursAndMinutes(dateInput) > endTime) {
+						setOpenScheduleWarningModal(true);
+					}
+
+					const service = services.find(
+						(service) => service.service_id === serviceIdInput
+					);
+
+					if (service) {
+						const time = endTimeInput ?? service.time;
+
+						if (
+							getTimeFromHoursAndMinutes(dateInput) + time * 60 * 1000 >
+							endTime
+						) {
+							setOpenScheduleWarningModal(true);
+						}
+					}
+				}
+			}
+		}
+	}, [dateInput, employeeIdInput, serviceIdInput, endTimeInput]);
 
 	const addReservationMutation = useAddReservationMutation({
 		onSuccess: () => setOpen(false),
@@ -755,6 +798,13 @@ const AddReservation: FC<AddReservationProp> = ({
 				setOpen={setOpenConflictWarningModal}
 				title={ERRORS.warnings.conflicts.title}
 				message={ERRORS.warnings.conflicts.message}
+			/>
+
+			<WarningModal
+				open={openScheduleWarningModal}
+				setOpen={setOpenScheduleWarningModal}
+				title={ERRORS.warnings.schedule.title}
+				message={ERRORS.warnings.schedule.message}
 			/>
 		</>
 	);

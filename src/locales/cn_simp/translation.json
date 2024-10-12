@@ -346,7 +346,7 @@
     "No beds available!": "没有床位!",
     "Bed Conflict": "{{max}}张床位已占满。",
     "Conflicting Schedule!": "时间冲突！",
-    "There is another reservation at this time for this employee.": "该技师同一时段已有约",
+    "There is another reservation at this time for this employee.": "该技师同一时段已有约。",
     "Gender Mismatch!": "性别不符！",
     "This employee does not have the requested gender. Please choose another employee.": "该技师性别不符合客人要求。",
 
