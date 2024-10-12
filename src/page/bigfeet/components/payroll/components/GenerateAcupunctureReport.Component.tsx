@@ -36,7 +36,7 @@ const GenerateAcupunctureReport: FC<GenerateAcupunctureReportProp> = ({
 				btnTitle={'Add Payroll: Acupuncture Report'}
 				btnType={ButtonType.ADD}
 				disabled={!creatable}
-				missingPermissionMessage={ERRORS.employee.permissions.add}
+				missingPermissionMessage={ERRORS.payroll.permissions.add}
 				onClick={() => setOpenAddModal(true)}
 			/>
 

@@ -13,6 +13,7 @@ import AddDropDown from '../../add/AddDropDown.Component';
 
 import { usePayrollDateContext } from '../../../payroll/PayRoll.Component';
 
+import { payrollsQueryKey } from '../../../../../hooks/payroll.hooks';
 import { useUserQuery } from '../../../../../hooks/profile.hooks';
 
 import { monthDropDownItems } from '../../../../../../constants/drop-down.constants';
@@ -53,7 +54,7 @@ const FilterPayrolls: FC<FilterPayrollsProp> = ({ setOpen }) => {
 			updatedDate.month !== monthInput
 		) {
 			queryClient.invalidateQueries({
-				queryKey: ['payrolls', updatedDate.year, updatedDate.month],
+				queryKey: [payrollsQueryKey, updatedDate.year, updatedDate.month],
 			});
 		}
 

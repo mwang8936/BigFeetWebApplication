@@ -13,6 +13,7 @@ import AddDate from '../../add/AddDate.Component';
 import { useScheduleDateContext } from '../../../scheduler/Scheduler.Component';
 
 import { useUserQuery } from '../../../../../hooks/profile.hooks';
+import { schedulesQueryKey } from '../../../../../hooks/schedule.hooks';
 
 import ERRORS from '../../../../../../constants/error.constants';
 import LABELS from '../../../../../../constants/label.constants';
@@ -47,7 +48,7 @@ const FilterSchedules: FC<FilterSchedulesProp> = ({ setOpen }) => {
 	const onDateFiltered = (updatedDate: Date) => {
 		if (scheduleGettable && !sameDate(date, updatedDate)) {
 			queryClient.invalidateQueries({
-				queryKey: ['schedules', formatDateToQueryKey(updatedDate)],
+				queryKey: [schedulesQueryKey, formatDateToQueryKey(updatedDate)],
 			});
 		}
 

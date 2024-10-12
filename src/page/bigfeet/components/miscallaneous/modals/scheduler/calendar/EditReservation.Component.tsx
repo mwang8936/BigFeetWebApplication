@@ -1270,7 +1270,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 										invalidMessage: ERRORS.customer.vip_serial.invalid,
 									}}
 									editable={editable}
-									missingPermissionMessage={ERRORS.customer.permissions.edit}
+									missingPermissionMessage={ERRORS.reservation.permissions.edit}
 								/>
 
 								{((customerPhoneNumberInput?.length === 10 &&
