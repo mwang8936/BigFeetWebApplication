@@ -15,7 +15,7 @@ const TipGrid: FC<TipGridProp> = ({ row, colNum, reservations }) => {
 		(reservation) =>
 			(reservation.tip_method === TipMethod.HALF ||
 				reservation.tip_method === TipMethod.MACHINE) &&
-			reservation.tips !== null
+			reservation.tips
 	);
 	tipReservations.sort(
 		(a, b) => a.reserved_date.getTime() - b.reserved_date.getTime()

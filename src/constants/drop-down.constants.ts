@@ -2,6 +2,7 @@ import {
 	Gender,
 	Language,
 	PaymentMethod,
+	PayrollOption,
 	Role,
 	ServiceColor,
 	TipMethod,
@@ -80,15 +81,43 @@ export const languageDropDownItems = [
 	},
 ];
 
+export const monthDropDownItems = [
+	{ id: null, name: 'No Month Selected' },
+	{ id: 1, name: 'January' },
+	{ id: 2, name: 'February' },
+	{ id: 3, name: 'March' },
+	{ id: 4, name: 'April' },
+	{ id: 5, name: 'May' },
+	{ id: 6, name: 'June' },
+	{ id: 7, name: 'July' },
+	{ id: 8, name: 'August' },
+	{ id: 9, name: 'September' },
+	{ id: 10, name: 'October' },
+	{ id: 11, name: 'November' },
+	{ id: 12, name: 'December' },
+];
+
 export const paymentMethodDropDownItems = [
 	{ id: null, name: 'No Payment Method Selected' },
 	{ id: PaymentMethod.CASH, name: PaymentMethod.CASH },
 	{ id: PaymentMethod.MACHINE, name: PaymentMethod.MACHINE },
 ];
 
+export const payrollOptionDropDownItems = [
+	{ id: null, name: 'No Payroll Option Selected' },
+	{ id: PayrollOption.ACUPUNCTURIST, name: PayrollOption.ACUPUNCTURIST },
+	{ id: PayrollOption.RECEPTIONIST, name: PayrollOption.RECEPTIONIST },
+	{ id: PayrollOption.STORE_EMPLOYEE, name: PayrollOption.STORE_EMPLOYEE },
+	{
+		id: PayrollOption.STORE_EMPLOYEE_WITH_TIPS_AND_CASH,
+		name: PayrollOption.STORE_EMPLOYEE_WITH_TIPS_AND_CASH,
+	},
+];
+
 export const roleDropDownItems = [
 	{ id: null, name: 'No Role Selected' },
 	{ id: Role.STORE_EMPLOYEE, name: Role.STORE_EMPLOYEE },
+	{ id: Role.ACUPUNCTURIST, name: Role.ACUPUNCTURIST },
 	{ id: Role.RECEPTIONIST, name: Role.RECEPTIONIST },
 	{ id: Role.MANAGER, name: Role.MANAGER },
 	{ id: Role.DEVELOPER, name: Role.DEVELOPER },

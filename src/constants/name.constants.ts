@@ -1,4 +1,9 @@
 const NAMES = {
+	acupuncture_report: {
+		acupuncture_percentage: 'acupuncture_percentage',
+		massage_percentage: 'massage_percentage',
+		insurance_percentage: 'insurance_percentage',
+	},
 	customer: {
 		search_customer: 'search_customer',
 		phone_number: 'phone_number',
@@ -27,6 +32,12 @@ const NAMES = {
 		password: 'password',
 		remember_me: 'remember_me',
 	},
+	payroll: {
+		year: 'year',
+		month: 'month',
+		option: 'option',
+		cheque_amount: 'cheque_amount',
+	},
 	profile: {
 		dark_mode: 'dark_mode',
 		old_password: 'old_password',
@@ -40,6 +51,7 @@ const NAMES = {
 		vip: 'vip',
 		gift_card: 'gift_card',
 		insurance: 'insurance',
+		cash_out: 'cash_out',
 		tips: 'tips',
 		message: 'message',
 	},

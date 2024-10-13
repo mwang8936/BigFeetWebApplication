@@ -30,6 +30,7 @@ import Schedule from '../../../../../../models/Schedule.Model';
 import User from '../../../../../../models/User.Model';
 
 import { sortEmployees } from '../../../../../../utils/employee.utils';
+import { moneyToString } from '../../../../../../utils/number.utils';
 import { getReservationOverlappingOrder } from '../../../../../../utils/reservation.utils';
 import { formatPhoneNumber } from '../../../../../../utils/string.utils';
 
@@ -189,19 +190,35 @@ const ReservationTag: FC<ReservationTagProp> = ({ reservation, colNum }) => {
 		</span>
 	);
 
-	const tipText = reservation.tip_method && (
+	const cashOutText = reservation.cash_out && (
 		<span className="font-medium">
-			{t('Tips: ') +
-				(reservation.tip_method === TipMethod.CASH
-					? '自'
-					: reservation.tip_method === TipMethod.MACHINE
-					? `\$${reservation.tips?.toFixed(2)}` || t('No Tips')
-					: reservation.tip_method === TipMethod.HALF && reservation.tips
-					? `\$${reservation.tips?.toFixed(2)} / 自`
-					: reservation.tip_method === TipMethod.HALF
-					? '自'
-					: t('Invalid'))}
+			{t('Cash Out: ') + `\$${moneyToString(reservation.cash_out)}`}
 		</span>
+	);
+
+	let tipString = t('Tips: ');
+	switch (reservation.tip_method) {
+		case TipMethod.CASH:
+			tipString += '自';
+			break;
+		case TipMethod.MACHINE:
+			if (reservation.tips) {
+				tipString += `\$${reservation.tips.toFixed(2)}`;
+			} else {
+				tipString += t('No Tips');
+			}
+			break;
+		case TipMethod.HALF:
+			if (reservation.tips) {
+				tipString += `\$${reservation.tips.toFixed(2)} / 自`;
+			} else {
+				tipString += '自';
+			}
+			break;
+	}
+
+	const tipText = reservation.tip_method && (
+		<span className="font-medium">{tipString}</span>
 	);
 
 	const requestedGenderText = reservation.requested_gender && (
@@ -340,6 +357,7 @@ const ReservationTag: FC<ReservationTagProp> = ({ reservation, colNum }) => {
 					<br />
 
 					{moneyText}
+					{cashOutText}
 					{tipText}
 					{(moneyText || tipText) && <br />}
 

@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { acupunctureReportsQueryKey } from './acupuncture-report.hooks';
 import { customersQueryKey } from './customer.hooks';
+import { payrollsQueryKey } from './payroll.hooks';
 import { MutationProp } from './props.hooks';
 import { schedulesQueryKey } from './schedule.hooks';
 
@@ -65,11 +67,44 @@ export const useUpdateReservationMutation = ({
 					formatDateToQueryKey(variables.originalDate),
 				],
 			});
+
+			queryClient.invalidateQueries({
+				queryKey: [
+					acupunctureReportsQueryKey,
+					variables.originalDate.getFullYear(),
+					variables.originalDate.getMonth() + 1,
+				],
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: [
+					payrollsQueryKey,
+					variables.originalDate.getFullYear(),
+					variables.originalDate.getMonth() + 1,
+				],
+			});
+
 			if (variables.newDate) {
 				queryClient.invalidateQueries({
 					queryKey: [
 						schedulesQueryKey,
 						formatDateToQueryKey(variables.newDate),
+					],
+				});
+
+				queryClient.invalidateQueries({
+					queryKey: [
+						acupunctureReportsQueryKey,
+						variables.newDate.getFullYear(),
+						variables.newDate.getMonth() + 1,
+					],
+				});
+
+				queryClient.invalidateQueries({
+					queryKey: [
+						payrollsQueryKey,
+						variables.newDate.getFullYear(),
+						variables.newDate.getMonth() + 1,
 					],
 				});
 			}
@@ -134,6 +169,23 @@ export const useAddReservationMutation = ({
 					formatDateToQueryKey(variables.request.reserved_date),
 				],
 			});
+
+			queryClient.invalidateQueries({
+				queryKey: [
+					acupunctureReportsQueryKey,
+					variables.request.reserved_date.getFullYear(),
+					variables.request.reserved_date.getMonth() + 1,
+				],
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: [
+					payrollsQueryKey,
+					variables.request.reserved_date.getFullYear(),
+					variables.request.reserved_date.getMonth() + 1,
+				],
+			});
+
 			if (
 				variables.request.phone_number ||
 				variables.request.customer_name ||
@@ -191,6 +243,22 @@ export const useDeleteReservationMutation = ({
 		onSuccess: (_data, variables, context) => {
 			queryClient.invalidateQueries({
 				queryKey: [schedulesQueryKey, formatDateToQueryKey(variables.date)],
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: [
+					acupunctureReportsQueryKey,
+					variables.date.getFullYear(),
+					variables.date.getMonth() + 1,
+				],
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: [
+					payrollsQueryKey,
+					variables.date.getFullYear(),
+					variables.date.getMonth() + 1,
+				],
 			});
 
 			if (onSuccess) onSuccess();

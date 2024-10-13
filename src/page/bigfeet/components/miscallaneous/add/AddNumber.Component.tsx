@@ -7,6 +7,7 @@ interface InvalidMessage {
 }
 
 interface ValidationProp {
+	min?: number;
 	max?: number;
 	required: boolean;
 	requiredMessage?: string;
@@ -52,7 +53,7 @@ const AddNumber: FC<AddNumberProp> = ({
 						setInput(text.length !== 0 ? parseInt(text, 10) : null);
 						validationProp.setInvalid(!event.target.validity.valid);
 					}}
-					min={0}
+					min={validationProp.min ?? 0}
 					max={validationProp.max}
 					step={1}
 					onWheel={(event) => event.currentTarget.blur()}

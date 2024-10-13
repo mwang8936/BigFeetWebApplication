@@ -28,6 +28,7 @@ import User from '../../../../../../../models/User.Model';
 
 import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
 
+import { getTimeFromHoursAndMinutes } from '../../../../../../../utils/calendar.utils';
 import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
@@ -61,6 +62,8 @@ const MoveReservation: FC<MoveReservationProp> = ({
 	const [openConflictWarningModal, setOpenConflictWarningModal] =
 		useState<boolean>(false);
 	const [openGenderMismatchWarningModel, setOpenGenderMismatchWarningModal] =
+		useState<boolean>(false);
+	const [openScheduleWarningModal, setOpenScheduleWarningModal] =
 		useState<boolean>(false);
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
@@ -165,6 +168,42 @@ const MoveReservation: FC<MoveReservationProp> = ({
 			}
 		} else {
 			setGenderMismatch(false);
+		}
+	}, []);
+
+	useEffect(() => {
+		const startDate = newTime ?? reservation.reserved_date;
+		const time = reservation.time ?? reservation.service.time;
+
+		const employeeId =
+			newEmployeeId === undefined ? reservation.employee_id : newEmployeeId;
+
+		const schedule = schedules.find(
+			(schedule) => schedule.employee.employee_id === employeeId
+		);
+
+		if (schedule) {
+			const startTime = schedule.start
+				? getTimeFromHoursAndMinutes(schedule.start)
+				: undefined;
+			const endTime = schedule.end
+				? getTimeFromHoursAndMinutes(schedule.end)
+				: undefined;
+
+			if (startTime && getTimeFromHoursAndMinutes(startDate) < startTime) {
+				setOpenScheduleWarningModal(true);
+			} else if (endTime) {
+				if (getTimeFromHoursAndMinutes(startDate) > endTime) {
+					setOpenScheduleWarningModal(true);
+				}
+
+				if (
+					getTimeFromHoursAndMinutes(startDate) + time * 60 * 1000 >
+					endTime
+				) {
+					setOpenScheduleWarningModal(true);
+				}
+			}
 		}
 	}, []);
 
@@ -305,6 +344,13 @@ const MoveReservation: FC<MoveReservationProp> = ({
 				setOpen={setOpenConflictWarningModal}
 				title={ERRORS.warnings.conflicts.title}
 				message={ERRORS.warnings.conflicts.message}
+			/>
+
+			<WarningModal
+				open={openScheduleWarningModal}
+				setOpen={setOpenScheduleWarningModal}
+				title={ERRORS.warnings.schedule.title}
+				message={ERRORS.warnings.schedule.message}
 			/>
 		</>
 	);

@@ -13,6 +13,7 @@ import AddDate from '../../add/AddDate.Component';
 import { useScheduleDateContext } from '../../../scheduler/Scheduler.Component';
 
 import { useUserQuery } from '../../../../../hooks/profile.hooks';
+import { schedulesQueryKey } from '../../../../../hooks/schedule.hooks';
 
 import ERRORS from '../../../../../../constants/error.constants';
 import LABELS from '../../../../../../constants/label.constants';
@@ -23,11 +24,11 @@ import User from '../../../../../../models/User.Model';
 import { sameDate } from '../../../../../../utils/date.utils';
 import { formatDateToQueryKey } from '../../../../../../utils/string.utils';
 
-interface FilterDateProp {
+interface FilterSchedulesProp {
 	setOpen(open: boolean): void;
 }
 
-const FilterDate: FC<FilterDateProp> = ({ setOpen }) => {
+const FilterSchedules: FC<FilterSchedulesProp> = ({ setOpen }) => {
 	const { t } = useTranslation();
 	const queryClient = useQueryClient();
 
@@ -47,7 +48,7 @@ const FilterDate: FC<FilterDateProp> = ({ setOpen }) => {
 	const onDateFiltered = (updatedDate: Date) => {
 		if (scheduleGettable && !sameDate(date, updatedDate)) {
 			queryClient.invalidateQueries({
-				queryKey: ['schedules', formatDateToQueryKey(updatedDate)],
+				queryKey: [schedulesQueryKey, formatDateToQueryKey(updatedDate)],
 			});
 		}
 
@@ -123,4 +124,4 @@ const FilterDate: FC<FilterDateProp> = ({ setOpen }) => {
 	);
 };
 
-export default FilterDate;
+export default FilterSchedules;

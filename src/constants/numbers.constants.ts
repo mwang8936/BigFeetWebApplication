@@ -1,4 +1,9 @@
 const NUMBERS = {
+	acupuncture_report: {
+		acupuncture_percentage: 100,
+		massage_percentage: 100,
+		insurance_percentage: 100,
+	},
 	employee: {
 		body_rate: 99.99,
 		feet_rate: 99.99,
@@ -8,12 +13,19 @@ const NUMBERS = {
 	gift_card: {
 		payment_amount: 999999.99,
 	},
+	payroll: {
+		year: {
+			min: 2020,
+		},
+		cheque_amount: 999999.99,
+	},
 	reservation: {
 		cash: 999.99,
 		machine: 999.99,
 		vip: 999.99,
 		gift_card: 999.99,
 		insurance: 999.99,
+		cash_out: 999.99,
 		tips: 9999.99,
 	},
 	service: {

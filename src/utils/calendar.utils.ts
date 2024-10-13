@@ -121,3 +121,22 @@ export function scrollable(time: string): boolean {
 	// Return true if both hours and minutes criteria are satisfied
 	return sameHours && sameMinutes;
 }
+
+/**
+ * Converts a Date object to a number representing the total milliseconds from hours and minutes.
+ *
+ * @param date - The Date object from which to extract the hours and minutes.
+ * @returns number - The total milliseconds calculated from the hours and minutes.
+ *
+ * This function calculates the total milliseconds by converting the hours to milliseconds
+ * and adding the milliseconds obtained from the minutes.
+ *
+ * Example usage:
+ * const totalMilliseconds = getTimeFromHoursAndMinutes(new Date('2024-10-11T14:30:00')); // Returns total milliseconds from 14:30
+ */
+export function getTimeFromHoursAndMinutes(date: Date): number {
+	const hourTime = date.getHours() * 60 * 60 * 1000;
+	const minuteTime = date.getMinutes() * 60 * 1000;
+
+	return hourTime + minuteTime;
+}

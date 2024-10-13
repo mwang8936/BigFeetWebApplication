@@ -1,4 +1,9 @@
 const PLACEHOLDERS = {
+	acupuncture_report: {
+		acupuncture_percentage: '70',
+		massage_percentage: '30',
+		insurance_percentage: '30',
+	},
 	customer: {
 		search_customer: 'Search by name or phone number',
 		phone_number: '(123) 456-7890',
@@ -25,12 +30,17 @@ const PLACEHOLDERS = {
 		gift_card_id: 'T123456',
 		payment_amount: '50.00',
 	},
+	payroll: {
+		year: '2024',
+		cheque_amount: '1600.00',
+	},
 	reservation: {
 		cash: '0.00',
 		machine: '0.00',
 		vip: '0.00',
 		gift_card: '0.00',
 		insurance: '0.00',
+		cash_out: '0.00',
 		tips: '0.00',
 		message: 'Add Message',
 	},

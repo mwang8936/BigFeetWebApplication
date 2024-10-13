@@ -1,4 +1,9 @@
 const LABELS = {
+	acupuncture_report: {
+		acupuncture_percentage: 'Acupuncture Percentage',
+		massage_percentage: 'Massage Percentage',
+		insurance_percentage: 'Insurance Percentage',
+	},
 	customer: {
 		search_customer: 'Search Customer',
 		phone_number: 'Phone Number',
@@ -26,6 +31,12 @@ const LABELS = {
 		payment_method: 'Payment Method',
 		payment_amount: 'Payment Amount',
 	},
+	payroll: {
+		year: 'Year',
+		month: 'Month',
+		option: 'Option',
+		cheque_amount: 'Cheque Amount',
+	},
 	profile: {
 		language: 'Language',
 		dark_mode: 'Dark Mode',
@@ -45,6 +56,7 @@ const LABELS = {
 		vip: 'VIP',
 		gift_card: 'Gift Card',
 		insurance: 'Acupuncture Insurance',
+		cash_out: 'Cash Out',
 		tip_method: 'Tip Method',
 		tips: 'Tips',
 		message: 'Message',

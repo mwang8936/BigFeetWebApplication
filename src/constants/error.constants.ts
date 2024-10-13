@@ -5,6 +5,29 @@ import STORES from './store.constants';
 import { formatTimeFromNumber } from '../utils/string.utils';
 
 const ERRORS = {
+	acupuncture_report: {
+		acupuncture_percentage: {
+			required: 'Acupuncture Percentage cannot be empty.',
+			invalid: {
+				key: 'Acupuncture Percentage Invalid',
+				value: { max: NUMBERS.acupuncture_report.acupuncture_percentage },
+			},
+		},
+		massage_percentage: {
+			required: 'Massage Percentage cannot be empty.',
+			invalid: {
+				key: 'Massage Percentage Invalid',
+				value: { max: NUMBERS.acupuncture_report.massage_percentage },
+			},
+		},
+		insurance_percentage: {
+			required: 'Insurance Percentage cannot be empty.',
+			invalid: {
+				key: 'Insurance Percentage Invalid',
+				value: { max: NUMBERS.acupuncture_report.insurance_percentage },
+			},
+		},
+	},
 	customer: {
 		search_customer: {
 			invalid: {
@@ -59,7 +82,7 @@ const ERRORS = {
 			required: 'Password cannot be empty.',
 			invalid: {
 				key: 'Password Invalid',
-				value: { max: LENGTHS.employee.password },
+				value: { length: LENGTHS.employee.password },
 			},
 			match: 'Passwords must match.',
 		},
@@ -172,6 +195,33 @@ const ERRORS = {
 			},
 		},
 	},
+	payroll: {
+		year: {
+			required: 'Year cannot be empty.',
+			invalid: {
+				key: 'Year Invalid',
+				value: { min: NUMBERS.payroll.year.min },
+			},
+		},
+		month: {
+			required: 'Month cannot be empty.',
+		},
+		option: {
+			required: 'Option cannot be empty.',
+		},
+		cheque_amount: {
+			invalid: {
+				key: 'Cheque Amount Invalid',
+				value: { max: NUMBERS.payroll.cheque_amount },
+			},
+		},
+		permissions: {
+			get: 'You do not have permissions to get payrolls.',
+			edit: 'You do not have permissions to edit payrolls.',
+			add: 'You do not have permissions to add payrolls.',
+			delete: 'You do not have permission to delete payrolls.',
+		},
+	},
 	profile: {
 		language: {
 			required: 'Language cannot be empty.',
@@ -240,6 +290,12 @@ const ERRORS = {
 			invalid: {
 				key: 'Acupuncture Insurance Invalid',
 				value: { max: NUMBERS.reservation.insurance },
+			},
+		},
+		cash_out: {
+			invalid: {
+				key: 'Cash Out Invalid',
+				value: { max: NUMBERS.reservation.cash_out },
 			},
 		},
 		tips: {
@@ -400,6 +456,10 @@ const ERRORS = {
 			title: 'Gender Mismatch!',
 			message:
 				'This employee does not have the requested gender. Please choose another employee.',
+		},
+		schedule: {
+			title: 'Conflicting Schedule!',
+			message: 'This employee is not scheduled to work at this time.',
 		},
 	},
 	required: 'You are missing a required input.',

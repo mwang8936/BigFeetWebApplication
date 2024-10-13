@@ -150,3 +150,71 @@ export function isHoliday(date: Date): boolean {
 	// Return false if there are no holidays for the year or the date is not a holiday
 	return false;
 }
+
+/**
+ * Converts a given year and month number into a localized month-year string.
+ *
+ * @param yearNumber - The year to use for the date.
+ * @param monthNumber - The month to use for the date (1 for January, 12 for December).
+ * @param locale - Optional. The locale string to format the date (default is 'en-US').
+ * @returns string - A formatted string representing the year and month (e.g., "January 2023").
+ *
+ * This function first validates the provided month number to ensure it is between 1 and 12.
+ * It then creates a Date object using the provided year and month, adjusting the month index (0-11).
+ * Finally, it converts the Date object into a localized string using toLocaleDateString with the
+ * specified locale and options to display the full month name and year.
+ *
+ * Example usage:
+ * const result = getYearMonthString(2023, 1); // "January 2023"
+ */
+export function getYearMonthString(
+	yearNumber: number,
+	monthNumber: number,
+	locale = 'en-US'
+): string {
+	if (monthNumber < 1 || monthNumber > 12) {
+		throw new Error(
+			'Invalid month number. Please provide a number between 1 and 12.'
+		);
+	}
+
+	const date = new Date(yearNumber, monthNumber - 1);
+
+	return date.toLocaleDateString(locale, {
+		year: 'numeric',
+		month: 'long',
+	});
+}
+
+/**
+ * Converts a given month number into a localized short month string.
+ *
+ * @param monthNumber - The month to use for the date (1 for January, 12 for December).
+ * @param locale - Optional. The locale string to format the month (default is 'en-US').
+ * @returns string - A formatted string representing the short month name (e.g., "Jan" for January).
+ *
+ * This function first validates the provided month number to ensure it is between 1 and 12.
+ * It then creates a Date object using an arbitrary year (2000) and the provided month,
+ * adjusting the month index (0-11) since JavaScript Date months are zero-indexed.
+ * Finally, it converts the Date object into a localized string using toLocaleDateString with the
+ * specified locale and options to display the short month name.
+ *
+ * Example usage:
+ * const result = getShortMonthString(1); // "Jan"
+ */
+export function getShortMonthString(
+	monthNumber: number,
+	locale = 'en-US'
+): string {
+	if (monthNumber < 1 || monthNumber > 12) {
+		throw new Error(
+			'Invalid month number. Please provide a number between 1 and 12.'
+		);
+	}
+
+	const date = new Date(2000, monthNumber - 1);
+
+	return date.toLocaleDateString(locale, {
+		month: 'short',
+	});
+}

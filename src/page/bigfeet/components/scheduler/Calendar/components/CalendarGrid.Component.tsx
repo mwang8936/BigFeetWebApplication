@@ -11,11 +11,18 @@ import AddReservationModal from '../../../miscallaneous/modals/scheduler/calenda
 interface CalendarGridProp {
 	date: Date;
 	employee: Employee;
+	blocked?: { top: number; bottom: number };
 	row: number;
 	col: number;
 }
 
-const CalendarGrid: FC<CalendarGridProp> = ({ date, employee, row, col }) => {
+const CalendarGrid: FC<CalendarGridProp> = ({
+	date,
+	employee,
+	blocked,
+	row,
+	col,
+}) => {
 	const [open, setOpen] = useState(false);
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
@@ -25,13 +32,27 @@ const CalendarGrid: FC<CalendarGridProp> = ({ date, employee, row, col }) => {
 		Permissions.PERMISSION_ADD_RESERVATION
 	);
 
+	// Calculate percentage stops for the gradient
+	const topPercent = blocked?.top || 0;
+	const bottomPercent = blocked?.bottom || 0;
+
+	const height = `${bottomPercent - topPercent}%`;
+	const top = `${topPercent / 2}%`;
+
 	return (
 		<div
-			style={{ gridRowStart: row, gridColumnStart: col }}
+			style={{
+				gridRowStart: row,
+				gridColumnStart: col,
+			}}
 			className="border-slate-500 border-b border-r cursor-pointer"
 			onClick={() => {
 				if (creatable) setOpen(true);
 			}}>
+			{blocked && (
+				<div style={{ height, marginTop: top }} className="bg-red-200" />
+			)}
+
 			<AddReservationModal
 				open={open}
 				setOpen={setOpen}

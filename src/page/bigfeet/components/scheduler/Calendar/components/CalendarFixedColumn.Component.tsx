@@ -42,23 +42,33 @@ const CalendarFixedColumn: FC<CalendarFixedColumnProp> = ({ timeArr }) => {
 				className="col-start-[1] border-slate-300 border-r whitespace-nowrap p-1.5 text-right text-black uppercase sticky left-0 z-[5] bg-white font-medium">
 				{t('Total')}
 			</div>
+
 			<div
 				style={{ gridRowStart: timeArr.length + 3 }}
 				className="col-start-[1] border-slate-300 border-r whitespace-nowrap p-1.5 text-right text-black uppercase sticky left-0 z-[5] bg-white font-medium">
-				{t('Tips')}
+				{t('Cash Out')}
 			</div>
+
 			<div
 				style={{ gridRowStart: timeArr.length + 4 }}
 				className="col-start-[1] border-slate-300 border-r whitespace-nowrap p-1.5 text-right text-black uppercase sticky left-0 z-[5] bg-white font-medium">
-				{t('VIP')}
+				{t('Tips')}
 			</div>
+
 			<div
 				style={{ gridRowStart: timeArr.length + 5 }}
 				className="col-start-[1] border-slate-300 border-r whitespace-nowrap p-1.5 text-right text-black uppercase sticky left-0 z-[5] bg-white font-medium">
-				{t('Payout')}
+				{t('VIP')}
 			</div>
+
 			<div
 				style={{ gridRowStart: timeArr.length + 6 }}
+				className="col-start-[1] border-slate-300 border-r whitespace-nowrap p-1.5 text-right text-black uppercase sticky left-0 z-[5] bg-white font-medium">
+				{t('Payout')}
+			</div>
+
+			<div
+				style={{ gridRowStart: timeArr.length + 7 }}
 				className="col-start-[1] border-slate-300 border-r whitespace-nowrap p-1.5 text-right text-black uppercase sticky left-0 z-[5] bg-white font-medium">
 				{t('Sign Off')}
 			</div>
