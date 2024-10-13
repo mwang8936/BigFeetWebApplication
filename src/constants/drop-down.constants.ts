@@ -3,7 +3,6 @@ import {
 	Language,
 	PaymentMethod,
 	PayrollOption,
-	PayrollPart,
 	Role,
 	ServiceColor,
 	TipMethod,
