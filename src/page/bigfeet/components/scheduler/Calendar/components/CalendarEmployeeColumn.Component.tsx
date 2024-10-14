@@ -66,6 +66,11 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 					if (startPercent > 100) {
 						return { top: 0, bottom: 100 };
 					}
+
+					if (startPercent < 0) {
+						return { top: 0, bottom: 0 };
+					}
+
 					return { top: 0, bottom: startPercent };
 				}
 
@@ -74,6 +79,10 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 
 					if (endPercent < 0) {
 						return { top: 0, bottom: 100 };
+					}
+
+					if (endPercent > 100) {
+						return { top: 0, bottom: 0 };
 					}
 					return { top: endPercent, bottom: 100 };
 				}

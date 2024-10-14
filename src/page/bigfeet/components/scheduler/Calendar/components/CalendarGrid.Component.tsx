@@ -50,7 +50,7 @@ const CalendarGrid: FC<CalendarGridProp> = ({
 				if (creatable) setOpen(true);
 			}}>
 			{blocked && (
-				<div style={{ height, marginTop: top }} className="bg-red-200" />
+				<div style={{ height, marginTop: top }} className="bg-yellow-200" />
 			)}
 
 			<AddReservationModal
