@@ -18,6 +18,8 @@ export interface UpdateReservationRequest {
 	gift_card?: number | null;
 	insurance?: number | null;
 	vip?: number | null;
+	cash_out?: number | null;
+	acupuncturist_employee_id?: number | null;
 	tips?: number | null;
 	tip_method?: TipMethod | null;
 	message?: string | null;

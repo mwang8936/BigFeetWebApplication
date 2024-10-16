@@ -121,6 +121,11 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 	const [insuranceInput, setInsuranceInput] = useState<number | null>(
 		reservation.insurance
 	);
+	const [acupuncturistEmployeeIdInput, setAcupuncturistEmployeeIdInput] =
+		useState<number | null>(reservation.acupuncturist?.employee_id ?? null);
+	const [cashOutInput, setCashOutInput] = useState<number | null>(
+		reservation.cash_out
+	);
 	const [tipMethodInput, setTipMethodInput] = useState<TipMethod | null>(
 		reservation.tip_method
 	);
@@ -154,6 +159,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 	const [invalidVip, setInvalidVip] = useState<boolean>(false);
 	const [invalidGiftCard, setInvalidGiftCard] = useState<boolean>(false);
 	const [invalidInsurance, setInvalidInsurance] = useState<boolean>(false);
+	const [invalidCashOut, setInvalidCashOut] = useState<boolean>(false);
 	const [invalidTips, setInvalidTips] = useState<boolean>(false);
 	const [invalidCustomerPhoneNumber, setInvalidCustomerPhoneNumber] =
 		useState<boolean>(false);
@@ -238,6 +244,9 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
 	const employeeDropDownItems = getEmployeeDropDownItems(employees);
+	const acupuncturistDropDownItems = getEmployeeDropDownItems(
+		employees.filter((employee) => employee.role === Role.ACUPUNCTURIST)
+	);
 	const serviceDropDownItems = getServiceDropDownItems(services);
 
 	useEffect(() => {
@@ -275,6 +284,13 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			giftCardInput === reservation.gift_card ? undefined : giftCardInput;
 		const insurance: number | null | undefined =
 			insuranceInput === reservation.insurance ? undefined : insuranceInput;
+		const acupuncturist_employee_id: number | null | undefined =
+			acupuncturistEmployeeIdInput ===
+			(reservation.acupuncturist?.employee_id ?? null)
+				? undefined
+				: acupuncturistEmployeeIdInput;
+		const cash_out: number | null | undefined =
+			cashOutInput === reservation.cash_out ? undefined : cashOutInput;
 		const tip_method: TipMethod | null | undefined =
 			tipMethodInput === reservation.tip_method ? undefined : tipMethodInput;
 		const tips: number | null | undefined =
@@ -326,6 +342,8 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			vip !== undefined ||
 			gift_card !== undefined ||
 			insurance !== undefined ||
+			acupuncturist_employee_id !== undefined ||
+			cash_out !== undefined ||
 			tip_method !== undefined ||
 			tips !== undefined ||
 			message !== undefined ||
@@ -354,6 +372,8 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		vipInput,
 		giftCardInput,
 		insuranceInput,
+		acupuncturistEmployeeIdInput,
+		cashOutInput,
 		tipMethodInput,
 		tipsInput,
 		messageInput,
@@ -382,6 +402,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			invalidVip ||
 			invalidGiftCard ||
 			invalidInsurance ||
+			invalidCashOut ||
 			invalidTips ||
 			invalidCustomer;
 
@@ -396,6 +417,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		invalidVip,
 		invalidGiftCard,
 		invalidInsurance,
+		invalidCashOut,
 		invalidTips,
 		invalidCustomerPhoneNumber,
 		invalidCustomerVipSerial,
@@ -436,6 +458,74 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 	useEffect(() => {
 		if (endTimeInput === 0) setEndTimeInput(null);
 	}, [endTimeInput]);
+
+	useEffect(() => {
+		if (serviceIdInput === null || employeeIdInput === null) {
+			setAcupuncturistEmployeeIdInput(null);
+		} else {
+			const employee: Employee | undefined = employees.find(
+				(employee) => employee.employee_id === employeeIdInput
+			);
+			const service: Service | undefined = services.find(
+				(service) => service.service_id === serviceIdInput
+			);
+
+			if (
+				service &&
+				service.acupuncture > 0 &&
+				employee &&
+				employee.role !== Role.ACUPUNCTURIST
+			) {
+				if (
+					service.service_id === reservation.service.service_id &&
+					employee.employee_id === reservation.employee_id
+				) {
+					setAcupuncturistEmployeeIdInput(
+						reservation.acupuncturist?.employee_id ?? null
+					);
+				}
+			} else {
+				setAcupuncturistEmployeeIdInput(null);
+			}
+		}
+	}, [employeeIdInput, serviceIdInput]);
+
+	useEffect(() => {
+		if (serviceIdInput === null || employeeIdInput === null) {
+			setInsuranceInput(null);
+			setInvalidInsurance(false);
+		} else {
+			const employee: Employee | undefined = employees.find(
+				(employee) => employee.employee_id === employeeIdInput
+			);
+			const service: Service | undefined = services.find(
+				(service) => service.service_id === serviceIdInput
+			);
+
+			if (
+				service &&
+				service.acupuncture > 0 &&
+				employee &&
+				employee.role === Role.ACUPUNCTURIST
+			) {
+				if (
+					service.service_id === reservation.service.service_id &&
+					employee.employee_id === reservation.employee_id
+				) {
+					setInsuranceInput(reservation.insurance);
+				}
+			} else {
+				setInsuranceInput(null);
+				setInvalidInsurance(false);
+			}
+		}
+	}, [employeeIdInput, serviceIdInput]);
+
+	useEffect(() => {
+		if (acupuncturistDropDownItems.length === 2) {
+			setAcupuncturistEmployeeIdInput(acupuncturistDropDownItems[1].id);
+		}
+	}, [acupuncturistDropDownItems.length]);
 
 	useEffect(() => {
 		if (
@@ -625,6 +715,13 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			giftCardInput === reservation.gift_card ? undefined : giftCardInput;
 		const insurance: number | null | undefined =
 			insuranceInput === reservation.insurance ? undefined : insuranceInput;
+		const acupuncturist_employee_id: number | null | undefined =
+			acupuncturistEmployeeIdInput ===
+			(reservation.acupuncturist?.employee_id ?? null)
+				? undefined
+				: acupuncturistEmployeeIdInput;
+		const cash_out: number | null | undefined =
+			cashOutInput === reservation.cash_out ? undefined : cashOutInput;
 		const tip_method: TipMethod | null | undefined =
 			tipMethodInput === reservation.tip_method ? undefined : tipMethodInput;
 		const tips: number | null | undefined =
@@ -682,6 +779,10 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			...(vip !== undefined && { vip }),
 			...(gift_card !== undefined && { gift_card }),
 			...(insurance !== undefined && { insurance }),
+			...(acupuncturist_employee_id !== undefined && {
+				acupuncturist_employee_id,
+			}),
+			...(cash_out !== undefined && { cash_out }),
 			...(tip_method !== undefined && { tip_method }),
 			...(tips !== undefined && { tips }),
 			...(message !== undefined && { message }),
@@ -712,6 +813,11 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		).toFixed(2)
 	);
 
+	const employee: Employee | undefined =
+		employeeIdInput !== null
+			? employees.find((employee) => employee.employee_id === employeeIdInput)
+			: undefined;
+
 	const service: Service | undefined =
 		serviceIdInput !== null
 			? services.find((service) => service.service_id === serviceIdInput)
@@ -725,6 +831,9 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			? new Date(dateInput.getTime() + time * (1000 * 60))
 			: undefined;
 	const endTimeText = endDate ? formatTimeFromDate(endDate) : undefined;
+
+	const isAcupunctureService = service ? service.acupuncture > 0 : false;
+	const employeeIsAcupuncturist = employee?.role === Role.ACUPUNCTURIST;
 
 	const currentCustomer: Customer | undefined =
 		customerIdInput !== null
@@ -929,6 +1038,126 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 									</div>
 								)}
 
+							{isAcupunctureService && (
+								<div className="mb-4">
+									<Accordion>
+										<AccordionSummary
+											expandIcon={<ExpandMoreIcon />}
+											aria-controls="panel1-content"
+											id="panel1-header">
+											{t('Acupuncture Settings')}
+										</AccordionSummary>
+
+										<AccordionDetails>
+											{!employeeIsAcupuncturist && (
+												<EditableDropDown
+													originalOption={
+														acupuncturistDropDownItems[
+															acupuncturistDropDownItems.findIndex(
+																(option) =>
+																	option.id ===
+																	(reservation.acupuncturist?.employee_id ??
+																		null)
+															) || 0
+														]
+													}
+													option={
+														acupuncturistDropDownItems[
+															acupuncturistDropDownItems.findIndex(
+																(option) =>
+																	option.id === acupuncturistEmployeeIdInput
+															) || 0
+														]
+													}
+													options={acupuncturistDropDownItems}
+													setOption={(option) => {
+														setAcupuncturistEmployeeIdInput(
+															option.id as number | null
+														);
+													}}
+													label={LABELS.reservation.acupuncturist_employee_id}
+													validationProp={{
+														required: true,
+														requiredMessage:
+															ERRORS.reservation.acupuncturist_employee_id
+																.required,
+													}}
+													editable={editable}
+													missingPermissionMessage={
+														ERRORS.reservation.permissions.edit
+													}
+												/>
+											)}
+
+											{employeeIsAcupuncturist && (
+												<EditablePayRateAutomatic
+													originalAmount={reservation.insurance}
+													amount={insuranceInput}
+													remainingAmount={remainingAmount}
+													roundToTheNearestDollar={false}
+													setAmount={setInsuranceInput}
+													label={LABELS.reservation.insurance}
+													name={NAMES.reservation.insurance}
+													validationProp={{
+														max: NUMBERS.reservation.insurance,
+														required: false,
+														invalid: invalidInsurance,
+														setInvalid: setInvalidInsurance,
+														invalidMessage:
+															ERRORS.reservation.insurance.invalid,
+													}}
+													placeholder={PLACEHOLDERS.reservation.insurance}
+													editable={editable}
+													missingPermissionMessage={
+														ERRORS.reservation.permissions.edit
+													}
+												/>
+											)}
+										</AccordionDetails>
+									</Accordion>
+								</div>
+							)}
+
+							{service &&
+								service.acupuncture > 0 &&
+								employee &&
+								employee.role !== Role.ACUPUNCTURIST && (
+									<EditableDropDown
+										originalOption={
+											acupuncturistDropDownItems[
+												acupuncturistDropDownItems.findIndex(
+													(option) =>
+														option.id ===
+														(reservation.acupuncturist?.employee_id ?? null)
+												) || 0
+											]
+										}
+										option={
+											acupuncturistDropDownItems[
+												acupuncturistDropDownItems.findIndex(
+													(option) => option.id === acupuncturistEmployeeIdInput
+												) || 0
+											]
+										}
+										options={acupuncturistDropDownItems}
+										setOption={(option) => {
+											setAcupuncturistEmployeeIdInput(
+												option.id as number | null
+											);
+										}}
+										label={LABELS.reservation.acupuncturist_employee_id}
+										validationProp={{
+											required: true,
+											requiredMessage:
+												ERRORS.reservation.acupuncturist_employee_id.required,
+										}}
+										editable={editable}
+										missingPermissionMessage={
+											ERRORS.reservation.permissions.edit
+										}
+									/>
+								)}
+
 							<EditableDropDown
 								originalOption={
 									genderDropDownItems[
@@ -1049,31 +1278,56 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
-							<EditablePayRateAutomatic
-								originalAmount={reservation.insurance}
-								amount={insuranceInput}
-								remainingAmount={remainingAmount}
-								roundToTheNearestDollar={false}
-								setAmount={setInsuranceInput}
-								label={LABELS.reservation.insurance}
-								name={NAMES.reservation.insurance}
-								validationProp={{
-									max: NUMBERS.reservation.insurance,
-									required: false,
-									invalid: invalidInsurance,
-									setInvalid: setInvalidInsurance,
-									invalidMessage: ERRORS.reservation.insurance.invalid,
-								}}
-								placeholder={PLACEHOLDERS.reservation.insurance}
-								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
-							/>
+							{service &&
+								service.acupuncture > 0 &&
+								employee &&
+								employee.role === Role.ACUPUNCTURIST && (
+									<EditablePayRateAutomatic
+										originalAmount={reservation.insurance}
+										amount={insuranceInput}
+										remainingAmount={remainingAmount}
+										roundToTheNearestDollar={false}
+										setAmount={setInsuranceInput}
+										label={LABELS.reservation.insurance}
+										name={NAMES.reservation.insurance}
+										validationProp={{
+											max: NUMBERS.reservation.insurance,
+											required: false,
+											invalid: invalidInsurance,
+											setInvalid: setInvalidInsurance,
+											invalidMessage: ERRORS.reservation.insurance.invalid,
+										}}
+										placeholder={PLACEHOLDERS.reservation.insurance}
+										editable={editable}
+										missingPermissionMessage={
+											ERRORS.reservation.permissions.edit
+										}
+									/>
+								)}
 
 							{remainingAmount > 0 && (
 								<p className="error-label mb-4">
 									{t('Total Amount Missing')}: {remainingAmount.toFixed(2)}
 								</p>
 							)}
+
+							<EditablePayRate
+								originalAmount={reservation.cash_out}
+								amount={cashOutInput}
+								setAmount={setCashOutInput}
+								label={LABELS.reservation.cash_out}
+								name={NAMES.reservation.cash_out}
+								validationProp={{
+									max: NUMBERS.reservation.cash_out,
+									required: false,
+									invalid: invalidCashOut,
+									setInvalid: setInvalidCashOut,
+									invalidMessage: ERRORS.reservation.cash_out.invalid,
+								}}
+								placeholder={PLACEHOLDERS.reservation.cash_out}
+								editable={editable}
+								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+							/>
 
 							<EditableDropDown
 								originalOption={

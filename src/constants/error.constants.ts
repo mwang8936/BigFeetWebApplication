@@ -265,6 +265,9 @@ const ERRORS = {
 		service_id: {
 			required: 'Service cannot be empty.',
 		},
+		acupuncturist_employee_id: {
+			required: 'Acupuncturist cannot be empty.',
+		},
 		cash: {
 			invalid: {
 				key: 'Cash Invalid',
@@ -290,6 +293,12 @@ const ERRORS = {
 			invalid: {
 				key: 'Acupuncture Insurance Invalid',
 				value: { max: NUMBERS.reservation.insurance },
+			},
+		},
+		cash_out: {
+			invalid: {
+				key: 'Cash Out Invalid',
+				value: { max: NUMBERS.reservation.cash_out },
 			},
 		},
 		tips: {

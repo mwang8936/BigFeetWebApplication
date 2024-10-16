@@ -49,7 +49,7 @@ const EditableDropDown: FC<EditableDropDownProp> = ({
 
 	useEffect(() => {
 		setDisabled(originalOption.id !== null);
-	}, [originalOption]);
+	}, [originalOption.id]);
 
 	const handleDisableBtnClick = () => {
 		if (!disabled) {

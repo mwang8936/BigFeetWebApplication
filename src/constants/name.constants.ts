@@ -51,6 +51,7 @@ const NAMES = {
 		vip: 'vip',
 		gift_card: 'gift_card',
 		insurance: 'insurance',
+		cash_out: 'cash_out',
 		tips: 'tips',
 		message: 'message',
 	},

@@ -1,4 +1,5 @@
 import Customer from './Customer.Model';
+import Employee from './Employee.Model';
 import Service from './Service.Model';
 import { Gender, TipMethod } from './enums';
 
@@ -18,6 +19,8 @@ export default interface Reservation {
 	vip: number | null;
 	gift_card: number | null;
 	insurance: number | null;
+	cash_out: number | null;
+	acupuncturist: Employee | null;
 	tips: number | null;
 	tip_method: TipMethod | null;
 	message: string | null;
