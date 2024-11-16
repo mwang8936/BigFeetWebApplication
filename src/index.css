@@ -190,11 +190,20 @@
 
 	.selected-tab {
 		@apply mr-2 inline-block p-4 text-blue-600 bg-gray-200 rounded-t-lg 
-    hover:bg-gray-300 hover:text-blue-700 cursor-pointer;
+    hover:bg-gray-300 hover:text-blue-700 cursor-default;
 	}
 
 	.tab {
 		@apply mr-2 inline-block p-4 text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-100 cursor-pointer;
+	}
+
+	.deleted-selected-tab {
+		@apply mr-2 inline-block p-4 text-red-600 bg-gray-200 rounded-t-lg 
+    hover:bg-gray-300 hover:text-red-700 cursor-default;
+	}
+
+	.deleted-tab {
+		@apply mr-2 inline-block p-4 text-red-500 bg-gray-50 rounded-t-lg hover:text-red-600 hover:bg-gray-100 cursor-pointer;
 	}
 
 	.input-div {
@@ -299,5 +308,13 @@
 
 	.show-password-div {
 		@apply absolute mt-3 mb-3 inset-y-0 left-0 flex items-center pl-3 z-20;
+	}
+
+	.records-box {
+		@apply border-4 border-gray-500 p-4;
+	}
+
+	[data-testid='flowbite-tooltip-arrow'] {
+		left: 24px !important;
 	}
 }

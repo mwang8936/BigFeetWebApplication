@@ -358,6 +358,13 @@ const ERRORS = {
 		},
 	},
 	service: {
+		date: {
+			required: 'Date cannot be empty.',
+			invalid: {
+				key: 'Date must be in format: MM/DD/YYYY and selected date is outside of date range.',
+				value: {},
+			},
+		},
 		service_name: {
 			required: 'Service Name cannot be empty.',
 			invalid: {
@@ -418,6 +425,7 @@ const ERRORS = {
 			edit: 'You do not have permissions to edit services.',
 			add: 'You do not have permissions to add services.',
 			delete: 'You do not have permission to delete services.',
+			recover: 'You do not have permission to recover services.',
 		},
 	},
 	vip_package: {

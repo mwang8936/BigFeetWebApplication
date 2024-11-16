@@ -72,6 +72,9 @@ const NAMES = {
 		feet: 'feet',
 		acupuncture: 'acupuncture',
 		beds_required: 'beds_required',
+		discontinue: 'discontinue_service',
+		continue: 'continue_service',
+		show_deleted: 'show_deleted',
 	},
 	vip_package: {
 		serial: 'serial',

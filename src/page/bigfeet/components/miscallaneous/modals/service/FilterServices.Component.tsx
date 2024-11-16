@@ -1,6 +1,5 @@
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from '@tanstack/react-query';
 
 import { Dialog } from '@headlessui/react';
 
@@ -9,50 +8,51 @@ import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 import AddBottom from '../AddBottom.Component';
 
 import AddDate from '../../add/AddDate.Component';
+import AddToggleSwitch, {
+	ToggleColor,
+} from '../../add/AddToggleSwitch.Component';
 
-import { useScheduleDateContext } from '../../../scheduler/Scheduler.Component';
+import {
+	useServiceDateContext,
+	useServiceShowDeletedContext,
+} from '../../../services/Services.Component';
 
 import { useUserQuery } from '../../../../../hooks/profile.hooks';
-import { schedulesQueryKey } from '../../../../../hooks/schedule.hooks';
 
 import ERRORS from '../../../../../../constants/error.constants';
 import LABELS from '../../../../../../constants/label.constants';
+import NAMES from '../../../../../../constants/name.constants';
 
 import { Permissions } from '../../../../../../models/enums';
 import User from '../../../../../../models/User.Model';
 
 import { sameDate } from '../../../../../../utils/date.utils';
-import { formatDateToQueryKey } from '../../../../../../utils/string.utils';
 
-interface FilterSchedulesProp {
+interface FilterServicesProp {
 	setOpen(open: boolean): void;
 }
 
-const FilterSchedules: FC<FilterSchedulesProp> = ({ setOpen }) => {
+const FilterServices: FC<FilterServicesProp> = ({ setOpen }) => {
 	const { t } = useTranslation();
-	const queryClient = useQueryClient();
 
-	const { date, setDate } = useScheduleDateContext();
+	const { date, setDate } = useServiceDateContext();
+	const { showDeleted, setShowDeleted } = useServiceShowDeletedContext();
 
 	const [selectedDate, setSelectedDate] = useState<Date | null>(date);
+	const [selectedShowDeleted, setSelectedShowDeleted] = useState(showDeleted);
 
 	const [invalidDate, setInvalidDate] = useState<boolean>(false);
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
 
-	const scheduleGettable = user.permissions.includes(
-		Permissions.PERMISSION_GET_SCHEDULE
+	const gettable = user.permissions.includes(
+		Permissions.PERMISSION_GET_SERVICE
 	);
 
-	const onDateFiltered = (updatedDate: Date) => {
-		if (scheduleGettable && !sameDate(date, updatedDate)) {
-			queryClient.invalidateQueries({
-				queryKey: [schedulesQueryKey, formatDateToQueryKey(updatedDate)],
-			});
-		}
-
+	const onDateFiltered = (updatedDate: Date, updatedShowDeleted: boolean) => {
 		setDate(updatedDate);
+		setShowDeleted(updatedShowDeleted);
 		setOpen(false);
 	};
 
@@ -71,7 +71,7 @@ const FilterSchedules: FC<FilterSchedulesProp> = ({ setOpen }) => {
 						<Dialog.Title
 							as="h3"
 							className="text-base font-semibold leading-6 text-gray-900">
-							{t('Filter Reservations')}
+							{t('Filter Services')}
 						</Dialog.Title>
 
 						<div className="mt-2">
@@ -89,6 +89,17 @@ const FilterSchedules: FC<FilterSchedulesProp> = ({ setOpen }) => {
 									invalidMessage: ERRORS.schedule.filter.invalid,
 								}}
 							/>
+
+							<AddToggleSwitch
+								checked={selectedShowDeleted}
+								setChecked={setSelectedShowDeleted}
+								falseText="Hide"
+								trueText="Show"
+								toggleColour={ToggleColor.BLUE}
+								label={LABELS.service.show_deleted}
+								name={NAMES.service.show_deleted}
+								disabled={false}
+							/>
 						</div>
 					</div>
 				</div>
@@ -98,12 +109,19 @@ const FilterSchedules: FC<FilterSchedulesProp> = ({ setOpen }) => {
 				onCancel={() => setOpen(false)}
 				addText={'Filter'}
 				disabledAdd={
-					(selectedDate && sameDate(date, selectedDate)) ||
+					!gettable ||
+					(selectedDate &&
+						sameDate(date, selectedDate) &&
+						selectedShowDeleted === showDeleted) ||
 					date === null ||
 					invalidDate
 				}
 				addMissingPermissionMessage={
-					selectedDate && sameDate(date, selectedDate)
+					!gettable
+						? ERRORS.service.permissions.get
+						: selectedDate &&
+						  sameDate(date, selectedDate) &&
+						  selectedShowDeleted === showDeleted
 						? ERRORS.no_changes
 						: date === null
 						? ERRORS.required
@@ -111,17 +129,17 @@ const FilterSchedules: FC<FilterSchedulesProp> = ({ setOpen }) => {
 						? ERRORS.invalid
 						: ''
 				}
-				onAdd={() => onDateFiltered(selectedDate as Date)}
-				editText={'Reset Filter'}
+				onAdd={() => onDateFiltered(selectedDate as Date, selectedShowDeleted)}
+				editText={'Reset Date'}
 				disabledEdit={
 					selectedDate !== null &&
 					(sameDate(selectedDate, new Date()) || sameDate(date, new Date()))
 				}
 				editMissingPermissionMessage={'Current date already selected.'}
-				onEdit={() => onDateFiltered(new Date())}
+				onEdit={() => onDateFiltered(new Date(), selectedShowDeleted)}
 			/>
 		</>
 	);
 };
 
-export default FilterSchedules;
+export default FilterServices;

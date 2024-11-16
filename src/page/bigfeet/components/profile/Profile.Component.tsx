@@ -34,7 +34,11 @@ const Profile: FC = () => {
 		Permissions.PERMISSION_DELETE_EMPLOYEE
 	);
 
-	const tabs = [t('Personal'), t('Professional'), t('Settings')];
+	const tabs = [
+		{ text: t('Personal'), deleted: false },
+		{ text: t('Professional'), deleted: false },
+		{ text: t('Settings'), deleted: false },
+	];
 
 	const profileElement =
 		selectedTab === 0 ? (

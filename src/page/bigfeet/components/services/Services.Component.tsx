@@ -1,5 +1,7 @@
-import { FC, useState } from 'react';
+import { createContext, FC, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 
 import EditService from './components/EditService.Component.tsx';
 
@@ -12,21 +14,59 @@ import PermissionsButton, {
 import Tabs from '../miscallaneous/Tabs.Component.tsx';
 
 import AddServiceModal from '../miscallaneous/modals/service/AddServiceModal.Component.tsx';
+import FilterServicesModal from '../miscallaneous/modals/service/FilterServicesModal.Component.tsx';
 
 import { useServicesQuery } from '../../../hooks/service.hooks.ts';
 import { useUserQuery } from '../../../hooks/profile.hooks.ts';
 
 import ERRORS from '../../../../constants/error.constants.ts';
 
-import { Permissions } from '../../../../models/enums.ts';
-import Service from '../../../../models/Service.Model.ts';
+import { Language, Permissions } from '../../../../models/enums.ts';
+import { Service } from '../../../../models/Service.Model.ts';
 import User from '../../../../models/User.Model.ts';
+
+import { sameDate } from '../../../../utils/date.utils.ts';
+
+const ServiceDateContext = createContext<
+	{ date: Date; setDate(date: Date): void } | undefined
+>(undefined);
+
+export function useServiceDateContext() {
+	const context = useContext(ServiceDateContext);
+	if (context === undefined) {
+		throw new Error(
+			'useServiceDateContext must be within ServiceDateProvider.'
+		);
+	}
+
+	return context;
+}
+
+const ServiceShowDeletedContext = createContext<
+	| { showDeleted: boolean; setShowDeleted(showDeleted: boolean): void }
+	| undefined
+>(undefined);
+
+export function useServiceShowDeletedContext() {
+	const context = useContext(ServiceShowDeletedContext);
+	if (context === undefined) {
+		throw new Error(
+			'useServiceShowDeletedContext must be within ServiceShowDeletedProvider.'
+		);
+	}
+
+	return context;
+}
 
 const Services: FC = () => {
 	const { t } = useTranslation();
 
+	const [date, setDate] = useState<Date>(() => new Date());
+	const [showDeleted, setShowDeleted] = useState(false);
+
 	const [selectedTab, setSelectedTab] = useState(0);
 
+	const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
 	const [openAddModal, setOpenAddModal] = useState<boolean>(false);
 
 	const [retryingServiceQuery, setRetryingServiceQuery] =
@@ -42,7 +82,11 @@ const Services: FC = () => {
 		Permissions.PERMISSION_ADD_SERVICE
 	);
 
-	const serviceQuery = useServicesQuery({ gettable });
+	const language = user.language;
+
+	const isToday = sameDate(date, new Date());
+
+	const serviceQuery = useServicesQuery({ gettable, withDeleted: showDeleted });
 
 	const services: Service[] = serviceQuery.data || [];
 
@@ -54,9 +98,16 @@ const Services: FC = () => {
 
 	const isServicePaused = serviceQuery.isPaused;
 
-	let tabs: string[] = [];
+	useEffect(() => {
+		retryServiceQuery();
+	}, [showDeleted, retryServiceQuery]);
+
+	let tabs: { text: string; deleted: boolean }[] = [];
 	if (!isServiceLoading && !isServiceError && !isServicePaused && services) {
-		tabs = services.map((service) => service.service_name);
+		tabs = services.map((service) => ({
+			text: service.service_name,
+			deleted: service.deleted_at != undefined,
+		}));
 	}
 
 	let service = services[selectedTab];
@@ -118,29 +169,72 @@ const Services: FC = () => {
 
 	const isLoadingElement = isServiceLoading ? <Loading /> : permissionsElement;
 
-	return (
-		<>
-			<div className="non-sidebar">
-				<div className="title-bar">
-					<h1 className="centered-title-text">{t('Services')}</h1>
+	const displayDate = () => {
+		const localeDateFormat =
+			language === Language.SIMPLIFIED_CHINESE
+				? 'zh-CN'
+				: user.language === Language.TRADITIONAL_CHINESE
+				? 'zh-TW'
+				: undefined;
 
-					<div className="vertical-center">
-						<PermissionsButton
-							btnTitle={'Add Service'}
-							btnType={ButtonType.ADD}
-							top={false}
-							disabled={!creatable}
-							missingPermissionMessage={ERRORS.service.permissions.add}
-							onClick={() => setOpenAddModal(true)}
-						/>
+		const dateString = date.toLocaleDateString(localeDateFormat, {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+			weekday: 'short',
+		});
+
+		return isToday ? `${t('Today')} - ${dateString}` : dateString;
+	};
+
+	return (
+		<ServiceDateContext.Provider value={{ date, setDate }}>
+			<ServiceShowDeletedContext.Provider
+				value={{ showDeleted, setShowDeleted }}>
+				<div className="non-sidebar overflow-x-hidden">
+					<div className="title-bar">
+						<div className="vertical-center">
+							<PermissionsButton
+								btnTitle={'Add Service'}
+								btnType={ButtonType.ADD}
+								top={false}
+								disabled={!creatable}
+								missingPermissionMessage={ERRORS.service.permissions.add}
+								onClick={() => setOpenAddModal(true)}
+							/>
+						</div>
+
+						<div className="vertical-center flex flex-col">
+							<h1 className="my-auto mx-auto text-gray-600 text-3xl">
+								{t('Services')}
+							</h1>
+
+							<h1 className="mx-auto text-gray-600 text-xl">{displayDate()}</h1>
+						</div>
+
+						<div className="vertical-center ms-10 flex flex-row ">
+							<CalendarDaysIcon
+								className={`h-16 w-16 ${
+									isToday && !showDeleted
+										? 'text-gray-600 hover:text-gray-400'
+										: 'text-blue-600 hover:text-blue-400'
+								} my-auto me-10 cursor-pointer transition-colors duration-200 hover:scale-110`}
+								onClick={() => setOpenFilterModal(true)}
+							/>
+						</div>
 					</div>
+
+					{isLoadingElement}
 				</div>
 
-				{isLoadingElement}
-			</div>
+				<FilterServicesModal
+					open={openFilterModal}
+					setOpen={setOpenFilterModal}
+				/>
 
-			<AddServiceModal open={openAddModal} setOpen={setOpenAddModal} />
-		</>
+				<AddServiceModal open={openAddModal} setOpen={setOpenAddModal} />
+			</ServiceShowDeletedContext.Provider>
+		</ServiceDateContext.Provider>
 	);
 };
 

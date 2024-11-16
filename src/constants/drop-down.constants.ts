@@ -24,7 +24,6 @@ import FemaleIcon from '../assets/Female_Icon.svg';
 import CanadaFlagIcon from '../assets/Canada_Flag.png';
 import ChinaFlagIcon from '../assets/China_Flag.png';
 
-import Service from '../models/Service.Model';
 import VipPackage from '../models/Vip-Package.Model';
 import Schedule from '../models/Schedule.Model';
 
@@ -138,15 +137,6 @@ export const getEmployeeDropDownItems = (employees: Employee[]) => {
 		name: employee.username,
 	}));
 	return [nullObject, ...employeeDropDownItems];
-};
-
-export const getServiceDropDownItems = (services: Service[]) => {
-	const nullObject = { id: null, name: 'No Service Selected' };
-	const serviceDropDownItems = services.map((service) => ({
-		id: service.service_id,
-		name: service.shorthand,
-	}));
-	return [nullObject, ...serviceDropDownItems];
 };
 
 export const getVipPackageDropDownItems = (vipPackages: VipPackage[]) => {
