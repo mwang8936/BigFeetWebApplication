@@ -17,6 +17,7 @@ import AddInput from '../../../add/AddInput.Component';
 import AddMinute from '../../../add/AddMinute.Component';
 import AddNumber from '../../../add/AddNumber.Component';
 import AddPhoneNumber from '../../../add/AddPhoneNumber.Component';
+import AddServiceInput from '../../../add/AddServiceInput.Component';
 import AddTextArea from '../../../add/AddTextArea.Component';
 import AddTime from '../../../add/AddTime.Component';
 import AddToggleSwitch, {
@@ -30,12 +31,11 @@ import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 import { useAddReservationMutation } from '../../../../../../hooks/reservation.hooks';
 import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
-import { useServicesQuery } from '../../../../../../hooks/service.hooks';
+import { useServiceRecordsQuery } from '../../../../../../hooks/service.hooks';
 
 import {
 	genderDropDownItems,
 	getEmployeeDropDownItems,
-	getServiceDropDownItems,
 } from '../../../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
@@ -50,7 +50,7 @@ import Customer from '../../../../../../../models/Customer.Model';
 import Employee from '../../../../../../../models/Employee.Model';
 import { Gender, Permissions, Role } from '../../../../../../../models/enums';
 import Schedule from '../../../../../../../models/Schedule.Model';
-import Service from '../../../../../../../models/Service.Model';
+import { ServiceRecord } from '../../../../../../../models/Service.Model';
 import User from '../../../../../../../models/User.Model';
 
 import { AddReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
@@ -169,11 +169,12 @@ const AddReservation: FC<AddReservationProp> = ({
 		(employeeQuery.data as Employee[]) || [user]
 	).filter((employee) => employee.role !== Role.DEVELOPER);
 
-	const serviceQuery = useServicesQuery({
+	const serviceQuery = useServiceRecordsQuery({
+		date: dateInput || date,
 		gettable: serviceGettable,
 		staleTime: Infinity,
 	});
-	const services: Service[] = serviceQuery.data || [];
+	const services: ServiceRecord[] = serviceQuery.data || [];
 
 	const scheduleQuery = useSchedulesQuery({
 		date: dateInput || date,
@@ -185,7 +186,6 @@ const AddReservation: FC<AddReservationProp> = ({
 	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
 	const employeeDropDownItems = getEmployeeDropDownItems(employees);
-	const serviceDropDownItems = getServiceDropDownItems(services);
 
 	useEffect(() => {
 		const missingRequiredInput =
@@ -234,7 +234,7 @@ const AddReservation: FC<AddReservationProp> = ({
 			setInvalidEndTime(false);
 			setInvalidBedsRequired(false);
 		} else {
-			const service: Service | undefined = services.find(
+			const service: ServiceRecord | undefined = services.find(
 				(service) => service.service_id === serviceIdInput
 			);
 
@@ -427,8 +427,16 @@ const AddReservation: FC<AddReservationProp> = ({
 		const reserved_date = dateInput as Date;
 		const employee_id = employeeIdInput as number;
 		const service_id = serviceIdInput as number;
-		const time = endTimeInput ?? undefined;
-		const beds_required = bedsRequiredInput ?? undefined;
+		const time = service
+			? service.time === endTimeInput
+				? undefined
+				: endTimeInput ?? undefined
+			: undefined;
+		const beds_required = service
+			? service.beds_required === bedsRequiredInput
+				? undefined
+				: bedsRequiredInput ?? undefined
+			: undefined;
 		const requested_gender = genderInput ?? undefined;
 		const requested_employee = requestedInput;
 		const message = messageInput?.trim();
@@ -532,220 +540,211 @@ const AddReservation: FC<AddReservationProp> = ({
 									invalidMessage: ERRORS.reservation.time.invalid,
 								}}
 							/>
+							{dateInput !== null && !invalidDate && !invalidTime && (
+								<>
+									<AddDropDown
+										option={
+											employeeDropDownItems[
+												employeeDropDownItems.findIndex(
+													(option) => option.id === employeeIdInput
+												) || 0
+											]
+										}
+										options={employeeDropDownItems}
+										setOption={(option) => {
+											setEmployeeIdInput(option.id as number | null);
+										}}
+										label={LABELS.reservation.employee_id}
+										validationProp={{
+											required: true,
+											requiredMessage: ERRORS.reservation.employee_id.required,
+										}}
+									/>
 
-							<AddDropDown
-								option={
-									employeeDropDownItems[
-										employeeDropDownItems.findIndex(
-											(option) => option.id === employeeIdInput
-										) || 0
-									]
-								}
-								options={employeeDropDownItems}
-								setOption={(option) => {
-									setEmployeeIdInput(option.id as number | null);
-								}}
-								label={LABELS.reservation.employee_id}
-								validationProp={{
-									required: true,
-									requiredMessage: ERRORS.reservation.employee_id.required,
-								}}
-							/>
+									<AddServiceInput
+										services={services}
+										service={service ?? null}
+										setService={(service) =>
+											setServiceIdInput(service?.service_id ?? null)
+										}
+										required={true}
+									/>
 
-							<AddDropDown
-								option={
-									serviceDropDownItems[
-										serviceDropDownItems.findIndex(
-											(option) => option.id === serviceIdInput
-										) || 0
-									]
-								}
-								options={serviceDropDownItems}
-								setOption={(option) => {
-									setServiceIdInput(option.id as number | null);
-								}}
-								label={LABELS.reservation.service_id}
-								validationProp={{
-									required: true,
-									requiredMessage: ERRORS.reservation.service_id.required,
-								}}
-							/>
+									{serviceIdInput !== null && (
+										<div className="mb-4">
+											<Accordion>
+												<AccordionSummary
+													expandIcon={<ExpandMoreIcon />}
+													aria-controls="panel1-content"
+													id="panel1-header">
+													{t('Service Settings')}
+												</AccordionSummary>
 
-							{dateInput !== null &&
-								serviceIdInput !== null &&
-								!invalidDate &&
-								!invalidTime && (
-									<div className="mb-4">
-										<Accordion>
-											<AccordionSummary
-												expandIcon={<ExpandMoreIcon />}
-												aria-controls="panel1-content"
-												id="panel1-header">
-												{t('Service Settings')}
-											</AccordionSummary>
-
-											<AccordionDetails>
-												<AddMinute
-													minutes={endTimeInput}
-													setMinutes={setEndTimeInput}
-													label={LABELS.service.time}
-													name={NAMES.service.time}
-													validationProp={{
-														max: maxEndTime,
-														required: false,
-														invalid: invalidEndTime,
-														setInvalid: setInvalidEndTime,
-														invalidMessage: {
-															key: 'Minute Invalid',
-															value: {
-																max: maxEndTime,
+												<AccordionDetails>
+													<AddMinute
+														minutes={endTimeInput}
+														setMinutes={setEndTimeInput}
+														label={LABELS.service.time}
+														name={NAMES.service.time}
+														validationProp={{
+															max: maxEndTime,
+															required: false,
+															invalid: invalidEndTime,
+															setInvalid: setInvalidEndTime,
+															invalidMessage: {
+																key: 'Minute Invalid',
+																value: {
+																	max: maxEndTime,
+																},
 															},
-														},
-													}}
-												/>
+														}}
+													/>
 
-												<AddNumber
-													input={bedsRequiredInput}
-													setInput={setBedsRequiredInput}
-													label={LABELS.service.beds_required}
-													name={NAMES.service.beds_required}
-													validationProp={{
-														max: STORES.beds,
-														required: false,
-														invalid: invalidBedsRequired,
-														setInvalid: setInvalidBedsRequired,
-														invalidMessage:
-															ERRORS.service.beds_required.invalid,
-													}}
-													placeholder={PLACEHOLDERS.service.beds_required}
-												/>
+													<AddNumber
+														input={bedsRequiredInput}
+														setInput={setBedsRequiredInput}
+														label={LABELS.service.beds_required}
+														name={NAMES.service.beds_required}
+														validationProp={{
+															max: STORES.beds,
+															required: false,
+															invalid: invalidBedsRequired,
+															setInvalid: setInvalidBedsRequired,
+															invalidMessage:
+																ERRORS.service.beds_required.invalid,
+														}}
+														placeholder={PLACEHOLDERS.service.beds_required}
+													/>
 
-												<span className="font-bold text-lg text-gray-800">
-													{t('End Time', { time: endTimeText })}
-												</span>
-											</AccordionDetails>
-										</Accordion>
-									</div>
-								)}
-
-							<AddDropDown
-								option={
-									genderDropDownItems[
-										genderDropDownItems.findIndex(
-											(option) => option.id === genderInput
-										) || 0
-									]
-								}
-								options={genderDropDownItems}
-								setOption={(option) => {
-									setGenderInput(option.id as Gender | null);
-								}}
-								label={LABELS.reservation.requested_gender}
-								validationProp={{
-									required: false,
-								}}
-							/>
-
-							<AddToggleSwitch
-								setChecked={setRequestedInput}
-								checked={requestedInput}
-								falseText={'Not Requested'}
-								trueText={'Requested'}
-								toggleColour={ToggleColor.GREEN}
-								label={LABELS.reservation.requested_employee}
-								name={NAMES.reservation.requested_employee}
-								disabled={false}
-							/>
-
-							<AddTextArea
-								text={messageInput}
-								setText={setMessageInput}
-								label={LABELS.reservation.message}
-								name={NAMES.reservation.message}
-								validationProp={{
-									required: false,
-								}}
-								placeholder={PLACEHOLDERS.reservation.message}
-							/>
-
-							<div className="customer-optional-div">
-								<span className="customer-optional-title">
-									{t('Customer (Optional)')}:
-									{customerIdInput !== null && (
-										<span className="current-customer-span">
-											<span>{t('Current Customer')}:</span>
-
-											<span>{currentPhoneNumberText}</span>
-
-											<span>{currentVipSerialText}</span>
-										</span>
+													<span className="font-bold text-lg text-gray-800">
+														{t('End Time', { time: endTimeText })}
+													</span>
+												</AccordionDetails>
+											</Accordion>
+										</div>
 									)}
-								</span>
 
-								<AddPhoneNumber
-									phoneNumber={customerPhoneNumberInput}
-									setPhoneNumber={setCustomerPhoneNumberInput}
-									label={LABELS.customer.phone_number}
-									name={NAMES.customer.phone_number}
-									validationProp={{
-										required: false,
-										invalid: invalidCustomerPhoneNumber,
-										setInvalid: setInvalidCustomerPhoneNumber,
-										invalidMessage: ERRORS.customer.phone_number.invalid,
-									}}
-								/>
+									<AddDropDown
+										option={
+											genderDropDownItems[
+												genderDropDownItems.findIndex(
+													(option) => option.id === genderInput
+												) || 0
+											]
+										}
+										options={genderDropDownItems}
+										setOption={(option) => {
+											setGenderInput(option.id as Gender | null);
+										}}
+										label={LABELS.reservation.requested_gender}
+										validationProp={{
+											required: false,
+										}}
+									/>
 
-								<AddInput
-									text={customerVipSerialInput}
-									setText={setCustomerVipSerialInput}
-									label={LABELS.customer.vip_serial}
-									name={NAMES.customer.vip_serial}
-									type="text"
-									validationProp={{
-										maxLength: LENGTHS.customer.vip_serial,
-										pattern: PATTERNS.customer.vip_serial,
-										required: false,
-										invalid: invalidCustomerVipSerial,
-										setInvalid: setInvalidCustomerVipSerial,
-										invalidMessage: ERRORS.customer.vip_serial.invalid,
-									}}
-									placeholder={PLACEHOLDERS.customer.vip_serial}
-								/>
+									<AddToggleSwitch
+										setChecked={setRequestedInput}
+										checked={requestedInput}
+										falseText={'Not Requested'}
+										trueText={'Requested'}
+										toggleColour={ToggleColor.GREEN}
+										label={LABELS.reservation.requested_employee}
+										name={NAMES.reservation.requested_employee}
+										disabled={false}
+									/>
 
-								{((customerPhoneNumberInput?.length === 10 &&
-									!invalidCustomerPhoneNumber) ||
-									(customerVipSerialInput?.length === 6 &&
-										!invalidCustomerVipSerial)) && (
-									<>
+									<AddTextArea
+										text={messageInput}
+										setText={setMessageInput}
+										label={LABELS.reservation.message}
+										name={NAMES.reservation.message}
+										validationProp={{
+											required: false,
+										}}
+										placeholder={PLACEHOLDERS.reservation.message}
+									/>
+
+									<div className="customer-optional-div">
+										<span className="customer-optional-title">
+											{t('Customer (Optional)')}:
+											{customerIdInput !== null && (
+												<span className="current-customer-span">
+													<span>{t('Current Customer')}:</span>
+
+													<span>{currentPhoneNumberText}</span>
+
+													<span>{currentVipSerialText}</span>
+												</span>
+											)}
+										</span>
+
+										<AddPhoneNumber
+											phoneNumber={customerPhoneNumberInput}
+											setPhoneNumber={setCustomerPhoneNumberInput}
+											label={LABELS.customer.phone_number}
+											name={NAMES.customer.phone_number}
+											validationProp={{
+												required: false,
+												invalid: invalidCustomerPhoneNumber,
+												setInvalid: setInvalidCustomerPhoneNumber,
+												invalidMessage: ERRORS.customer.phone_number.invalid,
+											}}
+										/>
+
 										<AddInput
-											text={customerNameInput}
-											setText={setCustomerNameInput}
-											label={LABELS.customer.customer_name}
-											name={NAMES.customer.customer_name}
+											text={customerVipSerialInput}
+											setText={setCustomerVipSerialInput}
+											label={LABELS.customer.vip_serial}
+											name={NAMES.customer.vip_serial}
 											type="text"
 											validationProp={{
-												maxLength: LENGTHS.customer.customer_name,
+												maxLength: LENGTHS.customer.vip_serial,
+												pattern: PATTERNS.customer.vip_serial,
 												required: false,
-												invalid: invalidCustomerName,
-												setInvalid: setInvalidCustomerName,
-												invalidMessage: ERRORS.customer.customer_name.invalid,
+												invalid: invalidCustomerVipSerial,
+												setInvalid: setInvalidCustomerVipSerial,
+												invalidMessage: ERRORS.customer.vip_serial.invalid,
 											}}
-											placeholder={PLACEHOLDERS.customer.customer_name}
+											placeholder={PLACEHOLDERS.customer.vip_serial}
 										/>
 
-										<AddTextArea
-											text={customerNotesInput}
-											setText={setCustomerNotesInput}
-											label={LABELS.customer.notes}
-											name={NAMES.customer.notes}
-											validationProp={{
-												required: false,
-											}}
-											placeholder={PLACEHOLDERS.customer.notes}
-										/>
-									</>
-								)}
-							</div>
+										{((customerPhoneNumberInput?.length === 10 &&
+											!invalidCustomerPhoneNumber) ||
+											(customerVipSerialInput?.length === 6 &&
+												!invalidCustomerVipSerial)) && (
+											<>
+												<AddInput
+													text={customerNameInput}
+													setText={setCustomerNameInput}
+													label={LABELS.customer.customer_name}
+													name={NAMES.customer.customer_name}
+													type="text"
+													validationProp={{
+														maxLength: LENGTHS.customer.customer_name,
+														required: false,
+														invalid: invalidCustomerName,
+														setInvalid: setInvalidCustomerName,
+														invalidMessage:
+															ERRORS.customer.customer_name.invalid,
+													}}
+													placeholder={PLACEHOLDERS.customer.customer_name}
+												/>
+
+												<AddTextArea
+													text={customerNotesInput}
+													setText={setCustomerNotesInput}
+													label={LABELS.customer.notes}
+													name={NAMES.customer.notes}
+													validationProp={{
+														required: false,
+													}}
+													placeholder={PLACEHOLDERS.customer.notes}
+												/>
+											</>
+										)}
+									</div>
+								</>
+							)}
 						</div>
 					</div>
 				</div>

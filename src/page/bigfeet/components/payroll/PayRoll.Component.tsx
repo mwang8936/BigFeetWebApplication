@@ -1,7 +1,7 @@
 import { createContext, FC, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 
 import Tabs from '../miscallaneous/Tabs.Component';
 
@@ -66,7 +66,10 @@ const PayRoll: FC = () => {
 		  )
 		: [user];
 
-	const tabs: string[] = employees.map((employee) => employee.username);
+	const tabs = employees.map((employee) => ({
+		text: employee.username,
+		deleted: employee.deleted_at != undefined,
+	}));
 
 	const employee = employees[selectedTab];
 
@@ -116,7 +119,7 @@ const PayRoll: FC = () => {
 					<h1 className="centered-title-text font-bold">{displayDate()}</h1>
 
 					<div className="vertical-center">
-						<AdjustmentsHorizontalIcon
+						<CalendarDaysIcon
 							className={`h-16 w-16 ${
 								filtered
 									? 'text-blue-600 hover:text-blue-400'

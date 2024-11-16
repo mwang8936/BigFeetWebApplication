@@ -27,6 +27,7 @@ import EditablePayRate from '../../../editable/EditablePayRate.Component';
 import EditablePayRateAutomatic from '../../../editable/EditablePayRateAutomatic.Component';
 import EditablePayRateHalf from '../../../editable/EditablePayRateHalf.Component';
 import EditablePhoneNumber from '../../../editable/EditablePhoneNumber.Component';
+import EditableServiceInput from '../../../editable/EditableServiceInput.Component';
 import EditableTextArea from '../../../editable/EditableTextArea.Component';
 import EditableTime from '../../../editable/EditableTime.Component';
 import EditableToggleSwitch from '../../../editable/EditableToggleSwitch.Component';
@@ -37,7 +38,7 @@ import { useCustomersQuery } from '../../../../../../hooks/customer.hooks';
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useUpdateReservationMutation } from '../../../../../../hooks/reservation.hooks';
 import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
-import { useServicesQuery } from '../../../../../../hooks/service.hooks';
+import { useServiceRecordsQuery } from '../../../../../../hooks/service.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 import Customer from '../../../../../../../models/Customer.Model';
@@ -50,7 +51,7 @@ import {
 } from '../../../../../../../models/enums';
 import Reservation from '../../../../../../../models/Reservation.Model';
 import Schedule from '../../../../../../../models/Schedule.Model';
-import Service from '../../../../../../../models/Service.Model';
+import { ServiceRecord } from '../../../../../../../models/Service.Model';
 import User from '../../../../../../../models/User.Model';
 
 import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
@@ -58,7 +59,6 @@ import { UpdateReservationRequest } from '../../../../../../../models/requests/R
 import {
 	genderDropDownItems,
 	getEmployeeDropDownItems,
-	getServiceDropDownItems,
 	tipMethodDropDownItems,
 } from '../../../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../../../constants/error.constants';
@@ -230,14 +230,15 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			(employee) => employee.role !== Role.DEVELOPER
 		) || [];
 
-	const serviceQuery = useServicesQuery({
+	const serviceQuery = useServiceRecordsQuery({
+		date: dateInput || date,
 		gettable: serviceGettable,
 		staleTime: Infinity,
 	});
-	const services: Service[] = serviceQuery.data || [];
+	const services: ServiceRecord[] = serviceQuery.data || [];
 
 	const scheduleQuery = useSchedulesQuery({
-		date,
+		date: dateInput || date,
 		gettable: scheduleGettable,
 		staleTime: Infinity,
 	});
@@ -246,7 +247,6 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
 	const employeeDropDownItems = getEmployeeDropDownItems(employees);
-	const serviceDropDownItems = getServiceDropDownItems(services);
 
 	useEffect(() => {
 		const reserved_date: Date | null | undefined =
@@ -435,7 +435,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 				!sameDate(dateInput, reservation.reserved_date) ||
 				!sameTime(dateInput, reservation.reserved_date)
 			) {
-				const service: Service | undefined = services.find(
+				const service: ServiceRecord | undefined = services.find(
 					(service) => service.service_id === serviceIdInput
 				);
 
@@ -657,12 +657,20 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			serviceIdInput === reservation.service.service_id
 				? undefined
 				: (serviceIdInput as number);
-		const time: number | null | undefined =
-			endTimeInput === reservation.time ? undefined : endTimeInput;
-		const beds_required: number | null | undefined =
-			bedsRequiredInput === reservation.beds_required
+		const time = service
+			? service.time === endTimeInput
 				? undefined
-				: bedsRequiredInput;
+				: endTimeInput === reservation.time
+				? undefined
+				: endTimeInput
+			: undefined;
+		const beds_required = service
+			? service.beds_required === bedsRequiredInput
+				? undefined
+				: bedsRequiredInput === reservation.beds_required
+				? undefined
+				: bedsRequiredInput
+			: undefined;
 		const requested_gender: Gender | null | undefined =
 			genderInput === reservation.requested_gender ? undefined : genderInput;
 		const requested_employee: boolean | undefined =
@@ -758,7 +766,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		);
 	};
 
-	const service: Service | undefined =
+	const service: ServiceRecord | undefined =
 		serviceIdInput !== null
 			? services.find((service) => service.service_id === serviceIdInput)
 			: undefined;
@@ -865,433 +873,425 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 								missingPermissionMessage={ERRORS.reservation.permissions.edit}
 							/>
 
-							<EditableDropDown
-								originalOption={
-									employeeDropDownItems[
-										employeeDropDownItems.findIndex(
-											(option) => option.id === reservation.employee_id
-										) || 0
-									]
-								}
-								option={
-									employeeDropDownItems[
-										employeeDropDownItems.findIndex(
-											(option) => option.id === employeeIdInput
-										) || 0
-									]
-								}
-								options={employeeDropDownItems}
-								setOption={(option) => {
-									setEmployeeIdInput(option.id as number | null);
-								}}
-								label={LABELS.reservation.employee_id}
-								validationProp={{
-									required: true,
-									requiredMessage: ERRORS.reservation.employee_id.required,
-								}}
-								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
-							/>
+							{dateInput !== null && !invalidDate && !invalidTime && (
+								<>
+									<EditableDropDown
+										originalOption={
+											employeeDropDownItems[
+												employeeDropDownItems.findIndex(
+													(option) => option.id === reservation.employee_id
+												) || 0
+											]
+										}
+										option={
+											employeeDropDownItems[
+												employeeDropDownItems.findIndex(
+													(option) => option.id === employeeIdInput
+												) || 0
+											]
+										}
+										options={employeeDropDownItems}
+										setOption={(option) => {
+											setEmployeeIdInput(option.id as number | null);
+										}}
+										label={LABELS.reservation.employee_id}
+										validationProp={{
+											required: true,
+											requiredMessage: ERRORS.reservation.employee_id.required,
+										}}
+										editable={editable}
+										missingPermissionMessage={
+											ERRORS.reservation.permissions.edit
+										}
+									/>
 
-							<EditableDropDown
-								originalOption={
-									serviceDropDownItems[
-										serviceDropDownItems.findIndex(
-											(option) => option.id === reservation.service.service_id
-										) || 0
-									]
-								}
-								option={
-									serviceDropDownItems[
-										serviceDropDownItems.findIndex(
-											(option) => option.id === serviceIdInput
-										) || 0
-									]
-								}
-								options={serviceDropDownItems}
-								setOption={(option) => {
-									setServiceIdInput(option.id as number | null);
-								}}
-								label={LABELS.reservation.service_id}
-								validationProp={{
-									required: true,
-									requiredMessage: ERRORS.reservation.service_id.required,
-								}}
-								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
-							/>
+									<EditableServiceInput
+										services={services}
+										originalService={
+											services.find(
+												(service) =>
+													service.service_id === reservation.service.service_id
+											) ?? null
+										}
+										service={service ?? null}
+										setService={(service) =>
+											setServiceIdInput(service?.service_id ?? null)
+										}
+										required={true}
+										editable={editable}
+										missingPermissionMessage={
+											ERRORS.reservation.permissions.edit
+										}
+									/>
 
-							{dateInput !== null &&
-								serviceIdInput !== null &&
-								!invalidDate &&
-								!invalidTime && (
-									<div className="mb-4">
-										<Accordion>
-											<AccordionSummary
-												expandIcon={<ExpandMoreIcon />}
-												aria-controls="panel1-content"
-												id="panel1-header">
-												{t('Service Settings')}
-											</AccordionSummary>
+									{serviceIdInput !== null && (
+										<div className="mb-4">
+											<Accordion>
+												<AccordionSummary
+													expandIcon={<ExpandMoreIcon />}
+													aria-controls="panel1-content"
+													id="panel1-header">
+													{t('Service Settings')}
+												</AccordionSummary>
 
-											<AccordionDetails>
-												<EditableMinute
-													originalMinutes={reservation.time}
-													minutes={endTimeInput}
-													setMinutes={setEndTimeInput}
-													label={LABELS.service.time}
-													name={NAMES.service.time}
-													validationProp={{
-														max: maxEndTime,
-														required: false,
-														invalid: invalidEndTime,
-														setInvalid: setInvalidEndTime,
-														invalidMessage: {
-															key: 'Minute Invalid',
-															value: {
-																max: maxEndTime,
+												<AccordionDetails>
+													<EditableMinute
+														originalMinutes={reservation.time}
+														minutes={endTimeInput}
+														setMinutes={setEndTimeInput}
+														label={LABELS.service.time}
+														name={NAMES.service.time}
+														validationProp={{
+															max: maxEndTime,
+															required: false,
+															invalid: invalidEndTime,
+															setInvalid: setInvalidEndTime,
+															invalidMessage: {
+																key: 'Minute Invalid',
+																value: {
+																	max: maxEndTime,
+																},
 															},
-														},
-													}}
-													editable={editable}
-													missingPermissionMessage={
-														ERRORS.reservation.permissions.edit
-													}
-												/>
+														}}
+														editable={editable}
+														missingPermissionMessage={
+															ERRORS.reservation.permissions.edit
+														}
+													/>
 
-												<EditableNumber
-													originalInput={reservation.beds_required}
-													input={bedsRequiredInput}
-													setInput={setBedsRequiredInput}
-													label={LABELS.service.beds_required}
-													name={NAMES.service.beds_required}
-													validationProp={{
-														max: STORES.beds,
-														required: false,
-														invalid: invalidBedsRequired,
-														setInvalid: setInvalidBedsRequired,
-														invalidMessage:
-															ERRORS.service.beds_required.invalid,
-													}}
-													placeholder={PLACEHOLDERS.service.beds_required}
-													editable={editable}
-													missingPermissionMessage={
-														ERRORS.reservation.permissions.edit
-													}
-												/>
+													<EditableNumber
+														originalInput={reservation.beds_required}
+														input={bedsRequiredInput}
+														setInput={setBedsRequiredInput}
+														label={LABELS.service.beds_required}
+														name={NAMES.service.beds_required}
+														validationProp={{
+															max: STORES.beds,
+															required: false,
+															invalid: invalidBedsRequired,
+															setInvalid: setInvalidBedsRequired,
+															invalidMessage:
+																ERRORS.service.beds_required.invalid,
+														}}
+														placeholder={PLACEHOLDERS.service.beds_required}
+														editable={editable}
+														missingPermissionMessage={
+															ERRORS.reservation.permissions.edit
+														}
+													/>
 
-												<span className="font-bold text-lg text-gray-800">
-													{t('End Time', { time: endTimeText })}
-												</span>
-											</AccordionDetails>
-										</Accordion>
-									</div>
-								)}
-
-							<EditableDropDown
-								originalOption={
-									genderDropDownItems[
-										genderDropDownItems.findIndex(
-											(option) => option.id === reservation.requested_gender
-										) || 0
-									]
-								}
-								option={
-									genderDropDownItems[
-										genderDropDownItems.findIndex(
-											(option) => option.id === genderInput
-										) || 0
-									]
-								}
-								options={genderDropDownItems}
-								setOption={(option) => {
-									setGenderInput(option.id as Gender | null);
-								}}
-								label={LABELS.reservation.requested_gender}
-								validationProp={{
-									required: false,
-								}}
-								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
-							/>
-
-							<EditableToggleSwitch
-								originalChecked={reservation.requested_employee}
-								setChecked={setRequestedInput}
-								checked={requestedInput}
-								falseText={'Not Requested'}
-								trueText={'Requested'}
-								toggleColour={ToggleColor.BLUE}
-								label={LABELS.reservation.requested_employee}
-								name={NAMES.reservation.requested_employee}
-								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
-							/>
-
-							<EditablePayRateAutomatic
-								originalAmount={reservation.cash}
-								amount={cashInput}
-								remainingAmount={remainingAmount}
-								roundToTheNearestDollar={true}
-								setAmount={setCashInput}
-								label={LABELS.reservation.cash}
-								name={NAMES.reservation.cash}
-								validationProp={{
-									max: NUMBERS.reservation.cash,
-									required: false,
-									invalid: invalidCash,
-									setInvalid: setInvalidCash,
-									invalidMessage: ERRORS.reservation.cash.invalid,
-								}}
-								placeholder={PLACEHOLDERS.reservation.cash}
-								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
-							/>
-
-							<EditablePayRateAutomatic
-								originalAmount={reservation.machine}
-								amount={machineInput}
-								remainingAmount={remainingAmount}
-								roundToTheNearestDollar={false}
-								setAmount={setMachineInput}
-								label={LABELS.reservation.machine}
-								name={NAMES.reservation.machine}
-								validationProp={{
-									max: NUMBERS.reservation.machine,
-									required: false,
-									invalid: invalidMachine,
-									setInvalid: setInvalidMachine,
-									invalidMessage: ERRORS.reservation.machine.invalid,
-								}}
-								placeholder={PLACEHOLDERS.reservation.machine}
-								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
-							/>
-
-							<EditablePayRateAutomatic
-								originalAmount={reservation.vip}
-								amount={vipInput}
-								remainingAmount={remainingAmount}
-								roundToTheNearestDollar={false}
-								setAmount={setVipInput}
-								label={LABELS.reservation.vip}
-								name={NAMES.reservation.vip}
-								validationProp={{
-									max: NUMBERS.reservation.vip,
-									required: false,
-									invalid: invalidVip,
-									setInvalid: setInvalidVip,
-									invalidMessage: ERRORS.reservation.vip.invalid,
-								}}
-								placeholder={PLACEHOLDERS.reservation.vip}
-								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
-							/>
-
-							<EditablePayRateAutomatic
-								originalAmount={reservation.gift_card}
-								amount={giftCardInput}
-								remainingAmount={remainingAmount}
-								roundToTheNearestDollar={false}
-								setAmount={setGiftCardInput}
-								label={LABELS.reservation.gift_card}
-								name={NAMES.reservation.gift_card}
-								validationProp={{
-									max: NUMBERS.reservation.gift_card,
-									required: false,
-									invalid: invalidGiftCard,
-									setInvalid: setInvalidGiftCard,
-									invalidMessage: ERRORS.reservation.gift_card.invalid,
-								}}
-								placeholder={PLACEHOLDERS.reservation.gift_card}
-								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
-							/>
-
-							<EditablePayRateAutomatic
-								originalAmount={reservation.insurance}
-								amount={insuranceInput}
-								remainingAmount={remainingAmount}
-								roundToTheNearestDollar={false}
-								setAmount={setInsuranceInput}
-								label={LABELS.reservation.insurance}
-								name={NAMES.reservation.insurance}
-								validationProp={{
-									max: NUMBERS.reservation.insurance,
-									required: false,
-									invalid: invalidInsurance,
-									setInvalid: setInvalidInsurance,
-									invalidMessage: ERRORS.reservation.insurance.invalid,
-								}}
-								placeholder={PLACEHOLDERS.reservation.insurance}
-								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
-							/>
-
-							{remainingAmount > 0 && (
-								<p className="error-label mb-4">
-									{t('Total Amount Missing')}: {remainingAmount.toFixed(2)}
-								</p>
-							)}
-
-							<EditablePayRateHalf
-								originalAmount={reservation.cash_out}
-								amount={cashOutInput}
-								totalAmount={totalAmount}
-								roundToTheNearestDollar={false}
-								setAmount={setCashOutInput}
-								label={LABELS.reservation.cash_out}
-								name={NAMES.reservation.cash_out}
-								validationProp={{
-									max: NUMBERS.reservation.cash_out,
-									required: false,
-									invalid: invalidCashOut,
-									setInvalid: setInvalidCashOut,
-									invalidMessage: ERRORS.reservation.cash_out.invalid,
-								}}
-								placeholder={PLACEHOLDERS.reservation.cash_out}
-								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
-							/>
-
-							<EditableDropDown
-								originalOption={
-									tipMethodDropDownItems[
-										tipMethodDropDownItems.findIndex(
-											(tipMethodDropDownItem) =>
-												tipMethodDropDownItem.id === reservation.tip_method
-										) || 0
-									]
-								}
-								option={
-									tipMethodDropDownItems[
-										tipMethodDropDownItems.findIndex(
-											(tipMethodDropDownItem) =>
-												tipMethodDropDownItem.id === tipMethodInput
-										) || 0
-									]
-								}
-								options={tipMethodDropDownItems}
-								setOption={(option) => {
-									setTipMethodInput(option.id as TipMethod | null);
-									if (option.id === TipMethod.CASH || option.id === null) {
-										setTipsInput(null);
-									}
-								}}
-								label={LABELS.reservation.tip_method}
-								validationProp={{
-									required: false,
-								}}
-								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
-							/>
-
-							{(tipMethodInput === TipMethod.HALF ||
-								tipMethodInput === TipMethod.MACHINE) && (
-								<EditablePayRate
-									originalAmount={reservation.tips}
-									amount={tipsInput}
-									setAmount={setTipsInput}
-									label={LABELS.reservation.tips}
-									name={NAMES.reservation.tips}
-									validationProp={{
-										max: NUMBERS.reservation.tips,
-										required: false,
-										invalid: invalidTips,
-										setInvalid: setInvalidTips,
-										invalidMessage: ERRORS.reservation.tips.invalid,
-									}}
-									placeholder={PLACEHOLDERS.reservation.tips}
-									editable={editable}
-									missingPermissionMessage={ERRORS.reservation.permissions.edit}
-								/>
-							)}
-
-							<EditableTextArea
-								originalText={reservation.message}
-								text={messageInput}
-								setText={setMessageInput}
-								label={LABELS.reservation.message}
-								name={NAMES.reservation.message}
-								placeholder={PLACEHOLDERS.reservation.message}
-								validationProp={{
-									required: false,
-								}}
-								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
-							/>
-
-							<div className="customer-optional-div">
-								<span className="customer-optional-title">
-									{t('Customer (Optional)')}:
-									{customerIdInput !== null && (
-										<span className="current-customer-span">
-											<span>{t('Current Customer')}:</span>
-
-											<span>{currentPhoneNumberText}</span>
-
-											<span>{currentVipSerialText}</span>
-										</span>
+													<span className="font-bold text-lg text-gray-800">
+														{t('End Time', { time: endTimeText })}
+													</span>
+												</AccordionDetails>
+											</Accordion>
+										</div>
 									)}
-								</span>
 
-								<EditablePhoneNumber
-									originalPhoneNumber={
-										reservation.customer?.phone_number || null
-									}
-									phoneNumber={customerPhoneNumberInput}
-									setPhoneNumber={setCustomerPhoneNumberInput}
-									label={LABELS.customer.phone_number}
-									name={NAMES.customer.phone_number}
-									validationProp={{
-										required: false,
-										invalid: invalidCustomerPhoneNumber,
-										setInvalid: setInvalidCustomerPhoneNumber,
-										invalidMessage: ERRORS.customer.phone_number.invalid,
-									}}
-									editable={editable}
-									missingPermissionMessage={ERRORS.reservation.permissions.edit}
-								/>
+									<EditableDropDown
+										originalOption={
+											genderDropDownItems[
+												genderDropDownItems.findIndex(
+													(option) => option.id === reservation.requested_gender
+												) || 0
+											]
+										}
+										option={
+											genderDropDownItems[
+												genderDropDownItems.findIndex(
+													(option) => option.id === genderInput
+												) || 0
+											]
+										}
+										options={genderDropDownItems}
+										setOption={(option) => {
+											setGenderInput(option.id as Gender | null);
+										}}
+										label={LABELS.reservation.requested_gender}
+										validationProp={{
+											required: false,
+										}}
+										editable={editable}
+										missingPermissionMessage={
+											ERRORS.reservation.permissions.edit
+										}
+									/>
 
-								<EditableInput
-									originalText={reservation.customer?.vip_serial || null}
-									text={customerVipSerialInput}
-									setText={setCustomerVipSerialInput}
-									label={LABELS.customer.vip_serial}
-									name={NAMES.customer.vip_serial}
-									type="text"
-									placeholder={PLACEHOLDERS.customer.vip_serial}
-									validationProp={{
-										maxLength: LENGTHS.customer.vip_serial,
-										pattern: PATTERNS.customer.vip_serial,
-										required: false,
-										invalid: invalidCustomerVipSerial,
-										setInvalid: setInvalidCustomerVipSerial,
-										invalidMessage: ERRORS.customer.vip_serial.invalid,
-									}}
-									editable={editable}
-									missingPermissionMessage={ERRORS.reservation.permissions.edit}
-								/>
+									<EditableToggleSwitch
+										originalChecked={reservation.requested_employee}
+										setChecked={setRequestedInput}
+										checked={requestedInput}
+										falseText={'Not Requested'}
+										trueText={'Requested'}
+										toggleColour={ToggleColor.BLUE}
+										label={LABELS.reservation.requested_employee}
+										name={NAMES.reservation.requested_employee}
+										editable={editable}
+										missingPermissionMessage={
+											ERRORS.reservation.permissions.edit
+										}
+									/>
 
-								{((customerPhoneNumberInput?.length === 10 &&
-									!invalidCustomerPhoneNumber) ||
-									(customerVipSerialInput?.length === 6 &&
-										!invalidCustomerVipSerial)) && (
-									<>
+									<EditablePayRateAutomatic
+										originalAmount={reservation.cash}
+										amount={cashInput}
+										remainingAmount={remainingAmount}
+										roundToTheNearestDollar={true}
+										setAmount={setCashInput}
+										label={LABELS.reservation.cash}
+										name={NAMES.reservation.cash}
+										validationProp={{
+											max: NUMBERS.reservation.cash,
+											required: false,
+											invalid: invalidCash,
+											setInvalid: setInvalidCash,
+											invalidMessage: ERRORS.reservation.cash.invalid,
+										}}
+										placeholder={PLACEHOLDERS.reservation.cash}
+										editable={editable}
+										missingPermissionMessage={
+											ERRORS.reservation.permissions.edit
+										}
+									/>
+
+									<EditablePayRateAutomatic
+										originalAmount={reservation.machine}
+										amount={machineInput}
+										remainingAmount={remainingAmount}
+										roundToTheNearestDollar={false}
+										setAmount={setMachineInput}
+										label={LABELS.reservation.machine}
+										name={NAMES.reservation.machine}
+										validationProp={{
+											max: NUMBERS.reservation.machine,
+											required: false,
+											invalid: invalidMachine,
+											setInvalid: setInvalidMachine,
+											invalidMessage: ERRORS.reservation.machine.invalid,
+										}}
+										placeholder={PLACEHOLDERS.reservation.machine}
+										editable={editable}
+										missingPermissionMessage={
+											ERRORS.reservation.permissions.edit
+										}
+									/>
+
+									<EditablePayRateAutomatic
+										originalAmount={reservation.vip}
+										amount={vipInput}
+										remainingAmount={remainingAmount}
+										roundToTheNearestDollar={false}
+										setAmount={setVipInput}
+										label={LABELS.reservation.vip}
+										name={NAMES.reservation.vip}
+										validationProp={{
+											max: NUMBERS.reservation.vip,
+											required: false,
+											invalid: invalidVip,
+											setInvalid: setInvalidVip,
+											invalidMessage: ERRORS.reservation.vip.invalid,
+										}}
+										placeholder={PLACEHOLDERS.reservation.vip}
+										editable={editable}
+										missingPermissionMessage={
+											ERRORS.reservation.permissions.edit
+										}
+									/>
+
+									<EditablePayRateAutomatic
+										originalAmount={reservation.gift_card}
+										amount={giftCardInput}
+										remainingAmount={remainingAmount}
+										roundToTheNearestDollar={false}
+										setAmount={setGiftCardInput}
+										label={LABELS.reservation.gift_card}
+										name={NAMES.reservation.gift_card}
+										validationProp={{
+											max: NUMBERS.reservation.gift_card,
+											required: false,
+											invalid: invalidGiftCard,
+											setInvalid: setInvalidGiftCard,
+											invalidMessage: ERRORS.reservation.gift_card.invalid,
+										}}
+										placeholder={PLACEHOLDERS.reservation.gift_card}
+										editable={editable}
+										missingPermissionMessage={
+											ERRORS.reservation.permissions.edit
+										}
+									/>
+
+									<EditablePayRateAutomatic
+										originalAmount={reservation.insurance}
+										amount={insuranceInput}
+										remainingAmount={remainingAmount}
+										roundToTheNearestDollar={false}
+										setAmount={setInsuranceInput}
+										label={LABELS.reservation.insurance}
+										name={NAMES.reservation.insurance}
+										validationProp={{
+											max: NUMBERS.reservation.insurance,
+											required: false,
+											invalid: invalidInsurance,
+											setInvalid: setInvalidInsurance,
+											invalidMessage: ERRORS.reservation.insurance.invalid,
+										}}
+										placeholder={PLACEHOLDERS.reservation.insurance}
+										editable={editable}
+										missingPermissionMessage={
+											ERRORS.reservation.permissions.edit
+										}
+									/>
+
+									{remainingAmount > 0 && (
+										<p className="error-label mb-4">
+											{t('Total Amount Missing')}: {remainingAmount.toFixed(2)}
+										</p>
+									)}
+
+									<EditablePayRateHalf
+										originalAmount={reservation.cash_out}
+										amount={cashOutInput}
+										totalAmount={totalAmount}
+										roundToTheNearestDollar={false}
+										setAmount={setCashOutInput}
+										label={LABELS.reservation.cash_out}
+										name={NAMES.reservation.cash_out}
+										validationProp={{
+											max: NUMBERS.reservation.cash_out,
+											required: false,
+											invalid: invalidCashOut,
+											setInvalid: setInvalidCashOut,
+											invalidMessage: ERRORS.reservation.cash_out.invalid,
+										}}
+										placeholder={PLACEHOLDERS.reservation.cash_out}
+										editable={editable}
+										missingPermissionMessage={
+											ERRORS.reservation.permissions.edit
+										}
+									/>
+
+									<EditableDropDown
+										originalOption={
+											tipMethodDropDownItems[
+												tipMethodDropDownItems.findIndex(
+													(tipMethodDropDownItem) =>
+														tipMethodDropDownItem.id === reservation.tip_method
+												) || 0
+											]
+										}
+										option={
+											tipMethodDropDownItems[
+												tipMethodDropDownItems.findIndex(
+													(tipMethodDropDownItem) =>
+														tipMethodDropDownItem.id === tipMethodInput
+												) || 0
+											]
+										}
+										options={tipMethodDropDownItems}
+										setOption={(option) => {
+											setTipMethodInput(option.id as TipMethod | null);
+											if (option.id === TipMethod.CASH || option.id === null) {
+												setTipsInput(null);
+											}
+										}}
+										label={LABELS.reservation.tip_method}
+										validationProp={{
+											required: false,
+										}}
+										editable={editable}
+										missingPermissionMessage={
+											ERRORS.reservation.permissions.edit
+										}
+									/>
+
+									{(tipMethodInput === TipMethod.HALF ||
+										tipMethodInput === TipMethod.MACHINE) && (
+										<EditablePayRate
+											originalAmount={reservation.tips}
+											amount={tipsInput}
+											setAmount={setTipsInput}
+											label={LABELS.reservation.tips}
+											name={NAMES.reservation.tips}
+											validationProp={{
+												max: NUMBERS.reservation.tips,
+												required: false,
+												invalid: invalidTips,
+												setInvalid: setInvalidTips,
+												invalidMessage: ERRORS.reservation.tips.invalid,
+											}}
+											placeholder={PLACEHOLDERS.reservation.tips}
+											editable={editable}
+											missingPermissionMessage={
+												ERRORS.reservation.permissions.edit
+											}
+										/>
+									)}
+
+									<EditableTextArea
+										originalText={reservation.message}
+										text={messageInput}
+										setText={setMessageInput}
+										label={LABELS.reservation.message}
+										name={NAMES.reservation.message}
+										placeholder={PLACEHOLDERS.reservation.message}
+										validationProp={{
+											required: false,
+										}}
+										editable={editable}
+										missingPermissionMessage={
+											ERRORS.reservation.permissions.edit
+										}
+									/>
+
+									<div className="customer-optional-div">
+										<span className="customer-optional-title">
+											{t('Customer (Optional)')}:
+											{customerIdInput !== null && (
+												<span className="current-customer-span">
+													<span>{t('Current Customer')}:</span>
+
+													<span>{currentPhoneNumberText}</span>
+
+													<span>{currentVipSerialText}</span>
+												</span>
+											)}
+										</span>
+
+										<EditablePhoneNumber
+											originalPhoneNumber={
+												reservation.customer?.phone_number || null
+											}
+											phoneNumber={customerPhoneNumberInput}
+											setPhoneNumber={setCustomerPhoneNumberInput}
+											label={LABELS.customer.phone_number}
+											name={NAMES.customer.phone_number}
+											validationProp={{
+												required: false,
+												invalid: invalidCustomerPhoneNumber,
+												setInvalid: setInvalidCustomerPhoneNumber,
+												invalidMessage: ERRORS.customer.phone_number.invalid,
+											}}
+											editable={editable}
+											missingPermissionMessage={
+												ERRORS.reservation.permissions.edit
+											}
+										/>
+
 										<EditableInput
-											originalText={reservation.customer?.customer_name || null}
-											text={customerNameInput}
-											setText={setCustomerNameInput}
-											label={LABELS.customer.customer_name}
-											name={NAMES.customer.customer_name}
+											originalText={reservation.customer?.vip_serial || null}
+											text={customerVipSerialInput}
+											setText={setCustomerVipSerialInput}
+											label={LABELS.customer.vip_serial}
+											name={NAMES.customer.vip_serial}
 											type="text"
-											placeholder={PLACEHOLDERS.customer.customer_name}
+											placeholder={PLACEHOLDERS.customer.vip_serial}
 											validationProp={{
-												maxLength: LENGTHS.customer.customer_name,
+												maxLength: LENGTHS.customer.vip_serial,
+												pattern: PATTERNS.customer.vip_serial,
 												required: false,
-												invalid: invalidCustomerName,
-												setInvalid: setInvalidCustomerName,
-												invalidMessage: ERRORS.customer.customer_name.invalid,
+												invalid: invalidCustomerVipSerial,
+												setInvalid: setInvalidCustomerVipSerial,
+												invalidMessage: ERRORS.customer.vip_serial.invalid,
 											}}
 											editable={editable}
 											missingPermissionMessage={
@@ -1299,24 +1299,55 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 											}
 										/>
 
-										<EditableTextArea
-											originalText={reservation.customer?.notes || null}
-											text={customerNotesInput}
-											setText={setCustomerNotesInput}
-											label={LABELS.customer.notes}
-											name={NAMES.customer.notes}
-											placeholder={PLACEHOLDERS.customer.notes}
-											validationProp={{
-												required: false,
-											}}
-											editable={editable}
-											missingPermissionMessage={
-												ERRORS.reservation.permissions.edit
-											}
-										/>
-									</>
-								)}
-							</div>
+										{((customerPhoneNumberInput?.length === 10 &&
+											!invalidCustomerPhoneNumber) ||
+											(customerVipSerialInput?.length === 6 &&
+												!invalidCustomerVipSerial)) && (
+											<>
+												<EditableInput
+													originalText={
+														reservation.customer?.customer_name || null
+													}
+													text={customerNameInput}
+													setText={setCustomerNameInput}
+													label={LABELS.customer.customer_name}
+													name={NAMES.customer.customer_name}
+													type="text"
+													placeholder={PLACEHOLDERS.customer.customer_name}
+													validationProp={{
+														maxLength: LENGTHS.customer.customer_name,
+														required: false,
+														invalid: invalidCustomerName,
+														setInvalid: setInvalidCustomerName,
+														invalidMessage:
+															ERRORS.customer.customer_name.invalid,
+													}}
+													editable={editable}
+													missingPermissionMessage={
+														ERRORS.reservation.permissions.edit
+													}
+												/>
+
+												<EditableTextArea
+													originalText={reservation.customer?.notes || null}
+													text={customerNotesInput}
+													setText={setCustomerNotesInput}
+													label={LABELS.customer.notes}
+													name={NAMES.customer.notes}
+													placeholder={PLACEHOLDERS.customer.notes}
+													validationProp={{
+														required: false,
+													}}
+													editable={editable}
+													missingPermissionMessage={
+														ERRORS.reservation.permissions.edit
+													}
+												/>
+											</>
+										)}
+									</div>
+								</>
+							)}
 						</div>
 					</div>
 				</div>

@@ -1,18 +1,18 @@
 import { FC } from 'react';
 
-import DeleteService from './DeleteService.Component';
+import RecoverService from './RecoverService.Component';
 
 import BaseModal from '../BaseModal.Component';
 
 import { Service } from '../../../../../../models/Service.Model';
 
-interface DeleteServiceModalProp {
+interface RecoverServiceModalProp {
 	open: boolean;
 	setOpen(open: boolean): void;
 	service: Service;
 }
 
-const DeleteServiceModal: FC<DeleteServiceModalProp> = ({
+const RecoverServiceModal: FC<RecoverServiceModalProp> = ({
 	open,
 	setOpen,
 	service,
@@ -21,9 +21,9 @@ const DeleteServiceModal: FC<DeleteServiceModalProp> = ({
 		<BaseModal
 			open={open}
 			setOpen={setOpen}
-			contentElement={<DeleteService setOpen={setOpen} service={service} />}
+			contentElement={<RecoverService setOpen={setOpen} service={service} />}
 		/>
 	);
 };
 
-export default DeleteServiceModal;
+export default RecoverServiceModal;

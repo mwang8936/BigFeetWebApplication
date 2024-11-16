@@ -9,7 +9,7 @@ import { useCustomersQuery } from '../../../../hooks/customer.hooks';
 import { useEmployeesQuery } from '../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../hooks/profile.hooks';
 import { useSchedulesQuery } from '../../../../hooks/schedule.hooks';
-import { useServicesQuery } from '../../../../hooks/service.hooks';
+import { useServiceRecordsQuery } from '../../../../hooks/service.hooks';
 
 import STORES from '../../../../../constants/store.constants';
 
@@ -63,7 +63,8 @@ const Calendar: FC = () => {
 		(scheduleQuery.data as Schedule[]) || []
 	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
-	useServicesQuery({
+	useServiceRecordsQuery({
+		date,
 		gettable: serviceGettable,
 		staleTime: Infinity,
 	});

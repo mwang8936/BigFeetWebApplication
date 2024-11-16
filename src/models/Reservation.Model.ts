@@ -1,13 +1,13 @@
 import Customer from './Customer.Model';
-import Service from './Service.Model';
 import { Gender, TipMethod } from './enums';
+import { ServiceRecord } from './Service.Model';
 
 export default interface Reservation {
 	reservation_id: number;
 	employee_id: number;
 	date: Date;
 	reserved_date: Date;
-	service: Service;
+	service: ServiceRecord;
 	time: number | null;
 	beds_required: number | null;
 	customer: Customer | null;

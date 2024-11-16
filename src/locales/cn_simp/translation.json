@@ -182,7 +182,7 @@
     "A": "A",
     "A (I)": "A (I)",
     "Delete Service": "删除服务项目: {{service}}",
-    "Are you sure you want to delete this service? This action cannot be reversed.": "请确认是否要删除？",
+    "Are you sure you want to delete this service? This will remove the service from the services list. You can reverse this action later.": "请确认是否要删除？",
 
     "No Items Found": "无法找到",
 
@@ -342,6 +342,7 @@
     "You do not have permissions to edit vip packages.": "你无此权限",
     "You do not have permissions to add vip packages.": "你无此权限",
     "You do not have permission to delete vip packages.": "你无此权限",
+    "You do not have permission to recover services.": "你无此权限",
 
     "No beds available!": "没有床位!",
     "Bed Conflict": "{{max}}张床位已占满。",
@@ -506,6 +507,7 @@
     "Generating Payroll...": "添加工资中",
     "Payroll Generated Successfully": "工资添加成功",
     "Failed to Generate Payroll": "工资添加失败",
+    "Generate Payroll": "添加工资",
     "Updating Payroll": "针灸工资中",
     "Payroll Updated Successfully": "工资针灸成功",
     "Failed to Update Payroll": "工资针灸失败",
@@ -553,5 +555,24 @@
     "September": "九月",
     "October": "十月",
     "November": "十一月",
-    "December": "十二月"
+    "December": "十二月",
+
+    "Min": "分钟",
+    "Discontinue": "Discontinue",
+    "Continue": "Continue",
+    "Discontinue Service": "Discontinue Service",
+    "Continue Service": "Continue Service",
+    "Recover Service": "Recover Service: {{service}}",
+    "Are you sure you want to recover this service?": "Are you sure you want to recover this service?",
+    "Delete Record": "Delete Record: {{name}} at {{date}}",
+    "Are you sure you want to delete this record? This action cannot be reversed.": "Are you sure you want to delete this record? This action cannot be reversed.",
+    "Filter Services": "Filter Services",
+    "Hide": "Hide",
+    "Show": "Show",
+    "Show Deleted": "Show Deleted",
+    "Now": "Now",
+    "Discontinued": "Discontinued",
+    "Service Created": "Service Created",
+    "Add Service Record": "Add Service Record",
+    "Recover": "Recover"
 }
