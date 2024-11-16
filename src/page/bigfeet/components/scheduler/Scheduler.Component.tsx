@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 
 import Calendar from './Calendar/Calendar.Component';
 import ZoomOverlay from './components/ZoomOverlay.Component';
@@ -402,7 +402,7 @@ const Scheduler: FC = () => {
 					</div>
 
 					<div className="vertical-center ms-10 flex flex-row ">
-						<AdjustmentsHorizontalIcon
+						<CalendarDaysIcon
 							className={`h-16 w-16 ${
 								filtered
 									? 'text-blue-600 hover:text-blue-400'

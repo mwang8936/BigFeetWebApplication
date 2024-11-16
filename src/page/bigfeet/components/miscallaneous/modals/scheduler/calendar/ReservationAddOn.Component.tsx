@@ -11,7 +11,6 @@ import WarningModal from './WarningModal.Component';
 
 import AddBottom from '../../AddBottom.Component';
 
-import AddDropDown from '../../../add/AddDropDown.Component';
 import AddMinute from '../../../add/AddMinute.Component';
 import AddNumber from '../../../add/AddNumber.Component';
 
@@ -21,9 +20,8 @@ import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 import { useAddReservationMutation } from '../../../../../../hooks/reservation.hooks';
 import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
-import { useServicesQuery } from '../../../../../../hooks/service.hooks';
+import { useServiceRecordsQuery } from '../../../../../../hooks/service.hooks';
 
-import { getServiceDropDownItems } from '../../../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
 import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
@@ -35,7 +33,7 @@ import Employee from '../../../../../../../models/Employee.Model';
 import { Permissions, Role } from '../../../../../../../models/enums';
 import Reservation from '../../../../../../../models/Reservation.Model';
 import Schedule from '../../../../../../../models/Schedule.Model';
-import Service from '../../../../../../../models/Service.Model';
+import { ServiceRecord } from '../../../../../../../models/Service.Model';
 import User from '../../../../../../../models/User.Model';
 
 import { AddReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
@@ -45,6 +43,7 @@ import {
 	reservationEmployeeConflict,
 } from '../../../../../../../utils/reservation.utils';
 import { formatTimeFromDate } from '../../../../../../../utils/string.utils';
+import AddServiceInput from '../../../add/AddServiceInput.Component';
 
 interface ReservationAddOnProp {
 	setOpen(open: boolean): void;
@@ -111,17 +110,16 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 		(scheduleQuery.data as Schedule[]) || []
 	).filter((schedule) => schedule.employee.role !== Role.DEVELOPER);
 
-	const serviceQuery = useServicesQuery({
+	const serviceQuery = useServiceRecordsQuery({
+		date,
 		gettable: serviceGettable,
 		staleTime: Infinity,
 	});
-	const services: Service[] = serviceQuery.data || [];
+	const services: ServiceRecord[] = serviceQuery.data || [];
 
 	const employee = employees.find(
 		(employee) => employee.employee_id === reservation.employee_id
 	);
-
-	const serviceDropDownItems = getServiceDropDownItems(services);
 
 	const startDate = new Date(
 		reservation.reserved_date.getTime() +
@@ -148,7 +146,7 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 			setInvalidEndTime(false);
 			setInvalidBedsRequired(false);
 		} else {
-			const service: Service | undefined = services.find(
+			const service: ServiceRecord | undefined = services.find(
 				(service) => service.service_id === serviceIdInput
 			);
 
@@ -222,8 +220,16 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 		const reserved_date = startDate;
 		const employee_id = reservation.employee_id;
 		const service_id = serviceIdInput as number;
-		const time = endTimeInput ?? undefined;
-		const beds_required = bedsRequiredInput ?? undefined;
+		const time = service
+			? service.time === endTimeInput
+				? undefined
+				: endTimeInput ?? undefined
+			: undefined;
+		const beds_required = service
+			? service.beds_required === bedsRequiredInput
+				? undefined
+				: bedsRequiredInput ?? undefined
+			: undefined;
 		const requested_gender = reservation.requested_gender ?? undefined;
 		const requested_employee = reservation.requested_employee;
 		const message = reservation.message?.trim();
@@ -302,23 +308,13 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 								</span>
 							</div>
 
-							<AddDropDown
-								option={
-									serviceDropDownItems[
-										serviceDropDownItems.findIndex(
-											(option) => option.id === serviceIdInput
-										) || 0
-									]
+							<AddServiceInput
+								services={services}
+								service={service ?? null}
+								setService={(service) =>
+									setServiceIdInput(service?.service_id ?? null)
 								}
-								options={serviceDropDownItems}
-								setOption={(option) => {
-									setServiceIdInput(option.id as number | null);
-								}}
-								label={LABELS.reservation.service_id}
-								validationProp={{
-									required: true,
-									requiredMessage: ERRORS.reservation.service_id.required,
-								}}
+								required={true}
 							/>
 
 							{serviceIdInput !== null && (

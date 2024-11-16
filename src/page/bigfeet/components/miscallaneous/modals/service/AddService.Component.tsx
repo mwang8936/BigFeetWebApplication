@@ -7,11 +7,14 @@ import { PlusCircleIcon } from '@heroicons/react/24/outline';
 
 import AddBottom from '../AddBottom.Component';
 
+import AddDate from '../../add/AddDate.Component';
 import AddDropDown from '../../add/AddDropDown.Component';
 import AddInput from '../../add/AddInput.Component';
 import AddMinute from '../../add/AddMinute.Component';
 import AddNumber from '../../add/AddNumber.Component';
 import AddPayRate from '../../add/AddPayRate.Component';
+
+import { useServiceDateContext } from '../../../services/Services.Component';
 
 import AddBodyFeetAcupunctureService from '../../../services/components/AddBodyFeetAcupunctureService.Component';
 
@@ -40,6 +43,9 @@ interface AddServiceProp {
 const AddService: FC<AddServiceProp> = ({ setOpen }) => {
 	const { t } = useTranslation();
 
+	const { date } = useServiceDateContext();
+
+	const [dateInput, setDateInput] = useState<Date | null>(date ?? new Date());
 	const [serviceNameInput, setServiceNameInput] = useState<string | null>(null);
 	const [shorthandInput, setShorthandInput] = useState<string | null>(null);
 	const [timeInput, setTimeInput] = useState<number | null>(null);
@@ -50,6 +56,7 @@ const AddService: FC<AddServiceProp> = ({ setOpen }) => {
 	const [bedsRequiredInput, setBedsRequiredInput] = useState<number | null>(0);
 	const [colorInput, setColorInput] = useState<ServiceColor | null>(null);
 
+	const [invalidDate, setInvalidDate] = useState<boolean>(false);
 	const [invalidServiceName, setInvalidServiceName] = useState<boolean>(false);
 	const [invalidShorthand, setInvalidShorthand] = useState<boolean>(false);
 	const [invalidTime, setInvalidTime] = useState<boolean>(false);
@@ -73,6 +80,7 @@ const AddService: FC<AddServiceProp> = ({ setOpen }) => {
 
 	useEffect(() => {
 		const missingRequiredInput =
+			dateInput === null ||
 			serviceNameInput === null ||
 			serviceNameInput.trim() === '' ||
 			shorthandInput === null ||
@@ -87,6 +95,7 @@ const AddService: FC<AddServiceProp> = ({ setOpen }) => {
 
 		setMissingRequiredInput(missingRequiredInput);
 	}, [
+		dateInput,
 		serviceNameInput,
 		shorthandInput,
 		timeInput,
@@ -100,6 +109,7 @@ const AddService: FC<AddServiceProp> = ({ setOpen }) => {
 
 	useEffect(() => {
 		const invalidInput =
+			invalidDate ||
 			invalidServiceName ||
 			invalidShorthand ||
 			invalidTime ||
@@ -111,6 +121,7 @@ const AddService: FC<AddServiceProp> = ({ setOpen }) => {
 
 		setInvalidInput(invalidInput);
 	}, [
+		invalidDate,
 		invalidServiceName,
 		invalidShorthand,
 		invalidTime,
@@ -129,6 +140,7 @@ const AddService: FC<AddServiceProp> = ({ setOpen }) => {
 	};
 
 	const onAdd = async () => {
+		const date = dateInput as Date;
 		const service_name: string = (serviceNameInput as string).trim();
 		const shorthand: string = (shorthandInput as string).trim();
 		const time: number = timeInput as number;
@@ -140,6 +152,7 @@ const AddService: FC<AddServiceProp> = ({ setOpen }) => {
 		const color: ServiceColor = colorInput as ServiceColor;
 
 		const addServiceRequest: AddServiceRequest = {
+			date,
 			service_name,
 			shorthand,
 			time,
@@ -172,6 +185,21 @@ const AddService: FC<AddServiceProp> = ({ setOpen }) => {
 						</Dialog.Title>
 
 						<div className="mt-2">
+							<AddDate
+								date={dateInput}
+								setDate={setDateInput}
+								label={LABELS.service.date}
+								validationProp={{
+									minDate: undefined,
+									maxDate: undefined,
+									required: true,
+									requiredMessage: ERRORS.service.date.required,
+									invalid: invalidDate,
+									setInvalid: setInvalidDate,
+									invalidMessage: ERRORS.service.date.invalid,
+								}}
+							/>
+
 							<AddInput
 								text={serviceNameInput}
 								setText={setServiceNameInput}

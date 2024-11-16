@@ -36,7 +36,7 @@ const PermissionsButton: FC<PermissionsButtonProp> = ({
 			? 'gray-button-color'
 			: btnType === ButtonType.DELETE
 			? 'red-button-color'
-			: 'blue-button-olor';
+			: 'blue-button-color';
 
 	return (
 		<button

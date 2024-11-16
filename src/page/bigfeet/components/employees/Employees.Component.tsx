@@ -54,14 +54,17 @@ const Employees: FC = () => {
 
 	const isEmployeePaused = employeeQuery.isPaused;
 
-	let tabs: string[] = [];
+	let tabs: { text: string; deleted: boolean }[] = [];
 	if (
 		!isEmployeeLoading &&
 		!isEmployeeError &&
 		!isEmployeePaused &&
 		employees
 	) {
-		tabs = employees.map((employee) => employee.username);
+		tabs = employees.map((employee) => ({
+			text: employee.username,
+			deleted: employee.deleted_at != undefined,
+		}));
 	}
 
 	let employee = employees[selectedTab];

@@ -71,6 +71,7 @@ const LABELS = {
 		filter: 'Select Date',
 	},
 	service: {
+		date: 'Select Date',
 		service_name: 'Service Name',
 		shorthand: 'Shorthand',
 		time: 'Time (Minutes)',
@@ -80,6 +81,9 @@ const LABELS = {
 		acupuncture: 'Acupuncture',
 		beds_required: 'Beds Required',
 		color: 'Color',
+		discontinue: 'Discontinue Service',
+		continue: 'Continue Service',
+		show_deleted: 'Show Deleted',
 	},
 	vip_package: {
 		serial: 'Serial',
