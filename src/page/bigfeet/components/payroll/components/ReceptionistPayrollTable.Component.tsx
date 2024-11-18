@@ -160,7 +160,7 @@ const ReceptionistPayrollTable: FC<ReceptionistPayrollTableProp> = ({
 
 	const totalBodyMoney = totalBodySessions * bodyRate;
 	const totalFeetMoney = totalFeetSessions * feetRate;
-	const totalHourlyMoney = totalHoursMinusSessions * hourlyRate;
+	const totalHourlyMoney = totalHoursFinal * hourlyRate;
 
 	const cheque = totalBodyMoney + totalFeetMoney + totalHourlyMoney;
 
