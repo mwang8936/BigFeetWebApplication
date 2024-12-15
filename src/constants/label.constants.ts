@@ -38,6 +38,7 @@ const LABELS = {
 		time: 'Select Time',
 		employee_id: 'Select Employee',
 		service_id: 'Select Service',
+		customer_id: 'Select Customer',
 		requested_gender: 'Requested Gender',
 		requested_employee: 'Requested Employee',
 		cash: 'Cash',

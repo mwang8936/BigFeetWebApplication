@@ -4,12 +4,12 @@ import EditCustomer from './EditCustomer.Component';
 
 import BaseModal from '../BaseModal.Component';
 
-import Customer from '../../../../../../models/Customer.Model';
+import { CustomerCurrent } from '../../../../../../models/Customer.Model';
 
 interface EditCustomerModalProp {
 	open: boolean;
 	setOpen(open: boolean): void;
-	customer: Customer;
+	customer: CustomerCurrent;
 }
 
 const EditCustomerModal: FC<EditCustomerModalProp> = ({

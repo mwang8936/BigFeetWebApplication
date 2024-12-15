@@ -6,7 +6,10 @@ import authorizedRequest from './base.service';
 
 import { customerPath } from '../constants/api.constants';
 
+import { CustomerCurrent, CustomerHistory } from '../models/Customer.Model';
+
 import {
+	GetCustomerHistoriesParam,
 	GetCustomerParam,
 	GetCustomersParam,
 } from '../models/params/Customer.Param';
@@ -21,12 +24,29 @@ export async function getCustomers(
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
 	params?: GetCustomersParam
-) {
+): Promise<CustomerCurrent[]> {
 	return authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
 		`${customerPath}`,
+		'get',
+		undefined,
+		params
+	);
+}
+
+export async function getCustomerHistories(
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
+	params?: GetCustomerHistoriesParam
+): Promise<CustomerHistory[]> {
+	return authorizedRequest(
+		i18n,
+		queryClient,
+		setAuthentication,
+		`${customerPath}/histories`,
 		'get',
 		undefined,
 		params
@@ -39,7 +59,7 @@ export async function getCustomer(
 	setAuthentication: (authenticated: boolean) => void,
 	customer_id: number,
 	params?: GetCustomerParam
-) {
+): Promise<CustomerCurrent> {
 	return authorizedRequest(
 		i18n,
 		queryClient,
@@ -58,7 +78,7 @@ export async function updateCustomer(
 	customer_id: number,
 	request: UpdateCustomerRequest,
 	socket_id?: string
-) {
+): Promise<CustomerCurrent> {
 	return authorizedRequest(
 		i18n,
 		queryClient,
@@ -77,7 +97,7 @@ export async function addCustomer(
 	setAuthentication: (authenticated: boolean) => void,
 	request: AddCustomerRequest,
 	socket_id?: string
-) {
+): Promise<CustomerCurrent> {
 	return authorizedRequest(
 		i18n,
 		queryClient,
@@ -96,7 +116,7 @@ export async function deleteCustomer(
 	setAuthentication: (authenticated: boolean) => void,
 	customer_id: number,
 	socket_id?: string
-) {
+): Promise<CustomerCurrent> {
 	return authorizedRequest(
 		i18n,
 		queryClient,
@@ -115,7 +135,7 @@ export async function recoverCustomer(
 	setAuthentication: (authenticated: boolean) => void,
 	customer_id: number,
 	socket_id?: string
-) {
+): Promise<CustomerCurrent> {
 	return authorizedRequest(
 		i18n,
 		queryClient,

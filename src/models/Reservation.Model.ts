@@ -1,6 +1,6 @@
-import Customer from './Customer.Model';
-import Service from './Service.Model';
+import { CustomerHistory } from './Customer.Model';
 import { Gender, TipMethod } from './enums';
+import Service from './Service.Model';
 
 export default interface Reservation {
 	reservation_id: number;
@@ -10,7 +10,7 @@ export default interface Reservation {
 	service: Service;
 	time: number | null;
 	beds_required: number | null;
-	customer: Customer | null;
+	customer: CustomerHistory | null;
 	requested_gender: Gender | null;
 	requested_employee: boolean;
 	cash: number | null;

@@ -13,10 +13,8 @@ import AddBottom from '../../AddBottom.Component';
 
 import AddDate from '../../../add/AddDate.Component';
 import AddDropDown from '../../../add/AddDropDown.Component';
-import AddInput from '../../../add/AddInput.Component';
 import AddMinute from '../../../add/AddMinute.Component';
 import AddNumber from '../../../add/AddNumber.Component';
-import AddPhoneNumber from '../../../add/AddPhoneNumber.Component';
 import AddTextArea from '../../../add/AddTextArea.Component';
 import AddTime from '../../../add/AddTime.Component';
 import AddToggleSwitch, {
@@ -25,7 +23,7 @@ import AddToggleSwitch, {
 
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
 
-import { useCustomersQuery } from '../../../../../../hooks/customer.hooks';
+import { useCustomerHistoriesQuery } from '../../../../../../hooks/customer.hooks';
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 import { useAddReservationMutation } from '../../../../../../hooks/reservation.hooks';
@@ -39,10 +37,8 @@ import {
 } from '../../../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
-import LENGTHS from '../../../../../../../constants/lengths.constants';
 import NAMES from '../../../../../../../constants/name.constants';
 import NUMBERS from '../../../../../../../constants/numbers.constants';
-import PATTERNS from '../../../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
 import STORES from '../../../../../../../constants/store.constants';
 
@@ -59,10 +55,8 @@ import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
 } from '../../../../../../../utils/reservation.utils';
-import {
-	formatPhoneNumber,
-	formatTimeFromDate,
-} from '../../../../../../../utils/string.utils';
+import { formatTimeFromDate } from '../../../../../../../utils/string.utils';
+import AddCustomerInput from '../../../add/AddCustomer.Component';
 
 interface AddReservationProp {
 	setOpen(open: boolean): void;
@@ -91,7 +85,7 @@ const AddReservation: FC<AddReservationProp> = ({
 	const [genderInput, setGenderInput] = useState<Gender | null>(null);
 	const [requestedInput, setRequestedInput] = useState<boolean>(false);
 	const [messageInput, setMessageInput] = useState<string | null>(null);
-	const [customerIdInput, setCustomerIdInput] = useState<number | null>(null);
+	const [customerInput, setCustomerInput] = useState<Customer | null>(null);
 	const [customerPhoneNumberInput, setCustomerPhoneNumberInput] = useState<
 		string | null
 	>(null);
@@ -152,11 +146,12 @@ const AddReservation: FC<AddReservationProp> = ({
 		Permissions.PERMISSION_GET_SCHEDULE
 	);
 
-	const customerQuery = useCustomersQuery({
+	const customerQuery = useCustomerHistoriesQuery({
+		date: dateInput ?? date,
 		gettable: customerGettable,
 		staleTime: Infinity,
 	});
-	const customers: Customer[] = customerQuery.data || [];
+	const customers = customerQuery.data || [];
 
 	const employeeQuery = useEmployeesQuery({
 		gettable: employeeGettable,
@@ -245,55 +240,6 @@ const AddReservation: FC<AddReservationProp> = ({
 	useEffect(() => {
 		if (endTimeInput === 0) setEndTimeInput(null);
 	}, [endTimeInput]);
-
-	useEffect(() => {
-		if (
-			customerPhoneNumberInput?.length === LENGTHS.customer.phone_number - 4 &&
-			customerIdInput === null
-		) {
-			const customer = customers.find(
-				(customer) => customer.phone_number === customerPhoneNumberInput
-			);
-			if (customer) {
-				setCustomerIdInput(customer.customer_id);
-
-				setCustomerVipSerialInput(customer.vip_serial);
-				setCustomerNameInput(customer.customer_name);
-				setCustomerNotesInput(customer.notes);
-
-				setInvalidCustomerVipSerial(false);
-				setInvalidCustomerName(false);
-			}
-		} else if (
-			customerVipSerialInput?.length === LENGTHS.customer.vip_serial &&
-			customerIdInput === null
-		) {
-			const customer = customers.find(
-				(customer) => customer.vip_serial === customerVipSerialInput
-			);
-			if (customer) {
-				setCustomerIdInput(customer.customer_id);
-
-				setCustomerPhoneNumberInput(customer.phone_number);
-				setCustomerNameInput(customer.customer_name);
-				setCustomerNotesInput(customer.notes);
-
-				setInvalidCustomerPhoneNumber(false);
-				setInvalidCustomerName(false);
-			}
-		} else if (
-			customerIdInput !== null &&
-			customerPhoneNumberInput?.length !== LENGTHS.customer.phone_number - 4 &&
-			customerVipSerialInput?.length !== LENGTHS.customer.vip_serial
-		) {
-			setCustomerIdInput(null);
-
-			setCustomerNameInput(null);
-			setCustomerNotesInput(null);
-
-			setInvalidCustomerName(false);
-		}
-	}, [customerPhoneNumberInput, customerVipSerialInput]);
 
 	useEffect(() => {
 		if (dateInput && serviceIdInput) {
@@ -389,11 +335,13 @@ const AddReservation: FC<AddReservationProp> = ({
 		const requested_gender = genderInput ?? undefined;
 		const requested_employee = requestedInput;
 		const message = messageInput?.trim();
-		const customer_id = customerIdInput ?? undefined;
-		const phone_number = customerPhoneNumberInput?.trim();
-		const vip_serial = customerVipSerialInput?.trim();
-		const customer_name = customerNameInput?.trim();
-		const notes = customerNotesInput?.trim();
+		const customer_id = customerInput?.customer_id ?? undefined;
+		const phone_number = customer_id
+			? undefined
+			: customerPhoneNumberInput?.trim();
+		const vip_serial = customer_id ? undefined : customerVipSerialInput?.trim();
+		const customer_name = customer_id ? undefined : customerNameInput?.trim();
+		const notes = customer_id ? undefined : customerNotesInput?.trim();
 
 		const addReservationRequest: AddReservationRequest = {
 			reserved_date,
@@ -427,19 +375,6 @@ const AddReservation: FC<AddReservationProp> = ({
 			? new Date(dateInput.getTime() + time * (1000 * 60))
 			: undefined;
 	const endTimeText = endDate ? formatTimeFromDate(endDate) : undefined;
-
-	const currentCustomer: Customer | undefined =
-		customerIdInput !== null
-			? customers.find((customer) => customer.customer_id === customerIdInput)
-			: undefined;
-
-	const currentPhoneNumberText =
-		currentCustomer?.phone_number &&
-		t('Phone Number') + ': ' + formatPhoneNumber(currentCustomer.phone_number);
-
-	const currentVipSerialText =
-		currentCustomer?.vip_serial &&
-		t('VIP Serial') + ': ' + currentCustomer.vip_serial;
 
 	return (
 		<>
@@ -628,80 +563,33 @@ const AddReservation: FC<AddReservationProp> = ({
 							<div className="customer-optional-div">
 								<span className="customer-optional-title">
 									{t('Customer (Optional)')}:
-									{customerIdInput !== null && (
-										<span className="current-customer-span">
-											<span>{t('Current Customer')}:</span>
-
-											<span>{currentPhoneNumberText}</span>
-
-											<span>{currentVipSerialText}</span>
-										</span>
-									)}
 								</span>
 
-								<AddPhoneNumber
+								<AddCustomerInput
+									customers={customers}
+									customer={customerInput}
+									setCustomer={setCustomerInput}
 									phoneNumber={customerPhoneNumberInput}
 									setPhoneNumber={setCustomerPhoneNumberInput}
-									label={LABELS.customer.phone_number}
-									name={NAMES.customer.phone_number}
-									validationProp={{
-										required: false,
+									phoneNumberValidationProp={{
 										invalid: invalidCustomerPhoneNumber,
 										setInvalid: setInvalidCustomerPhoneNumber,
-										invalidMessage: ERRORS.customer.phone_number.invalid,
 									}}
-								/>
-
-								<AddInput
-									text={customerVipSerialInput}
-									setText={setCustomerVipSerialInput}
-									label={LABELS.customer.vip_serial}
-									name={NAMES.customer.vip_serial}
-									type="text"
-									validationProp={{
-										maxLength: LENGTHS.customer.vip_serial,
-										pattern: PATTERNS.customer.vip_serial,
-										required: false,
+									vipSerial={customerVipSerialInput}
+									setVipSerial={setCustomerVipSerialInput}
+									vipSerialvalidationProp={{
 										invalid: invalidCustomerVipSerial,
 										setInvalid: setInvalidCustomerVipSerial,
-										invalidMessage: ERRORS.customer.vip_serial.invalid,
 									}}
-									placeholder={PLACEHOLDERS.customer.vip_serial}
+									customerName={customerNameInput}
+									setCustomerName={setCustomerNameInput}
+									customerNameValidationProp={{
+										invalid: invalidCustomerName,
+										setInvalid: setInvalidCustomerName,
+									}}
+									notes={customerNotesInput}
+									setNotes={setCustomerNotesInput}
 								/>
-
-								{((customerPhoneNumberInput?.length === 10 &&
-									!invalidCustomerPhoneNumber) ||
-									(customerVipSerialInput?.length === 6 &&
-										!invalidCustomerVipSerial)) && (
-									<>
-										<AddInput
-											text={customerNameInput}
-											setText={setCustomerNameInput}
-											label={LABELS.customer.customer_name}
-											name={NAMES.customer.customer_name}
-											type="text"
-											validationProp={{
-												maxLength: LENGTHS.customer.customer_name,
-												required: false,
-												invalid: invalidCustomerName,
-												setInvalid: setInvalidCustomerName,
-												invalidMessage: ERRORS.customer.customer_name.invalid,
-											}}
-											placeholder={PLACEHOLDERS.customer.customer_name}
-										/>
-
-										<AddTextArea
-											text={customerNotesInput}
-											setText={setCustomerNotesInput}
-											label={LABELS.customer.notes}
-											name={NAMES.customer.notes}
-											validationProp={{
-												required: false,
-											}}
-											placeholder={PLACEHOLDERS.customer.notes}
-										/>
-									</>
-								)}
 							</div>
 						</div>
 					</div>

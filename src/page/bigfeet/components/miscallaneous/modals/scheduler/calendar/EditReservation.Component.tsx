@@ -20,19 +20,17 @@ import { ToggleColor } from '../../../add/AddToggleSwitch.Component';
 
 import EditableDate from '../../../editable/EditableDate.Component';
 import EditableDropDown from '../../../editable/EditableDropDown.Component';
-import EditableInput from '../../../editable/EditableInput.Component';
 import EditableMinute from '../../../editable/EditableMinute.Component';
 import EditableNumber from '../../../editable/EditableNumber.Component';
 import EditablePayRate from '../../../editable/EditablePayRate.Component';
 import EditablePayRateAutomatic from '../../../editable/EditablePayRateAutomatic.Component';
-import EditablePhoneNumber from '../../../editable/EditablePhoneNumber.Component';
 import EditableTextArea from '../../../editable/EditableTextArea.Component';
 import EditableTime from '../../../editable/EditableTime.Component';
 import EditableToggleSwitch from '../../../editable/EditableToggleSwitch.Component';
 
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
 
-import { useCustomersQuery } from '../../../../../../hooks/customer.hooks';
+import { useCustomerHistoriesQuery } from '../../../../../../hooks/customer.hooks';
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useUpdateReservationMutation } from '../../../../../../hooks/reservation.hooks';
 import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
@@ -62,10 +60,8 @@ import {
 } from '../../../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
-import LENGTHS from '../../../../../../../constants/lengths.constants';
 import NAMES from '../../../../../../../constants/name.constants';
 import NUMBERS from '../../../../../../../constants/numbers.constants';
-import PATTERNS from '../../../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
 import STORES from '../../../../../../../constants/store.constants';
 
@@ -74,10 +70,8 @@ import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
 } from '../../../../../../../utils/reservation.utils';
-import {
-	formatPhoneNumber,
-	formatTimeFromDate,
-} from '../../../../../../../utils/string.utils';
+import { formatTimeFromDate } from '../../../../../../../utils/string.utils';
+import EditableCustomerInput from '../../../editable/EditableCustomer.Component';
 
 interface EditReservationProp {
 	setOpen(open: boolean): void;
@@ -128,8 +122,8 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 	const [messageInput, setMessageInput] = useState<string | null>(
 		reservation.message
 	);
-	const [customerIdInput, setCustomerIdInput] = useState<number | null>(
-		reservation.customer?.customer_id || null
+	const [customerInput, setCustomerInput] = useState<Customer | null>(
+		reservation.customer
 	);
 	const [customerPhoneNumberInput, setCustomerPhoneNumberInput] = useState<
 		string | null
@@ -207,11 +201,12 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		Permissions.PERMISSION_GET_SCHEDULE
 	);
 
-	const customerQuery = useCustomersQuery({
+	const customerQuery = useCustomerHistoriesQuery({
+		date: dateInput ?? date,
 		gettable: customerGettable,
 		staleTime: Infinity,
 	});
-	const customers: Customer[] = customerQuery.data || [];
+	const customers = customerQuery.data || [];
 
 	const employeeQuery = useEmployeesQuery({
 		gettable: employeeGettable,
@@ -283,35 +278,23 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		const message: string | null | undefined =
 			trimmedMessage === reservation.message ? undefined : trimmedMessage;
 		const customer_id: number | null | undefined =
-			customerIdInput === (reservation.customer?.customer_id || null)
+			customerInput?.customer_id === reservation.customer?.customer_id
 				? undefined
-				: customerIdInput;
-		const trimmedPhoneNumber = customerPhoneNumberInput
-			? customerPhoneNumberInput.trim()
-			: null;
-		const phone_number: string | null | undefined =
-			trimmedPhoneNumber === (reservation.customer?.phone_number || null)
-				? undefined
-				: trimmedPhoneNumber;
-		const trimmedVipSerial = customerVipSerialInput
-			? customerVipSerialInput.trim()
-			: null;
-		const vip_serial: string | null | undefined =
-			trimmedVipSerial === (reservation.customer?.vip_serial || null)
-				? undefined
-				: trimmedVipSerial;
-		const trimmedCustomerName = customerNameInput
-			? customerNameInput.trim()
-			: null;
-		const customer_name: string | null | undefined =
-			trimmedCustomerName === (reservation.customer?.customer_name || null)
-				? undefined
-				: trimmedCustomerName;
-		const trimmedNotes = customerNotesInput ? customerNotesInput.trim() : null;
-		const notes: string | null | undefined =
-			trimmedNotes === (reservation.customer?.notes || null)
-				? undefined
-				: trimmedNotes;
+				: customerInput?.customer_id ?? null;
+		const trimmedPhoneNumber = customerPhoneNumberInput?.trim();
+		const phone_number: string | undefined = customerInput
+			? undefined
+			: trimmedPhoneNumber;
+		const trimmedVipSerial = customerVipSerialInput?.trim();
+		const vip_serial: string | undefined = customerInput
+			? undefined
+			: trimmedVipSerial;
+		const trimmedCustomerName = customerNameInput?.trim();
+		const customer_name: string | undefined = customerInput
+			? undefined
+			: trimmedCustomerName;
+		const trimmedNotes = customerNotesInput?.trim();
+		const notes: string | undefined = customerInput ? undefined : trimmedNotes;
 
 		const changesMade =
 			reserved_date !== undefined ||
@@ -357,7 +340,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		tipMethodInput,
 		tipsInput,
 		messageInput,
-		customerIdInput,
+		customerInput?.customer_id,
 		customerPhoneNumberInput,
 		customerVipSerialInput,
 		customerNameInput,
@@ -436,57 +419,6 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 	useEffect(() => {
 		if (endTimeInput === 0) setEndTimeInput(null);
 	}, [endTimeInput]);
-
-	useEffect(() => {
-		if (
-			customerPhoneNumberInput?.length === LENGTHS.customer.phone_number - 4 &&
-			customerIdInput === null
-		) {
-			const customer = customers.find(
-				(customer) => customer.phone_number === customerPhoneNumberInput
-			);
-
-			if (customer) {
-				setCustomerIdInput(customer.customer_id);
-
-				setCustomerVipSerialInput(customer.vip_serial);
-				setCustomerNameInput(customer.customer_name);
-				setCustomerNotesInput(customer.notes);
-
-				setInvalidCustomerVipSerial(false);
-				setInvalidCustomerName(false);
-			}
-		} else if (
-			customerVipSerialInput?.length === LENGTHS.customer.vip_serial &&
-			customerIdInput === null
-		) {
-			const customer = customers.find(
-				(customer) => customer.vip_serial === customerVipSerialInput
-			);
-
-			if (customer) {
-				setCustomerIdInput(customer.customer_id);
-
-				setCustomerPhoneNumberInput(customer.phone_number);
-				setCustomerNameInput(customer.customer_name);
-				setCustomerNotesInput(customer.notes);
-
-				setInvalidCustomerPhoneNumber(false);
-				setInvalidCustomerName(false);
-			}
-		} else if (
-			customerIdInput !== null &&
-			customerPhoneNumberInput?.length !== LENGTHS.customer.phone_number - 4 &&
-			customerVipSerialInput?.length !== LENGTHS.customer.vip_serial
-		) {
-			setCustomerIdInput(null);
-
-			setCustomerNameInput(null);
-			setCustomerNotesInput(null);
-
-			setInvalidCustomerName(false);
-		}
-	}, [customerPhoneNumberInput, customerVipSerialInput]);
 
 	useEffect(() => {
 		if (dateInput && serviceIdInput) {
@@ -632,42 +564,24 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		const trimmedMessage = messageInput ? messageInput.trim() : null;
 		const message: string | null | undefined =
 			trimmedMessage === reservation.message ? undefined : trimmedMessage;
-
-		const trimmedPhoneNumber = customerPhoneNumberInput
-			? customerPhoneNumberInput.trim()
-			: null;
-		const phone_number: string | null | undefined =
-			trimmedPhoneNumber === (reservation.customer?.phone_number || null)
-				? undefined
-				: trimmedPhoneNumber;
-		const trimmedVipSerial = customerVipSerialInput
-			? customerVipSerialInput.trim()
-			: null;
-		const vip_serial: string | null | undefined =
-			trimmedVipSerial === (reservation.customer?.vip_serial || null)
-				? undefined
-				: trimmedVipSerial;
-		const trimmedCustomerName = customerNameInput
-			? customerNameInput.trim()
-			: null;
-		const customer_name: string | null | undefined =
-			trimmedCustomerName === (reservation.customer?.customer_name || null)
-				? undefined
-				: trimmedCustomerName;
-		const trimmedNotes = customerNotesInput ? customerNotesInput.trim() : null;
-		const notes: string | null | undefined =
-			trimmedNotes === (reservation.customer?.notes || null)
-				? undefined
-				: trimmedNotes;
-
 		const customer_id: number | null | undefined =
-			customerIdInput === (reservation.customer?.customer_id || null) &&
-			phone_number === undefined &&
-			vip_serial === undefined &&
-			customer_name === undefined &&
-			notes === undefined
+			customerInput?.customer_id === reservation.customer?.customer_id
 				? undefined
-				: customerIdInput;
+				: customerInput?.customer_id ?? null;
+		const trimmedPhoneNumber = customerPhoneNumberInput?.trim();
+		const phone_number: string | undefined = customerInput
+			? undefined
+			: trimmedPhoneNumber;
+		const trimmedVipSerial = customerVipSerialInput?.trim();
+		const vip_serial: string | undefined = customerInput
+			? undefined
+			: trimmedVipSerial;
+		const trimmedCustomerName = customerNameInput?.trim();
+		const customer_name: string | undefined = customerInput
+			? undefined
+			: trimmedCustomerName;
+		const trimmedNotes = customerNotesInput?.trim();
+		const notes: string | undefined = customerInput ? undefined : trimmedNotes;
 
 		const updateReservationRequest: UpdateReservationRequest = {
 			...(reserved_date !== undefined && { reserved_date }),
@@ -725,19 +639,6 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 			? new Date(dateInput.getTime() + time * (1000 * 60))
 			: undefined;
 	const endTimeText = endDate ? formatTimeFromDate(endDate) : undefined;
-
-	const currentCustomer: Customer | undefined =
-		customerIdInput !== null
-			? customers.find((customer) => customer.customer_id === customerIdInput)
-			: undefined;
-
-	const currentPhoneNumberText =
-		currentCustomer?.phone_number &&
-		t('Phone Number') + ': ' + formatPhoneNumber(currentCustomer.phone_number);
-
-	const currentVipSerialText =
-		currentCustomer?.vip_serial &&
-		t('VIP Serial') + ': ' + currentCustomer.vip_serial;
 
 	return (
 		<>
@@ -1145,98 +1046,36 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 							<div className="customer-optional-div">
 								<span className="customer-optional-title">
 									{t('Customer (Optional)')}:
-									{customerIdInput !== null && (
-										<span className="current-customer-span">
-											<span>{t('Current Customer')}:</span>
-
-											<span>{currentPhoneNumberText}</span>
-
-											<span>{currentVipSerialText}</span>
-										</span>
-									)}
 								</span>
 
-								<EditablePhoneNumber
-									originalPhoneNumber={
-										reservation.customer?.phone_number || null
-									}
+								<EditableCustomerInput
+									customers={customers}
+									customer={customerInput}
+									originalCustomer={reservation.customer}
+									setCustomer={setCustomerInput}
 									phoneNumber={customerPhoneNumberInput}
 									setPhoneNumber={setCustomerPhoneNumberInput}
-									label={LABELS.customer.phone_number}
-									name={NAMES.customer.phone_number}
-									validationProp={{
-										required: false,
+									phoneNumberValidationProp={{
 										invalid: invalidCustomerPhoneNumber,
 										setInvalid: setInvalidCustomerPhoneNumber,
-										invalidMessage: ERRORS.customer.phone_number.invalid,
 									}}
+									vipSerial={customerVipSerialInput}
+									setVipSerial={setCustomerVipSerialInput}
+									vipSerialvalidationProp={{
+										invalid: invalidCustomerVipSerial,
+										setInvalid: setInvalidCustomerVipSerial,
+									}}
+									customerName={customerNameInput}
+									setCustomerName={setCustomerNameInput}
+									customerNameValidationProp={{
+										invalid: invalidCustomerName,
+										setInvalid: setInvalidCustomerName,
+									}}
+									notes={customerNotesInput}
+									setNotes={setCustomerNotesInput}
 									editable={editable}
 									missingPermissionMessage={ERRORS.reservation.permissions.edit}
 								/>
-
-								<EditableInput
-									originalText={reservation.customer?.vip_serial || null}
-									text={customerVipSerialInput}
-									setText={setCustomerVipSerialInput}
-									label={LABELS.customer.vip_serial}
-									name={NAMES.customer.vip_serial}
-									type="text"
-									placeholder={PLACEHOLDERS.customer.vip_serial}
-									validationProp={{
-										maxLength: LENGTHS.customer.vip_serial,
-										pattern: PATTERNS.customer.vip_serial,
-										required: false,
-										invalid: invalidCustomerVipSerial,
-										setInvalid: setInvalidCustomerVipSerial,
-										invalidMessage: ERRORS.customer.vip_serial.invalid,
-									}}
-									editable={editable}
-									missingPermissionMessage={ERRORS.customer.permissions.edit}
-								/>
-
-								{((customerPhoneNumberInput?.length === 10 &&
-									!invalidCustomerPhoneNumber) ||
-									(customerVipSerialInput?.length === 6 &&
-										!invalidCustomerVipSerial)) && (
-									<>
-										<EditableInput
-											originalText={reservation.customer?.customer_name || null}
-											text={customerNameInput}
-											setText={setCustomerNameInput}
-											label={LABELS.customer.customer_name}
-											name={NAMES.customer.customer_name}
-											type="text"
-											placeholder={PLACEHOLDERS.customer.customer_name}
-											validationProp={{
-												maxLength: LENGTHS.customer.customer_name,
-												required: false,
-												invalid: invalidCustomerName,
-												setInvalid: setInvalidCustomerName,
-												invalidMessage: ERRORS.customer.customer_name.invalid,
-											}}
-											editable={editable}
-											missingPermissionMessage={
-												ERRORS.reservation.permissions.edit
-											}
-										/>
-
-										<EditableTextArea
-											originalText={reservation.customer?.notes || null}
-											text={customerNotesInput}
-											setText={setCustomerNotesInput}
-											label={LABELS.customer.notes}
-											name={NAMES.customer.notes}
-											placeholder={PLACEHOLDERS.customer.notes}
-											validationProp={{
-												required: false,
-											}}
-											editable={editable}
-											missingPermissionMessage={
-												ERRORS.reservation.permissions.edit
-											}
-										/>
-									</>
-								)}
 							</div>
 						</div>
 					</div>

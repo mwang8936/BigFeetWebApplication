@@ -23,7 +23,7 @@ import NAMES from '../../../../../../constants/name.constants';
 import PATTERNS from '../../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../../constants/placeholder.constants';
 
-import Customer from '../../../../../../models/Customer.Model';
+import { CustomerCurrent } from '../../../../../../models/Customer.Model';
 import { Permissions } from '../../../../../../models/enums';
 import User from '../../../../../../models/User.Model';
 
@@ -33,7 +33,7 @@ import { formatPhoneNumber } from '../../../../../../utils/string.utils';
 
 interface EditCustomerProp {
 	setOpen(open: boolean): void;
-	customer: Customer;
+	customer: CustomerCurrent;
 }
 
 const EditCustomer: FC<EditCustomerProp> = ({ setOpen, customer }) => {

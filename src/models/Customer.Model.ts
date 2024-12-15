@@ -4,7 +4,15 @@ export default interface Customer {
 	vip_serial: string | null;
 	customer_name: string | null;
 	notes: string | null;
+}
+
+export interface CustomerCurrent extends Customer {
 	created_at: Date;
 	updated_at: Date;
 	deleted_at?: Date;
+}
+
+export interface CustomerHistory extends Customer {
+	valid_from: Date;
+	valid_to: Date | null;
 }

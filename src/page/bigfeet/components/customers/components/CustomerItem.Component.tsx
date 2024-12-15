@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next';
 
 import EditCustomerModal from '../../miscallaneous/modals/customer/EditCustomerModal.Component';
 
-import Customer from '../../../../../models/Customer.Model';
+import { CustomerCurrent } from '../../../../../models/Customer.Model';
 
 import { formatPhoneNumber } from '../../../../../utils/string.utils';
 
 interface CustomerItemProp {
-	customer: Customer;
+	customer: CustomerCurrent;
 }
 
 const CustomerItem: FC<CustomerItemProp> = ({ customer }) => {

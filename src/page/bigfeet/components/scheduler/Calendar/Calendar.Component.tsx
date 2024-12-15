@@ -5,7 +5,7 @@ import { useScheduleDateContext } from '../Scheduler.Component';
 import CalendarEmployeeColumn from './components/CalendarEmployeeColumn.Component';
 import CalendarFixedColumn from './components/CalendarFixedColumn.Component';
 
-import { useCustomersQuery } from '../../../../hooks/customer.hooks';
+import { useCustomerHistoriesQuery } from '../../../../hooks/customer.hooks';
 import { useEmployeesQuery } from '../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../hooks/profile.hooks';
 import { useSchedulesQuery } from '../../../../hooks/schedule.hooks';
@@ -41,7 +41,8 @@ const Calendar: FC = () => {
 		Permissions.PERMISSION_GET_SERVICE
 	);
 
-	useCustomersQuery({
+	useCustomerHistoriesQuery({
+		date,
 		gettable: customerGettable,
 		staleTime: Infinity,
 	});

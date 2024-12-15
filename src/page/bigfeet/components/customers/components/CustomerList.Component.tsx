@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 
 import CustomerItem from './CustomerItem.Component';
 
-import Customer from '../../../../../models/Customer.Model';
+import { CustomerCurrent } from '../../../../../models/Customer.Model';
 
 interface CustomerListProp {
-	customers: Customer[];
+	customers: CustomerCurrent[];
 }
 
 const CustomerList: FC<CustomerListProp> = ({ customers }) => {

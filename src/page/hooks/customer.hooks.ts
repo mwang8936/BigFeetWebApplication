@@ -6,6 +6,8 @@ import { MutationProp, QueryProp } from './props.hooks';
 import { useSocketIdContext } from '../bigfeet/BigFeet.Page';
 import { useAuthenticationContext } from '../../App';
 
+import { GetCustomerHistoriesParam } from '../../models/params/Customer.Param';
+
 import {
 	AddCustomerRequest,
 	UpdateCustomerRequest,
@@ -14,10 +16,13 @@ import {
 import {
 	addCustomer,
 	deleteCustomer,
+	getCustomerHistories,
 	getCustomers,
 	updateCustomer,
 } from '../../service/customer.service';
 
+import { setDateToEndOfDay } from '../../utils/date.utils';
+import { formatDateToQueryKey } from '../../utils/string.utils';
 import {
 	createLoadingToast,
 	errorToast,
@@ -55,6 +60,38 @@ export const useCustomersQuery = ({
 	return useQuery({
 		queryKey: [customersQueryKey],
 		queryFn: () => getCustomers(i18n, queryClient, setAuthentication),
+		enabled: gettable,
+		staleTime,
+		refetchInterval,
+		refetchIntervalInBackground,
+	});
+};
+
+interface CustomerHistoriesQueryProp extends QueryProp {
+	date: Date;
+}
+
+export const useCustomerHistoriesQuery = ({
+	date,
+	gettable,
+	staleTime = 1000 * 30,
+	refetchInterval,
+	refetchIntervalInBackground,
+}: CustomerHistoriesQueryProp) => {
+	const { i18n } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
+
+	return useQuery({
+		queryKey: [customersQueryKey, formatDateToQueryKey(date)],
+		queryFn: () => {
+			const params: GetCustomerHistoriesParam = {
+				date: setDateToEndOfDay(date),
+			};
+
+			return getCustomerHistories(i18n, queryClient, setAuthentication, params);
+		},
 		enabled: gettable,
 		staleTime,
 		refetchInterval,

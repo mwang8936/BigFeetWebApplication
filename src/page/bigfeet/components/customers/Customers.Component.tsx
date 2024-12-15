@@ -22,7 +22,7 @@ import LABELS from '../../../../constants/label.constants';
 import NAMES from '../../../../constants/name.constants';
 import PLACEHOLDERS from '../../../../constants/placeholder.constants';
 
-import Customer from '../../../../models/Customer.Model';
+import { CustomerCurrent } from '../../../../models/Customer.Model';
 import { Permissions } from '../../../../models/enums';
 import User from '../../../../models/User.Model';
 
@@ -49,7 +49,7 @@ const Customers: FC = () => {
 
 	const customerQuery = useCustomersQuery({ gettable });
 
-	const customers: Customer[] = customerQuery.data || [];
+	const customers = customerQuery.data || [];
 
 	const isCustomerLoading = customerQuery.isLoading;
 
@@ -59,7 +59,7 @@ const Customers: FC = () => {
 
 	const isCustomerPaused = customerQuery.isPaused;
 
-	let filteredCustomers: Customer[] = [];
+	let filteredCustomers: CustomerCurrent[] = [];
 	if (
 		!isCustomerLoading &&
 		!isCustomerError &&

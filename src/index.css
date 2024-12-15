@@ -184,11 +184,11 @@
 
   .selected-tab {
     @apply mr-2 inline-block p-4 text-blue-600 bg-gray-200 rounded-t-lg 
-    hover:bg-gray-300 hover:text-blue-700 cursor-pointer
+    hover:bg-gray-300 hover:text-blue-700
   }
 
   .tab {
-    @apply mr-2 inline-block p-4 text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-100 cursor-pointer
+    @apply mr-2 inline-block p-4 text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-100
   }
 
   .input-div {

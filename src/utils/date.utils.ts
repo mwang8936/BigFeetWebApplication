@@ -150,3 +150,21 @@ export function isHoliday(date: Date): boolean {
 	// Return false if there are no holidays for the year or the date is not a holiday
 	return false;
 }
+
+/**
+ * Sets the given date to the end of the day.
+ * The end of the day is considered to be 23:59:59.999.
+ *
+ * @param date - The Date object to be modified.
+ * @returns A new Date object with the time set to the end of the day.
+ *
+ * @example
+ * const originalDate = new Date('2024-08-29T10:30:00Z');
+ * const endOfDayDate = setDateToEndOfDay(originalDate);
+ * console.log(endOfDayDate.toISOString()); // '2024-08-29T23:59:59.999Z'
+ */
+export function setDateToEndOfDay(date: Date): Date {
+	const endOfDay = new Date(date);
+	endOfDay.setHours(23, 59, 59, 999);
+	return endOfDay;
+}

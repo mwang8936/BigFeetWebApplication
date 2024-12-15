@@ -11,7 +11,7 @@ import { useUserQuery } from '../../../../../hooks/profile.hooks';
 
 import ERRORS from '../../../../../../constants/error.constants';
 
-import Customer from '../../../../../../models/Customer.Model';
+import { CustomerCurrent } from '../../../../../../models/Customer.Model';
 import { Permissions } from '../../../../../../models/enums';
 import User from '../../../../../../models/User.Model';
 
@@ -19,7 +19,7 @@ import { formatPhoneNumber } from '../../../../../../utils/string.utils';
 
 interface DeleteCustomerProp {
 	setOpen(open: boolean): void;
-	customer: Customer;
+	customer: CustomerCurrent;
 }
 
 const DeleteCustomer: FC<DeleteCustomerProp> = ({ setOpen, customer }) => {
