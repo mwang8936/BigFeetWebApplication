@@ -104,3 +104,21 @@ export async function deletePayroll(
 		'delete'
 	);
 }
+
+export async function refreshPayroll(
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
+	year: number,
+	month: number,
+	part: PayrollPart,
+	employee_id: number
+): Promise<Payroll> {
+	return authorizedRequest(
+		i18n,
+		queryClient,
+		setAuthentication,
+		`${payrollPath}/refresh/${year}/${month}/${part}/employee/${employee_id}`,
+		'patch'
+	);
+}

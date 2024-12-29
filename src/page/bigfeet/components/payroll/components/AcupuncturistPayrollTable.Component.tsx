@@ -11,6 +11,7 @@ import { ButtonType } from '../../miscallaneous/PermissionsButton.Component';
 
 import EditPayrollModal from '../../miscallaneous/modals/payroll/EditPayrollModal.Component';
 
+import { useRefreshPayrollMutation } from '../../../../hooks/payroll.hooks';
 import { useUserQuery } from '../../../../hooks/profile.hooks';
 
 import ERRORS from '../../../../../constants/error.constants';
@@ -118,6 +119,17 @@ const AcupuncturistPayrollTable: FC<AcupuncturistPayrollTableProp> = ({
 
 	const cheque = totalBodyMoney + totalFeetMoney + totalAcupunctureMoney;
 
+	const refreshPayrollMutation = useRefreshPayrollMutation({});
+
+	const refreshPayroll = async (
+		year: number,
+		month: number,
+		part: PayrollPart,
+		employeeId: number
+	) => {
+		refreshPayrollMutation.mutate({ year, month, part, employeeId });
+	};
+
 	const exportToPDF = async () => {
 		setExporting(true);
 
@@ -158,7 +170,8 @@ const AcupuncturistPayrollTable: FC<AcupuncturistPayrollTableProp> = ({
 		<div>
 			<table
 				className="table-fixed w-full text-xl"
-				id={`payroll-table-${payroll.part}`}>
+				id={`payroll-table-${payroll.part}`}
+			>
 				<thead>
 					<tr>
 						<th className="border border-black border-2 p-2 font-bold w-auto">
@@ -179,7 +192,8 @@ const AcupuncturistPayrollTable: FC<AcupuncturistPayrollTableProp> = ({
 					{data.map((row, index) => (
 						<tr
 							key={index}
-							className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}>
+							className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}
+						>
 							<td className="border border-gray-300 text-center">{row.day}</td>
 							<td className="border border-gray-300 text-right pr-2">
 								{sessionToString(row.body)}
@@ -244,6 +258,21 @@ const AcupuncturistPayrollTable: FC<AcupuncturistPayrollTableProp> = ({
 					</tr>
 				</tbody>
 			</table>
+
+			<FilledPermissionsButton
+				btnTitle={'Refresh Payroll'}
+				btnType={ButtonType.CANCEL}
+				disabled={false}
+				missingPermissionMessage={''}
+				onClick={() => {
+					refreshPayroll(
+						payroll.year,
+						payroll.month,
+						payroll.part,
+						payroll.employee.employee_id
+					);
+				}}
+			/>
 
 			<FilledPermissionsButton
 				btnTitle={'Edit Payroll'}

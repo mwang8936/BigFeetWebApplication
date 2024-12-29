@@ -18,6 +18,7 @@ import { getProfilePayrolls } from '../../service/profile.service';
 import {
 	addPayroll,
 	getPayrolls,
+	refreshPayroll,
 	updatePayroll,
 } from '../../service/payroll.service';
 
@@ -167,6 +168,63 @@ export const useAddPayrollMutation = ({
 				errorToast(
 					context.toastId,
 					t('Failed to Generate Payroll'),
+					error.message
+				);
+		},
+		onSettled: async () => {
+			if (setLoading) setLoading(false);
+		},
+	});
+};
+
+export const useRefreshPayrollMutation = ({
+	setLoading,
+	setError,
+	onSuccess,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
+
+	return useMutation({
+		mutationFn: (data: {
+			year: number;
+			month: number;
+			part: PayrollPart;
+			employeeId: number;
+		}) =>
+			refreshPayroll(
+				i18n,
+				queryClient,
+				setAuthentication,
+				data.year,
+				data.month,
+				data.part,
+				data.employeeId
+			),
+		onMutate: async () => {
+			if (setLoading) setLoading(true);
+
+			const toastId = createLoadingToast(t('Refreshing Payroll...'));
+			return { toastId };
+		},
+		onSuccess: (_data, variables, context) => {
+			queryClient.invalidateQueries({
+				queryKey: [payrollsQueryKey, variables.year, variables.month],
+			});
+
+			if (onSuccess) onSuccess();
+
+			successToast(context.toastId, t('Payroll Refreshed Successfully'));
+		},
+		onError: (error, _variables, context) => {
+			if (setError) setError(error.message);
+
+			if (context)
+				errorToast(
+					context.toastId,
+					t('Failed to Refresh Payroll'),
 					error.message
 				);
 		},
