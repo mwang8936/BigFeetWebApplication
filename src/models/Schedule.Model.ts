@@ -11,6 +11,7 @@ export default interface Schedule {
 	end: Date | null;
 	priority: number | null;
 	add_award: boolean;
+	award: number;
 	reservations: Reservation[];
 	vip_packages: VipPackage[];
 	signed: boolean;
