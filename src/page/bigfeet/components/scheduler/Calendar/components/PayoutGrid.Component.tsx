@@ -1,21 +1,17 @@
 import { FC } from 'react';
 import { moneyToString } from '../../../../../../utils/number.utils';
 import { useTranslation } from 'react-i18next';
-import { Permissions, TipMethod } from '../../../../../../models/enums';
+import { TipMethod } from '../../../../../../models/enums';
 import Reservation from '../../../../../../models/Reservation.Model';
 import VipPackage from '../../../../../../models/Vip-Package.Model';
 import { useScheduleDateContext } from '../../Scheduler.Component';
 import { isHoliday } from '../../../../../../utils/date.utils';
-import { useSchedulesQuery } from '../../../../../hooks/schedule.hooks';
-import { useUserQuery } from '../../../../../hooks/profile.hooks';
-import User from '../../../../../../models/User.Model';
-import Schedule from '../../../../../../models/Schedule.Model';
 import STORES from '../../../../../../constants/store.constants';
 
 interface PayoutGridProp {
 	row: number;
 	colNum: number;
-	addAward: boolean;
+	award: number;
 	reservations: Reservation[];
 	vipPackages: VipPackage[];
 }
@@ -23,7 +19,7 @@ interface PayoutGridProp {
 const PayoutGrid: FC<PayoutGridProp> = ({
 	row,
 	colNum,
-	addAward,
+	award,
 	reservations,
 	vipPackages,
 }) => {
@@ -31,40 +27,7 @@ const PayoutGrid: FC<PayoutGridProp> = ({
 
 	const { date } = useScheduleDateContext();
 
-	const userQuery = useUserQuery({
-		gettable: true,
-	});
-	const user: User = userQuery.data;
-
-	const scheduleGettable = user.permissions.includes(
-		Permissions.PERMISSION_GET_SCHEDULE
-	);
-
-	const scheduleQuery = useSchedulesQuery({
-		date,
-		gettable: scheduleGettable,
-		staleTime: Infinity,
-	});
-	const schedules: Schedule[] = scheduleQuery.data ?? [];
-
-	const totalReservations = schedules
-		.flatMap((schedule) => schedule.reservations)
-		.filter((reservation) => {
-			const time = reservation.time ?? reservation.service.time;
-			const endDate = reservation.reserved_date.getTime() + time * (1000 * 60);
-
-			return endDate <= new Date().getTime();
-		});
-
-	const totalSessions = totalReservations
-		.flatMap((reservation) => [
-			reservation.service.acupuncture * 1.5,
-			reservation.service.feet,
-			reservation.service.body,
-		])
-		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
-
-	const awardMoney = totalSessions - STORES.award_reservation_count;
+	const awardMoney = Math.max(award - STORES.award_reservation_count, 0);
 
 	const completedReservations = reservations.filter((reservation) => {
 		const time = reservation.time ?? reservation.service.time;
@@ -124,7 +87,7 @@ const PayoutGrid: FC<PayoutGridProp> = ({
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
 
 	const payoutElement =
-		addAward && awardMoney > 0 ? (
+		awardMoney > 0 ? (
 			<span>
 				{t('Payout')}{' '}
 				<span className="font-bold">
@@ -136,7 +99,9 @@ const PayoutGrid: FC<PayoutGridProp> = ({
 							vipPackagesCommissionTotal
 					)}`}
 
-					<span className="text-red-500">{` + \$${awardMoney} = \$${moneyToString(
+					<span className="text-red-500">{` + \$${moneyToString(
+						awardMoney
+					)} = \$${moneyToString(
 						requestedTotal +
 							holidayTotal +
 							cashOutTotal +
@@ -165,7 +130,8 @@ const PayoutGrid: FC<PayoutGridProp> = ({
 					gridColumnStart: colNum,
 					gridRowStart: row,
 				}}
-				className="relative border-slate-500 border-b border-r border-t-2 p-2 z-[2] bg-white hover:bg-slate-300 group overflow-visible cursor-pointer">
+				className="relative border-slate-500 border-b border-r border-t-2 p-2 z-[2] bg-white hover:bg-slate-300 group overflow-visible cursor-pointer"
+			>
 				{payoutElement}
 			</div>
 		</>
