@@ -26,10 +26,6 @@ export default async function authorizedRequest(
 
 	const requestData = data || {};
 
-	if (socket_id) {
-		requestData.socket_id = socket_id;
-	}
-
 	const config: AxiosRequestConfig = {
 		method,
 		baseURL: BASE_API_URL,
@@ -38,6 +34,10 @@ export default async function authorizedRequest(
 		data: requestData,
 		params,
 	};
+
+	if (socket_id && config.headers) {
+		config.headers['x-socket-id'] = socket_id;
+	}
 
 	if (import.meta.env.VITE_ENV === 'development')
 		console.log('API Request:', config);
