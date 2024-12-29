@@ -2,17 +2,13 @@ import { FC, useEffect, useState } from 'react';
 
 import PermissionsButton from '../../miscallaneous/PermissionsButton.Component';
 
-import { ToggleColor } from '../../miscallaneous/add/AddToggleSwitch.Component';
-
 import EditableDropDown from '../../miscallaneous/editable/EditableDropDown.Component';
-import EditableToggleSwitch from '../../miscallaneous/editable/EditableToggleSwitch.Component';
 
 import { useUpdateProfileSettingsMutation } from '../../../../hooks/profile.hooks';
 
 import { languageDropDownItems } from '../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../constants/error.constants';
 import LABELS from '../../../../../constants/label.constants';
-import NAMES from '../../../../../constants/name.constants';
 
 import { Language } from '../../../../../models/enums';
 
@@ -20,14 +16,12 @@ import { UpdateProfileRequest } from '../../../../../models/requests/Profile.Req
 
 interface SettingsProp {
 	originalLanguage: Language;
-	originalDarkMode: boolean;
 }
 
-const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
+const Settings: FC<SettingsProp> = ({ originalLanguage }) => {
 	const [languageInput, setLanguageInput] = useState<Language | null>(
 		originalLanguage
 	);
-	const [darkModeInput, setDarkModeInput] = useState<boolean>(originalDarkMode);
 
 	const [changesMade, setChangesMade] = useState<boolean>(false);
 	const [missingRequiredInput, setMissingRequiredInput] =
@@ -35,27 +29,24 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 
 	useEffect(() => {
 		setLanguageInput(originalLanguage);
-		setDarkModeInput(originalDarkMode);
 
 		setChangesMade(false);
 
 		setMissingRequiredInput(false);
-	}, [originalLanguage, originalDarkMode]);
+	}, [originalLanguage]);
 
 	useEffect(() => {
 		const language: Language | null | undefined =
 			languageInput === originalLanguage ? undefined : languageInput;
-		const dark_mode: boolean | undefined =
-			darkModeInput === originalDarkMode ? undefined : darkModeInput;
 
-		const changesMade = language !== undefined || dark_mode !== undefined;
+		const changesMade = language !== undefined;
 
 		setChangesMade(changesMade);
 
 		const missingRequiredInput = language === null;
 
 		setMissingRequiredInput(missingRequiredInput);
-	}, [languageInput, darkModeInput]);
+	}, [languageInput]);
 
 	const updateProfileSettingsMutation = useUpdateProfileSettingsMutation({});
 	const onSave = async () => {
@@ -63,12 +54,9 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 			languageInput === originalLanguage
 				? undefined
 				: (languageInput as Language);
-		const dark_mode: boolean | undefined =
-			darkModeInput === originalDarkMode ? undefined : darkModeInput;
 
 		const request: UpdateProfileRequest = {
 			...(language !== undefined && { language }),
-			...(dark_mode !== undefined && { dark_mode }),
 		};
 
 		updateProfileSettingsMutation.mutate({ request });
@@ -98,19 +86,6 @@ const Settings: FC<SettingsProp> = ({ originalLanguage, originalDarkMode }) => {
 					required: true,
 					requiredMessage: ERRORS.profile.language.required,
 				}}
-				editable={true}
-				missingPermissionMessage=""
-			/>
-
-			<EditableToggleSwitch
-				originalChecked={originalDarkMode}
-				checked={darkModeInput}
-				setChecked={setDarkModeInput}
-				falseText={'Light'}
-				trueText={'Dark'}
-				toggleColour={ToggleColor.BLACK}
-				label={LABELS.profile.dark_mode}
-				name={NAMES.profile.dark_mode}
 				editable={true}
 				missingPermissionMessage=""
 			/>

@@ -53,10 +53,7 @@ const Profile: FC = () => {
 				originalPerHour={user.per_hour}
 			/>
 		) : (
-			<Settings
-				originalLanguage={user.language}
-				originalDarkMode={user.dark_mode}
-			/>
+			<Settings originalLanguage={user.language} />
 		);
 
 	return (

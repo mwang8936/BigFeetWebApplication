@@ -72,8 +72,6 @@
 	"Updating Profile...": "Updating Profile...",
 	"Profile Updated Successfully": "Profile Updated Successfully",
 	"Failed to Update Profile": "Failed to Update Profile",
-	"Light": "Light",
-	"Dark": "Dark",
 	"Delete Profile": "Delete Profile: {{username}}",
 	"Are you sure you want to delete your profile? This action cannot be reversed.": "Are you sure you want to delete your profile? This action cannot be reversed.",
 
@@ -375,7 +373,6 @@
 	"Hourly Rate": "Hourly Rate",
 
 	"Language": "Language",
-	"Dark Mode": "Dark Mode",
 	"Old Password": "Old Password",
 	"New Password": "New Password",
 	"Retype New Password": "Retype New Password",

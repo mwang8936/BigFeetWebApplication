@@ -39,7 +39,6 @@ const NAMES = {
 		cheque_amount: 'cheque_amount',
 	},
 	profile: {
-		dark_mode: 'dark_mode',
 		old_password: 'old_password',
 		new_password: 'new_password',
 		retype_new_password: 'retype_new_password',

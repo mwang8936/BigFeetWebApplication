@@ -72,8 +72,6 @@
 	"Updating Profile...": "更新檔案中",
 	"Profile Updated Successfully": "檔案更新成功",
 	"Failed to Update Profile": "檔案更新失敗",
-	"Light": "亮",
-	"Dark": "暗",
 	"Delete Profile": "刪除檔案: {{username}}",
 	"Are you sure you want to delete your profile? This action cannot be reversed.": "請確認是否要刪除？",
 
@@ -375,7 +373,6 @@
 	"Hourly Rate": "小時工資",
 
 	"Language": "語言",
-	"Dark Mode": "暗黑模式",
 	"Old Password": "舊密碼",
 	"New Password": "新密碼",
 	"Retype New Password": "重新輸入新密碼",
