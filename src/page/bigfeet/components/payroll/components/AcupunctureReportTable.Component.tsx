@@ -34,6 +34,7 @@ interface RowData {
 	acupuncture: number;
 	massage: number;
 	insurance: number;
+	non_acupuncturist_insurance: number;
 	total: number;
 }
 
@@ -81,13 +82,16 @@ const AcupunctureReportTable: FC<AcupunctureReportTableProp> = ({
 			const total =
 				scheduleData.acupuncture * acupunctureReport.acupuncture_percentage +
 				scheduleData.massage * acupunctureReport.massage_percentage -
-				scheduleData.insurance * acupunctureReport.insurance_percentage;
+				scheduleData.insurance * acupunctureReport.insurance_percentage -
+				scheduleData.non_acupuncturist_insurance *
+					acupunctureReport.non_acupuncturist_insurance_percentage;
 
 			return {
 				day,
 				acupuncture: scheduleData.acupuncture,
 				massage: scheduleData.massage,
 				insurance: scheduleData.insurance,
+				non_acupuncturist_insurance: scheduleData.non_acupuncturist_insurance,
 				total,
 			};
 		} else {
@@ -96,6 +100,7 @@ const AcupunctureReportTable: FC<AcupunctureReportTableProp> = ({
 				acupuncture: 0,
 				massage: 0,
 				insurance: 0,
+				non_acupuncturist_insurance: 0,
 				total: 0,
 			};
 		}
@@ -104,6 +109,8 @@ const AcupunctureReportTable: FC<AcupunctureReportTableProp> = ({
 	const acupuncturePercentage = acupunctureReport.acupuncture_percentage;
 	const massagePercentage = acupunctureReport.massage_percentage;
 	const insurancePercentage = acupunctureReport.insurance_percentage;
+	const nonAcupuncturistInsurancePercentage =
+		acupunctureReport.non_acupuncturist_insurance_percentage;
 
 	const totalAcupuncture = data
 		.map((row) => row.acupuncture)
@@ -114,10 +121,15 @@ const AcupunctureReportTable: FC<AcupunctureReportTableProp> = ({
 	const totalInsurance = data
 		.map((row) => row.insurance)
 		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+	const totalNonAcupuncturistInsurance = data
+		.map((row) => row.non_acupuncturist_insurance)
+		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
 
 	const totalAcupunctureMoney = totalAcupuncture * acupuncturePercentage;
 	const totalMassageMoney = totalMassage * massagePercentage;
 	const totalInsuranceMoney = totalInsurance * insurancePercentage;
+	const totalNonAcupuncturistInsuranceMoney =
+		totalNonAcupuncturistInsurance * nonAcupuncturistInsurancePercentage;
 
 	const totalMoney = data
 		.map((row) => row.total)
@@ -163,22 +175,26 @@ const AcupunctureReportTable: FC<AcupunctureReportTableProp> = ({
 		<div>
 			<table
 				className="table-fixed w-full text-xl"
-				id="acupuncture-report-table">
+				id="acupuncture-report-table"
+			>
 				<thead>
 					<tr>
 						<th className="border border-black border-2 p-2 font-bold w-auto">
 							{displayDate()}
 						</th>
-						<th className="border border-black p-2 border-2 font-bold w-[22.5%]">
+						<th className="border border-black p-2 border-2 font-bold w-[18%]">
 							{t('Acupuncture')}
 						</th>
-						<th className="border border-black p-2 border-2 font-bold w-[22.5%]">
+						<th className="border border-black p-2 border-2 font-bold w-[18%]">
 							{t('Massage')}
 						</th>
-						<th className="border border-black p-2 border-2 font-bold w-[22.5%]">
+						<th className="border border-black p-2 border-2 font-bold w-[18%]">
 							{t('Insurance')}
 						</th>
-						<th className="border border-black p-2 border-2 font-bold w-[22.5%]">
+						<th className="border border-black p-2 border-2 font-bold w-[18%]">
+							{t('Insurance (Other)')}
+						</th>
+						<th className="border border-black p-2 border-2 font-bold w-[18%]">
 							{t('Total')}
 						</th>
 					</tr>
@@ -187,7 +203,8 @@ const AcupunctureReportTable: FC<AcupunctureReportTableProp> = ({
 					{data.map((row, index) => (
 						<tr
 							key={index}
-							className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}>
+							className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}
+						>
 							<td className="border border-gray-300 text-center">{row.day}</td>
 							<td className="border border-gray-300 text-right pr-2">
 								{moneyToString(row.acupuncture)}
@@ -197,6 +214,9 @@ const AcupunctureReportTable: FC<AcupunctureReportTableProp> = ({
 							</td>
 							<td className="border border-gray-300 text-right pr-2">
 								{moneyToString(row.insurance)}
+							</td>
+							<td className="border border-gray-300 text-right pr-2">
+								{moneyToString(row.non_acupuncturist_insurance)}
 							</td>
 							<td className="border border-gray-300 text-right pr-2">
 								{moneyToString(row.total)}
@@ -217,6 +237,9 @@ const AcupunctureReportTable: FC<AcupunctureReportTableProp> = ({
 						<td className="border-black border-2 text-right pr-2 bg-blue-100">
 							${moneyToString(totalInsurance)}
 						</td>
+						<td className="border-black border-2 text-right pr-2 bg-blue-100">
+							${moneyToString(totalNonAcupuncturistInsurance)}
+						</td>
 					</tr>
 
 					<tr className="font-bold">
@@ -231,6 +254,9 @@ const AcupunctureReportTable: FC<AcupunctureReportTableProp> = ({
 						</td>
 						<td className="border-black border-2 text-right pr-2 bg-green-100">
 							-{percentageToString(insurancePercentage)}%
+						</td>
+						<td className="border-black border-2 text-right pr-2 bg-green-100">
+							-{percentageToString(nonAcupuncturistInsurancePercentage)}%
 						</td>
 					</tr>
 
@@ -249,9 +275,15 @@ const AcupunctureReportTable: FC<AcupunctureReportTableProp> = ({
 								? `$0`
 								: `-${moneyToString(totalInsuranceMoney)}`}
 						</td>
+						<td className="border-black border-2 text-right pr-2 bg-yellow-100">
+							{totalNonAcupuncturistInsuranceMoney === 0
+								? `$0`
+								: `-${moneyToString(totalNonAcupuncturistInsuranceMoney)}`}
+						</td>
 					</tr>
 
 					<tr className="font-extrabold">
+						<td />
 						<td />
 						<td />
 						<td />

@@ -2,6 +2,7 @@ export interface UpdateAcupunctureReportRequest {
 	acupuncture_percentage?: number;
 	massage_percentage?: number;
 	insurance_percentage?: number;
+	non_acupuncturist_insurance_percentage?: number;
 }
 
 export interface AddAcupunctureReportRequest {
@@ -11,4 +12,5 @@ export interface AddAcupunctureReportRequest {
 	acupuncture_percentage: number;
 	massage_percentage: number;
 	insurance_percentage: number;
+	non_acupuncturist_insurance_percentage: number;
 }

@@ -50,6 +50,10 @@ const AddAcupunctureReport: FC<AddAcupunctureReportProp> = ({
 	const [insurancePercentageInput, setInsurancePercentageInput] = useState<
 		number | null
 	>(0.3);
+	const [
+		nonAcupuncturistInsurancePercentageInput,
+		setNonAcupuncturistInsurancePercentageInput,
+	] = useState<number | null>(0.7);
 
 	const [invalidAcupuncturePercentage, setInvalidAcupuncturePercentage] =
 		useState<boolean>(false);
@@ -57,6 +61,10 @@ const AddAcupunctureReport: FC<AddAcupunctureReportProp> = ({
 		useState<boolean>(false);
 	const [invalidInsurancePercentage, setInvalidInsurancePercentage] =
 		useState<boolean>(false);
+	const [
+		invalidNonAcupuncturistInsurancePercentage,
+		setInvalidNonAcupuncturistInsurancePercentage,
+	] = useState<boolean>(false);
 
 	const [missingRequiredInput, setMissingRequiredInput] =
 		useState<boolean>(true);
@@ -75,26 +83,30 @@ const AddAcupunctureReport: FC<AddAcupunctureReportProp> = ({
 		const missingRequiredInput =
 			acupuncturePercentageInput === null ||
 			massagePercentageInput === null ||
-			insurancePercentageInput === null;
+			insurancePercentageInput === null ||
+			nonAcupuncturistInsurancePercentageInput === null;
 
 		setMissingRequiredInput(missingRequiredInput);
 	}, [
 		acupuncturePercentageInput,
 		massagePercentageInput,
 		insurancePercentageInput,
+		nonAcupuncturistInsurancePercentageInput,
 	]);
 
 	useEffect(() => {
 		const invalidInput =
 			invalidAcupuncturePercentage ||
 			invalidMassagePercentage ||
-			invalidInsurancePercentage;
+			invalidInsurancePercentage ||
+			invalidNonAcupuncturistInsurancePercentage;
 
 		setInvalidInput(invalidInput);
 	}, [
 		invalidAcupuncturePercentage,
 		invalidMassagePercentage,
 		invalidInsurancePercentage,
+		invalidNonAcupuncturistInsurancePercentage,
 	]);
 
 	const addAcupunctureReportMutation = useAddAcupunctureReportMutation({
@@ -113,6 +125,8 @@ const AddAcupunctureReport: FC<AddAcupunctureReportProp> = ({
 		const acupuncture_percentage = acupuncturePercentageInput as number;
 		const massage_percentage = massagePercentageInput as number;
 		const insurance_percentage = insurancePercentageInput as number;
+		const non_acupuncturist_insurance_percentage =
+			nonAcupuncturistInsurancePercentageInput as number;
 
 		const addAcupunctureReportRequest: AddAcupunctureReportRequest = {
 			year,
@@ -121,6 +135,7 @@ const AddAcupunctureReport: FC<AddAcupunctureReportProp> = ({
 			acupuncture_percentage,
 			massage_percentage,
 			insurance_percentage,
+			non_acupuncturist_insurance_percentage,
 		};
 
 		onAddAcupunctureReport(addAcupunctureReportRequest);
@@ -153,7 +168,8 @@ const AddAcupunctureReport: FC<AddAcupunctureReportProp> = ({
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
-							className="text-base font-semibold leading-6 text-gray-900">
+							className="text-base font-semibold leading-6 text-gray-900"
+						>
 							{t('Add Acupuncture Report')}
 						</Dialog.Title>
 
@@ -227,6 +243,36 @@ const AddAcupunctureReport: FC<AddAcupunctureReportProp> = ({
 								}}
 								placeholder={
 									PLACEHOLDERS.acupuncture_report.insurance_percentage
+								}
+							/>
+
+							<AddPercentage
+								percentage={nonAcupuncturistInsurancePercentageInput}
+								setPercentage={setNonAcupuncturistInsurancePercentageInput}
+								label={
+									LABELS.acupuncture_report
+										.non_acupuncturist_insurance_percentage
+								}
+								name={
+									NAMES.acupuncture_report
+										.non_acupuncturist_insurance_percentage
+								}
+								validationProp={{
+									max: NUMBERS.acupuncture_report
+										.non_acupuncturist_insurance_percentage,
+									required: true,
+									requiredMessage:
+										ERRORS.acupuncture_report
+											.non_acupuncturist_insurance_percentage.required,
+									invalid: invalidNonAcupuncturistInsurancePercentage,
+									setInvalid: setInvalidNonAcupuncturistInsurancePercentage,
+									invalidMessage:
+										ERRORS.acupuncture_report
+											.non_acupuncturist_insurance_percentage.invalid,
+								}}
+								placeholder={
+									PLACEHOLDERS.acupuncture_report
+										.non_acupuncturist_insurance_percentage
 								}
 							/>
 						</div>

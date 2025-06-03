@@ -3,6 +3,7 @@ const NUMBERS = {
 		acupuncture_percentage: 100,
 		massage_percentage: 100,
 		insurance_percentage: 100,
+		non_acupuncturist_insurance_percentage: 100,
 	},
 	employee: {
 		body_rate: 99.99,

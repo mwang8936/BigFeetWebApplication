@@ -27,6 +27,16 @@ const ERRORS = {
 				value: { max: NUMBERS.acupuncture_report.insurance_percentage },
 			},
 		},
+		non_acupuncturist_insurance_percentage: {
+			required: 'Insurance Percentage (Other) cannot be empty.',
+			invalid: {
+				key: 'Insurance Percentage (Other) Invalid',
+				value: {
+					max: NUMBERS.acupuncture_report
+						.non_acupuncturist_insurance_percentage,
+				},
+			},
+		},
 	},
 	customer: {
 		search_customer: {

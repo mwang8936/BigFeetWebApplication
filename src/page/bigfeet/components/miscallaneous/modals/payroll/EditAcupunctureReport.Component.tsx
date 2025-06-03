@@ -50,6 +50,12 @@ const EditAcupunctureReport: FC<EditAcupunctureProp> = ({
 	const [insurancePercentageInput, setInsurancePercentageInput] = useState<
 		number | null
 	>(acupunctureReport.insurance_percentage);
+	const [
+		nonAcupuncturistInsurancePercentageInput,
+		setNonAcupuncturistInsurancePercentageInput,
+	] = useState<number | null>(
+		acupunctureReport.non_acupuncturist_insurance_percentage
+	);
 
 	const [invalidAcupuncturePercentage, setInvalidAcupuncturePercentage] =
 		useState<boolean>(false);
@@ -57,6 +63,10 @@ const EditAcupunctureReport: FC<EditAcupunctureProp> = ({
 		useState<boolean>(false);
 	const [invalidInsurancePercentage, setInvalidInsurancePercentage] =
 		useState<boolean>(false);
+	const [
+		invalidNonAcupuncturistInsurancePercentage,
+		setInvalidNonAcupuncturistInsurancePercentage,
+	] = useState<boolean>(false);
 
 	const [changesMade, setChangesMade] = useState<boolean>(false);
 	const [missingRequiredInput, setMissingRequiredInput] =
@@ -85,37 +95,47 @@ const EditAcupunctureReport: FC<EditAcupunctureProp> = ({
 			insurancePercentageInput === acupunctureReport.insurance_percentage
 				? undefined
 				: insurancePercentageInput;
+		const non_acupuncturist_insurance_percentage: number | null | undefined =
+			nonAcupuncturistInsurancePercentageInput ===
+			acupunctureReport.non_acupuncturist_insurance_percentage
+				? undefined
+				: nonAcupuncturistInsurancePercentageInput;
 
 		const changesMade =
 			acupuncture_percentage !== undefined ||
 			massage_percentage !== undefined ||
-			insurance_percentage !== undefined;
+			insurance_percentage !== undefined ||
+			non_acupuncturist_insurance_percentage !== undefined;
 
 		setChangesMade(changesMade);
 
 		const missingRequiredInput =
 			acupuncturePercentageInput === null ||
 			massagePercentageInput === null ||
-			insurancePercentageInput === null;
+			insurancePercentageInput === null ||
+			nonAcupuncturistInsurancePercentageInput === null;
 
 		setMissingRequiredInput(missingRequiredInput);
 	}, [
 		acupuncturePercentageInput,
 		massagePercentageInput,
 		insurancePercentageInput,
+		nonAcupuncturistInsurancePercentageInput,
 	]);
 
 	useEffect(() => {
 		const invalidInput =
 			invalidAcupuncturePercentage ||
 			invalidMassagePercentage ||
-			invalidInsurancePercentage;
+			invalidInsurancePercentage ||
+			invalidNonAcupuncturistInsurancePercentage;
 
 		setInvalidInput(invalidInput);
 	}, [
 		invalidAcupuncturePercentage,
 		invalidMassagePercentage,
 		invalidInsurancePercentage,
+		invalidNonAcupuncturistInsurancePercentage,
 	]);
 
 	const updateAcupunctureReportMutation = useUpdateAcupunctureReportMutation({
@@ -148,11 +168,19 @@ const EditAcupunctureReport: FC<EditAcupunctureProp> = ({
 			insurancePercentageInput === acupunctureReport.insurance_percentage
 				? undefined
 				: (insurancePercentageInput as number);
+		const non_acupuncturist_insurance_percentage: number | undefined =
+			nonAcupuncturistInsurancePercentageInput ===
+			acupunctureReport.non_acupuncturist_insurance_percentage
+				? undefined
+				: (nonAcupuncturistInsurancePercentageInput as number);
 
 		const updateAcupunctureReportRequest: UpdateAcupunctureReportRequest = {
 			...(acupuncture_percentage !== undefined && { acupuncture_percentage }),
 			...(massage_percentage !== undefined && { massage_percentage }),
 			...(insurance_percentage !== undefined && { insurance_percentage }),
+			...(non_acupuncturist_insurance_percentage !== undefined && {
+				non_acupuncturist_insurance_percentage,
+			}),
 		};
 
 		onEditAcupunctureReport(
@@ -190,7 +218,8 @@ const EditAcupunctureReport: FC<EditAcupunctureProp> = ({
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
-							className="text-base font-semibold leading-6 text-gray-900">
+							className="text-base font-semibold leading-6 text-gray-900"
+						>
 							{t('Edit Acupuncture Report')}
 						</Dialog.Title>
 
@@ -271,6 +300,41 @@ const EditAcupunctureReport: FC<EditAcupunctureProp> = ({
 								}}
 								placeholder={
 									PLACEHOLDERS.acupuncture_report.insurance_percentage
+								}
+								editable={editable}
+								missingPermissionMessage={ERRORS.payroll.permissions.edit}
+							/>
+
+							<EditablePercentage
+								originalPercentage={
+									acupunctureReport.non_acupuncturist_insurance_percentage
+								}
+								percentage={nonAcupuncturistInsurancePercentageInput}
+								setPercentage={setNonAcupuncturistInsurancePercentageInput}
+								label={
+									LABELS.acupuncture_report
+										.non_acupuncturist_insurance_percentage
+								}
+								name={
+									NAMES.acupuncture_report
+										.non_acupuncturist_insurance_percentage
+								}
+								validationProp={{
+									max: NUMBERS.acupuncture_report
+										.non_acupuncturist_insurance_percentage,
+									required: true,
+									requiredMessage:
+										ERRORS.acupuncture_report
+											.non_acupuncturist_insurance_percentage.required,
+									invalid: invalidNonAcupuncturistInsurancePercentage,
+									setInvalid: setInvalidNonAcupuncturistInsurancePercentage,
+									invalidMessage:
+										ERRORS.acupuncture_report
+											.non_acupuncturist_insurance_percentage.invalid,
+								}}
+								placeholder={
+									PLACEHOLDERS.acupuncture_report
+										.non_acupuncturist_insurance_percentage
 								}
 								editable={editable}
 								missingPermissionMessage={ERRORS.payroll.permissions.edit}

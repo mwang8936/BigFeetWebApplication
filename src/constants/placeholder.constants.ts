@@ -3,6 +3,7 @@ const PLACEHOLDERS = {
 		acupuncture_percentage: '70',
 		massage_percentage: '30',
 		insurance_percentage: '30',
+		non_acupuncturist_insurance_percentage: '70',
 	},
 	customer: {
 		search_customer: 'Search by name or phone number',

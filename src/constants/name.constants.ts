@@ -3,6 +3,8 @@ const NAMES = {
 		acupuncture_percentage: 'acupuncture_percentage',
 		massage_percentage: 'massage_percentage',
 		insurance_percentage: 'insurance_percentage',
+		non_acupuncturist_insurance_percentage:
+			'non_acupuncturist_insurance_percentage',
 	},
 	customer: {
 		search_customer: 'search_customer',

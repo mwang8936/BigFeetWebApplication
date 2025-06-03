@@ -3,6 +3,7 @@ const LABELS = {
 		acupuncture_percentage: 'Acupuncture Percentage',
 		massage_percentage: 'Massage Percentage',
 		insurance_percentage: 'Insurance Percentage',
+		non_acupuncturist_insurance_percentage: 'Insurance Percentage (Other)',
 	},
 	customer: {
 		search_customer: 'Search Customer',
