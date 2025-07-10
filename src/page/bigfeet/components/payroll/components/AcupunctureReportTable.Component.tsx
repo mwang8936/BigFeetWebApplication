@@ -273,12 +273,12 @@ const AcupunctureReportTable: FC<AcupunctureReportTableProp> = ({
 						<td className="border-black border-2 text-right pr-2 bg-yellow-100">
 							{totalInsuranceMoney === 0
 								? `$0`
-								: `-${moneyToString(totalInsuranceMoney)}`}
+								: `-$${moneyToString(totalInsuranceMoney)}`}
 						</td>
 						<td className="border-black border-2 text-right pr-2 bg-yellow-100">
 							{totalNonAcupuncturistInsuranceMoney === 0
 								? `$0`
-								: `-${moneyToString(totalNonAcupuncturistInsuranceMoney)}`}
+								: `-$${moneyToString(totalNonAcupuncturistInsuranceMoney)}`}
 						</td>
 					</tr>
 
