@@ -30,7 +30,7 @@
     "html2canvas": "^1.4.1",
     "i18next": "^23.7.16",
     "js-cookie": "^3.0.5",
-    "jspdf": "^2.5.2",
+    "jspdf": "^3.0.1",
     "luxon": "^3.6.1",
     "multiselect-react-dropdown": "^2.0.25",
     "pusher-js": "^8.4.0-rc2",
@@ -59,6 +59,6 @@
     "postcss": "^8.4.28",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.0.2",
-    "vite": "^4.4.5"
+    "vite": "^6.3.5"
   }
 }
