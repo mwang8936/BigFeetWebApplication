@@ -8,7 +8,10 @@ import { i18n } from 'i18next';
 
 import Cookies from 'js-cookie';
 
-import BASE_API_URL, { tokenKey } from '../constants/api.constants';
+import BASE_API_URL, {
+	refreshPath,
+	tokenKey,
+} from '../constants/api.constants';
 
 import { Language } from '../models/enums';
 
@@ -51,11 +54,16 @@ export default async function authorizedRequest(
 
 			return parseData(response.data);
 		})
-		.catch((error: AxiosError) => {
+		.catch(async (error: AxiosError) => {
 			if (import.meta.env.VITE_ENV === 'development')
 				console.error('API Error:', error);
 
-			const message = onError(error, i18n, queryClient, setAuthentication);
+			const message = await onError(
+				error,
+				i18n,
+				queryClient,
+				setAuthentication
+			);
 			if (typeof message === 'string') throw new Error(message);
 		});
 }
@@ -119,23 +127,37 @@ function parseData(data: any) {
 	return data;
 }
 
-function onError(
+async function onError(
 	error: AxiosError,
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void
-) {
+): Promise<string> {
 	if (error.response) {
 		const responseData: any = error.response.data;
 		if (error.response.status === 401) {
-			i18n.changeLanguage(getLanguageFile(Language.ENGLISH));
+			try {
+				const config: AxiosRequestConfig = {
+					method: 'post',
+					baseURL: BASE_API_URL,
+					url: refreshPath,
+					withCredentials: true,
+				};
+				const refreshResponse = await axios(config);
 
-			queryClient.clear();
+				const { accessToken } = refreshResponse.data;
+				Cookies.set(tokenKey, accessToken);
+				// TODO Retry the original request with the new access token
+			} catch (refreshError) {
+				i18n.changeLanguage(getLanguageFile(Language.ENGLISH));
 
-			Cookies.remove(tokenKey);
-			setAuthentication(false);
+				queryClient.clear();
 
-			return 'Access token invalid.';
+				Cookies.remove(tokenKey);
+				setAuthentication(false);
+
+				return 'Access token invalid.';
+			}
 		}
 		if (responseData) {
 			return `${responseData.error}: ${responseData.messages}`;

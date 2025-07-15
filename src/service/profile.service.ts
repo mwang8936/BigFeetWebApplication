@@ -18,6 +18,7 @@ import {
 
 import {
 	ChangeProfilePasswordRequest,
+	LogoutRequest,
 	UpdateProfileRequest,
 } from '../models/requests/Profile.Request.Model';
 
@@ -134,5 +135,21 @@ export async function signProfileSchedule(
 		undefined,
 		undefined,
 		socket_id
+	);
+}
+
+export async function logout(
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
+	request: LogoutRequest
+) {
+	return authorizedRequest(
+		i18n,
+		queryClient,
+		setAuthentication,
+		`${profilePath}/logout`,
+		'post',
+		request
 	);
 }

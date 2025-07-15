@@ -12,8 +12,6 @@ import PATTERNS from '../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../constants/placeholder.constants';
 import STORES from '../../../constants/store.constants';
 
-import { LoginRequest } from '../../../models/requests/Login.Request.Model';
-
 import { useLoginMutation } from '../../hooks/authentication.hooks';
 
 const LoginForm: FC = () => {
@@ -59,13 +57,8 @@ const LoginForm: FC = () => {
 		if (!username) setError(ERRORS.login.username.required);
 		else if (!password) setError(ERRORS.login.password.required);
 		else {
-			const request: LoginRequest = {
-				username,
-				password,
-			};
-
 			// Login API
-			loginMutation.mutate({ request, rememberMe });
+			loginMutation.mutate({ username, password, rememberMe });
 		}
 	};
 
@@ -180,13 +173,15 @@ const LoginForm: FC = () => {
 				<button
 					className="button"
 					type="submit"
-					disabled={loading || username == '' || password == ''}>
+					disabled={loading || username == '' || password == ''}
+				>
 					{loading && (
 						<svg
 							className="white-spin"
 							xmlns="http://www.w3.org/2000/svg"
 							fill="none"
-							viewBox="0 0 24 24">
+							viewBox="0 0 24 24"
+						>
 							<circle
 								className="opacity-25"
 								cx="12"

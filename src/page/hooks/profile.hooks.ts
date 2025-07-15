@@ -1,13 +1,19 @@
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import Cookies from 'js-cookie';
+
 import { useLogout } from './authentication.hooks';
 import { employeesQueryKey } from './employee.hooks';
 import { MutationProp, QueryProp } from './props.hooks';
+import { useDeviceInfo } from './useDeviceInfo.hooks';
 
 import { useSocketIdContext } from '../bigfeet/BigFeet.Page';
 import { useAuthenticationContext } from '../../App';
 
+import { tokenKey } from '../../constants/api.constants';
+
+import { Language } from '../../models/enums';
 import { UpdateEmployeeRequest } from '../../models/requests/Employee.Request.Model';
 import {
 	ChangeProfilePasswordRequest,
@@ -18,6 +24,7 @@ import { deleteEmployee, updateEmployee } from '../../service/employee.service';
 import {
 	changeProfilePassword,
 	getProfile,
+	logout,
 	updateProfile,
 } from '../../service/profile.service';
 
@@ -240,6 +247,44 @@ export const useDeleteProfileMutation = ({
 				);
 		},
 		onSettled: async () => {
+			if (setLoading) setLoading(false);
+		},
+	});
+};
+
+export const useLogoutMutation = ({
+	setLoading,
+	setError,
+	onSuccess,
+}: MutationProp) => {
+	const { i18n, t } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
+
+	const { deviceId } = useDeviceInfo();
+	const logoutLocal = useLogout();
+
+	return useMutation({
+		mutationFn: () =>
+			logout(i18n, queryClient, setAuthentication, { device_id: deviceId }),
+		onMutate: async () => {
+			if (setLoading) setLoading(true);
+
+			const toastId = createLoadingToast(t('Logging out...'));
+			return { toastId };
+		},
+		onSuccess: (_data, _variables, context) => {
+			if (onSuccess) onSuccess();
+
+			successToast(context.toastId, t('Successfully Logged Out'));
+		},
+		onError: (error, _variables) => {
+			if (setError) setError(error.message);
+		},
+		onSettled: async () => {
+			logoutLocal();
+
 			if (setLoading) setLoading(false);
 		},
 	});

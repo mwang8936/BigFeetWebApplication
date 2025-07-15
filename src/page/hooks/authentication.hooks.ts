@@ -6,6 +6,7 @@ import Cookies from 'js-cookie';
 
 import { MutationProp } from './props.hooks';
 import { userQueryKey } from './profile.hooks';
+import { useDeviceInfo } from './useDeviceInfo.hooks';
 
 import { useAuthenticationContext } from '../../App';
 
@@ -31,10 +32,24 @@ export const useLoginMutation = ({
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
+	const { deviceId, deviceName, deviceModel } = useDeviceInfo();
 
 	return useMutation({
-		mutationFn: (data: { request: LoginRequest; rememberMe: boolean }) =>
-			login(data.request),
+		mutationFn: (data: {
+			username: string;
+			password: string;
+			rememberMe: boolean;
+		}) => {
+			const request: LoginRequest = {
+				username: data.username,
+				password: data.password,
+				device_id: deviceId,
+				device_name: deviceName,
+				device_model: deviceModel,
+			};
+
+			return login(request);
+		},
 		onMutate: async () => {
 			if (setLoading) setLoading(true);
 		},
@@ -47,8 +62,8 @@ export const useLoginMutation = ({
 			Cookies.set(tokenKey, accessToken);
 
 			//If remember me is checked, securely store username and password in local storage.
-			const username = variables.request.username;
-			const password = variables.request.password;
+			const username = variables.username;
+			const password = variables.password;
 
 			const rememberMe = variables.rememberMe;
 			if (rememberMe) {
