@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import { SideBarItems } from '../BigFeet.Page';
 
-import { useLogout } from '../../hooks/authentication.hooks';
 import { usePrefetchCustomersQuery } from '../../hooks/customer.hooks';
 import { usePrefetchEmployeesQuery } from '../../hooks/employee.hooks';
 import { usePrefetchServicesQuery } from '../../hooks/service.hooks';
