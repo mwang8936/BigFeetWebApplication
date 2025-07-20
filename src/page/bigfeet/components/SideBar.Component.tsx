@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import { SideBarItems } from '../BigFeet.Page';
 
-import { useLogout } from '../../hooks/authentication.hooks';
 import { usePrefetchCustomersQuery } from '../../hooks/customer.hooks';
 import { usePrefetchEmployeesQuery } from '../../hooks/employee.hooks';
 import { usePrefetchServicesQuery } from '../../hooks/service.hooks';
@@ -14,6 +13,7 @@ import PayRollIcon from '../../../assets/Payroll_Icon.svg';
 import ProfileIcon from '../../../assets/Profile_Icon.svg';
 import SchedulerIcon from '../../../assets/Scheduler_Icon.svg';
 import ServicesIcon from '../../../assets/Services_Icon.svg';
+import { useLogoutMutation } from '../../hooks/profile.hooks';
 
 interface SideBarProp {
 	selectedIndex: number;
@@ -32,7 +32,7 @@ const SideBar: FC<SideBarProp> = ({
 	const prefetchServices = usePrefetchServicesQuery();
 	const prefetchCustomers = usePrefetchCustomersQuery();
 
-	const logout = useLogout();
+	const logOutMutation = useLogoutMutation({});
 
 	return (
 		<div className="sidebar">
@@ -45,7 +45,8 @@ const SideBar: FC<SideBarProp> = ({
 					}
 					onClick={() => {
 						onIndexSelected(SideBarItems.Profile);
-					}}>
+					}}
+				>
 					<img src={ProfileIcon} className="h-16 w-16" />
 
 					<span className="sidebar-tip group-hover:scale-100">
@@ -63,7 +64,8 @@ const SideBar: FC<SideBarProp> = ({
 					}
 					onClick={() => {
 						onIndexSelected(SideBarItems.Scheduler);
-					}}>
+					}}
+				>
 					<img src={SchedulerIcon} className="h-16 w-16" />
 
 					<span className="sidebar-tip group-hover:scale-100">
@@ -81,7 +83,8 @@ const SideBar: FC<SideBarProp> = ({
 					}
 					onClick={() => {
 						onIndexSelected(SideBarItems.PayRoll);
-					}}>
+					}}
+				>
 					<img src={PayRollIcon} className="h-16 w-16" />
 
 					<span className="sidebar-tip group-hover:scale-100">
@@ -100,7 +103,8 @@ const SideBar: FC<SideBarProp> = ({
 					onMouseEnter={prefetchEmployees}
 					onClick={() => {
 						onIndexSelected(SideBarItems.Employees);
-					}}>
+					}}
+				>
 					<img src={EmployeesIcon} className="h-16 w-16" />
 
 					<span className="sidebar-tip group-hover:scale-100">
@@ -119,7 +123,8 @@ const SideBar: FC<SideBarProp> = ({
 					onMouseEnter={prefetchServices}
 					onClick={() => {
 						onIndexSelected(SideBarItems.Services);
-					}}>
+					}}
+				>
 					<img src={ServicesIcon} className="h-16 w-16" />
 
 					<span className="sidebar-tip group-hover:scale-100">
@@ -138,7 +143,8 @@ const SideBar: FC<SideBarProp> = ({
 					onMouseEnter={prefetchCustomers}
 					onClick={() => {
 						onIndexSelected(SideBarItems.Customers);
-					}}>
+					}}
+				>
 					<img src={CustomersIcon} className="h-16 w-16" />
 
 					<span className="sidebar-tip group-hover:scale-100">
@@ -147,7 +153,10 @@ const SideBar: FC<SideBarProp> = ({
 				</div>
 			)}
 
-			<div className="sidebar-icon sidebar-login" onClick={logout}>
+			<div
+				className="sidebar-icon sidebar-login"
+				onClick={() => logOutMutation.mutate()}
+			>
 				{t('Log Out')}
 			</div>
 		</div>

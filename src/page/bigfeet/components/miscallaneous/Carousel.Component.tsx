@@ -1,32 +1,50 @@
-// src/components/CustomCarousel.tsx
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 
 interface CarouselProps {
-	items: React.ReactNode[]; // Accepts an array of React nodes for carousel items
+	items: React.ReactNode[];
 }
 
 const Carousel: FC<CarouselProps> = ({ items }) => {
 	const [currentIndex, setCurrentIndex] = useState(0);
+	const [containerHeight, setContainerHeight] = useState<number | undefined>(
+		undefined
+	);
+	const containerRef = useRef<HTMLDivElement | null>(null);
+	const currentItemRef = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
-		if (currentIndex > items.length - 1) {
-			setCurrentIndex(items.length - 1);
+		const measureHeight = () => {
+			if (currentItemRef.current) {
+				setContainerHeight(currentItemRef.current.offsetHeight);
+			}
+		};
+
+		measureHeight();
+
+		// Optional: observe height changes for dynamic content
+		const resizeObserver = new ResizeObserver(measureHeight);
+		if (currentItemRef.current) {
+			resizeObserver.observe(currentItemRef.current);
 		}
-	}, [items.length]);
+
+		return () => resizeObserver.disconnect();
+	}, [currentIndex]);
 
 	const goToPrevious = () => {
-		setCurrentIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : prevIndex));
+		setCurrentIndex((prev) => Math.max(0, prev - 1));
 	};
 
 	const goToNext = () => {
-		setCurrentIndex((prevIndex) =>
-			prevIndex < items.length - 1 ? prevIndex + 1 : prevIndex
-		);
+		setCurrentIndex((prev) => Math.min(items.length - 1, prev + 1));
 	};
 
 	return (
-		<div className="relative w-full mx-auto">
-			{/* Dots on Top */}
+		<div
+			ref={containerRef}
+			className="relative w-full mx-auto transition-all duration-300"
+			style={{ height: containerHeight }}
+		>
+			{/* Dots */}
 			<div className="flex justify-center mb-2">
 				{items.map((_, index) => (
 					<div
@@ -34,48 +52,50 @@ const Carousel: FC<CarouselProps> = ({ items }) => {
 						className={`cursor-pointer w-3 h-3 mx-1 rounded-full ${
 							index === currentIndex ? 'bg-blue-600' : 'bg-gray-300'
 						}`}
-						onClick={() => setCurrentIndex(index)} // Allow jumping to specific slide on dot click
+						onClick={() => setCurrentIndex(index)}
 					/>
 				))}
 			</div>
 
-			<div className="flex justify-between items-center">
-				{/* Disable left arrow if at first item */}
-				<button
-					onClick={goToPrevious}
-					className={`absolute left-0 z-10 p-2 bg-gray-600 text-white rounded ${
-						currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''
-					}`}
-					disabled={currentIndex === 0} // Disable button
-				>
-					&#10094; {/* Left arrow */}
-				</button>
-
-				<div className="overflow-hidden w-full">
+			{/* Slide Container */}
+			<div className="relative w-full">
+				{items.map((item, index) => (
 					<div
-						className="flex transition-transform duration-500"
-						style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
-						{items.map((item, index) => (
-							<div key={index} className="w-full flex-shrink-0 px-8">
-								{item}
-							</div>
-						))}
+						key={index}
+						ref={index === currentIndex ? currentItemRef : null}
+						className={`absolute top-0 left-0 w-full transition-opacity duration-500 ${
+							index === currentIndex
+								? 'opacity-100 relative'
+								: 'opacity-0 pointer-events-none'
+						}`}
+					>
+						<div className="px-8">{item}</div>
 					</div>
-				</div>
-
-				{/* Disable right arrow if at last item */}
-				<button
-					onClick={goToNext}
-					className={`absolute right-0 z-10 p-2 bg-gray-600 text-white rounded ${
-						currentIndex === items.length - 1
-							? 'opacity-50 cursor-not-allowed'
-							: ''
-					}`}
-					disabled={currentIndex === items.length - 1} // Disable button
-				>
-					&#10095; {/* Right arrow */}
-				</button>
+				))}
 			</div>
+
+			{/* Navigation Buttons */}
+			<button
+				onClick={goToPrevious}
+				className={`absolute left-0 top-1/2 transform -translate-y-1/2 z-10 p-2 bg-gray-600 text-white rounded ${
+					currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''
+				}`}
+				disabled={currentIndex === 0}
+			>
+				&#10094;
+			</button>
+
+			<button
+				onClick={goToNext}
+				className={`absolute right-0 top-1/2 transform -translate-y-1/2 z-10 p-2 bg-gray-600 text-white rounded ${
+					currentIndex === items.length - 1
+						? 'opacity-50 cursor-not-allowed'
+						: ''
+				}`}
+				disabled={currentIndex === items.length - 1}
+			>
+				&#10095;
+			</button>
 		</div>
 	);
 };

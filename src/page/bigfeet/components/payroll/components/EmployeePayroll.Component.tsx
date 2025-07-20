@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 
 import AcupuncturistPayrollTable from './AcupuncturistPayrollTable.Component';
 import AcupunctureReportTable from './AcupunctureReportTable.Component';
@@ -26,6 +26,8 @@ import {
 } from '../../../../../models/enums';
 import Payroll from '../../../../../models/Payroll.Model';
 import User from '../../../../../models/User.Model';
+import FilledPermissionsButton from '../../miscallaneous/FilledPermissionsButton.Component';
+import { ButtonType } from '../../miscallaneous/PermissionsButton.Component';
 
 interface EmployeePayrollProp {
 	employee: Employee;
@@ -33,6 +35,8 @@ interface EmployeePayrollProp {
 
 const EmployeePayroll: FC<EmployeePayrollProp> = ({ employee }) => {
 	const { date } = usePayrollDateContext();
+
+	const [isCashOutMode, setIsCashOutMode] = useState<boolean>(false);
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
@@ -71,17 +75,35 @@ const EmployeePayroll: FC<EmployeePayrollProp> = ({ employee }) => {
 		if (payroll) {
 			switch (payroll.option) {
 				case PayrollOption.ACUPUNCTURIST:
-					items.push(<AcupuncturistPayrollTable payroll={payroll} />);
+					items.push(
+						<AcupuncturistPayrollTable
+							payroll={payroll}
+							isCashOutMode={isCashOutMode}
+						/>
+					);
 					break;
 				case PayrollOption.RECEPTIONIST:
-					items.push(<ReceptionistPayrollTable payroll={payroll} />);
+					items.push(
+						<ReceptionistPayrollTable
+							payroll={payroll}
+							isCashOutMode={isCashOutMode}
+						/>
+					);
 					break;
 				case PayrollOption.STORE_EMPLOYEE:
-					items.push(<StoreEmployeePayrollTable payroll={payroll} />);
+					items.push(
+						<StoreEmployeePayrollTable
+							payroll={payroll}
+							isCashOutMode={isCashOutMode}
+						/>
+					);
 					break;
 				case PayrollOption.STORE_EMPLOYEE_WITH_TIPS_AND_CASH:
 					items.push(
-						<StoreEmployeeWithCashAndTipsPayrollTable payroll={payroll} />
+						<StoreEmployeeWithCashAndTipsPayrollTable
+							payroll={payroll}
+							isCashOutMode={isCashOutMode}
+						/>
 					);
 					break;
 			}
@@ -100,7 +122,22 @@ const EmployeePayroll: FC<EmployeePayrollProp> = ({ employee }) => {
 		}
 	}
 
-	return <Carousel items={items} />;
+	return (
+		<div className="flex flex-col flex-shrink-0 overflow-hidden">
+			<Carousel items={items} />
+			{payrolls.length > 0 && (
+				<FilledPermissionsButton
+					btnType={isCashOutMode ? ButtonType.ADD : ButtonType.CANCEL}
+					btnTitle={isCashOutMode ? 'Payroll' : 'Cash Out'}
+					disabled={false}
+					missingPermissionMessage={''}
+					onClick={() => {
+						setIsCashOutMode(!isCashOutMode);
+					}}
+				/>
+			)}
+		</div>
+	);
 };
 
 export default EmployeePayroll;

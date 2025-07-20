@@ -1,8 +1,10 @@
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+
+import CashAndTipPayrollTable from './CashAndTipPayrollTable';
 
 import { usePayrollDateContext } from '../PayRoll.Component';
 
@@ -36,6 +38,7 @@ import { formatTimeFromDate } from '../../../../../utils/string.utils';
 
 interface ReceptionistPayrollTableProp {
 	payroll: Payroll;
+	isCashOutMode: boolean;
 }
 
 interface RowData {
@@ -52,6 +55,7 @@ interface RowData {
 
 const ReceptionistPayrollTable: FC<ReceptionistPayrollTableProp> = ({
 	payroll,
+	isCashOutMode,
 }) => {
 	const { t } = useTranslation();
 
@@ -212,7 +216,7 @@ const ReceptionistPayrollTable: FC<ReceptionistPayrollTableProp> = ({
 		);
 	};
 
-	return (
+	const payrollTable = (
 		<div>
 			<table
 				className="table-fixed w-full text-xl"
@@ -424,6 +428,12 @@ const ReceptionistPayrollTable: FC<ReceptionistPayrollTableProp> = ({
 			/>
 		</div>
 	);
+
+	const cashOutTable = useMemo(() => {
+		return <CashAndTipPayrollTable payroll={payroll} />;
+	}, [payroll]);
+
+	return isCashOutMode ? cashOutTable : payrollTable;
 };
 
 export default ReceptionistPayrollTable;

@@ -15,6 +15,7 @@ export function login(request: LoginRequest) {
 		baseURL: BASE_API_URL,
 		url: loginPath,
 		data: request,
+		withCredentials: true,
 	};
 
 	return axios(config)
