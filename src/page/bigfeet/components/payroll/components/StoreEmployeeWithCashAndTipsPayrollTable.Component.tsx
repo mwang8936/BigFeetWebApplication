@@ -1,8 +1,10 @@
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+
+import CashAndTipPayrollTable from './CashAndTipPayrollTable';
 
 import { usePayrollDateContext } from '../PayRoll.Component';
 
@@ -35,6 +37,7 @@ import {
 
 interface StoreEmployeeWithCashAndTipsPayrollTableProp {
 	payroll: Payroll;
+	isCashOutMode: boolean;
 }
 
 interface RowData {
@@ -47,7 +50,7 @@ interface RowData {
 
 const StoreEmployeeWithCashAndTipsPayrollTable: FC<
 	StoreEmployeeWithCashAndTipsPayrollTableProp
-> = ({ payroll }) => {
+> = ({ payroll, isCashOutMode }) => {
 	const { t } = useTranslation();
 
 	const { date } = usePayrollDateContext();
@@ -104,6 +107,7 @@ const StoreEmployeeWithCashAndTipsPayrollTable: FC<
 			const cash =
 				requestedSessions +
 				holidayPay +
+				scheduleData.award_amount +
 				scheduleData.vip_amount +
 				scheduleData.total_cash_out;
 
@@ -199,7 +203,7 @@ const StoreEmployeeWithCashAndTipsPayrollTable: FC<
 		);
 	};
 
-	return (
+	const payrollTable = (
 		<div>
 			<table
 				className="table-fixed w-full text-xl"
@@ -373,6 +377,12 @@ const StoreEmployeeWithCashAndTipsPayrollTable: FC<
 			/>
 		</div>
 	);
+
+	const cashOutTable = useMemo(() => {
+		return <CashAndTipPayrollTable payroll={payroll} />;
+	}, [payroll]);
+
+	return isCashOutMode ? cashOutTable : payrollTable;
 };
 
 export default StoreEmployeeWithCashAndTipsPayrollTable;

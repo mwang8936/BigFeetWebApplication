@@ -1,67 +1,49 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-
-import CashAndTipPayrollTable from './CashAndTipPayrollTable';
 
 import { usePayrollDateContext } from '../PayRoll.Component';
 
 import FilledPermissionsButton from '../../miscallaneous/FilledPermissionsButton.Component';
 import { ButtonType } from '../../miscallaneous/PermissionsButton.Component';
 
-import EditPayrollModal from '../../miscallaneous/modals/payroll/EditPayrollModal.Component';
-
 import { useRefreshPayrollMutation } from '../../../../hooks/payroll.hooks';
 import { useUserQuery } from '../../../../hooks/profile.hooks';
 
-import ERRORS from '../../../../../constants/error.constants';
-
-import {
-	Language,
-	PayrollPart,
-	Permissions,
-} from '../../../../../models/enums';
+import { Language, PayrollPart } from '../../../../../models/enums';
 import Payroll from '../../../../../models/Payroll.Model';
 import User from '../../../../../models/User.Model';
 
-import { getShortMonthString } from '../../../../../utils/date.utils';
 import {
-	moneyToString,
-	sessionToString,
-} from '../../../../../utils/number.utils';
+	getShortMonthString,
+	isHoliday,
+} from '../../../../../utils/date.utils';
+import { moneyToString } from '../../../../../utils/number.utils';
 
-interface AcupuncturistPayrollTableProp {
+interface CashAndTipPayrollTableProp {
 	payroll: Payroll;
-	isCashOutMode: boolean;
 }
 
 interface RowData {
 	day: number;
-	body: number;
-	feet: number;
-	acupuncture: number;
+	cash: number;
+	tips: number;
+	total: number;
 }
 
-const AcupuncturistPayrollTable: FC<AcupuncturistPayrollTableProp> = ({
+const CashAndTipPayrollTable: FC<CashAndTipPayrollTableProp> = ({
 	payroll,
-	isCashOutMode,
 }) => {
 	const { t } = useTranslation();
 
 	const { date } = usePayrollDateContext();
 
-	const [openEditModal, setOpenEditModal] = useState<boolean>(false);
-
 	const [exporting, setExporting] = useState<boolean>(false);
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
-
-	const editable = user.permissions.includes(
-		Permissions.PERMISSION_UPDATE_PAYROLL
-	);
 
 	const language = user.language;
 
@@ -87,41 +69,48 @@ const AcupuncturistPayrollTable: FC<AcupuncturistPayrollTableProp> = ({
 		const scheduleData = payroll.data.find((row) => row.date.getDate() === day);
 
 		if (scheduleData) {
+			const totalSessions =
+				scheduleData.acupuncture_sessions +
+				scheduleData.body_sessions +
+				scheduleData.feet_sessions;
+
+			const requestedSessions =
+				scheduleData.requested_acupuncture_sessions +
+				scheduleData.requested_body_sessions +
+				scheduleData.requested_feet_sessions;
+
+			const holidayPay = isHoliday(new Date(date.year, date.month - 1, day))
+				? 2 * totalSessions
+				: 0;
+
+			const cash =
+				requestedSessions +
+				holidayPay +
+				scheduleData.award_amount +
+				scheduleData.vip_amount +
+				scheduleData.total_cash_out;
+
+			const tips = scheduleData.tips * 0.9;
+
 			return {
 				day,
-				body: scheduleData.body_sessions,
-				feet: scheduleData.feet_sessions,
-				acupuncture: scheduleData.acupuncture_sessions,
+				cash,
+				tips,
+				total: cash + tips,
 			};
 		} else {
 			return {
 				day,
-				body: 0,
-				feet: 0,
-				acupuncture: 0,
+				cash: 0,
+				tips: 0,
+				total: 0,
 			};
 		}
 	});
 
-	const bodyRate = payroll.employee.body_rate ?? 0;
-	const feetRate = payroll.employee.feet_rate ?? 0;
-	const acupunctureRate = payroll.employee.acupuncture_rate ?? 0;
-
-	const totalBodySessions = data
-		.map((row) => row.body)
-		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
-	const totalFeetSessions = data
-		.map((row) => row.feet)
-		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
-	const totalAcupunctureSessions = data
-		.map((row) => row.acupuncture)
-		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
-
-	const totalBodyMoney = totalBodySessions * bodyRate;
-	const totalFeetMoney = totalFeetSessions * feetRate;
-	const totalAcupunctureMoney = totalAcupunctureSessions * acupunctureRate;
-
-	const cheque = totalBodyMoney + totalFeetMoney + totalAcupunctureMoney;
+	const totalCash = data.reduce((sum, row) => sum + row.cash, 0);
+	const totalTips = data.reduce((sum, row) => sum + row.tips, 0);
+	const total = totalCash + totalTips;
 
 	const refreshPayrollMutation = useRefreshPayrollMutation({});
 
@@ -137,7 +126,9 @@ const AcupuncturistPayrollTable: FC<AcupuncturistPayrollTableProp> = ({
 	const exportToPDF = async () => {
 		setExporting(true);
 
-		const input = document.getElementById(`payroll-table-${payroll.part}`);
+		const input = document.getElementById(
+			`cash-and-tips-table-${payroll.part}`
+		);
 		if (!input) return;
 
 		const canvas = await html2canvas(input, {
@@ -170,11 +161,11 @@ const AcupuncturistPayrollTable: FC<AcupuncturistPayrollTableProp> = ({
 		);
 	};
 
-	const payrollTable = (
+	return (
 		<div>
 			<table
 				className="table-fixed w-full text-xl"
-				id={`payroll-table-${payroll.part}`}
+				id={`cash-and-tips-table-${payroll.part}`}
 			>
 				<thead>
 					<tr>
@@ -182,13 +173,13 @@ const AcupuncturistPayrollTable: FC<AcupuncturistPayrollTableProp> = ({
 							{displayDate()}
 						</th>
 						<th className="border border-black p-2 border-2 font-bold w-[30%]">
-							{t('Body')}
+							{t('Cash')}
 						</th>
 						<th className="border border-black p-2 border-2 font-bold w-[30%]">
-							{t('Feet')}
+							{t('Tips')}
 						</th>
 						<th className="border border-black p-2 border-2 font-bold w-[30%]">
-							{t('Acupuncture')}
+							{t('Total')}
 						</th>
 					</tr>
 				</thead>
@@ -200,13 +191,13 @@ const AcupuncturistPayrollTable: FC<AcupuncturistPayrollTableProp> = ({
 						>
 							<td className="border border-gray-300 text-center">{row.day}</td>
 							<td className="border border-gray-300 text-right pr-2">
-								{sessionToString(row.body)}
+								{moneyToString(row.cash)}
 							</td>
 							<td className="border border-gray-300 text-right pr-2">
-								{sessionToString(row.feet)}
+								{moneyToString(row.tips)}
 							</td>
 							<td className="border border-gray-300 text-right pr-2">
-								{sessionToString(row.acupuncture)}
+								{moneyToString(row.total)}
 							</td>
 						</tr>
 					))}
@@ -214,39 +205,13 @@ const AcupuncturistPayrollTable: FC<AcupuncturistPayrollTableProp> = ({
 					<tr className="bg-blue-100 font-bold">
 						<td className="border-black border-2 pl-2">{t('SUM')}</td>
 						<td className="border-black border-2 text-right pr-2">
-							{sessionToString(totalBodySessions)}
+							{moneyToString(totalCash)}
 						</td>
 						<td className="border-black border-2 text-right pr-2">
-							{sessionToString(totalFeetSessions)}
+							{moneyToString(totalTips)}
 						</td>
 						<td className="border-black border-2 text-right pr-2">
-							{sessionToString(totalAcupunctureSessions)}
-						</td>
-					</tr>
-
-					<tr className="bg-green-100 font-bold">
-						<td className="border-black border-2 pl-2">{t('PAY/PER')}</td>
-						<td className="border-black border-2 text-right pr-2">
-							${moneyToString(bodyRate)}
-						</td>
-						<td className="border-black border-2 text-right pr-2">
-							${moneyToString(feetRate)}
-						</td>
-						<td className="border-black border-2 text-right pr-2">
-							${moneyToString(acupunctureRate)}
-						</td>
-					</tr>
-
-					<tr className="bg-yellow-100 font-bold">
-						<td className="border-black border-2 pl-2">{t('TOTAL')}</td>
-						<td className="border-black border-2 text-right pr-2">
-							${moneyToString(totalBodyMoney)}
-						</td>
-						<td className="border-black border-2 text-right pr-2">
-							${moneyToString(totalFeetMoney)}
-						</td>
-						<td className="border-black border-2 text-right pr-2">
-							${moneyToString(totalAcupunctureMoney)}
+							{moneyToString(total)}
 						</td>
 					</tr>
 
@@ -254,10 +219,10 @@ const AcupuncturistPayrollTable: FC<AcupuncturistPayrollTableProp> = ({
 						<td />
 						<td />
 						<td className="border-black border-2 pl-2 bg-yellow-400">
-							{t('CHEQUE')}:
+							{t('CASH OUT')}:
 						</td>
 						<td className="border-black border-2 text-right pr-2 bg-yellow-400">
-							${moneyToString(cheque)}
+							${moneyToString(total)}
 						</td>
 					</tr>
 				</tbody>
@@ -279,15 +244,6 @@ const AcupuncturistPayrollTable: FC<AcupuncturistPayrollTableProp> = ({
 			/>
 
 			<FilledPermissionsButton
-				btnTitle={'Edit Payroll'}
-				disabled={!editable}
-				missingPermissionMessage={ERRORS.payroll.permissions.edit}
-				onClick={() => {
-					setOpenEditModal(true);
-				}}
-			/>
-
-			<FilledPermissionsButton
 				btnTitle={'Export Payroll'}
 				btnType={ButtonType.ADD}
 				disabled={exporting}
@@ -296,20 +252,8 @@ const AcupuncturistPayrollTable: FC<AcupuncturistPayrollTableProp> = ({
 					exportToPDF().finally(() => setExporting(false));
 				}}
 			/>
-
-			<EditPayrollModal
-				open={openEditModal}
-				setOpen={setOpenEditModal}
-				payroll={payroll}
-			/>
 		</div>
 	);
-
-	const cashOutTable = useMemo(() => {
-		return <CashAndTipPayrollTable payroll={payroll} />;
-	}, [payroll]);
-
-	return isCashOutMode ? cashOutTable : payrollTable;
 };
 
-export default AcupuncturistPayrollTable;
+export default CashAndTipPayrollTable;
