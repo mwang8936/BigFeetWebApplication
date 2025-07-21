@@ -6,6 +6,7 @@ import { PlusCircleIcon } from '@heroicons/react/24/outline';
 
 import AddBottom from '../../AddBottom.Component';
 
+import AddDropDown from '../../../add/AddDropDown.Component';
 import AddInput from '../../../add/AddInput.Component';
 import AddMultiSelect from '../../../add/AddMultiSelect.Component';
 import AddPayRate from '../../../add/AddPayRate.Component';
@@ -16,6 +17,7 @@ import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 import { useAddVipPackageMutation } from '../../../../../../hooks/vip-package.hooks';
 
+import { paymentMethodDropDownItems } from '../../../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
 import NAMES from '../../../../../../../constants/name.constants';
@@ -25,7 +27,11 @@ import PATTERNS from '../../../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
 
 import Employee from '../../../../../../../models/Employee.Model';
-import { Permissions, Role } from '../../../../../../../models/enums';
+import {
+	PaymentMethod,
+	Permissions,
+	Role,
+} from '../../../../../../../models/enums';
 import User from '../../../../../../../models/User.Model';
 
 import { AddVipPackageRequest } from '../../../../../../../models/requests/Vip-Package.Request.Model';
@@ -41,6 +47,8 @@ const AddVip: FC<AddVipProp> = ({ setOpen, defaultEmployeeId }) => {
 	const { date } = useScheduleDateContext();
 
 	const [serialInput, setSerialInput] = useState<string | null>(null);
+	const [paymentMethodInput, setPaymentMethodInput] =
+		useState<PaymentMethod | null>(null);
 	const [soldAmountInput, setSoldAmountInput] = useState<number | null>(null);
 	const [employeesInput, setEmployeesInput] = useState<number[]>(
 		defaultEmployeeId ? [defaultEmployeeId] : []
@@ -80,6 +88,7 @@ const AddVip: FC<AddVipProp> = ({ setOpen, defaultEmployeeId }) => {
 	useEffect(() => {
 		const missingRequiredInput =
 			serialInput === null ||
+			paymentMethodInput === null ||
 			soldAmountInput === null ||
 			employeesInput.length === 0 ||
 			commissionAmountInput === null;
@@ -87,6 +96,7 @@ const AddVip: FC<AddVipProp> = ({ setOpen, defaultEmployeeId }) => {
 		setMissingRequiredInput(missingRequiredInput);
 	}, [
 		serialInput,
+		paymentMethodInput,
 		soldAmountInput,
 		employeesInput.length,
 		commissionAmountInput,
@@ -108,12 +118,14 @@ const AddVip: FC<AddVipProp> = ({ setOpen, defaultEmployeeId }) => {
 
 	const onAdd = () => {
 		const serial = serialInput as string;
+		const payment_method = paymentMethodInput as PaymentMethod;
 		const sold_amount = soldAmountInput as number;
 		const employee_ids = employeesInput;
 		const commission_amount = commissionAmountInput as number;
 
 		const addVipPackageRequest: AddVipPackageRequest = {
 			serial,
+			payment_method,
 			sold_amount,
 			commission_amount,
 			date,
@@ -137,7 +149,8 @@ const AddVip: FC<AddVipProp> = ({ setOpen, defaultEmployeeId }) => {
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
-							className="text-base font-semibold leading-6 text-gray-900">
+							className="text-base font-semibold leading-6 text-gray-900"
+						>
 							{t('Add Vip Package')}
 						</Dialog.Title>
 
@@ -158,6 +171,25 @@ const AddVip: FC<AddVipProp> = ({ setOpen, defaultEmployeeId }) => {
 									invalidMessage: ERRORS.vip_package.serial.invalid,
 								}}
 								placeholder={PLACEHOLDERS.vip_package.serial}
+							/>
+
+							<AddDropDown
+								option={
+									paymentMethodDropDownItems[
+										paymentMethodDropDownItems.findIndex(
+											(option) => option.id === paymentMethodInput
+										) || 0
+									]
+								}
+								options={paymentMethodDropDownItems}
+								setOption={(option) => {
+									setPaymentMethodInput(option.id as PaymentMethod | null);
+								}}
+								label={LABELS.vip_package.payment_method}
+								validationProp={{
+									required: true,
+									requiredMessage: ERRORS.vip_package.payment_method.required,
+								}}
 							/>
 
 							<AddPayRate

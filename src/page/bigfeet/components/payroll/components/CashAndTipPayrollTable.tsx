@@ -191,13 +191,13 @@ const CashAndTipPayrollTable: FC<CashAndTipPayrollTableProp> = ({
 						>
 							<td className="border border-gray-300 text-center">{row.day}</td>
 							<td className="border border-gray-300 text-right pr-2">
-								{moneyToString(row.cash)}
+								${moneyToString(row.cash)}
 							</td>
 							<td className="border border-gray-300 text-right pr-2">
-								{moneyToString(row.tips)}
+								${moneyToString(row.tips)}
 							</td>
 							<td className="border border-gray-300 text-right pr-2">
-								{moneyToString(row.total)}
+								${moneyToString(row.total)}
 							</td>
 						</tr>
 					))}
@@ -205,13 +205,13 @@ const CashAndTipPayrollTable: FC<CashAndTipPayrollTableProp> = ({
 					<tr className="bg-blue-100 font-bold">
 						<td className="border-black border-2 pl-2">{t('SUM')}</td>
 						<td className="border-black border-2 text-right pr-2">
-							{moneyToString(totalCash)}
+							${moneyToString(totalCash)}
 						</td>
 						<td className="border-black border-2 text-right pr-2">
-							{moneyToString(totalTips)}
+							${moneyToString(totalTips)}
 						</td>
 						<td className="border-black border-2 text-right pr-2">
-							{moneyToString(total)}
+							${moneyToString(total)}
 						</td>
 					</tr>
 

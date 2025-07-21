@@ -1,5 +1,8 @@
+import { PaymentMethod } from '../enums';
+
 export interface UpdateVipPackageRequest {
 	serial?: string;
+	payment_method?: PaymentMethod;
 	sold_amount?: number;
 	commission_amount?: number;
 	date?: Date;
@@ -8,6 +11,7 @@ export interface UpdateVipPackageRequest {
 
 export interface AddVipPackageRequest {
 	serial: string;
+	payment_method: PaymentMethod;
 	sold_amount: number;
 	commission_amount: number;
 	date: Date;

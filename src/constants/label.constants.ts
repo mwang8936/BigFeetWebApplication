@@ -83,6 +83,7 @@ const LABELS = {
 	},
 	vip_package: {
 		serial: 'Serial',
+		payment_method: 'Payment Method',
 		sold_amount: 'Sold Amount',
 		commission_amount: 'Commission Amount',
 		employee_ids: 'Employees',

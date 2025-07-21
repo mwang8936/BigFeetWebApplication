@@ -8,6 +8,7 @@ import DeleteVipModal from './DeleteVipModal.Component';
 
 import EditBottom from '../../EditBottom.Component';
 
+import EditableDropDown from '../../../editable/EditableDropDown.Component';
 import EditableInput from '../../../editable/EditableInput.Component';
 import EditableMultiSelect from '../../../editable/EditableMultiSelect.Component';
 import EditablePayRate from '../../../editable/EditablePayRate.Component';
@@ -18,6 +19,7 @@ import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 import { useUpdateVipPackageMutation } from '../../../../../../hooks/vip-package.hooks';
 
+import { paymentMethodDropDownItems } from '../../../../../../../constants/drop-down.constants';
 import ERRORS from '../../../../../../../constants/error.constants';
 import LABELS from '../../../../../../../constants/label.constants';
 import LENGTHS from '../../../../../../../constants/lengths.constants';
@@ -27,7 +29,11 @@ import PATTERNS from '../../../../../../../constants/patterns.constants';
 import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
 
 import Employee from '../../../../../../../models/Employee.Model';
-import { Permissions, Role } from '../../../../../../../models/enums';
+import {
+	PaymentMethod,
+	Permissions,
+	Role,
+} from '../../../../../../../models/enums';
 import User from '../../../../../../../models/User.Model';
 import VipPackage from '../../../../../../../models/Vip-Package.Model';
 
@@ -50,6 +56,8 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 	const [serialInput, setSerialInput] = useState<string | null>(
 		vipPackage.serial
 	);
+	const [paymentMethodInput, setPaymentMethodInput] =
+		useState<PaymentMethod | null>(vipPackage.payment_method);
 	const [soldAmountInput, setSoldAmountInput] = useState<number | null>(
 		vipPackage.sold_amount
 	);
@@ -95,6 +103,10 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 	useEffect(() => {
 		const serial: string | null | undefined =
 			serialInput === vipPackage.serial ? undefined : serialInput;
+		const payment_method: PaymentMethod | null | undefined =
+			paymentMethodInput === vipPackage.payment_method
+				? undefined
+				: paymentMethodInput;
 		const sold_amount: number | null | undefined =
 			soldAmountInput === vipPackage.sold_amount ? undefined : soldAmountInput;
 		const employee_ids: number[] | undefined = arraysHaveSameContent(
@@ -110,6 +122,7 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 
 		const changesMade =
 			serial !== undefined ||
+			payment_method !== undefined ||
 			sold_amount !== undefined ||
 			employee_ids !== undefined ||
 			commission_amount !== undefined;
@@ -118,6 +131,7 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 
 		const missingRequiredInput =
 			serialInput === null ||
+			paymentMethodInput === null ||
 			soldAmountInput === null ||
 			employeesInput.length === 0 ||
 			commissionAmountInput === null;
@@ -125,6 +139,7 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 		setMissingRequiredInput(missingRequiredInput);
 	}, [
 		serialInput,
+		paymentMethodInput,
 		employeesInput.length,
 		soldAmountInput,
 		commissionAmountInput,
@@ -156,6 +171,10 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 	const onEdit = () => {
 		const serial: string | undefined =
 			serialInput === vipPackage.serial ? undefined : (serialInput as string);
+		const payment_method: PaymentMethod | undefined =
+			paymentMethodInput === vipPackage.payment_method
+				? undefined
+				: (paymentMethodInput as PaymentMethod);
 		const sold_amount: number | undefined =
 			soldAmountInput === vipPackage.sold_amount
 				? undefined
@@ -173,6 +192,7 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 
 		const editVipPackageRequest: UpdateVipPackageRequest = {
 			...(serial !== undefined && { serial }),
+			...(payment_method !== undefined && { payment_method }),
 			...(sold_amount !== undefined && { sold_amount }),
 			...(employee_ids !== undefined && { date }),
 			...(employee_ids !== undefined && { employee_ids }),
@@ -201,7 +221,8 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
-							className="text-base font-semibold leading-6 text-gray-900">
+							className="text-base font-semibold leading-6 text-gray-900"
+						>
 							{t('Edit Serial')}
 						</Dialog.Title>
 
@@ -223,6 +244,34 @@ const EditVip: FC<EditVipProp> = ({ setOpen, vipPackage }) => {
 									invalidMessage: ERRORS.vip_package.serial.invalid,
 								}}
 								placeholder={PLACEHOLDERS.vip_package.serial}
+								editable={editable}
+								missingPermissionMessage={ERRORS.vip_package.permissions.edit}
+							/>
+
+							<EditableDropDown
+								originalOption={
+									paymentMethodDropDownItems[
+										paymentMethodDropDownItems.findIndex(
+											(option) => option.id === vipPackage.payment_method
+										) || 0
+									]
+								}
+								option={
+									paymentMethodDropDownItems[
+										paymentMethodDropDownItems.findIndex(
+											(option) => option.id === paymentMethodInput
+										) || 0
+									]
+								}
+								options={paymentMethodDropDownItems}
+								setOption={(option) => {
+									setPaymentMethodInput(option.id as PaymentMethod | null);
+								}}
+								label={LABELS.vip_package.payment_method}
+								validationProp={{
+									required: true,
+									requiredMessage: ERRORS.vip_package.payment_method.required,
+								}}
 								editable={editable}
 								missingPermissionMessage={ERRORS.vip_package.permissions.edit}
 							/>
