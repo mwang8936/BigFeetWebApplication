@@ -90,7 +90,9 @@ const EditGiftCard: FC<EditGiftCardProp> = ({ setOpen, giftCard }) => {
 		setChangesMade(changesMade);
 
 		const missingRequiredInput =
-			date === null || payment_method === null || payment_amount === null;
+			dateInput === null ||
+			paymentMethodInput === null ||
+			paymentAmountInput === null;
 
 		setMissingRequiredInput(missingRequiredInput);
 	}, [dateInput, paymentMethodInput, paymentAmountInput]);
@@ -159,7 +161,8 @@ const EditGiftCard: FC<EditGiftCardProp> = ({ setOpen, giftCard }) => {
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
 						<Dialog.Title
 							as="h3"
-							className="text-base font-semibold leading-6 text-gray-900">
+							className="text-base font-semibold leading-6 text-gray-900"
+						>
 							{t('Edit Gift Card')}: {giftCard.gift_card_id}
 						</Dialog.Title>
 

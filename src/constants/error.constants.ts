@@ -428,6 +428,9 @@ const ERRORS = {
 				value: { length: LENGTHS.vip_package.serial },
 			},
 		},
+		payment_method: {
+			required: 'Payment Method cannot be empty.',
+		},
 		sold_amount: {
 			required: 'Sold Amount cannot be empty.',
 			invalid: {

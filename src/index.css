@@ -3,297 +3,301 @@
 @tailwind utilities;
 
 @layer base {
-  img {
-    @apply inline-block; /* Restores img display to inline-block */
-    vertical-align: middle; /* Ensure vertical alignment is set */
-  }
+	img {
+		@apply inline-block; /* Restores img display to inline-block */
+		vertical-align: middle; /* Ensure vertical alignment is set */
+	}
 }
 
 @layer components {
+	/* Login Page */
+	.center-page {
+		@apply flex flex-col items-center justify-center h-screen;
+	}
 
-  /* Login Page */
-  .center-page {
-    @apply flex flex-col items-center justify-center h-screen
-  }
+	.login-form {
+		@apply mb-4 px-8 pt-6 pb-8 w-full max-w-xs bg-white shadow-md rounded;
+	}
 
-  .login-form {
-    @apply mb-4 px-8 pt-6 pb-8 w-full max-w-xs bg-white shadow-md rounded 
-  }
+	.login-title {
+		@apply block mb-3 text-gray-700 font-bold text-xl text-center;
+	}
 
-  .login-title {
-    @apply block mb-3 text-gray-700 font-bold text-xl text-center 
-  }
-
-  .input-form {
-    @apply mt-1 mb-3 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+	.input-form {
+		@apply mt-1 mb-3 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
     focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
     disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
     invalid:border-pink-500 invalid:text-pink-600
-    focus:invalid:border-pink-500 focus:invalid:ring-pink-500
-  }
+    focus:invalid:border-pink-500 focus:invalid:ring-pink-500;
+	}
 
-  .input-form-highlighted {
-    @apply mt-1 mb-3 block w-full px-3 py-2 bg-yellow-200 border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+	.input-form-highlighted {
+		@apply mt-1 mb-3 block w-full px-3 py-2 bg-yellow-200 border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
     focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
     disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
     invalid:border-pink-500 invalid:text-pink-600
-    focus:invalid:border-pink-500 focus:invalid:ring-pink-500
-  }
+    focus:invalid:border-pink-500 focus:invalid:ring-pink-500;
+	}
 
-  .show-password-login-div {
-    @apply absolute inset-y-0 left-0 flex items-center pl-3 mt-1 mb-3 z-20
-  }
+	.show-password-login-div {
+		@apply absolute inset-y-0 left-0 flex items-center pl-3 mt-1 mb-3 z-20;
+	}
 
-  .remember-me-label {
-    @apply block text-gray-700 text-sm font-bold
-  }
+	.remember-me-label {
+		@apply block text-gray-700 text-sm font-bold;
+	}
 
-  /* BigFeet Page */
-  .fill-horizontal {
-    @apply flex min-h-screen
-  }
+	/* BigFeet Page */
+	.fill-horizontal {
+		@apply flex min-h-screen;
+	}
 
-  .content-fill {
-    @apply grid landscape:grow landscape:h-screen landscape:ml-[9%] portrait:w-screen portrait:mt-[20%] portrait:sm:mt-[12%]
-  }
+	.content-fill {
+		@apply grid landscape:grow landscape:h-screen landscape:ml-[9%] portrait:w-screen portrait:mt-[20%] portrait:sm:mt-[12%];
+	}
 
-  .retry-div {
-    @apply m-auto text-gray-700 text-xl font-bold flex flex-col items-center justify-center
-  }
+	.retry-div {
+		@apply m-auto text-gray-700 text-xl font-bold flex flex-col items-center justify-center;
+	}
 
-  .centered-big-green-spin {
-    @apply animate-spin h-40 w-40 m-auto text-green-500
-  }
+	.centered-big-green-spin {
+		@apply animate-spin h-40 w-40 m-auto text-green-500;
+	}
 
-  /* SideBar */
-  .sidebar {
-    @apply fixed top-0 left-0 flex z-20 landscape:flex-col landscape:h-screen landscape:w-1/12 landscape:min-w-max landscape:min-h-max 
-    portrait:flex-row portrait:h-[10%] portrait:w-screen portrait:min-h-max  bg-primary shadow-lg 
-  }
+	/* SideBar */
+	.sidebar {
+		@apply fixed top-0 left-0 flex z-20 landscape:flex-col landscape:h-screen landscape:w-1/12 landscape:min-w-max landscape:min-h-max 
+    portrait:flex-row portrait:h-[10%] portrait:w-screen portrait:min-h-max  bg-primary shadow-lg;
+	}
 
-  .sidebar-icon {
-    @apply relative flex items-center justify-center landscape:w-full landscape:h-24 landscape:px-1 
+	.sidebar-icon {
+		@apply relative flex items-center justify-center landscape:w-full landscape:h-24 landscape:px-1 
     landscape:py-3  portrait:h-full portrait:py-1 portrait:px-3 portrait:w-24
-    hover:bg-secondary transition-all duration-200 ease-linear cursor-pointer select-none
-  }
+    hover:bg-secondary transition-all duration-200 ease-linear cursor-pointer select-none;
+	}
 
-  .sidebar-icon-selected {
-    @apply relative flex items-center justify-center landscape:w-full landscape:h-24 landscape:px-1 
+	.sidebar-icon-selected {
+		@apply relative flex items-center justify-center landscape:w-full landscape:h-24 landscape:px-1 
     landscape:py-3 portrait:h-full portrait:py-1 portrait:px-3 portrait:w-24
-    portrait:border-b-4 landscape:border-r-4 border-black bg-white pointer-events-none select-none
-  }
+    portrait:border-b-4 landscape:border-r-4 border-black bg-white pointer-events-none select-none;
+	}
 
-  .sidebar-tip {
-    @apply absolute w-auto p-2 m-2 min-w-max landscape:left-[100%] portrait:top-[100%] rounded-md shadow-md text-white 
-    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-left
-  }
+	.sidebar-tip {
+		@apply absolute w-auto p-2 m-2 min-w-max landscape:left-[100%] portrait:top-[100%] rounded-md shadow-md text-white 
+    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-left;
+	}
 
-  .sidebar-login {
-    @apply landscape:mt-auto landscape:py-5 portrait:ml-auto portrait:px-5 text-center
-  }
+	.sidebar-login {
+		@apply landscape:mt-auto landscape:py-5 portrait:ml-auto portrait:px-5 text-center;
+	}
 
-  /* Non-SideBar */
-  .non-sidebar {
-    @apply flex flex-col w-11/12 h-screen mx-auto
-  }
+	/* Non-SideBar */
+	.non-sidebar {
+		@apply flex flex-col w-11/12 h-screen mx-auto;
+	}
 
-  .dates-bar {
-    @apply flex flex-col text-sm font-medium text-gray-500 italic
-  }
+	.dates-bar {
+		@apply flex flex-col text-sm font-medium text-gray-500 italic;
+	}
 
-  .title-bar {
-    @apply flex flex-row py-4 justify-between border-b-2 border-gray-400
-  }
+	.title-bar {
+		@apply flex flex-row py-4 justify-between border-b-2 border-gray-400;
+	}
 
-  .centered-title-text {
-    @apply my-auto text-gray-600 text-3xl
-  }
+	.centered-title-text {
+		@apply my-auto text-gray-600 text-3xl;
+	}
 
-  .vertical-center {
-    @apply h-fit my-auto
-  }
+	.vertical-center {
+		@apply h-fit my-auto;
+	}
 
-  .large-centered-text {
-    @apply m-auto p-2 text-gray-600 text-3xl
-  }
+	.large-centered-text {
+		@apply m-auto p-2 text-gray-600 text-3xl;
+	}
 
-  .content-div {
-    @apply mt-8 mb-4 pr-4 overflow-auto flex-1
-  }
+	.content-div {
+		@apply mt-8 mb-4 pr-4 overflow-auto flex-1;
+	}
 
-  .list-div {
-    @apply flex flex-col flex-1 h-fit w-full mx-auto border-black border-2
-  }
+	.list-div {
+		@apply flex flex-col flex-1 h-fit w-full mx-auto border-black border-2;
+	}
 
-  .list-item-div {
-    @apply w-full h-fit p-2 border-2 border-black flex flex-col hover:bg-slate-300 transition-colors ease-in-out duration-200 cursor-pointer
-  }
+	.list-item-div {
+		@apply w-full h-fit p-2 border-2 border-black flex flex-col hover:bg-slate-300 transition-colors ease-in-out duration-200 cursor-pointer;
+	}
 
-  .list-item-field {
-    @apply font-bold me-1
-  }
+	.list-item-field {
+		@apply font-bold me-1;
+	}
 
-  .bottom-bar {
-    @apply flex border-t-2 border-gray-400 py-4 justify-between
-  }
+	.bottom-bar {
+		@apply flex border-t-2 border-gray-400 py-4 justify-between;
+	}
 
-  .div-input {
-    @apply flex relative rounded-md shadow-sm
-  }
+	.div-input {
+		@apply flex relative rounded-md shadow-sm;
+	}
 
-  .input-icon-div {
-    @apply absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4
-  }
-  
-  .button {
-    @apply relative inline-flex w-fit justify-center text-white font-bold py-2 px-4 my-2 rounded-md
-    bg-blue-500 hover:bg-blue-700 disabled:bg-blue-300 transition ease-in-out duration-150 disabled:cursor-not-allowed
-  } 
+	.input-icon-div {
+		@apply absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4;
+	}
 
-  .filled-button {
-    @apply relative inline-flex w-full justify-center text-white font-bold py-2 px-4 mt-4 mb-8 rounded-md
-    bg-blue-500 hover:bg-blue-700 disabled:bg-blue-300 transition ease-in-out duration-150 disabled:cursor-not-allowed
-  } 
+	.button {
+		@apply relative inline-flex w-fit justify-center text-white font-bold py-2 px-4 my-2 rounded-md
+    bg-blue-500 hover:bg-blue-700 disabled:bg-blue-300 transition ease-in-out duration-150 disabled:cursor-not-allowed;
+	}
 
-  .modal-button {
-    @apply relative inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm 
-    bg-blue-600 hover:bg-blue-500 disabled:bg-blue-300 sm:ml-3 sm:w-auto disabled:cursor-not-allowed
-  }
+	.filled-button {
+		@apply relative inline-flex w-full justify-center text-white font-bold py-2 px-4 mt-4 mb-8 rounded-md
+    bg-blue-500 hover:bg-blue-700 disabled:bg-blue-300 transition ease-in-out duration-150 disabled:cursor-not-allowed;
+	}
 
-  .modal-bottom {
-    @apply bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6
-  }
+	.modal-button {
+		@apply relative inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm 
+    bg-blue-600 hover:bg-blue-500 disabled:bg-blue-300 sm:ml-3 sm:w-auto disabled:cursor-not-allowed;
+	}
 
-  .button-tip {
-    @apply absolute w-[200px] p-2 rounded-md shadow-md text-white z-20
-    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom-right
-  }
+	.modal-bottom {
+		@apply bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6;
+	}
 
-  .green-button-color {
-    @apply bg-green-500 hover:bg-green-700 disabled:bg-green-300
-  }
+	.button-tip {
+		@apply absolute w-[200px] p-2 rounded-md shadow-md text-white z-20
+    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom-right;
+	}
 
-  .gray-button-color {
-    @apply bg-gray-500 hover:bg-gray-700 disabled:bg-gray-300
-  }
+	.green-button-color {
+		@apply bg-green-500 hover:bg-green-700 disabled:bg-green-300;
+	}
 
-  .red-button-color {
-    @apply bg-red-500 hover:bg-red-700 disabled:bg-red-300
-  }
+	.gray-button-color {
+		@apply bg-gray-500 hover:bg-gray-700 disabled:bg-gray-300;
+	}
 
-  .blue-button-color {
-    @apply bg-blue-500 hover:bg-blue-700 disabled:bg-blue-300
-  }
+	.red-button-color {
+		@apply bg-red-500 hover:bg-red-700 disabled:bg-red-300;
+	}
 
-  .tab-ul {
-    @apply flex flex-wrap text-sm font-medium text-center border-b border-gray-200 mt-3 max-h-28 overflow-auto
-  }
+	.blue-button-color {
+		@apply bg-blue-500 hover:bg-blue-700 disabled:bg-blue-300;
+	}
 
-  .selected-tab {
-    @apply mr-2 inline-block p-4 text-blue-600 bg-gray-200 rounded-t-lg 
-    hover:bg-gray-300 hover:text-blue-700 cursor-pointer
-  }
+	.tab-ul {
+		@apply flex flex-wrap text-sm font-medium text-center border-b border-gray-200 mt-3 max-h-28 overflow-auto;
+	}
 
-  .tab {
-    @apply mr-2 inline-block p-4 text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-100 cursor-pointer
-  }
+	.selected-tab {
+		@apply mr-2 inline-block p-4 text-blue-600 bg-gray-200 rounded-t-lg 
+    hover:bg-gray-300 hover:text-blue-700 cursor-pointer;
+	}
 
-  .input-div {
-    @apply flex rounded-md shadow-sm
-  }
+	.tab {
+		@apply mr-2 inline-block p-4 text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-100 cursor-pointer;
+	}
 
-  .editable-input {
-    @apply my-2 block flex-1 px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+	.input-div {
+		@apply flex rounded-md shadow-sm;
+	}
+
+	.editable-input {
+		@apply my-2 block flex-1 px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
     focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
     disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
     invalid:border-pink-500 invalid:text-pink-600
-    focus:invalid:border-pink-500 focus:invalid:ring-pink-500
-  }
+    focus:invalid:border-pink-500 focus:invalid:ring-pink-500;
+	}
 
-  .add-input {
-    @apply my-2 block flex-1 px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+	.add-input {
+		@apply my-2 block flex-1 px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
     focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
     invalid:border-pink-500 invalid:text-pink-600
-    focus:invalid:border-pink-500 focus:invalid:ring-pink-500
-  }
+    focus:invalid:border-pink-500 focus:invalid:ring-pink-500;
+	}
 
-  .list-box {
-    @apply absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm
-  }
+	.list-box {
+		@apply absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm;
+	}
 
-  .list-box-active {
-    @apply relative cursor-default select-none py-2 pl-3 pr-9
-  }
+	.list-box-active {
+		@apply relative cursor-default select-none py-2 pl-3 pr-9;
+	}
 
-  .list-box-selected {
-    @apply absolute inset-y-0 right-0 flex items-center pr-4
-  }
+	.list-box-selected {
+		@apply absolute inset-y-0 right-0 flex items-center pr-4;
+	}
 
-  .drop-down-chevron {
-    @apply pointer-events-none absolute inset-y-0 right-[5px] ml-3 flex items-center pr-2
-  }
+	.drop-down-chevron {
+		@apply pointer-events-none absolute inset-y-0 right-[5px] ml-3 flex items-center pr-2;
+	}
 
-  .drop-down-icon {
-    @apply h-5 w-5 flex-shrink-0 rounded-full
-  }
+	.drop-down-icon {
+		@apply h-5 w-5 flex-shrink-0 rounded-full;
+	}
 
-  .drop-down-span {
-    @apply ml-3 block truncate
-  }
+	.drop-down-span {
+		@apply ml-3 block truncate;
+	}
 
-  .customer-optional-div {
-    @apply flex flex-col border-t-2 border-black p-2
-  }
+	.customer-optional-div {
+		@apply flex flex-col border-t-2 border-black p-2;
+	}
 
-  .customer-optional-title {
-    @apply font-bold mb-2 flex flex-col
-  }
+	.customer-optional-title {
+		@apply font-bold mb-2 flex flex-col;
+	}
 
-  .current-customer-span {
-    @apply flex flex-col text-green-500 font-medium text-sm
-  }
+	.current-customer-span {
+		@apply flex flex-col text-green-500 font-medium text-sm;
+	}
 
-  .zoom-overlay-div {
-    @apply absolute flex flex-row justify-between h-auto w-auto p-2 right-[5%] bottom-0 mb-10 z-[4] border border-black bg-gray-200 bg-opacity-50 cursor-move
-  }
+	.zoom-overlay-div {
+		@apply absolute flex flex-row justify-between h-auto w-auto p-2 right-[5%] bottom-0 mb-10 z-[4] border border-black bg-gray-200 bg-opacity-50 cursor-move;
+	}
 
-  .opacity-icon {
-    @apply flex w-12 h-12 p-2 mx-2 bg-gray-400 text-black hover:bg-gray-500 focus:outline-none bg-opacity-50 justify-center transition-colors transition ease-in-out duration-200 hover:scale-110
-  }
+	.opacity-icon {
+		@apply flex w-12 h-12 p-2 mx-2 bg-gray-400 text-black hover:bg-gray-500 focus:outline-none bg-opacity-50 justify-center transition-colors transition ease-in-out duration-200 hover:scale-110;
+	}
 
-  .reservation-tip-above {
-    @apply absolute w-[178px] h-auto p-2 mx-auto bottom-[100%] rounded-md shadow-md text-white flex flex-col
-    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom
-  }
+	.reservation-tip-above {
+		@apply absolute w-[178px] h-auto p-2 mx-auto bottom-[100%] rounded-md shadow-md text-white flex flex-col
+    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom;
+	}
 
-  .reservation-tip-below {
-    @apply absolute w-[178px] h-auto p-2 mx-auto top-[100%] rounded-md shadow-md text-white flex flex-col
-    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-top
-  }
+	.reservation-tip-below {
+		@apply absolute w-[178px] h-auto p-2 mx-auto top-[100%] rounded-md shadow-md text-white flex flex-col
+    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-top;
+	}
 
-  .grid-tip {
-    @apply absolute w-[178px] h-auto p-2 mx-auto bottom-[100%] rounded-md shadow-md text-white flex flex-col
-    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom
-  }
+	.grid-tip {
+		@apply absolute w-[178px] h-auto p-2 mx-auto bottom-[100%] rounded-md shadow-md text-white flex flex-col
+    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-bottom;
+	}
 
-  /* Miscallaneous */
-  .white-spin {
-    @apply animate-spin -ml-1 mr-3 h-5 w-5 text-white
-  }
+	.title-tip {
+		@apply absolute w-[178px] h-auto p-2 mx-auto top-[100%] rounded-md shadow-md text-white flex flex-col
+    bg-gray-900 text-xs font-bold transition-all duration-100 scale-0 origin-top;
+	}
 
-  .label {
-    @apply block text-gray-700 text-sm font-bold mb-2
-  }
+	/* Miscallaneous */
+	.white-spin {
+		@apply animate-spin -ml-1 mr-3 h-5 w-5 text-white;
+	}
 
-  .error-label {
-    @apply my-auto text-red-500 text-sm
-  }
+	.label {
+		@apply block text-gray-700 text-sm font-bold mb-2;
+	}
 
-  .pointer-icon {
-    @apply h-6 w-6 text-gray-500 cursor-pointer
-  }
+	.error-label {
+		@apply my-auto text-red-500 text-sm;
+	}
 
-  .show-password-div {
-    @apply absolute mt-3 mb-3 inset-y-0 left-0 flex items-center pl-3 z-20
-  }
+	.pointer-icon {
+		@apply h-6 w-6 text-gray-500 cursor-pointer;
+	}
+
+	.show-password-div {
+		@apply absolute mt-3 mb-3 inset-y-0 left-0 flex items-center pl-3 z-20;
+	}
 }

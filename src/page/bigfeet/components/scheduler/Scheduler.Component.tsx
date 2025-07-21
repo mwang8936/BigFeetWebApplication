@@ -1,4 +1,11 @@
-import { useState, createContext, useContext, FC, useEffect } from 'react';
+import {
+	useState,
+	createContext,
+	useContext,
+	FC,
+	useEffect,
+	useMemo,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
@@ -29,9 +36,15 @@ import {
 import GiftCard from '../../../../models/Gift-Card.Model';
 import Schedule from '../../../../models/Schedule.Model';
 import User from '../../../../models/User.Model';
+import VipPackage from '../../../../models/Vip-Package.Model';
 
 import { sameDate } from '../../../../utils/date.utils';
 import { moneyToString } from '../../../../utils/number.utils';
+
+interface KeyValueText {
+	label: string;
+	value: string;
+}
 
 const ScheduleDateContext = createContext<
 	{ date: Date; setDate(date: Date): void } | undefined
@@ -123,9 +136,15 @@ const Scheduler: FC = () => {
 		Permissions.PERMISSION_ADD_RESERVATION
 	);
 
-	const totalGiftCardAmount = giftCards
-		.map((giftCard) => giftCard.payment_amount)
-		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+	const vipPackageMap = new Map<number, VipPackage>();
+
+	schedules.forEach((schedule) => {
+		schedule.vip_packages.forEach((vipPackage) => {
+			vipPackageMap.set(vipPackage.vip_package_id, vipPackage);
+		});
+	});
+
+	const vipPackages = Array.from(vipPackageMap.values());
 
 	const totalReservations = schedules
 		.flatMap((schedule) => schedule.reservations)
@@ -135,45 +154,6 @@ const Scheduler: FC = () => {
 
 			return endDate <= new Date().getTime();
 		});
-
-	const totalSessions = totalReservations
-		.flatMap((reservation) => [
-			reservation.service.acupuncture * 1.5,
-			reservation.service.feet,
-			reservation.service.body,
-		])
-		.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
-
-	const total10MinuteSessions = totalReservations.filter(
-		(reservation) =>
-			reservation.service.time === 10 &&
-			!reservation.service.body &&
-			!reservation.service.feet &&
-			!reservation.service.acupuncture
-	).length;
-	const total15MinuteSessions = totalReservations.filter(
-		(reservation) =>
-			reservation.service.time === 15 &&
-			!reservation.service.body &&
-			!reservation.service.feet &&
-			!reservation.service.acupuncture
-	).length;
-	const total30MinuteSessions = totalReservations.filter(
-		(reservation) =>
-			reservation.service.time === 30 &&
-			!reservation.service.body &&
-			!reservation.service.feet &&
-			!reservation.service.acupuncture
-	).length;
-
-	const totalCash =
-		totalReservations
-			.map((reservation) => reservation.cash || 0)
-			.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0) +
-		giftCards
-			.filter((giftCard) => giftCard.payment_method === PaymentMethod.CASH)
-			.map((giftCard) => giftCard.payment_amount)
-			.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
 
 	const zoomIn = () => {
 		setScale((prevScale) => prevScale + 0.1);
@@ -209,6 +189,174 @@ const Scheduler: FC = () => {
 			: dateString;
 	};
 
+	const titleWithToolTip = (title: KeyValueText, children: KeyValueText[]) => {
+		const toolTip = children.length ? (
+			<span className="title-tip group-hover:scale-100 z-[3]">
+				{children.map((children) => (
+					<strong>
+						{children.label}:
+						<span className="font-normal ms-2">{children.value}</span>
+					</strong>
+				))}
+			</span>
+		) : null;
+		return (
+			<div className="flex relative group">
+				{title.label}:<span className="font-bold ms-2">{title.value}</span>
+				{toolTip}
+			</div>
+		);
+	};
+
+	const cashText = useMemo(() => {
+		const totalReservationCash = totalReservations
+			.map((reservation) => reservation.cash || 0)
+			.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+
+		const giftCardCash = giftCards
+			.filter((giftCard) => giftCard.payment_method === PaymentMethod.CASH)
+			.map((giftCard) => giftCard.payment_amount)
+			.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+
+		const vipPackageCash = vipPackages
+			.filter((vipPackage) => vipPackage.payment_method === PaymentMethod.CASH)
+			.map((vipPackage) => vipPackage.sold_amount)
+			.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+
+		const totalCash = totalReservationCash + giftCardCash + vipPackageCash;
+
+		const title: KeyValueText = {
+			label: t('Total Cash'),
+			value: '$' + moneyToString(totalCash),
+		};
+
+		const children: KeyValueText[] = [
+			{
+				label: t('Reservation Cash'),
+				value: '$' + moneyToString(totalReservationCash),
+			},
+			{
+				label: t('Gift Card Cash'),
+				value: '$' + moneyToString(giftCardCash),
+			},
+			{
+				label: t('VIP Package Cash'),
+				value: '$' + moneyToString(vipPackageCash),
+			},
+		];
+
+		return titleWithToolTip(title, children);
+	}, [totalReservations, giftCards, vipPackages]);
+
+	const giftCardAmountText = useMemo(() => {
+		const giftCardCash = giftCards
+			.filter((giftCard) => giftCard.payment_method === PaymentMethod.CASH)
+			.map((giftCard) => giftCard.payment_amount)
+			.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+
+		const giftCardMachine = giftCards
+			.filter((giftCard) => giftCard.payment_method === PaymentMethod.MACHINE)
+			.map((giftCard) => giftCard.payment_amount)
+			.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+
+		const totalGiftCardAmount = giftCardCash + giftCardMachine;
+
+		const title: KeyValueText = {
+			label: t('Total Gift Cards'),
+			value: '$' + moneyToString(totalGiftCardAmount),
+		};
+
+		const children: KeyValueText[] = [
+			{
+				label: t('Cash'),
+				value: '$' + moneyToString(giftCardCash),
+			},
+			{
+				label: t('Machine'),
+				value: '$' + moneyToString(giftCardMachine),
+			},
+		];
+
+		return titleWithToolTip(title, children);
+	}, [giftCards]);
+
+	const vipPackageAmountText = useMemo(() => {
+		const vipPackageCash = vipPackages
+			.filter((giftCard) => giftCard.payment_method === PaymentMethod.CASH)
+			.map((vipPackage) => vipPackage.sold_amount)
+			.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+
+		const vipPackageMachine = vipPackages
+			.filter((giftCard) => giftCard.payment_method === PaymentMethod.MACHINE)
+			.map((vipPackage) => vipPackage.sold_amount)
+			.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+
+		const totalVipPackageAmount = vipPackageCash + vipPackageMachine;
+
+		const title: KeyValueText = {
+			label: t('Total VIP Packages'),
+			value: '$' + moneyToString(totalVipPackageAmount),
+		};
+
+		const children: KeyValueText[] = [
+			{
+				label: t('Cash'),
+				value: '$' + moneyToString(vipPackageCash),
+			},
+			{
+				label: t('Machine'),
+				value: '$' + moneyToString(vipPackageMachine),
+			},
+		];
+
+		return titleWithToolTip(title, children);
+	}, [vipPackages]);
+
+	const reservationText = useMemo(() => {
+		const totalSessions = totalReservations
+			.flatMap((reservation) => [
+				reservation.service.acupuncture * 1.5,
+				reservation.service.feet,
+				reservation.service.body,
+			])
+			.reduce((acc, curr) => acc + parseFloat(curr.toString()), 0);
+
+		const total10MinuteSessions = totalReservations.filter(
+			(reservation) =>
+				reservation.service.time === 10 &&
+				!reservation.service.body &&
+				!reservation.service.feet &&
+				!reservation.service.acupuncture
+		).length;
+		const total15MinuteSessions = totalReservations.filter(
+			(reservation) =>
+				reservation.service.time === 15 &&
+				!reservation.service.body &&
+				!reservation.service.feet &&
+				!reservation.service.acupuncture
+		).length;
+		const total30MinuteSessions = totalReservations.filter(
+			(reservation) =>
+				reservation.service.time === 30 &&
+				!reservation.service.body &&
+				!reservation.service.feet &&
+				!reservation.service.acupuncture
+		).length;
+
+		const title: KeyValueText = {
+			label: t('Total Reservations'),
+			value: totalSessions.toString(),
+		};
+
+		const children: KeyValueText[] = [
+			{ label: t('10 Minutes'), value: total10MinuteSessions.toString() },
+			{ label: t('15 Minutes'), value: total15MinuteSessions.toString() },
+			{ label: t('30 Minutes'), value: total30MinuteSessions.toString() },
+		];
+
+		return titleWithToolTip(title, children);
+	}, [totalReservations]);
+
 	return (
 		<ScheduleDateContext.Provider value={{ date, setDate }}>
 			<CalendarScaleContext.Provider value={{ scale, setScale }}>
@@ -236,24 +384,9 @@ const Scheduler: FC = () => {
 					</div>
 
 					<div className="vertical-center flex flex-col text-gray-600 text-xl">
-						<div className="flex">
-							{t('Total Reservations')}:
-							<span className="font-bold ms-2">{totalSessions}</span>
-						</div>
-
-						<div className="flex">
-							{t('Total Cash')}:
-							<span className="font-bold ms-2">
-								${moneyToString(totalCash)}
-							</span>
-						</div>
-
-						<div className="flex">
-							{t('Total Gift Cards')}:
-							<span className="font-bold ms-2">
-								${moneyToString(totalGiftCardAmount)}
-							</span>
-						</div>
+						{cashText}
+						{giftCardAmountText}
+						{vipPackageAmountText}
 					</div>
 
 					<div className="vertical-center flex flex-col">
@@ -265,20 +398,7 @@ const Scheduler: FC = () => {
 					</div>
 
 					<div className="vertical-center flex flex-col text-gray-600 text-xl">
-						<div className="flex">
-							{t('10 Minutes')}:
-							<span className="font-bold ms-2">{total10MinuteSessions}</span>
-						</div>
-
-						<div className="flex">
-							{t('15 Minutes')}:
-							<span className="font-bold ms-2">{total15MinuteSessions}</span>
-						</div>
-
-						<div className="flex">
-							{t('30 Minutes')}:
-							<span className="font-bold ms-2">{total30MinuteSessions}</span>
-						</div>
+						{reservationText}
 					</div>
 
 					<div className="vertical-center ms-10 flex flex-row ">
@@ -307,7 +427,8 @@ const Scheduler: FC = () => {
 						transformOrigin: 'top left',
 						width: `${100 / scale}%`,
 						height: `${100 / scale}%`,
-					}}>
+					}}
+				>
 					<Calendar />
 				</div>
 

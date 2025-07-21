@@ -40,6 +40,10 @@ const VipItem: FC<VipItemProp> = ({ vipPackage }) => {
 				{vipPackage.serial}
 			</span>
 			<span>
+				<span className="list-item-field">{t('Payment Method')}:</span>
+				{t(vipPackage.payment_method)}
+			</span>
+			<span>
 				<span className="list-item-field">{t('Sold Amount')}:</span>$
 				{moneyToString(vipPackage.sold_amount)}
 			</span>
