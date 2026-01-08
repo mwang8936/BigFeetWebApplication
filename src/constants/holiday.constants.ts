@@ -25,6 +25,19 @@ const HOLIDAYS: Record<number, Date[]> = {
 		new Date(2025, 10, 11), // Remembrance Day
 		new Date(2025, 11, 25), // Christmas Day
 	],
+	2026: [
+		new Date(2026, 0, 1), // New Year's Day
+		new Date(2026, 1, 16), // Family Day
+		new Date(2026, 3, 3), // Good Friday
+		new Date(2026, 4, 18), // Victoria Day
+		new Date(2026, 6, 1), // Canada Day
+		new Date(2026, 7, 3), // B.C. Day
+		new Date(2026, 8, 7), // Labour Day
+		new Date(2026, 8, 30), // National Day for Truth and Reconciliation
+		new Date(2026, 9, 12), // Thanksgiving Day
+		new Date(2026, 10, 11), // Remembrance Day
+		new Date(2026, 11, 25), // Christmas Day
+	],
 };
 
 export default HOLIDAYS;
