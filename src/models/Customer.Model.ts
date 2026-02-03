@@ -8,3 +8,11 @@ export default interface Customer {
 	updated_at: Date;
 	deleted_at?: Date;
 }
+
+export interface PaginatedCustomers {
+	data: Customer[];
+	total: number;
+	page: number;
+	pageSize: number;
+	totalPages: number;
+}

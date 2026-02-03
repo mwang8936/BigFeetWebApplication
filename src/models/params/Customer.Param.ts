@@ -1,4 +1,7 @@
 export interface GetCustomersParam {
+	page?: number;
+	page_size?: number;
+	search?: string;
 	with_deleted?: boolean;
 }
 
