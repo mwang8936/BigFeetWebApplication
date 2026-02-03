@@ -15,8 +15,11 @@ import {
 	addCustomer,
 	deleteCustomer,
 	getCustomers,
+	searchCustomer,
 	updateCustomer,
 } from '../../service/customer.service';
+
+import { SearchCustomerParam } from '../../models/params/Customer.Param';
 
 import {
 	createLoadingToast,
@@ -59,6 +62,31 @@ export const useCustomersQuery = ({
 		staleTime,
 		refetchInterval,
 		refetchIntervalInBackground,
+	});
+};
+
+export interface SearchCustomerQueryProp {
+	gettable: boolean;
+	params: SearchCustomerParam | null;
+}
+
+export const searchCustomerQueryKey = 'searchCustomer';
+
+export const useSearchCustomerQuery = ({
+	gettable,
+	params,
+}: SearchCustomerQueryProp) => {
+	const { i18n } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
+
+	return useQuery({
+		queryKey: [searchCustomerQueryKey, params],
+		queryFn: () =>
+			searchCustomer(i18n, queryClient, setAuthentication, params!),
+		enabled: gettable && params !== null,
+		staleTime: Infinity,
 	});
 };
 
