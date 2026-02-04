@@ -15,8 +15,14 @@ import {
 	addCustomer,
 	deleteCustomer,
 	getCustomers,
+	searchCustomer,
 	updateCustomer,
 } from '../../service/customer.service';
+
+import {
+	GetCustomersParam,
+	SearchCustomerParam,
+} from '../../models/params/Customer.Param';
 
 import {
 	createLoadingToast,
@@ -25,6 +31,7 @@ import {
 } from '../../utils/toast.utils';
 
 export const customersQueryKey = 'customers';
+export const DEFAULT_PAGE_SIZE = 50;
 
 export const usePrefetchCustomersQuery = () => {
 	const { i18n } = useTranslation();
@@ -32,33 +39,69 @@ export const usePrefetchCustomersQuery = () => {
 
 	const { setAuthentication } = useAuthenticationContext();
 
+	const defaultParams: GetCustomersParam = {
+		page: 1,
+		page_size: DEFAULT_PAGE_SIZE,
+	};
+
 	const prefetchCustomers = async () =>
 		queryClient.prefetchQuery({
-			queryKey: [customersQueryKey],
-			queryFn: () => getCustomers(i18n, queryClient, setAuthentication),
+			queryKey: [customersQueryKey, defaultParams],
+			queryFn: () =>
+				getCustomers(i18n, queryClient, setAuthentication, defaultParams),
 		});
 
 	return prefetchCustomers;
 };
+
+export interface CustomersQueryProp extends QueryProp {
+	params?: GetCustomersParam;
+}
 
 export const useCustomersQuery = ({
 	gettable,
 	staleTime = 1000 * 30,
 	refetchInterval,
 	refetchIntervalInBackground,
-}: QueryProp) => {
+	params,
+}: CustomersQueryProp) => {
 	const { i18n } = useTranslation();
 	const queryClient = useQueryClient();
 
 	const { setAuthentication } = useAuthenticationContext();
 
 	return useQuery({
-		queryKey: [customersQueryKey],
-		queryFn: () => getCustomers(i18n, queryClient, setAuthentication),
+		queryKey: [customersQueryKey, params],
+		queryFn: () => getCustomers(i18n, queryClient, setAuthentication, params),
 		enabled: gettable,
 		staleTime,
 		refetchInterval,
 		refetchIntervalInBackground,
+	});
+};
+
+export interface SearchCustomerQueryProp {
+	gettable: boolean;
+	params: SearchCustomerParam | null;
+}
+
+export const searchCustomerQueryKey = 'searchCustomer';
+
+export const useSearchCustomerQuery = ({
+	gettable,
+	params,
+}: SearchCustomerQueryProp) => {
+	const { i18n } = useTranslation();
+	const queryClient = useQueryClient();
+
+	const { setAuthentication } = useAuthenticationContext();
+
+	return useQuery({
+		queryKey: [searchCustomerQueryKey, params],
+		queryFn: () =>
+			searchCustomer(i18n, queryClient, setAuthentication, params!),
+		enabled: gettable && params !== null,
+		staleTime: Infinity,
 	});
 };
 

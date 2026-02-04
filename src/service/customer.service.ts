@@ -9,6 +9,7 @@ import { customerPath } from '../constants/api.constants';
 import {
 	GetCustomerParam,
 	GetCustomersParam,
+	SearchCustomerParam,
 } from '../models/params/Customer.Param';
 
 import {
@@ -45,6 +46,23 @@ export async function getCustomer(
 		queryClient,
 		setAuthentication,
 		`${customerPath}/${customer_id}`,
+		'get',
+		undefined,
+		params
+	);
+}
+
+export async function searchCustomer(
+	i18n: i18n,
+	queryClient: QueryClient,
+	setAuthentication: (authenticated: boolean) => void,
+	params: SearchCustomerParam
+) {
+	return authorizedRequest(
+		i18n,
+		queryClient,
+		setAuthentication,
+		`${customerPath}/search`,
 		'get',
 		undefined,
 		params

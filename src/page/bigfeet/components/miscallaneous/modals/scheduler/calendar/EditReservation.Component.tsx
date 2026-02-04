@@ -33,7 +33,7 @@ import EditableToggleSwitch from '../../../editable/EditableToggleSwitch.Compone
 
 import { useScheduleDateContext } from '../../../../scheduler/Scheduler.Component';
 
-import { useCustomersQuery } from '../../../../../../hooks/customer.hooks';
+import { useSearchCustomerQuery } from '../../../../../../hooks/customer.hooks';
 import { useEmployeesQuery } from '../../../../../../hooks/employee.hooks';
 import { useUpdateReservationMutation } from '../../../../../../hooks/reservation.hooks';
 import { useSchedulesQuery } from '../../../../../../hooks/schedule.hooks';
@@ -41,6 +41,7 @@ import { useServicesQuery } from '../../../../../../hooks/service.hooks';
 import { useUserQuery } from '../../../../../../hooks/profile.hooks';
 
 import Customer from '../../../../../../../models/Customer.Model';
+import { SearchCustomerParam } from '../../../../../../../models/params/Customer.Param';
 import Employee from '../../../../../../../models/Employee.Model';
 import {
 	Gender,
@@ -215,11 +216,15 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		Permissions.PERMISSION_GET_SCHEDULE
 	);
 
-	const customerQuery = useCustomersQuery({
+	const [searchParams, setSearchParams] = useState<SearchCustomerParam | null>(
+		null
+	);
+
+	const searchCustomerQuery = useSearchCustomerQuery({
 		gettable: customerGettable,
-		staleTime: Infinity,
+		params: searchParams,
 	});
-	const customers: Customer[] = customerQuery.data || [];
+	const searchedCustomer: Customer | null = searchCustomerQuery.data || null;
 
 	const employeeQuery = useEmployeesQuery({
 		gettable: employeeGettable,
@@ -451,56 +456,61 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 		if (endTimeInput === 0) setEndTimeInput(null);
 	}, [endTimeInput]);
 
+	// Trigger search when phone number or vip serial is complete
 	useEffect(() => {
 		if (
 			customerPhoneNumberInput?.length === LENGTHS.customer.phone_number - 4 &&
+			!invalidCustomerPhoneNumber &&
 			customerIdInput === null
 		) {
-			const customer = customers.find(
-				(customer) => customer.phone_number === customerPhoneNumberInput
-			);
-
-			if (customer) {
-				setCustomerIdInput(customer.customer_id);
-
-				setCustomerVipSerialInput(customer.vip_serial);
-				setCustomerNameInput(customer.customer_name);
-				setCustomerNotesInput(customer.notes);
-
-				setInvalidCustomerVipSerial(false);
-				setInvalidCustomerName(false);
-			}
+			setSearchParams({ phone_number: customerPhoneNumberInput });
 		} else if (
 			customerVipSerialInput?.length === LENGTHS.customer.vip_serial &&
+			!invalidCustomerVipSerial &&
 			customerIdInput === null
 		) {
-			const customer = customers.find(
-				(customer) => customer.vip_serial === customerVipSerialInput
-			);
-
-			if (customer) {
-				setCustomerIdInput(customer.customer_id);
-
-				setCustomerPhoneNumberInput(customer.phone_number);
-				setCustomerNameInput(customer.customer_name);
-				setCustomerNotesInput(customer.notes);
-
-				setInvalidCustomerPhoneNumber(false);
-				setInvalidCustomerName(false);
-			}
+			setSearchParams({ vip_serial: customerVipSerialInput });
 		} else if (
 			customerIdInput !== null &&
 			customerPhoneNumberInput?.length !== LENGTHS.customer.phone_number - 4 &&
 			customerVipSerialInput?.length !== LENGTHS.customer.vip_serial
 		) {
+			setSearchParams(null);
 			setCustomerIdInput(null);
 
 			setCustomerNameInput(null);
 			setCustomerNotesInput(null);
 
 			setInvalidCustomerName(false);
+		} else {
+			setSearchParams(null);
 		}
-	}, [customerPhoneNumberInput, customerVipSerialInput]);
+	}, [
+		customerPhoneNumberInput,
+		customerVipSerialInput,
+		invalidCustomerPhoneNumber,
+		invalidCustomerVipSerial,
+		customerIdInput,
+	]);
+
+	// Handle search result
+	useEffect(() => {
+		if (searchedCustomer && customerIdInput === null) {
+			setCustomerIdInput(searchedCustomer.customer_id);
+
+			if (searchParams?.phone_number) {
+				setCustomerVipSerialInput(searchedCustomer.vip_serial);
+				setInvalidCustomerVipSerial(false);
+			} else if (searchParams?.vip_serial) {
+				setCustomerPhoneNumberInput(searchedCustomer.phone_number);
+				setInvalidCustomerPhoneNumber(false);
+			}
+
+			setCustomerNameInput(searchedCustomer.customer_name);
+			setCustomerNotesInput(searchedCustomer.notes);
+			setInvalidCustomerName(false);
+		}
+	}, [searchedCustomer]);
 
 	useEffect(() => {
 		if (dateInput && serviceIdInput) {
@@ -785,18 +795,15 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 
 	const totalAmount = Number((service?.money ?? 0).toFixed(2));
 
-	const currentCustomer: Customer | undefined =
-		customerIdInput !== null
-			? customers.find((customer) => customer.customer_id === customerIdInput)
-			: undefined;
-
 	const currentPhoneNumberText =
-		currentCustomer?.phone_number &&
-		t('Phone Number') + ': ' + formatPhoneNumber(currentCustomer.phone_number);
+		customerIdInput !== null &&
+		customerPhoneNumberInput &&
+		t('Phone Number') + ': ' + formatPhoneNumber(customerPhoneNumberInput);
 
 	const currentVipSerialText =
-		currentCustomer?.vip_serial &&
-		t('VIP Serial') + ': ' + currentCustomer.vip_serial;
+		customerIdInput !== null &&
+		customerVipSerialInput &&
+		t('VIP Serial') + ': ' + customerVipSerialInput;
 
 	return (
 		<>

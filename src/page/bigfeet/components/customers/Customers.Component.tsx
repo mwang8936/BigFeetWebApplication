@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CustomerList from './components/CustomerList.Component';
@@ -14,7 +14,10 @@ import AddInput from '../miscallaneous/add/AddInput.Component';
 
 import AddCustomerModal from '../miscallaneous/modals/customer/AddCustomerModal.Component';
 
-import { useCustomersQuery } from '../../../hooks/customer.hooks';
+import {
+	DEFAULT_PAGE_SIZE,
+	useCustomersQuery,
+} from '../../../hooks/customer.hooks';
 import { useUserQuery } from '../../../hooks/profile.hooks';
 
 import ERRORS from '../../../../constants/error.constants';
@@ -22,7 +25,7 @@ import LABELS from '../../../../constants/label.constants';
 import NAMES from '../../../../constants/name.constants';
 import PLACEHOLDERS from '../../../../constants/placeholder.constants';
 
-import Customer from '../../../../models/Customer.Model';
+import { PaginatedCustomers } from '../../../../models/Customer.Model';
 import { Permissions } from '../../../../models/enums';
 import User from '../../../../models/User.Model';
 
@@ -32,10 +35,25 @@ const Customers: FC = () => {
 	const [openAddCustomerModal, setOpenAddCustomerModal] = useState(false);
 
 	const [searchFilter, setSearchFilter] = useState<string | null>(null);
+	const [debouncedSearch, setDebouncedSearch] = useState<string | undefined>(
+		undefined
+	);
 	const [invalidSearch, setInvalidSearch] = useState<boolean>(false);
+
+	const [currentPage, setCurrentPage] = useState<number>(1);
 
 	const [retryingCustomerQuery, setRetryingCustomerQuery] =
 		useState<boolean>(false);
+
+	// Debounce search input by 500ms
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedSearch(searchFilter?.trim() || undefined);
+			setCurrentPage(1); // Reset to page 1 when search changes
+		}, 500);
+
+		return () => clearTimeout(timer);
+	}, [searchFilter]);
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
@@ -47,9 +65,17 @@ const Customers: FC = () => {
 		Permissions.PERMISSION_ADD_CUSTOMER
 	);
 
-	const customerQuery = useCustomersQuery({ gettable });
+	const customerQuery = useCustomersQuery({
+		gettable,
+		params: {
+			page: currentPage,
+			page_size: DEFAULT_PAGE_SIZE,
+			search: debouncedSearch,
+		},
+	});
 
-	const customers: Customer[] = customerQuery.data || [];
+	const paginatedData: PaginatedCustomers | undefined = customerQuery.data;
+	const customers = paginatedData?.data || [];
 
 	const isCustomerLoading = customerQuery.isLoading;
 
@@ -59,35 +85,48 @@ const Customers: FC = () => {
 
 	const isCustomerPaused = customerQuery.isPaused;
 
-	let filteredCustomers: Customer[] = [];
-	if (
-		!isCustomerLoading &&
-		!isCustomerError &&
-		!isCustomerPaused &&
-		customers
-	) {
-		filteredCustomers = searchFilter
-			? customers.filter(
-					(customer) =>
-						customer.phone_number
-							?.toLowerCase()
-							?.includes(searchFilter.toLowerCase()) ||
-						customer.vip_serial
-							?.toLowerCase()
-							?.includes(searchFilter.toLowerCase()) ||
-						customer.customer_name
-							?.toLowerCase()
-							?.includes(searchFilter.toLowerCase())
-			  )
-			: customers;
-	}
+	// Show loading in list area, or show the customer list
+	const customersElement = isCustomerLoading ? (
+		<Loading />
+	) : customers.length !== 0 ? (
+		<CustomerList customers={customers} />
+	) : (
+		<h1 className="large-centered-text">
+			{debouncedSearch ? t('No Customers Found') : t('No Customers Created')}
+		</h1>
+	);
 
-	const customersElement =
-		customers.length !== 0 ? (
-			<CustomerList customers={filteredCustomers} />
-		) : (
-			<h1 className="large-centered-text">{t('No Customers Created')}</h1>
-		);
+	const paginationElement = paginatedData && paginatedData.totalPages > 0 && (
+		<div className="flex justify-end items-center gap-4 mt-4 text-sm text-gray-600">
+			<span>
+				{t('Page')} {paginatedData.page} {t('of')} {paginatedData.totalPages}
+			</span>
+			<span>|</span>
+			<span>
+				{paginatedData.total} {t('total customers')}
+			</span>
+			<div className="flex gap-2">
+				<button
+					className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+					disabled={currentPage <= 1}
+					onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+				>
+					{t('Previous')}
+				</button>
+				<button
+					className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+					disabled={currentPage >= paginatedData.totalPages}
+					onClick={() =>
+						setCurrentPage((prev) =>
+							Math.min(paginatedData.totalPages, prev + 1)
+						)
+					}
+				>
+					{t('Next')}
+				</button>
+			</div>
+		</div>
+	);
 
 	const searchElement = (
 		<>
@@ -107,43 +146,49 @@ const Customers: FC = () => {
 			/>
 
 			<div className="content-div">{customersElement}</div>
+
+			{paginationElement}
 		</>
 	);
 
-	const pausedElement = isCustomerPaused ? (
-		<Retry
-			retrying={retryingCustomerQuery}
-			error={'Network Connection Issue'}
-			onRetry={() => {}}
-			enabled={false}
-		/>
-	) : (
-		searchElement
-	);
+	// Determine what to show in the content area
+	const getContentElement = () => {
+		if (!gettable) {
+			return (
+				<h1 className="large-centered-text">
+					{t(ERRORS.customer.permissions.get)}
+				</h1>
+			);
+		}
 
-	const errorsElement = isCustomerError ? (
-		<Retry
-			retrying={retryingCustomerQuery}
-			error={customerError?.message ?? ''}
-			onRetry={() => {
-				setRetryingCustomerQuery(true);
-				retryCustomerQuery().finally(() => setRetryingCustomerQuery(false));
-			}}
-			enabled={gettable}
-		/>
-	) : (
-		pausedElement
-	);
+		if (isCustomerPaused) {
+			return (
+				<Retry
+					retrying={retryingCustomerQuery}
+					error={'Network Connection Issue'}
+					onRetry={() => {}}
+					enabled={false}
+				/>
+			);
+		}
 
-	const permissionsElement = !gettable ? (
-		<h1 className="large-centered-text">
-			{t(ERRORS.customer.permissions.get)}
-		</h1>
-	) : (
-		errorsElement
-	);
+		if (isCustomerError) {
+			return (
+				<Retry
+					retrying={retryingCustomerQuery}
+					error={customerError?.message ?? ''}
+					onRetry={() => {
+						setRetryingCustomerQuery(true);
+						retryCustomerQuery().finally(() => setRetryingCustomerQuery(false));
+					}}
+					enabled={gettable}
+				/>
+			);
+		}
 
-	const isLoadingElement = isCustomerLoading ? <Loading /> : permissionsElement;
+		// Show search and list (loading indicator is inside customersElement)
+		return searchElement;
+	};
 
 	return (
 		<>
@@ -163,7 +208,7 @@ const Customers: FC = () => {
 					</div>
 				</div>
 
-				{isLoadingElement}
+				{getContentElement()}
 			</div>
 
 			<AddCustomerModal
