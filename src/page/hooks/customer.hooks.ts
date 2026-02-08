@@ -101,7 +101,8 @@ export const useSearchCustomerQuery = ({
 		queryFn: () =>
 			searchCustomer(i18n, queryClient, setAuthentication, params!),
 		enabled: gettable && params !== null,
-		staleTime: Infinity,
+		staleTime: 0,
+		gcTime: 0,
 	});
 };
 
