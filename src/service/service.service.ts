@@ -22,13 +22,31 @@ import {
 	UpdateServiceRequest,
 } from '../models/requests/Service.Request.Model';
 
+function deserializeRecord(raw: any): ServiceRecord {
+	return {
+		...raw,
+		valid_from: new Date(raw.valid_from),
+		valid_to: raw.valid_to != null ? new Date(raw.valid_to) : undefined,
+	};
+}
+
+function deserializeService(raw: any): Service {
+	return {
+		...raw,
+		created_at: new Date(raw.created_at),
+		updated_at: new Date(raw.updated_at),
+		deleted_at: raw.deleted_at != null ? new Date(raw.deleted_at) : undefined,
+		records: raw.records?.map(deserializeRecord),
+	};
+}
+
 export async function getServices(
 	i18n: i18n,
 	queryClient: QueryClient,
 	setAuthentication: (authenticated: boolean) => void,
 	params?: GetServicesParam
 ): Promise<Service[]> {
-	return authorizedRequest(
+	const raw: any[] = await authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
@@ -37,6 +55,7 @@ export async function getServices(
 		undefined,
 		params
 	);
+	return raw.map(deserializeService);
 }
 
 export async function getServiceRecords(
@@ -45,13 +64,14 @@ export async function getServiceRecords(
 	setAuthentication: (authenticated: boolean) => void,
 	date: Date
 ): Promise<ServiceRecord[]> {
-	return authorizedRequest(
+	const raw: any[] = await authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
-		`${servicePath}/records/${date.toISOString()}`,
+		`${servicePath}/records/${encodeURIComponent(date.toISOString())}`,
 		'get'
 	);
+	return raw.map(deserializeRecord);
 }
 
 export async function getService(
@@ -61,7 +81,7 @@ export async function getService(
 	service_id: number,
 	params?: GetServiceParam
 ): Promise<Service> {
-	return authorizedRequest(
+	const raw = await authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
@@ -70,6 +90,7 @@ export async function getService(
 		undefined,
 		params
 	);
+	return deserializeService(raw);
 }
 
 export async function updateService(
@@ -118,8 +139,8 @@ export async function addServiceRecord(
 	service_id: number,
 	request: AddServiceRecordRequest,
 	socket_id?: string
-): Promise<ServiceRecord> {
-	return authorizedRequest(
+): Promise<ServiceRecord | null> {
+	const raw = await authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
@@ -129,6 +150,7 @@ export async function addServiceRecord(
 		undefined,
 		socket_id
 	);
+	return raw ? deserializeRecord(raw) : null;
 }
 
 export async function continueService(
@@ -198,16 +220,17 @@ export async function deleteServiceRecord(
 	valid_from: Date,
 	socket_id?: string
 ): Promise<ServiceRecord> {
-	return authorizedRequest(
+	const raw = await authorizedRequest(
 		i18n,
 		queryClient,
 		setAuthentication,
-		`${servicePath}/${service_id}/record/${valid_from.toISOString()}`,
+		`${servicePath}/${service_id}/record/${encodeURIComponent(valid_from.toISOString())}`,
 		'delete',
 		undefined,
 		undefined,
 		socket_id
 	);
+	return deserializeRecord(raw);
 }
 
 export async function recoverService(

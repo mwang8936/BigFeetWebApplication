@@ -669,16 +669,12 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 				: (serviceIdInput as number);
 		const time = service
 			? service.time === endTimeInput
-				? undefined
-				: endTimeInput === reservation.time
-				? undefined
+				? null
 				: endTimeInput
 			: undefined;
 		const beds_required = service
 			? service.beds_required === bedsRequiredInput
-				? undefined
-				: bedsRequiredInput === reservation.beds_required
-				? undefined
+				? null
 				: bedsRequiredInput
 			: undefined;
 		const requested_gender: Gender | null | undefined =
