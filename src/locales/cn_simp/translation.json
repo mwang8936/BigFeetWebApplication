@@ -301,6 +301,9 @@
 	"You do not have permissions to edit reservations.": "你无此权限",
 	"You do not have permissions to add reservations.": "你无此权限",
 	"You do not have permission to delete reservations.": "你无此权限",
+	"You do not have permissions to edit reservations from previous days.": "你无修改过去预约的权限",
+	"You do not have permissions to add reservations to previous days.": "你无添加过去预约的权限",
+	"You do not have permission to delete reservations from previous days.": "你无删除过去预约的权限",
 
 	"Start time cannot be empty.": "不能为空",
 	"End time cannot be empty.": "不能为空",

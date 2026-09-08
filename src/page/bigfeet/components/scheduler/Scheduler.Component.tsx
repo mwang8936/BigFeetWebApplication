@@ -38,7 +38,7 @@ import Schedule from '../../../../models/Schedule.Model';
 import User from '../../../../models/User.Model';
 import VipPackage from '../../../../models/Vip-Package.Model';
 
-import { sameDate } from '../../../../utils/date.utils';
+import { isPastDate, sameDate } from '../../../../utils/date.utils';
 import { moneyToString } from '../../../../utils/number.utils';
 
 interface KeyValueText {
@@ -132,9 +132,16 @@ const Scheduler: FC = () => {
 		Permissions.PERMISSION_ADD_GIFT_CARD
 	);
 
-	const reservationCreatable = user.permissions.includes(
-		Permissions.PERMISSION_ADD_RESERVATION
+	// Reservations cannot be added to a day that is already over in PST without
+	// permission to edit past reservations.
+	const pastReservationEditable = user.permissions.includes(
+		Permissions.PERMISSION_EDIT_PAST_RESERVATION
 	);
+	const pastReservationLocked = isPastDate(date) && !pastReservationEditable;
+
+	const reservationCreatable =
+		user.permissions.includes(Permissions.PERMISSION_ADD_RESERVATION) &&
+		!pastReservationLocked;
 
 	const vipPackageMap = new Map<number, VipPackage>();
 
@@ -368,7 +375,11 @@ const Scheduler: FC = () => {
 							top={false}
 							right={false}
 							disabled={!reservationCreatable}
-							missingPermissionMessage={ERRORS.reservation.permissions.add}
+							missingPermissionMessage={
+								pastReservationLocked
+									? ERRORS.reservation.permissions.past.add
+									: ERRORS.reservation.permissions.add
+							}
 							onClick={() => setOpenAddReservationModal(true)}
 						/>
 

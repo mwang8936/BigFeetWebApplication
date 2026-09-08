@@ -29,6 +29,7 @@ import User from '../../../../../../../models/User.Model';
 import { UpdateReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
 
 import { getTimeFromHoursAndMinutes } from '../../../../../../../utils/calendar.utils';
+import { isPastDate } from '../../../../../../../utils/date.utils';
 import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
@@ -71,9 +72,20 @@ const MoveReservation: FC<MoveReservationProp> = ({
 
 	const updatedBy = user.username;
 
-	const editable = user.permissions.includes(
-		Permissions.PERMISSION_UPDATE_RESERVATION
+	// Reservations from days that are already over in PST cannot be moved, and
+	// neither can a reservation be moved onto such a day, without permission to
+	// edit past reservations.
+	const pastEditable = user.permissions.includes(
+		Permissions.PERMISSION_EDIT_PAST_RESERVATION
 	);
+	const pastLocked =
+		!pastEditable &&
+		(isPastDate(reservation.reserved_date) ||
+			(newTime !== undefined && isPastDate(newTime)));
+
+	const editable =
+		user.permissions.includes(Permissions.PERMISSION_UPDATE_RESERVATION) &&
+		!pastLocked;
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -312,7 +324,9 @@ const MoveReservation: FC<MoveReservationProp> = ({
 				disabledEdit={!editable || noBeds || genderMismatch}
 				editMissingPermissionMessage={
 					!editable
-						? ERRORS.reservation.permissions.edit
+						? pastLocked
+							? ERRORS.reservation.permissions.past.edit
+							: ERRORS.reservation.permissions.edit
 						: noBeds
 						? ERRORS.warnings.no_beds.title
 						: genderMismatch

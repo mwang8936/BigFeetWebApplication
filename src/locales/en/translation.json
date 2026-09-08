@@ -301,6 +301,9 @@
 	"You do not have permissions to edit reservations.": "You do not have permissions to edit reservations.",
 	"You do not have permissions to add reservations.": "You do not have permissions to add reservations.",
 	"You do not have permission to delete reservations.": "You do not have permission to delete reservations.",
+	"You do not have permissions to edit reservations from previous days.": "You do not have permissions to edit reservations from previous days.",
+	"You do not have permissions to add reservations to previous days.": "You do not have permissions to add reservations to previous days.",
+	"You do not have permission to delete reservations from previous days.": "You do not have permission to delete reservations from previous days.",
 
 	"Start time cannot be empty.": "Start time cannot be empty.",
 	"End time cannot be empty.": "End time cannot be empty.",

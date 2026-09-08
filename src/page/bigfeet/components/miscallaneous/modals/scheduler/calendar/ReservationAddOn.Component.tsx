@@ -40,6 +40,7 @@ import User from '../../../../../../../models/User.Model';
 
 import { AddReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
 
+import { isPastDate } from '../../../../../../../utils/date.utils';
 import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
@@ -82,9 +83,17 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
 
-	const creatable = user.permissions.includes(
-		Permissions.PERMISSION_ADD_RESERVATION
+	// Add ons land on the same day as the reservation they are added to, so they
+	// are blocked once that day is over in PST unless the user has permission to
+	// edit past reservations.
+	const pastEditable = user.permissions.includes(
+		Permissions.PERMISSION_EDIT_PAST_RESERVATION
 	);
+	const pastLocked = isPastDate(reservation.reserved_date) && !pastEditable;
+
+	const creatable =
+		user.permissions.includes(Permissions.PERMISSION_ADD_RESERVATION) &&
+		!pastLocked;
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -385,7 +394,9 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 				}
 				addMissingPermissionMessage={
 					!creatable
-						? ERRORS.reservation.permissions.add
+						? pastLocked
+							? ERRORS.reservation.permissions.past.add
+							: ERRORS.reservation.permissions.add
 						: missingRequiredInput
 						? ERRORS.required
 						: invalidInput

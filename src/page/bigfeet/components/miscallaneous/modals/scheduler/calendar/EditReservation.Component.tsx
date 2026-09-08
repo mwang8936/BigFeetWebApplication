@@ -72,7 +72,11 @@ import PLACEHOLDERS from '../../../../../../../constants/placeholder.constants';
 import STORES from '../../../../../../../constants/store.constants';
 
 import { getTimeFromHoursAndMinutes } from '../../../../../../../utils/calendar.utils';
-import { sameDate, sameTime } from '../../../../../../../utils/date.utils';
+import {
+	isPastDate,
+	sameDate,
+	sameTime,
+} from '../../../../../../../utils/date.utils';
 import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
@@ -193,15 +197,33 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 
 	const updatedBy = user.username;
 
-	const creatable = user.permissions.includes(
-		Permissions.PERMISSION_ADD_RESERVATION
+	// Reservations from days that are already over in PST are read only unless
+	// the user has been given permission to edit past reservations.
+	const pastEditable = user.permissions.includes(
+		Permissions.PERMISSION_EDIT_PAST_RESERVATION
 	);
-	const editable = user.permissions.includes(
-		Permissions.PERMISSION_UPDATE_RESERVATION
-	);
-	const deletable = user.permissions.includes(
-		Permissions.PERMISSION_DELETE_RESERVATION
-	);
+	const isPast = isPastDate(reservation.reserved_date);
+	const pastLocked = isPast && !pastEditable;
+
+	const creatable =
+		user.permissions.includes(Permissions.PERMISSION_ADD_RESERVATION) &&
+		!pastLocked;
+	const editable =
+		user.permissions.includes(Permissions.PERMISSION_UPDATE_RESERVATION) &&
+		!pastLocked;
+	const deletable =
+		user.permissions.includes(Permissions.PERMISSION_DELETE_RESERVATION) &&
+		!pastLocked;
+
+	const addMissingPermissionMessage = pastLocked
+		? ERRORS.reservation.permissions.past.add
+		: ERRORS.reservation.permissions.add;
+	const editMissingPermissionMessage = pastLocked
+		? ERRORS.reservation.permissions.past.edit
+		: ERRORS.reservation.permissions.edit;
+	const deleteMissingPermissionMessage = pastLocked
+		? ERRORS.reservation.permissions.past.delete
+		: ERRORS.reservation.permissions.delete;
 
 	const customerGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_CUSTOMER
@@ -830,7 +852,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 								top={false}
 								right={false}
 								disabled={!creatable}
-								missingPermissionMessage={ERRORS.reservation.permissions.add}
+								missingPermissionMessage={addMissingPermissionMessage}
 								onClick={() => {
 									setOpenAddModal(true);
 								}}
@@ -851,7 +873,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 									invalidMessage: ERRORS.reservation.date.invalid,
 								}}
 								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+								missingPermissionMessage={editMissingPermissionMessage}
 							/>
 
 							<EditableTime
@@ -869,7 +891,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 									invalidMessage: ERRORS.reservation.time.invalid,
 								}}
 								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+								missingPermissionMessage={editMissingPermissionMessage}
 							/>
 
 							<EditableDropDown
@@ -897,7 +919,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 									requiredMessage: ERRORS.reservation.employee_id.required,
 								}}
 								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+								missingPermissionMessage={editMissingPermissionMessage}
 							/>
 
 							<EditableDropDown
@@ -925,7 +947,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 									requiredMessage: ERRORS.reservation.service_id.required,
 								}}
 								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+								missingPermissionMessage={editMissingPermissionMessage}
 							/>
 
 							{dateInput !== null &&
@@ -962,7 +984,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 													}}
 													editable={editable}
 													missingPermissionMessage={
-														ERRORS.reservation.permissions.edit
+														editMissingPermissionMessage
 													}
 												/>
 
@@ -983,7 +1005,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 													placeholder={PLACEHOLDERS.service.beds_required}
 													editable={editable}
 													missingPermissionMessage={
-														ERRORS.reservation.permissions.edit
+														editMissingPermissionMessage
 													}
 												/>
 
@@ -1019,7 +1041,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 									required: false,
 								}}
 								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+								missingPermissionMessage={editMissingPermissionMessage}
 							/>
 
 							<EditableToggleSwitch
@@ -1032,7 +1054,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 								label={LABELS.reservation.requested_employee}
 								name={NAMES.reservation.requested_employee}
 								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+								missingPermissionMessage={editMissingPermissionMessage}
 							/>
 
 							<EditablePayRateAutomatic
@@ -1052,7 +1074,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 								}}
 								placeholder={PLACEHOLDERS.reservation.cash}
 								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+								missingPermissionMessage={editMissingPermissionMessage}
 							/>
 
 							<EditablePayRateAutomatic
@@ -1072,7 +1094,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 								}}
 								placeholder={PLACEHOLDERS.reservation.machine}
 								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+								missingPermissionMessage={editMissingPermissionMessage}
 							/>
 
 							<EditablePayRateAutomatic
@@ -1092,7 +1114,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 								}}
 								placeholder={PLACEHOLDERS.reservation.vip}
 								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+								missingPermissionMessage={editMissingPermissionMessage}
 							/>
 
 							<EditablePayRateAutomatic
@@ -1112,7 +1134,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 								}}
 								placeholder={PLACEHOLDERS.reservation.gift_card}
 								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+								missingPermissionMessage={editMissingPermissionMessage}
 							/>
 
 							<EditablePayRateAutomatic
@@ -1132,7 +1154,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 								}}
 								placeholder={PLACEHOLDERS.reservation.insurance}
 								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+								missingPermissionMessage={editMissingPermissionMessage}
 							/>
 
 							{remainingAmount > 0 && (
@@ -1158,7 +1180,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 								}}
 								placeholder={PLACEHOLDERS.reservation.cash_out}
 								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+								missingPermissionMessage={editMissingPermissionMessage}
 							/>
 
 							<EditableDropDown
@@ -1190,7 +1212,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 									required: false,
 								}}
 								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+								missingPermissionMessage={editMissingPermissionMessage}
 							/>
 
 							{(tipMethodInput === TipMethod.HALF ||
@@ -1210,7 +1232,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 									}}
 									placeholder={PLACEHOLDERS.reservation.tips}
 									editable={editable}
-									missingPermissionMessage={ERRORS.reservation.permissions.edit}
+									missingPermissionMessage={editMissingPermissionMessage}
 								/>
 							)}
 
@@ -1225,7 +1247,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 									required: false,
 								}}
 								editable={editable}
-								missingPermissionMessage={ERRORS.reservation.permissions.edit}
+								missingPermissionMessage={editMissingPermissionMessage}
 							/>
 
 							<div className="customer-optional-div">
@@ -1257,7 +1279,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 										invalidMessage: ERRORS.customer.phone_number.invalid,
 									}}
 									editable={editable}
-									missingPermissionMessage={ERRORS.reservation.permissions.edit}
+									missingPermissionMessage={editMissingPermissionMessage}
 								/>
 
 								<EditableInput
@@ -1277,7 +1299,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 										invalidMessage: ERRORS.customer.vip_serial.invalid,
 									}}
 									editable={editable}
-									missingPermissionMessage={ERRORS.reservation.permissions.edit}
+									missingPermissionMessage={editMissingPermissionMessage}
 								/>
 
 								{((customerPhoneNumberInput?.length === 10 &&
@@ -1302,7 +1324,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 											}}
 											editable={editable}
 											missingPermissionMessage={
-												ERRORS.reservation.permissions.edit
+												editMissingPermissionMessage
 											}
 										/>
 
@@ -1318,7 +1340,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 											}}
 											editable={editable}
 											missingPermissionMessage={
-												ERRORS.reservation.permissions.edit
+												editMissingPermissionMessage
 											}
 										/>
 									</>
@@ -1341,7 +1363,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 				}
 				editMissingPermissionMessage={
 					!editable
-						? ERRORS.reservation.permissions.edit
+						? editMissingPermissionMessage
 						: !changesMade
 						? ERRORS.no_changes
 						: missingRequiredInput
@@ -1356,7 +1378,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 				}
 				onEdit={onEdit}
 				disabledDelete={!deletable}
-				deleteMissingPermissionMessage={ERRORS.reservation.permissions.delete}
+				deleteMissingPermissionMessage={deleteMissingPermissionMessage}
 				onDelete={() => setOpenDeleteModal(true)}
 			/>
 
@@ -1370,6 +1392,7 @@ const EditReservation: FC<EditReservationProp> = ({ setOpen, reservation }) => {
 				open={openDeleteModal}
 				setOpen={setOpenDeleteModal}
 				reservationId={reservation.reservation_id}
+				reservedDate={reservation.reserved_date}
 			/>
 
 			<WarningModal

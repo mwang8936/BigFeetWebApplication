@@ -57,6 +57,7 @@ import User from '../../../../../../../models/User.Model';
 import { AddReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
 
 import { getTimeFromHoursAndMinutes } from '../../../../../../../utils/calendar.utils';
+import { isPastDate } from '../../../../../../../utils/date.utils';
 import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
@@ -139,9 +140,17 @@ const AddReservation: FC<AddReservationProp> = ({
 
 	const createdBy = user.username;
 
-	const creatable = user.permissions.includes(
-		Permissions.PERMISSION_ADD_RESERVATION
+	// Reservations cannot be added to a day that is already over in PST without
+	// permission to edit past reservations.
+	const pastEditable = user.permissions.includes(
+		Permissions.PERMISSION_EDIT_PAST_RESERVATION
 	);
+	const pastLocked =
+		!pastEditable && dateInput !== null && isPastDate(dateInput);
+
+	const creatable =
+		user.permissions.includes(Permissions.PERMISSION_ADD_RESERVATION) &&
+		!pastLocked;
 
 	const customerGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_CUSTOMER
@@ -771,7 +780,9 @@ const AddReservation: FC<AddReservationProp> = ({
 				}
 				addMissingPermissionMessage={
 					!creatable
-						? ERRORS.reservation.permissions.add
+						? pastLocked
+							? ERRORS.reservation.permissions.past.add
+							: ERRORS.reservation.permissions.add
 						: missingRequiredInput
 						? ERRORS.required
 						: invalidInput

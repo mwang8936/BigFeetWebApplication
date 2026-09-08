@@ -6,6 +6,8 @@ import Employee from '../../../../../../models/Employee.Model';
 import { Permissions } from '../../../../../../models/enums';
 import User from '../../../../../../models/User.Model';
 
+import { isPastDate } from '../../../../../../utils/date.utils';
+
 import AddReservationModal from '../../../miscallaneous/modals/scheduler/calendar/AddReservationModal.Component';
 
 interface CalendarGridProp {
@@ -28,9 +30,15 @@ const CalendarGrid: FC<CalendarGridProp> = ({
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
 
-	const creatable = user.permissions.includes(
-		Permissions.PERMISSION_ADD_RESERVATION
+	// Empty slots on a day that is already over in PST cannot be filled in
+	// without permission to edit past reservations.
+	const pastEditable = user.permissions.includes(
+		Permissions.PERMISSION_EDIT_PAST_RESERVATION
 	);
+
+	const creatable =
+		user.permissions.includes(Permissions.PERMISSION_ADD_RESERVATION) &&
+		(!isPastDate(date) || pastEditable);
 
 	// Calculate percentage stops for the gradient
 	const topPercent = blocked?.top || 0;
@@ -45,7 +53,9 @@ const CalendarGrid: FC<CalendarGridProp> = ({
 				gridRowStart: row,
 				gridColumnStart: col,
 			}}
-			className="border-slate-500 border-b border-r cursor-pointer"
+			className={`border-slate-500 border-b border-r ${
+				creatable ? 'cursor-pointer' : ''
+			}`}
 			onClick={() => {
 				if (creatable) setOpen(true);
 			}}>
