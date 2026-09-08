@@ -24,6 +24,39 @@ export function sameDate(date1: Date, date2: Date): boolean {
 	);
 }
 
+const PST_TIME_ZONE = 'America/Los_Angeles';
+
+/**
+ * Converts a Date object into its PST calendar date, formatted as YYYY-MM-DD.
+ *
+ * @param date - The Date object to convert.
+ * @returns string - The PST calendar date of the given Date (e.g. "2024-07-29").
+ *
+ * The store always operates on PST days, so dates are compared in PST rather
+ * than in whatever timezone the browser happens to be set to.
+ */
+export function getPSTDateString(date: Date): string {
+	// en-CA formats dates as YYYY-MM-DD, which sorts correctly as a string.
+	return date.toLocaleDateString('en-CA', { timeZone: PST_TIME_ZONE });
+}
+
+/**
+ * Checks if a date falls on a PST day that has already ended.
+ *
+ * @param date - The Date object to check.
+ * @returns boolean - True if the date is before the PST day currently in
+ * progress; false otherwise.
+ *
+ * A day is over once it hits 12AM PST, so a reservation is only considered to
+ * be in the past once its whole day has passed in PST.
+ *
+ * Example usage:
+ * const isPast = isPastDate(new Date('2024-07-29T10:00:00')); // Returns true
+ */
+export function isPastDate(date: Date): boolean {
+	return getPSTDateString(date) < getPSTDateString(new Date());
+}
+
 /**
  * Compares two Date objects to determine if they represent the same time.
  *

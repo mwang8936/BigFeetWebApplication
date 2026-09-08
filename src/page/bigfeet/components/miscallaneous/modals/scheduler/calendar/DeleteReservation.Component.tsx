@@ -16,14 +16,18 @@ import ERRORS from '../../../../../../../constants/error.constants';
 import { Permissions } from '../../../../../../../models/enums';
 import User from '../../../../../../../models/User.Model';
 
+import { isPastDate } from '../../../../../../../utils/date.utils';
+
 interface DeleteReservationProp {
 	setOpen(open: boolean): void;
 	reservationId: number;
+	reservedDate: Date;
 }
 
 const DeleteReservation: FC<DeleteReservationProp> = ({
 	setOpen,
 	reservationId,
+	reservedDate,
 }) => {
 	const { t } = useTranslation();
 
@@ -32,9 +36,16 @@ const DeleteReservation: FC<DeleteReservationProp> = ({
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
 
-	const deletable = user.permissions.includes(
-		Permissions.PERMISSION_DELETE_RESERVATION
+	// Reservations from days that are already over in PST cannot be deleted
+	// without permission to edit past reservations.
+	const pastEditable = user.permissions.includes(
+		Permissions.PERMISSION_EDIT_PAST_RESERVATION
 	);
+	const pastLocked = isPastDate(reservedDate) && !pastEditable;
+
+	const deletable =
+		user.permissions.includes(Permissions.PERMISSION_DELETE_RESERVATION) &&
+		!pastLocked;
 
 	const deleteReservationMutation = useDeleteReservationMutation({});
 	const onDeleteReservation = async (reservationId: number) => {
@@ -75,7 +86,11 @@ const DeleteReservation: FC<DeleteReservationProp> = ({
 			<DeleteBottom
 				onCancel={() => setOpen(false)}
 				disabledDelete={!deletable}
-				deleteMissingPermissionMessage={ERRORS.reservation.permissions.delete}
+				deleteMissingPermissionMessage={
+					pastLocked
+						? ERRORS.reservation.permissions.past.delete
+						: ERRORS.reservation.permissions.delete
+				}
 				onDelete={onDelete}
 			/>
 		</>

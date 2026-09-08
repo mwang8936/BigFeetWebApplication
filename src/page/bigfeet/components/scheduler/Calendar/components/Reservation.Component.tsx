@@ -29,6 +29,7 @@ import Reservation from '../../../../../../models/Reservation.Model';
 import Schedule from '../../../../../../models/Schedule.Model';
 import User from '../../../../../../models/User.Model';
 
+import { isPastDate } from '../../../../../../utils/date.utils';
 import { sortEmployees } from '../../../../../../utils/employee.utils';
 import { moneyToString } from '../../../../../../utils/number.utils';
 import { getReservationOverlappingOrder } from '../../../../../../utils/reservation.utils';
@@ -56,9 +57,14 @@ const ReservationTag: FC<ReservationTagProp> = ({ reservation, colNum }) => {
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
 	const user: User = userQuery.data;
 
-	const editable = user.permissions.includes(
-		Permissions.PERMISSION_UPDATE_RESERVATION
+	const pastEditable = user.permissions.includes(
+		Permissions.PERMISSION_EDIT_PAST_RESERVATION
 	);
+	const isPast = isPastDate(reservation.reserved_date);
+
+	const editable =
+		user.permissions.includes(Permissions.PERMISSION_UPDATE_RESERVATION) &&
+		(!isPast || pastEditable);
 
 	const employeeGettable = user.permissions.includes(
 		Permissions.PERMISSION_GET_EMPLOYEE
@@ -351,7 +357,12 @@ const ReservationTag: FC<ReservationTagProp> = ({ reservation, colNum }) => {
 					height: height,
 					left: left,
 				}}
-				className={`row-span-2 ${completionColour} border-4 rounded-lg mx-1 p-1 flex flex-row cursor-move overflow-visible z-[2] transition-colors ease-in-out duration-200 hover:z-[3] group relative`}>
+				className={`row-span-2 ${completionColour} border-4 rounded-lg mx-1 p-1 flex flex-row ${
+					editable ? 'cursor-move' : 'cursor-pointer'
+				} overflow-visible z-[2] transition-colors ease-in-out duration-200 hover:z-[3] group relative`}
+				// Dragging is disabled when the reservation cannot be edited, so the
+				// reservation is opened on click instead to still allow reading it.
+				onClick={editable ? undefined : () => setOpenEdit(true)}>
 				<span className={tipLocation}>
 					{serviceText}
 					<br />

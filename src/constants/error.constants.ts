@@ -319,6 +319,12 @@ const ERRORS = {
 			edit: 'You do not have permissions to edit reservations.',
 			add: 'You do not have permissions to add reservations.',
 			delete: 'You do not have permission to delete reservations.',
+			past: {
+				edit: 'You do not have permissions to edit reservations from previous days.',
+				add: 'You do not have permissions to add reservations to previous days.',
+				delete:
+					'You do not have permission to delete reservations from previous days.',
+			},
 		},
 	},
 	schedule: {
