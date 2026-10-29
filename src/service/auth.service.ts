@@ -9,6 +9,8 @@ import BASE_API_URL, {
 
 import { LoginRequest } from '../models/requests/Login.Request.Model';
 
+import { getBCTimeZone } from '../utils/date.utils';
+
 export function login(request: LoginRequest) {
 	const config: AxiosRequestConfig = {
 		method: 'post',
@@ -83,7 +85,7 @@ function parseData(data: any) {
 						const date = new Date(year, month - 1, day);
 
 						const pstDate = new Date(
-							date.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })
+							date.toLocaleString('en-US', { timeZone: getBCTimeZone(date) })
 						);
 
 						data[key] = pstDate;

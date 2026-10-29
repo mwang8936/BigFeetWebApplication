@@ -40,7 +40,10 @@ import User from '../../../../../../../models/User.Model';
 
 import { AddReservationRequest } from '../../../../../../../models/requests/Reservation.Request.Model';
 
-import { isPastDate } from '../../../../../../../utils/date.utils';
+import {
+	getBCTimeZone,
+	isPastDate,
+} from '../../../../../../../utils/date.utils';
 import {
 	reservationBedConflict,
 	reservationEmployeeConflict,
@@ -303,7 +306,7 @@ const ReservationAddOn: FC<ReservationAddOnProp> = ({
 								<span>
 									{t('Time')}:{' '}
 									{startDate.toLocaleTimeString('en-US', {
-										timeZone: 'America/Los_Angeles',
+										timeZone: getBCTimeZone(startDate),
 										hour12: true,
 										hour: '2-digit',
 										minute: '2-digit',

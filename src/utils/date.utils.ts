@@ -24,7 +24,50 @@ export function sameDate(date1: Date, date2: Date): boolean {
 	);
 }
 
-const PST_TIME_ZONE = 'America/Los_Angeles';
+/**
+ * BC stopped changing its clocks in 2026 and now stays on UTC-7 all year, while
+ * America/Los_Angeles keeps falling back to UTC-8. Browsers with older tz data
+ * still have America/Vancouver falling back at 2AM on 2026-11-01, so from that
+ * moment on a fixed UTC-7 zone is used instead of trusting the tz database.
+ * Before it, America/Vancouver is correct with any tz data.
+ */
+const BC_PERMANENT_TIME_START = Date.UTC(2026, 10, 1, 9); // 2026-11-01 2AM UTC-7
+
+// The Etc/GMT zones invert the sign, so this is UTC-7.
+const BC_PERMANENT_TIME_ZONE = 'Etc/GMT+7';
+
+const BC_HISTORICAL_TIME_ZONE = 'America/Vancouver';
+
+/**
+ * Returns the time zone to use for a given instant in BC.
+ *
+ * @param date - The instant to get the time zone for. Defaults to now.
+ * @returns string - An IANA time zone usable with Intl and luxon.
+ */
+export function getBCTimeZone(date: Date = new Date()): string {
+	return date.getTime() >= BC_PERMANENT_TIME_START
+		? BC_PERMANENT_TIME_ZONE
+		: BC_HISTORICAL_TIME_ZONE;
+}
+
+/**
+ * Returns the time zone to use for a BC calendar day, for when the day is known
+ * but the instant is not yet (e.g. finding the start of that day).
+ *
+ * @param year - The year of the day.
+ * @param month - The month of the day (1 for January, 12 for December).
+ * @param day - The day of the month.
+ * @returns string - An IANA time zone usable with Intl and luxon.
+ */
+export function getBCTimeZoneForDay(
+	year: number,
+	month: number,
+	day: number
+): string {
+	return Date.UTC(year, month - 1, day) >= Date.UTC(2026, 10, 1)
+		? BC_PERMANENT_TIME_ZONE
+		: BC_HISTORICAL_TIME_ZONE;
+}
 
 /**
  * Converts a Date object into its PST calendar date, formatted as YYYY-MM-DD.
@@ -37,7 +80,7 @@ const PST_TIME_ZONE = 'America/Los_Angeles';
  */
 export function getPSTDateString(date: Date): string {
 	// en-CA formats dates as YYYY-MM-DD, which sorts correctly as a string.
-	return date.toLocaleDateString('en-CA', { timeZone: PST_TIME_ZONE });
+	return date.toLocaleDateString('en-CA', { timeZone: getBCTimeZone(date) });
 }
 
 /**

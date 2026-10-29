@@ -4,6 +4,8 @@ import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
 import { DateTime } from 'luxon';
 
+import { getBCTimeZone, getBCTimeZoneForDay } from '../utils/date.utils';
+
 import { i18n } from 'i18next';
 
 import Cookies from 'js-cookie';
@@ -81,7 +83,7 @@ function parseData(data: any) {
 						const date = new Date(year, month - 1, day);
 
 						const pstDate = new Date(
-							date.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })
+							date.toLocaleString('en-US', { timeZone: getBCTimeZone(date) })
 						);
 
 						data[key] = pstDate;
@@ -100,10 +102,20 @@ function parseData(data: any) {
 								.map((part, i) => (i === 0 ? part : part.padStart(2, '0')))
 								.join('-');
 
-							// Parse as a date in the beginning of the day in PST (America/Los_Angeles)
-							const isoDate = DateTime.fromISO(normalizedInput, {
-								zone: 'America/Los_Angeles',
-							}).startOf('day');
+							// Parse as a date in the beginning of the day in BC
+							const localDate = DateTime.fromISO(normalizedInput, {
+								zone: 'UTC',
+							});
+							const isoDate = localDate
+								.setZone(
+									getBCTimeZoneForDay(
+										localDate.year,
+										localDate.month,
+										localDate.day
+									),
+									{ keepLocalTime: true }
+								)
+								.startOf('day');
 
 							if (isoDate.isValid) {
 								data[key] = isoDate.toJSDate();
