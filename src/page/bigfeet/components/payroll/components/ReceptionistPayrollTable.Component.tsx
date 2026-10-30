@@ -27,6 +27,7 @@ import Payroll from '../../../../../models/Payroll.Model';
 import User from '../../../../../models/User.Model';
 
 import {
+	getBCParts,
 	getShortMonthString,
 	isHoliday,
 } from '../../../../../utils/date.utils';
@@ -93,7 +94,7 @@ const ReceptionistPayrollTable: FC<ReceptionistPayrollTableProp> = ({
 			: Array.from({ length: 16 }, (_, i) => i + 16);
 
 	const data: RowData[] = days.map((day) => {
-		const scheduleData = payroll.data.find((row) => row.date.getDate() === day);
+		const scheduleData = payroll.data.find((row) => getBCParts(row.date).day === day);
 
 		if (scheduleData) {
 			const start = scheduleData.start;
@@ -110,7 +111,7 @@ const ReceptionistPayrollTable: FC<ReceptionistPayrollTableProp> = ({
 
 			const hours_minus_sessions = Math.max(hours - body - feet, 0);
 
-			const holiday = isHoliday(new Date(date.year, date.month - 1, day));
+			const holiday = isHoliday({ year: date.year, month: date.month, day });
 
 			const total_hours = Math.max(
 				holiday ? 1.5 * hours_minus_sessions : hours_minus_sessions,
@@ -137,7 +138,7 @@ const ReceptionistPayrollTable: FC<ReceptionistPayrollTableProp> = ({
 				body: 0,
 				feet: 0,
 				hours_minus_sessions: 0,
-				holiday: isHoliday(new Date(date.year, date.month - 1, day)),
+				holiday: isHoliday({ year: date.year, month: date.month, day }),
 				total_hours: 0,
 			};
 		}

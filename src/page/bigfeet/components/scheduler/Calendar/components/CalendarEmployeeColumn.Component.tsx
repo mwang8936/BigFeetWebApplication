@@ -20,7 +20,11 @@ import {
 	timeHourToNumber,
 	timeMinuteToNumber,
 } from '../../../../../../utils/calendar.utils';
-import { doesDateOverlap } from '../../../../../../utils/date.utils';
+import {
+	doesDateOverlap,
+	getBCParts,
+	setBCTime,
+} from '../../../../../../utils/date.utils';
 
 interface CalendarEmployeeColumnProp {
 	employee: Employee;
@@ -40,9 +44,13 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 	const renderGrids = () => {
 		const grids = [];
 		for (let i = 2; i < timeArr.length + 2; i++) {
-			const gridDate = new Date(date);
-			gridDate.setHours(timeHourToNumber(timeArr[i - 2]));
-			gridDate.setMinutes(timeMinuteToNumber(timeArr[i - 2]));
+			// Each row is a BC wall clock time on the scheduler's BC day.
+			const gridHour = timeHourToNumber(timeArr[i - 2]);
+			let gridDate = setBCTime(
+				date,
+				gridHour,
+				timeMinuteToNumber(timeArr[i - 2])
+			);
 
 			const start = schedule?.start
 				? getTimeFromHoursAndMinutes(schedule.start)
@@ -110,12 +118,15 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 			const blocked = getBlocked();
 
 			if (schedule?.start) {
+				const scheduleStart = getBCParts(schedule.start);
+				const gridMinute = getBCParts(gridDate).minute;
+
 				if (
-					schedule.start.getHours() === gridDate.getHours() &&
-					schedule.start.getMinutes() > gridDate.getMinutes() &&
-					schedule.start.getMinutes() < gridDate.getMinutes() + 30
+					scheduleStart.hour === gridHour &&
+					scheduleStart.minute > gridMinute &&
+					scheduleStart.minute < gridMinute + 30
 				)
-					gridDate.setMinutes(schedule.start.getMinutes());
+					gridDate = setBCTime(gridDate, gridHour, scheduleStart.minute);
 			}
 
 			const overlappingReservations = schedule?.reservations
@@ -138,8 +149,10 @@ const CalendarEmployeeColumn: FC<CalendarEmployeeColumnProp> = ({
 					overlappingReservation.reserved_date.getTime() + time * (1000 * 60)
 				);
 
-				gridDate.setMinutes(
-					Math.max(gridDate.getMinutes(), startDate.getMinutes())
+				gridDate = setBCTime(
+					gridDate,
+					gridHour,
+					Math.max(getBCParts(gridDate).minute, getBCParts(startDate).minute)
 				);
 			}
 

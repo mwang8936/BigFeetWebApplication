@@ -14,7 +14,10 @@ import Employee from '../../../../models/Employee.Model';
 import { Language, Permissions, Role } from '../../../../models/enums';
 import User from '../../../../models/User.Model';
 
-import { getYearMonthString } from '../../../../utils/date.utils';
+import {
+	getBCParts,
+	getYearMonthString,
+} from '../../../../utils/date.utils';
 
 import EmployeePayroll from './components/EmployeePayroll.Component';
 
@@ -45,8 +48,8 @@ const PayRoll: FC = () => {
 	const [openFilterDialog, setOpenFilterDialog] = useState(false);
 
 	const [date, setDate] = useState<{ year: number; month: number }>({
-		year: new Date().getFullYear(),
-		month: new Date().getMonth() + 1,
+		year: getBCParts().year,
+		month: getBCParts().month,
 	});
 
 	const userQuery = useUserQuery({ gettable: true, staleTime: Infinity });
@@ -91,8 +94,8 @@ const PayRoll: FC = () => {
 	const language = user.language;
 
 	const filtered =
-		new Date().getMonth() + 1 !== date.month ||
-		new Date().getFullYear() !== date.year;
+		getBCParts().month !== date.month ||
+		getBCParts().year !== date.year;
 
 	const displayDate = () => {
 		let localeDateFormat;

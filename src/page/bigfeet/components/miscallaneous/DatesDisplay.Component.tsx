@@ -6,6 +6,8 @@ import { useUserQuery } from '../../../hooks/profile.hooks';
 import { Language } from '../../../../models/enums';
 import User from '../../../../models/User.Model';
 
+import { getBCTimeZone } from '../../../../utils/date.utils';
+
 interface DatesDisplayProp {
 	updatedAt: Date;
 	createdAt: Date;
@@ -29,12 +31,14 @@ const DatesDisplay: FC<DatesDisplayProp> = ({ updatedAt, createdAt }) => {
 	}
 
 	const updatedAtString = updatedAt.toLocaleDateString(localeDateFormat, {
+		timeZone: getBCTimeZone(updatedAt),
 		year: 'numeric',
 		month: 'long',
 		day: 'numeric',
 	});
 
 	const createdAtString = createdAt.toLocaleDateString(localeDateFormat, {
+		timeZone: getBCTimeZone(createdAt),
 		year: 'numeric',
 		month: 'long',
 		day: 'numeric',

@@ -34,6 +34,8 @@ import User from '../../../../../../../models/User.Model';
 
 import { AddScheduleRequest } from '../../../../../../../models/requests/Schedule.Request.Model';
 
+import { getBCParts } from '../../../../../../../utils/date.utils';
+
 interface AddScheduleProp {
 	setOpen(open: boolean): void;
 	employeeId: number;
@@ -220,8 +222,8 @@ const AddSchedule: FC<AddScheduleProp> = ({ setOpen, employeeId }) => {
 									label={LABELS.schedule.end}
 									validationProp={{
 										min:
-											startInput.getHours() +
-											(startInput.getMinutes() + 1) / 60,
+											getBCParts(startInput).hour +
+											(getBCParts(startInput).minute + 1) / 60,
 										max: STORES.end,
 										required: false,
 										requiredMessage: ERRORS.schedule.end.required,

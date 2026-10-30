@@ -6,6 +6,11 @@ import dayjs from 'dayjs';
 import { LocalizationProvider, DesktopTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
+import {
+	fromPickerDate,
+	toPickerDate,
+} from '../../../../../utils/date.utils';
+
 interface InvalidMessage {
 	key: string;
 	value: Record<string, string | number>;
@@ -64,15 +69,15 @@ const AddTime: FC<AddTimeProp> = ({ time, setTime, label, validationProp }) => {
 					<DesktopTimePicker
 						className="add-input"
 						label={t(label)}
-						value={time ? dayjs(time) : null}
+						// The picker edits the browser's clock, so it is shown the BC wall clock
+						// and what is picked is read back as BC time.
+						value={time ? dayjs(toPickerDate(time)) : null}
 						onChange={(time: dayjs.Dayjs | null) => {
 							if (time === null) {
 								setTime(null);
 							} else {
-								const selectedTime = time;
-								selectedTime.set('second', 0);
-								selectedTime.set('millisecond', 0);
-								setTime(selectedTime.toDate());
+								const selectedTime = time.second(0).millisecond(0);
+								setTime(fromPickerDate(selectedTime.toDate()));
 							}
 						}}
 						closeOnSelect={false}

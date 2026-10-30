@@ -19,6 +19,7 @@ import {
 } from '../../service/acupuncture-report.service';
 import { getProfileAcupunctureReports } from '../../service/profile.service';
 
+import { fromBCParts } from '../../utils/date.utils';
 import {
 	createLoadingToast,
 	errorToast,
@@ -48,7 +49,8 @@ export const useAcupunctureReportsQuery = ({
 	return useQuery({
 		queryKey: [acupunctureReportsQueryKey, year, month],
 		queryFn: () => {
-			const date = new Date(year, month - 1, 1);
+			// Midnight on the 1st in BC, so the server reads the right month.
+			const date = fromBCParts({ year, month, day: 1 });
 
 			const params: GetAcupunctureReportsParam = {
 				start: date,

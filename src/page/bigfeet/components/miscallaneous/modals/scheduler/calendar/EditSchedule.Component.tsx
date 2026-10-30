@@ -32,7 +32,7 @@ import User from '../../../../../../../models/User.Model';
 
 import { UpdateScheduleRequest } from '../../../../../../../models/requests/Schedule.Request.Model';
 
-import { sameTime } from '../../../../../../../utils/date.utils';
+import { getBCParts, sameTime } from '../../../../../../../utils/date.utils';
 
 interface EditScheduleProp {
 	setOpen(open: boolean): void;
@@ -306,7 +306,9 @@ const EditSchedule: FC<EditScheduleProp> = ({ setOpen, schedule }) => {
 									setTime={setEndInput}
 									label={LABELS.schedule.end}
 									validationProp={{
-										min: startInput.getHours() + startInput.getMinutes() / 60,
+										min:
+											getBCParts(startInput).hour +
+											getBCParts(startInput).minute / 60,
 										max: STORES.end,
 										required: false,
 										requiredMessage: ERRORS.schedule.end.required,

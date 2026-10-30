@@ -25,6 +25,8 @@ import Employee from '../../../../../../../models/Employee.Model';
 import { Language, Permissions } from '../../../../../../../models/enums';
 import User from '../../../../../../../models/User.Model';
 
+import { getBCTimeZone } from '../../../../../../../utils/date.utils';
+
 import { SignScheduleRequest } from '../../../../../../../models/requests/Schedule.Request.Model';
 
 interface SignScheduleProp {
@@ -76,6 +78,7 @@ const SignSchedule: FC<SignScheduleProp> = ({ setOpen, employee }) => {
 	}
 
 	const dateString = date.toLocaleDateString(localeDateFormat, {
+		timeZone: getBCTimeZone(date),
 		year: 'numeric',
 		month: 'long',
 		day: 'numeric',

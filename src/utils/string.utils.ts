@@ -1,4 +1,4 @@
-import { getBCTimeZone } from './date.utils';
+import { getBCParts, getBCTimeZone } from './date.utils';
 
 /**
  * Formats a 10-digit phone number into the (XXX) XXX-XXXX format.
@@ -39,14 +39,13 @@ export const formatPhoneNumber = (phoneNumber: string) => {
  * @param date - The Date object to format.
  * @returns string - The formatted time in the format of HH:mm AM/PM.
  *
- * The function extracts the hours and minutes from the provided Date object.
+ * The function extracts the hours and minutes the provided Date object shows on a BC clock.
  * It converts the hours into a 12-hour format and ensures that single-digit minutes are padded with a leading zero.
  * The function also appends AM or PM based on the time of day.
  */
 export function formatTimeFromDate(date: Date): string {
-	// Extract hours and minutes from the date object
-	const hour = date.getHours();
-	const minute = date.getMinutes();
+	// Extract the BC hours and minutes from the date object
+	const { hour, minute } = getBCParts(date);
 
 	// Convert hours to 12-hour format and handle edge cases
 	const formattedHour = hour === 12 ? 12 : hour % 12;

@@ -1,3 +1,4 @@
+import { getBCParts } from './date.utils';
 import { formatTimeFromNumber } from './string.utils';
 
 import STORES from '../constants/store.constants';
@@ -93,7 +94,7 @@ export function timeMinuteToNumber(time: string): number {
  * @param time - The time string to check in the format 'HH:mm AM/PM' (e.g., '6:30 PM').
  * @returns boolean - True if the given time matches the current time based on the criteria, false otherwise.
  *
- * This function checks if the provided time matches the current time. It considers the following:
+ * This function checks if the provided time matches the current time in BC. It considers the following:
  * - The hour from the provided time must match the current hour.
  * - The provided time must either have zero minutes or the current minutes must be at least 30.
  *
@@ -101,10 +102,8 @@ export function timeMinuteToNumber(time: string): number {
  * const isScrollable = scrollable('6:30 PM'); // Returns true or false based on the current time.
  */
 export function scrollable(time: string): boolean {
-	// Get the current date and time
-	const currentDate = new Date();
-	const currentHours = currentDate.getHours();
-	const currentMinutes = currentDate.getMinutes();
+	// Get the current time in BC
+	const { hour: currentHours, minute: currentMinutes } = getBCParts();
 
 	// Extract hours from the given time string
 	const hours: number = timeHourToNumber(time);
@@ -129,14 +128,16 @@ export function scrollable(time: string): boolean {
  * @returns number - The total milliseconds calculated from the hours and minutes.
  *
  * This function calculates the total milliseconds by converting the hours to milliseconds
- * and adding the milliseconds obtained from the minutes.
+ * and adding the milliseconds obtained from the minutes, as shown on a BC clock.
  *
  * Example usage:
  * const totalMilliseconds = getTimeFromHoursAndMinutes(new Date('2024-10-11T14:30:00')); // Returns total milliseconds from 14:30
  */
 export function getTimeFromHoursAndMinutes(date: Date): number {
-	const hourTime = date.getHours() * 60 * 60 * 1000;
-	const minuteTime = date.getMinutes() * 60 * 1000;
+	const { hour, minute } = getBCParts(date);
+
+	const hourTime = hour * 60 * 60 * 1000;
+	const minuteTime = minute * 60 * 1000;
 
 	return hourTime + minuteTime;
 }

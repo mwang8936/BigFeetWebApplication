@@ -26,7 +26,10 @@ import {
 import Payroll from '../../../../../models/Payroll.Model';
 import User from '../../../../../models/User.Model';
 
-import { getShortMonthString } from '../../../../../utils/date.utils';
+import {
+	getBCParts,
+	getShortMonthString,
+} from '../../../../../utils/date.utils';
 import {
 	moneyToString,
 	sessionToString,
@@ -84,7 +87,7 @@ const AcupuncturistPayrollTable: FC<AcupuncturistPayrollTableProp> = ({
 			: Array.from({ length: 16 }, (_, i) => i + 16);
 
 	const data: RowData[] = days.map((day) => {
-		const scheduleData = payroll.data.find((row) => row.date.getDate() === day);
+		const scheduleData = payroll.data.find((row) => getBCParts(row.date).day === day);
 
 		if (scheduleData) {
 			return {

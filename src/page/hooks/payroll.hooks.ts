@@ -22,6 +22,7 @@ import {
 	updatePayroll,
 } from '../../service/payroll.service';
 
+import { fromBCParts } from '../../utils/date.utils';
 import {
 	createLoadingToast,
 	errorToast,
@@ -51,7 +52,8 @@ export const usePayrollsQuery = ({
 	return useQuery({
 		queryKey: [payrollsQueryKey, year, month],
 		queryFn: () => {
-			const date = new Date(year, month - 1, 1);
+			// Midnight on the 1st in BC, so the server reads the right month.
+			const date = fromBCParts({ year, month, day: 1 });
 
 			const params: GetPayrollsParam = {
 				start: date,

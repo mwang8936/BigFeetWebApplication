@@ -7,6 +7,7 @@ import EditCustomerModal from '../../miscallaneous/modals/customer/EditCustomerM
 
 import { PaginatedCustomer } from '../../../../../models/Customer.Model';
 
+import { getBCTimeZone } from '../../../../../utils/date.utils';
 import { formatPhoneNumber } from '../../../../../utils/string.utils';
 import { moneyToString } from '../../../../../utils/number.utils';
 
@@ -62,7 +63,11 @@ const CustomerItem: FC<CustomerItemProp> = ({ customer }) => {
 									className="flex gap-4 py-1 border-b last:border-b-0 text-sm"
 								>
 									<span>{reservation.service?.service_name}</span>
-									<span>{new Date(reservation.date).toLocaleDateString()}</span>
+									<span>
+										{new Date(reservation.date).toLocaleDateString(undefined, {
+											timeZone: getBCTimeZone(new Date(reservation.date)),
+										})}
+									</span>
 									<span>
 										{reservation.employee.first_name}{' '}
 										{reservation.employee.last_name}
@@ -86,7 +91,9 @@ const CustomerItem: FC<CustomerItemProp> = ({ customer }) => {
 								>
 									<span>${moneyToString(vipPackage.sold_amount)}</span>
 									<span>
-										{new Date(vipPackage.created_at).toLocaleDateString()}
+										{new Date(vipPackage.created_at).toLocaleDateString(undefined, {
+											timeZone: getBCTimeZone(new Date(vipPackage.created_at)),
+										})}
 									</span>
 								</div>
 							))}

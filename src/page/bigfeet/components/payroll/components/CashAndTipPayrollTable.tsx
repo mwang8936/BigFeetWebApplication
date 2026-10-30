@@ -17,6 +17,7 @@ import Payroll from '../../../../../models/Payroll.Model';
 import User from '../../../../../models/User.Model';
 
 import {
+	getBCParts,
 	getShortMonthString,
 	isHoliday,
 } from '../../../../../utils/date.utils';
@@ -66,7 +67,7 @@ const CashAndTipPayrollTable: FC<CashAndTipPayrollTableProp> = ({
 			: Array.from({ length: 16 }, (_, i) => i + 16);
 
 	const data: RowData[] = days.map((day) => {
-		const scheduleData = payroll.data.find((row) => row.date.getDate() === day);
+		const scheduleData = payroll.data.find((row) => getBCParts(row.date).day === day);
 
 		if (scheduleData) {
 			const totalSessions =
@@ -79,7 +80,7 @@ const CashAndTipPayrollTable: FC<CashAndTipPayrollTableProp> = ({
 				scheduleData.requested_body_sessions +
 				scheduleData.requested_feet_sessions;
 
-			const holidayPay = isHoliday(new Date(date.year, date.month - 1, day))
+			const holidayPay = isHoliday({ year: date.year, month: date.month, day })
 				? 2 * totalSessions
 				: 0;
 

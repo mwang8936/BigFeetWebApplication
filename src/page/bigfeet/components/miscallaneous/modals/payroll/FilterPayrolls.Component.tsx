@@ -25,6 +25,8 @@ import NUMBERS from '../../../../../../constants/numbers.constants';
 import { Permissions } from '../../../../../../models/enums';
 import User from '../../../../../../models/User.Model';
 
+import { getBCParts } from '../../../../../../utils/date.utils';
+
 interface FilterPayrollsProp {
 	setOpen(open: boolean): void;
 }
@@ -148,16 +150,16 @@ const FilterPayrolls: FC<FilterPayrollsProp> = ({ setOpen }) => {
 				disabledEdit={
 					yearInput !== null &&
 					monthInput !== null &&
-					((yearInput === new Date().getFullYear() &&
-						monthInput === new Date().getMonth() + 1) ||
-						(date.year === new Date().getFullYear() &&
-							date.month === new Date().getMonth() + 1))
+					((yearInput === getBCParts().year &&
+						monthInput === getBCParts().month) ||
+						(date.year === getBCParts().year &&
+							date.month === getBCParts().month))
 				}
 				editMissingPermissionMessage={'Current date already selected.'}
 				onEdit={() =>
 					onDateFiltered({
-						year: new Date().getFullYear(),
-						month: new Date().getMonth() + 1,
+						year: getBCParts().year,
+						month: getBCParts().month,
 					})
 				}
 			/>
