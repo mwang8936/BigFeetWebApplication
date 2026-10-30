@@ -1,3 +1,5 @@
+import { getBCParts, getBCTimeZone } from './date.utils';
+
 /**
  * Formats a 10-digit phone number into the (XXX) XXX-XXXX format.
  *
@@ -37,14 +39,13 @@ export const formatPhoneNumber = (phoneNumber: string) => {
  * @param date - The Date object to format.
  * @returns string - The formatted time in the format of HH:mm AM/PM.
  *
- * The function extracts the hours and minutes from the provided Date object.
+ * The function extracts the hours and minutes the provided Date object shows on a BC clock.
  * It converts the hours into a 12-hour format and ensures that single-digit minutes are padded with a leading zero.
  * The function also appends AM or PM based on the time of day.
  */
 export function formatTimeFromDate(date: Date): string {
-	// Extract hours and minutes from the date object
-	const hour = date.getHours();
-	const minute = date.getMinutes();
+	// Extract the BC hours and minutes from the date object
+	const { hour, minute } = getBCParts(date);
 
 	// Convert hours to 12-hour format and handle edge cases
 	const formattedHour = hour === 12 ? 12 : hour % 12;
@@ -91,14 +92,14 @@ export function formatTimeFromNumber(time: number): string {
  * Formats a Date object into a string suitable for use as a query key in React Query.
  *
  * @param date - The Date object to be formatted.
- * @returns string - The formatted date string in the format "MM/DD/YYYY", adjusted to the America/Los_Angeles time zone.
+ * @returns string - The formatted date string in the format "MM/DD/YYYY", adjusted to the BC time zone.
  *
  * The function converts the date into a string with the format "MM/DD/YYYY" considering the specified time zone.
  */
 export function formatDateToQueryKey(date: Date): string {
-	// Convert the date to a localized string in 'America/Los_Angeles' time zone
+	// Convert the date to a localized string in the BC time zone
 	return date.toLocaleString('en-US', {
-		timeZone: 'America/Los_Angeles', // Set the time zone to 'America/Los_Angeles'
+		timeZone: getBCTimeZone(date), // Set the time zone to BC
 		year: 'numeric', // Format year as a 4-digit number
 		month: '2-digit', // Format month as a 2-digit number
 		day: '2-digit', // Format day as a 2-digit number

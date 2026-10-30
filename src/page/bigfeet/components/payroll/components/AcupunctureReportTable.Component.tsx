@@ -19,7 +19,10 @@ import AcupunctureReport from '../../../../../models/Acupuncture-Report.Model';
 import { Language, Permissions } from '../../../../../models/enums';
 import User from '../../../../../models/User.Model';
 
-import { getShortMonthString } from '../../../../../utils/date.utils';
+import {
+	getBCParts,
+	getShortMonthString,
+} from '../../../../../utils/date.utils';
 import {
 	moneyToString,
 	percentageToString,
@@ -75,7 +78,7 @@ const AcupunctureReportTable: FC<AcupunctureReportTableProp> = ({
 
 	const data: RowData[] = days.map((day) => {
 		const scheduleData = acupunctureReport.data.find(
-			(row) => row.date.getDate() === day
+			(row) => getBCParts(row.date).day === day
 		);
 
 		if (scheduleData) {

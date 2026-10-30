@@ -4,6 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { LocalizationProvider, DesktopTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
+import {
+	fromPickerDate,
+	toPickerDate,
+} from '../../../../../utils/date.utils';
+
 import dayjs from 'dayjs';
 
 import PermissionsButton from '../PermissionsButton.Component';
@@ -91,15 +96,15 @@ const EditableTime: FC<EditableTimeProp> = ({
 					<DesktopTimePicker
 						className="editable-input"
 						label={t(label)}
-						value={time ? dayjs(time) : null}
+						// The picker edits the browser's clock, so it is shown the BC wall clock
+						// and what is picked is read back as BC time.
+						value={time ? dayjs(toPickerDate(time)) : null}
 						onChange={(time: dayjs.Dayjs | null) => {
 							if (time === null) {
 								setTime(null);
 							} else {
-								const selectedTime = time;
-								selectedTime.set('second', 0);
-								selectedTime.set('millisecond', 0);
-								setTime(selectedTime.toDate());
+								const selectedTime = time.second(0).millisecond(0);
+								setTime(fromPickerDate(selectedTime.toDate()));
 							}
 						}}
 						closeOnSelect={false}

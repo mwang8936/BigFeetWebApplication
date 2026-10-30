@@ -6,6 +6,11 @@ import dayjs from 'dayjs';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
+import {
+	fromPickerDate,
+	toPickerDate,
+} from '../../../../../utils/date.utils';
+
 interface InvalidMessage {
 	key: string;
 	value: Record<string, string | number>;
@@ -41,13 +46,13 @@ const AddDate: FC<AddDateProp> = ({ date, setDate, label, validationProp }) => {
 	}, []);
 
 	const minDay = validationProp.minDate
-		? dayjs(validationProp.minDate)
+		? dayjs(toPickerDate(validationProp.minDate))
 		: undefined;
 	minDay?.set('second', 0);
 	minDay?.set('millisecond', 0);
 
 	const maxDay = validationProp.maxDate
-		? dayjs(validationProp.maxDate)
+		? dayjs(toPickerDate(validationProp.maxDate))
 		: undefined;
 	maxDay?.set('second', 0);
 	maxDay?.set('millisecond', 0);
@@ -59,15 +64,15 @@ const AddDate: FC<AddDateProp> = ({ date, setDate, label, validationProp }) => {
 					<DesktopDatePicker
 						className="add-input"
 						label={t(label)}
-						value={dayjs(date)}
+						// The picker edits the browser's clock, so it is shown the BC wall clock
+						// and what is picked is read back as BC time.
+						value={dayjs(date && toPickerDate(date))}
 						onChange={(date: dayjs.Dayjs | null) => {
 							if (date === null) {
 								setDate(null);
 							} else {
-								const selectedDate = date;
-								selectedDate.set('second', 0);
-								selectedDate.set('millisecond', 0);
-								setDate(selectedDate.toDate());
+								const selectedDate = date.second(0).millisecond(0);
+								setDate(fromPickerDate(selectedDate.toDate()));
 							}
 						}}
 						minDate={minDay}

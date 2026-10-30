@@ -21,6 +21,7 @@ import {
 	updateReservation,
 } from '../../service/reservation.service';
 
+import { getBCParts } from '../../utils/date.utils';
 import { formatDateToQueryKey } from '../../utils/string.utils';
 import {
 	createLoadingToast,
@@ -71,16 +72,16 @@ export const useUpdateReservationMutation = ({
 			queryClient.invalidateQueries({
 				queryKey: [
 					acupunctureReportsQueryKey,
-					variables.originalDate.getFullYear(),
-					variables.originalDate.getMonth() + 1,
+					getBCParts(variables.originalDate).year,
+					getBCParts(variables.originalDate).month,
 				],
 			});
 
 			queryClient.invalidateQueries({
 				queryKey: [
 					payrollsQueryKey,
-					variables.originalDate.getFullYear(),
-					variables.originalDate.getMonth() + 1,
+					getBCParts(variables.originalDate).year,
+					getBCParts(variables.originalDate).month,
 				],
 			});
 
@@ -95,16 +96,16 @@ export const useUpdateReservationMutation = ({
 				queryClient.invalidateQueries({
 					queryKey: [
 						acupunctureReportsQueryKey,
-						variables.newDate.getFullYear(),
-						variables.newDate.getMonth() + 1,
+						getBCParts(variables.newDate).year,
+						getBCParts(variables.newDate).month,
 					],
 				});
 
 				queryClient.invalidateQueries({
 					queryKey: [
 						payrollsQueryKey,
-						variables.newDate.getFullYear(),
-						variables.newDate.getMonth() + 1,
+						getBCParts(variables.newDate).year,
+						getBCParts(variables.newDate).month,
 					],
 				});
 			}
@@ -173,16 +174,16 @@ export const useAddReservationMutation = ({
 			queryClient.invalidateQueries({
 				queryKey: [
 					acupunctureReportsQueryKey,
-					variables.request.reserved_date.getFullYear(),
-					variables.request.reserved_date.getMonth() + 1,
+					getBCParts(variables.request.reserved_date).year,
+					getBCParts(variables.request.reserved_date).month,
 				],
 			});
 
 			queryClient.invalidateQueries({
 				queryKey: [
 					payrollsQueryKey,
-					variables.request.reserved_date.getFullYear(),
-					variables.request.reserved_date.getMonth() + 1,
+					getBCParts(variables.request.reserved_date).year,
+					getBCParts(variables.request.reserved_date).month,
 				],
 			});
 
@@ -248,16 +249,16 @@ export const useDeleteReservationMutation = ({
 			queryClient.invalidateQueries({
 				queryKey: [
 					acupunctureReportsQueryKey,
-					variables.date.getFullYear(),
-					variables.date.getMonth() + 1,
+					getBCParts(variables.date).year,
+					getBCParts(variables.date).month,
 				],
 			});
 
 			queryClient.invalidateQueries({
 				queryKey: [
 					payrollsQueryKey,
-					variables.date.getFullYear(),
-					variables.date.getMonth() + 1,
+					getBCParts(variables.date).year,
+					getBCParts(variables.date).month,
 				],
 			});
 

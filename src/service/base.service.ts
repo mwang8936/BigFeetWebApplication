@@ -2,7 +2,7 @@ import { QueryClient } from '@tanstack/react-query';
 
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
-import { DateTime } from 'luxon';
+import { parseDateString } from '../utils/date.utils';
 
 import { i18n } from 'i18next';
 
@@ -76,48 +76,11 @@ function parseData(data: any) {
 			Object.keys(data).forEach((key) => {
 				const property = data[key];
 				if (typeof property === 'string') {
-					if (/^\d{4}-\d{2}-\d{2}$/.test(property)) {
-						const [year, month, day] = property.split('-').map(Number);
-						const date = new Date(year, month - 1, day);
-
-						const pstDate = new Date(
-							date.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })
-						);
-
-						data[key] = pstDate;
-					} else if (
-						/(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/.exec(
-							property
-						)
-					) {
-						const parsed = DateTime.fromISO(property);
-						if (parsed.isValid) {
-							data[key] = parsed.toJSDate();
-						} else {
-							// Pad a 0 before the day value if it is single digit
-							const normalizedInput = property
-								.split('-')
-								.map((part, i) => (i === 0 ? part : part.padStart(2, '0')))
-								.join('-');
-
-							// Parse as a date in the beginning of the day in PST (America/Los_Angeles)
-							const isoDate = DateTime.fromISO(normalizedInput, {
-								zone: 'America/Los_Angeles',
-							}).startOf('day');
-
-							if (isoDate.isValid) {
-								data[key] = isoDate.toJSDate();
-							} else {
-								data[key] = new Date(property); // Fallback to original string if parsing fails
-							}
-						}
-					} else if (
-						/((?:2[0-3]|[01]?[0-9]):[0-5][0-9]:[0-5][0-9])/.exec(property)
-					) {
-						const hours = parseInt(property.split(':')[0]);
-						const minutes = parseInt(property.split(':')[1]);
-						data[key] = new Date(1970, 1, 1, hours, minutes);
-					}
+					// Only write back converted values: arrays of plain strings (e.g.
+					// permissions) recurse into here as strings, whose characters are
+					// read only.
+					const parsed = parseDateString(property);
+					if (parsed instanceof Date) data[key] = parsed;
 				} else if (typeof property === 'object') {
 					data[key] = parseData(property);
 				}

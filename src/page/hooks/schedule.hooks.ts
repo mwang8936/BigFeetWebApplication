@@ -26,6 +26,7 @@ import {
 	updateSchedule,
 } from '../../service/schedule.service';
 
+import { getBCParts } from '../../utils/date.utils';
 import { formatDateToQueryKey } from '../../utils/string.utils';
 import {
 	createLoadingToast,
@@ -116,8 +117,8 @@ export const useUpdateScheduleMutation = ({
 			queryClient.invalidateQueries({
 				queryKey: [
 					payrollsQueryKey,
-					variables.date.getFullYear(),
-					variables.date.getMonth() + 1,
+					getBCParts(variables.date).year,
+					getBCParts(variables.date).month,
 				],
 			});
 
@@ -229,8 +230,8 @@ export const useAddScheduleMutation = ({
 			queryClient.invalidateQueries({
 				queryKey: [
 					payrollsQueryKey,
-					variables.request.date.getFullYear(),
-					variables.request.date.getMonth() + 1,
+					getBCParts(variables.request.date).year,
+					getBCParts(variables.request.date).month,
 				],
 			});
 

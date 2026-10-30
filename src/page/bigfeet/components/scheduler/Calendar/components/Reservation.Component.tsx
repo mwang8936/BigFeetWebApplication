@@ -29,7 +29,11 @@ import Reservation from '../../../../../../models/Reservation.Model';
 import Schedule from '../../../../../../models/Schedule.Model';
 import User from '../../../../../../models/User.Model';
 
-import { isPastDate } from '../../../../../../utils/date.utils';
+import {
+	getBCParts,
+	getBCTimeZone,
+	isPastDate,
+} from '../../../../../../utils/date.utils';
 import { sortEmployees } from '../../../../../../utils/employee.utils';
 import { moneyToString } from '../../../../../../utils/number.utils';
 import { getReservationOverlappingOrder } from '../../../../../../utils/reservation.utils';
@@ -116,8 +120,10 @@ const ReservationTag: FC<ReservationTagProp> = ({ reservation, colNum }) => {
 	// mt-[x%] where x=1/3 to move down one square
 	// row-span-1 is 30 min, row-span-2 is 1 hour
 
-	const startHour = reservation.reserved_date.getHours();
-	const startMinute = reservation.reserved_date.getMinutes();
+	// Position the reservation by its BC wall clock time, not the browser's.
+	const { hour: startHour, minute: startMinute } = getBCParts(
+		reservation.reserved_date
+	);
 
 	const rowStart =
 		(startHour - STORES.start) * 2 + 2 + Math.floor(startMinute / 30);
@@ -264,14 +270,22 @@ const ReservationTag: FC<ReservationTagProp> = ({ reservation, colNum }) => {
 		<span className="font-medium">{'Notes: ' + reservation.message}</span>
 	);
 
+	const reservationEndDate = new Date(
+		reservation.reserved_date.getTime() + time * (1000 * 60)
+	);
+
 	const timeText = (
 		<span className="mt-auto text-base">
 			{reservation.reserved_date
-				.toLocaleTimeString()
+				.toLocaleTimeString(undefined, {
+					timeZone: getBCTimeZone(reservation.reserved_date),
+				})
 				.replace(/(.*)\D\d+/, '$1')}{' '}
 			-{' '}
-			{new Date(reservation.reserved_date.getTime() + time * (1000 * 60))
-				.toLocaleTimeString()
+			{reservationEndDate
+				.toLocaleTimeString(undefined, {
+					timeZone: getBCTimeZone(reservationEndDate),
+				})
 				.replace(/(.*)\D\d+/, '$1')}
 		</span>
 	);
@@ -290,6 +304,7 @@ const ReservationTag: FC<ReservationTagProp> = ({ reservation, colNum }) => {
 	const updatedAtString = reservation.updated_at.toLocaleDateString(
 		localeDateFormat,
 		{
+			timeZone: getBCTimeZone(reservation.updated_at),
 			year: 'numeric',
 			month: 'long',
 			day: 'numeric',
@@ -310,6 +325,7 @@ const ReservationTag: FC<ReservationTagProp> = ({ reservation, colNum }) => {
 	const createdAtString = reservation.created_at.toLocaleDateString(
 		localeDateFormat,
 		{
+			timeZone: getBCTimeZone(reservation.created_at),
 			year: 'numeric',
 			month: 'long',
 			day: 'numeric',

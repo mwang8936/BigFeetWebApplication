@@ -38,7 +38,11 @@ import Schedule from '../../../../models/Schedule.Model';
 import User from '../../../../models/User.Model';
 import VipPackage from '../../../../models/Vip-Package.Model';
 
-import { isPastDate, sameDate } from '../../../../utils/date.utils';
+import {
+	getBCTimeZone,
+	isPastDate,
+	sameDate,
+} from '../../../../utils/date.utils';
 import { moneyToString } from '../../../../utils/number.utils';
 
 interface KeyValueText {
@@ -185,6 +189,7 @@ const Scheduler: FC = () => {
 		}
 
 		const dateString = date.toLocaleDateString(localeDateFormat, {
+			timeZone: getBCTimeZone(date),
 			year: 'numeric',
 			month: 'long',
 			day: 'numeric',

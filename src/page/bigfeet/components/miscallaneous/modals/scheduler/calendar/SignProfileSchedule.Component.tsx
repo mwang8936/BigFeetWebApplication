@@ -15,6 +15,8 @@ import { useSignProfileScheduleMutation } from '../../../../../../hooks/schedule
 import { Language } from '../../../../../../../models/enums';
 import User from '../../../../../../../models/User.Model';
 
+import { getBCTimeZone } from '../../../../../../../utils/date.utils';
+
 interface SignProfileScheduleProp {
 	setOpen(open: boolean): void;
 }
@@ -39,6 +41,7 @@ const SignProfileSchedule: FC<SignProfileScheduleProp> = ({ setOpen }) => {
 	}
 
 	const dateString = date.toLocaleDateString(localeDateFormat, {
+		timeZone: getBCTimeZone(date),
 		year: 'numeric',
 		month: 'long',
 		day: 'numeric',
